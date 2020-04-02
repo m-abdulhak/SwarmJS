@@ -5,12 +5,38 @@
     font-size: 1.2em;
     font-family: serif;
   }
-
   .key{
     display: inline-block;
     width: 500px;
     color: #34a21a;
     font-weight: 700;
+  }
+  .slider {
+    -webkit-appearance: none;
+    width: 40%;
+    height: 25px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+  }
+  .slider:hover {
+    opacity: 1;
+  }
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: #4CAF50;
+    cursor: pointer;
+  }
+  .slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: #4CAF50;
+    cursor: pointer;
   }
 </style>
 <svg width="1400" height="600"></svg>
@@ -18,6 +44,10 @@
 <label><span class="key">Unique Collisions:</span> <span id="unique-collisions">0</span></label>
 <br>
 <label><span class="key">Total Collisions-Time Instances:</span> <spane id="total-collisions">0</spane></label>
+<br>
+<label><span class="key">Timescale:</span></label>
+<br>
+<input type="range" min="0.0001" max="5.0" value=".1" step="0.001" class="slider" id="time-scale-slider">
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="libraries/d3-delaunay.js"></script>
@@ -173,8 +203,10 @@ class Scene{
   checkCollision(preventCollision = false){
     let detectedCollisions = [];
 
-    this.robots.forEach((r,i) => r.getCollisionsAgainstRobots(this.robots.slice(i+1)).forEach(d => detectedCollisions.push(d)));
-    
+    this.robots.forEach((r,i) => {
+        r.getCollisionsAgainstRobots(this.robots.slice(i+1), 0).forEach(d => detectedCollisions.push(d))
+      });
+   
     if(detectedCollisions.length > 0){
       this.totalCollisionTimeInst += detectedCollisions.length;
       detectedCollisions.forEach(d => this.pushUniqueCollisions(this.uniqueCollisions,d));
@@ -225,6 +257,7 @@ class Robot{
 
     this.id = id;
     this.position = position;
+    this.prevPosition = position;
     this.goal = goal;
     this.radius = radius;
     this.envWidth = envWidth;
@@ -239,6 +272,7 @@ class Robot{
   timeStep(timeDelta){
     this.updateVelocity();
     this.limitGoal();
+    this.prevPosition = this.position;
     this.position = this.limitPos({   x: this.position.x + this.velocity.x * timeDelta,
                                       y: this.position.y + this.velocity.y * timeDelta});
   }
@@ -314,13 +348,13 @@ class Robot{
     return distanceBetween2Points(this.position,r.position) < this.radius*2;
   }
 
-  getCollisionsAgainstRobots(robots){
+  getCollisionsAgainstRobots(robots, prevent=false){
     let collisions = [];
     robots.forEach(r => {
       if(this.collidingWithRobot(r)){
         collisions.push([Math.min(this.id, r.id), Math.max(this.id, r.id)]);
       }
-    })
+    });
     return collisions;
   }
 }
@@ -328,10 +362,11 @@ class Robot{
 // Setup
 var svg = d3.select("svg");
 var gScene = new Scene(svg, 20, 10);
-gScene.setTimeScale(1);
+gScene.setTimeScale(.1);
 
 var renderScene = function(){
   gScene.update();
+  gScene.setTimeScale(document.getElementById("time-scale-slider").value);
   document.getElementById("unique-collisions").textContent = gScene.uniqueCollisions.length;
   document.getElementById("total-collisions").textContent = gScene.totalCollisionTimeInst;
 
