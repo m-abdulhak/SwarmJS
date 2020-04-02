@@ -9,6 +9,14 @@
 <script>
 
 /**************************************************
+  ******************* Classes **********************
+  **************************************************/
+
+function distanceBetween2Points(pos1, pos2){
+  return Math.sqrt( (pos1.x - pos2.x) * (pos1.x - pos2.x) + (pos1.y - pos2.y) * (pos1.y - pos2.y));
+}
+
+/**************************************************
  ******************* Classes **********************
  **************************************************/
 
@@ -122,11 +130,11 @@ class Scene{
     this.renderer = new Renderer(svg, this);
 
     // Simulation Speed
-    this.timeScale = 1;
+    this.timeScale = 0.1;
   }
 
   setTimeScale(scale){
-    this.timeScale = scale;
+    this.timeScale = scale/10;
   }
 
   update(){
@@ -183,39 +191,84 @@ class Robot{
     this.envWidth = envWidth;
     this.envHeight = envHeight;
 
-    this.movementGoal = this.MovementGoals.Random;
-    this.setMovement(this.movementGoal);
+    // Initialize velocity according to movement goal
+    this.velocity = {x: 0, y: 0};
+    this.setMovementGoal(this.MovementGoals.GoalStraight);
 
   }
 
   timeStep(timeDelta){
+    this.updateVelocity();
     this.position = this.limitPos({   x: this.position.x + this.velocity.x * timeDelta,
                                       y: this.position.y + this.velocity.y * timeDelta});
   }
 
-  setMovement(movementGoal){
-    let vel = {};
+  setMovementGoal(movementGoal){
+    this.movementGoal = movementGoal;
 
-    if(movementGoal == this.MovementGoals.Random){
-      vel = {x: (Math.random()-0.5) * this.radius, y: (Math.random()-0.5) * this.radius};
+    switch (this.movementGoal ) {
+      case this.MovementGoals.Random:
+        this.velocity = {x: (Math.random()-0.5) * this.radius, y: (Math.random()-0.5) * this.radius};
+        break;
+      default:
+        this.updateVelocity();
+        break;
     }
+  }
 
-    this.velocity = vel;
+  updateVelocity(){
+    switch (this.movementGoal) {
+      case this.MovementGoals.Random:
+        // should not change random speed at each time step to avoid vibrating in place 
+        break;
+      case this.MovementGoals.GoalStraight:
+        this.setVelocityStraightToGoal();
+        break;
+      default:
+        break;
+    }
+  }
+
+  setVelocityStraightToGoal(){
+    if(this.reachedGoal()){
+      this.velocity = {x:0, y:0};
+    } else{
+      const xDiff = this.goal.x - this.position.x;
+      const yDiff = this.goal.y - this.position.y;
+
+      // this.velocity.x = Math.max( Math.abs(xDiff/20), this.radius/2);
+      // this.velocity.y = Math.max( Math.abs(yDiff/20), this.radius/2);
+
+      // this.velocity.x *= Math.sign(xDiff);
+      // this.velocity.y *= Math.sign(yDiff);
+      
+      this.velocity.x = xDiff/20;
+      this.velocity.y = yDiff/20;
+    }
+  }
+
+  reachedGoal(){
+    return this.getDistanceToGoal() < this.radius/2;
+  }
+
+  getDistanceToGoal(){
+    return distanceBetween2Points(this.position, this.goal);
   }
 
   limitPos(position){
-    this.velocity.x = position.x < 0 || position.x > this.envWidth ? this.velocity.x * -1 : this.velocity.x; 
-    this.velocity.y = position.y < 0 || position.y > this.envHeight ? this.velocity.y * -1 : this.velocity.y; 
+    const radius = this.radius;
+    this.velocity.x = position.x <= radius || position.x >= this.envWidth-radius ? this.velocity.x * -1 : this.velocity.x; 
+    this.velocity.y = position.y <= radius || position.y >= this.envHeight-radius ? this.velocity.y * -1 : this.velocity.y; 
 
-    return {  x: Math.min( Math.max(0, position.x), this.envWidth),
-              y: Math.min( Math.max(0, position.y), this.envHeight)};
+    return {  x: Math.min( Math.max(0, position.x), this.envWidth-radius),
+              y: Math.min( Math.max(0, position.y), this.envHeight-radius)};
   }
 }
 
 // Setup
 var svg = d3.select("svg");
-var gScene = new Scene(svg, 50, 20);
-gScene.setTimeScale(0.2);
+var gScene = new Scene(svg, 20, 20);
+gScene.setTimeScale(1);
 
 var renderScene = function(){
   gScene.update();
