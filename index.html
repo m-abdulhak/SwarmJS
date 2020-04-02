@@ -47,7 +47,7 @@
 <br>
 <label><span class="key">Timescale:</span></label>
 <br>
-<input type="range" min="0.0001" max="5.0" value=".1" step="0.001" class="slider" id="time-scale-slider">
+<input type="range" min="0.0001" max="5.0" value=".5" step="0.001" class="slider" id="time-scale-slider">
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="libraries/d3-delaunay.js"></script>
@@ -162,6 +162,7 @@ class Scene{
     this.height = svg.attr("height");
     this.numOfRobots = numOfRobots;
     this.radius = robotRadius;
+    this.collisionFreePositions = this.getCollisionFreePositions(this.numOfRobots, this.radius, this.width, this.height);
 
     // Initialize Robots
     this.robots = this.initializeRobotsRange(this.numOfRobots, this.radius, this.width, this.height);
@@ -231,20 +232,45 @@ class Scene{
   initializeRobotsRange(numOfRobots, radius, envWidth, envHeight){
     return  d3.range(numOfRobots)
               .map(i => new Robot(  i,
-                                    this.getRandSafePos(radius, envWidth, envHeight),
-                                    this.getRandSafePos(radius, envWidth, envHeight),
+                                    this.getRandCollisionFreePos(),
+                                    this.getRandCollisionFreePos(),
                                     radius,
                                     envWidth,
                                     envHeight));    
   }
 
-  getRandSafePos(radius, envWidth, envHeight){
-    return {  x: Math.random() * (envWidth - radius * 2) + radius,
-              y: Math.random() * (envHeight - radius * 2) + radius};
+  getRandCollisionFreePos(){
+    return this.collisionFreePositions.pop();
   }
 
-  getRandSafePosRange(range, radius, envWidth, envHeight){
-    return d3.range(range).map(i => this.getRandSafePos(radius, envWidth, envHeight));
+  getCollisionFreePositions(numOfRobots, radius, envWidth, envHeight){
+    const resolution = (radius*2.1);
+    let xCount = envWidth / resolution;
+    let yCount = envHeight / resolution;
+
+    if(xCount*yCount<numOfRobots*4){
+      throw "Invalid inputs, number and size of robots are too high for this environment size!"
+    }
+
+    let positions = [];
+    let i = 0;
+    while (positions.length<numOfRobots*3  && i<numOfRobots*100) {
+      const newX = Math.max(radius,Math.min(envWidth-radius,Math.floor(Math.random()*xCount)*resolution));
+      const newY = Math.max(radius,Math.min(envHeight-radius,Math.floor(Math.random()*yCount)*resolution));
+      const newPos = {x:newX, y:newY};
+
+      if(positions.findIndex(x => distanceBetween2Points(x,newPos)<radius*2.5) == -1){
+        positions.push(newPos);
+      }      
+      i++;
+    }
+    
+    if(positions.length<numOfRobots*2){
+      throw "Invalid inputs, number and size of robots are too high for this environment size!"
+    }
+
+    //console.log(positions);
+    return positions;
   }
 }
 
@@ -322,7 +348,7 @@ class Robot{
   }
 
   reachedGoal(){
-    return this.getDistanceToGoal() < this.radius/2;
+    return this.getDistanceToGoal() <= this.radius/10;
   }
 
   getDistanceToGoal(){
@@ -361,8 +387,8 @@ class Robot{
 
 // Setup
 var svg = d3.select("svg");
-var gScene = new Scene(svg, 20, 10);
-gScene.setTimeScale(.1);
+var gScene = new Scene(svg, 80, 10);
+gScene.setTimeScale(.5);
 
 var renderScene = function(){
   gScene.update();
