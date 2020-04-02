@@ -8,25 +8,25 @@
 <script src="libraries/d3-delaunay.js"></script>
 <script>
 
-
-
 /**************************************************
  ******************* Classes **********************
  **************************************************/
+
 class Renderer{
   constructor(svg, scene){
     this.scene = scene;
 
     // Create line segments between robots and corresponding goal 
-    this.scene.robotToGoalLineSegs = [];
-    this.scene.robotPositions.forEach( (el,i) => {
-    this.scene.robotToGoalLineSegs.push(svg.append("path")
+    this.scene.robotToGoalLineSegs = svg.append("g")
+            .selectAll("path")
+            .data(this.scene.robots)
+            .enter()
+            .append("path")
             .attr("fill", "none")
-            .attr("stroke", d3.schemeCategory10[i % 10])
+            .attr("stroke", (d, i) => d3.schemeCategory10[i % 10])
             .attr("stroke-width", 1)
             .attr("stroke-dasharray","10,10")
-            .attr("d", this.renderLineSeg(el.x, el.y, this.scene.goalPositions[i].x, this.scene.goalPositions[i].y)));
-    });
+            .attr("d", d => this.renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y));
 
     // Buffered Voronoi cells edges
     this.scene.BvcMesh = svg.append("path")
@@ -47,7 +47,7 @@ class Renderer{
           .attr("fill", "none")
           .attr("pointer-events", "all")
           .selectAll("path")
-          .data(this.scene.robotPositions)
+          .data(this.scene.getCurRobotsPos())
           .enter()
           .append("path")
           .attr("d", (d, i) => this.scene.voronoi.renderCell(i));
@@ -55,46 +55,46 @@ class Renderer{
     // Robots
     this.scene.robotsCircles = svg.append("g")
           .selectAll("circle")
-          .data(this.scene.robotPositions)
+          .data(this.scene.robots)
           .enter()
           .append("circle")
-          .attr("cx", d => d.x)
-          .attr("cy", d => d.y)
-          .attr("r", this.scene.radius)
+          .attr("cx", d => d.position.x)
+          .attr("cy", d => d.position.y)
+          .attr("id", d => d.id)
+          .attr("r", d => d.radius)
           .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
           .call(d3.drag()
-                .on("start", d => this.scene.robotsCircles.filter(p => p === d).raise().attr("stroke", "black"))
-                .on("drag", d => (d.x = d3.event.x, d.y = d3.event.y))
-                .on("end", d => this.scene.robotsCircles.filter(p => p === d).attr("stroke", null))
+                .on("start", d => this.scene.robotsCircles.filter(p => p.id === d.id).raise().attr("stroke", "black"))
+                .on("drag", d => (d.position.x = d3.event.x, d.position.y = d3.event.y))
+                .on("end", d => this.scene.robotsCircles.filter(p => p.id === d.id).attr("stroke", null))
                 .on("start.update drag.update end.update", this.scene.update));
 
     // Goals
     this.scene.goalsCircles = svg.append("g")
           .selectAll("circle")
-          .data(this.scene.goalPositions)
+          .data(this.scene.robots)
           .enter()
           .append("circle")
-          .attr("cx", d => d.x)
-          .attr("cy", d => d.y)
-          .attr("r", this.scene.radius/4)
+          .attr("cx", d => d.goal.x)
+          .attr("cy", d => d.goal.y)
+          .attr("id", d => d.id)
+          .attr("r", d => d.radius/4)
           .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
           .call(d3.drag()
-                .on("start", d => this.scene.goalsCircles.filter(p => p === d).raise().attr("stroke", "black"))
-                .on("drag", d => (d.x = d3.event.x, d.y = d3.event.y))
-                .on("end", d => this.scene.goalsCircles.filter(p => p === d).attr("stroke", null))
+                .on("start", d => this.scene.goalsCircles.filter(p => p.id === d.id).raise().attr("stroke", "black"))
+                .on("drag", d => (d.goal.x = d3.event.x, d.goal.y = d3.event.y))
+                .on("end", d => this.scene.goalsCircles.filter(p => p.id === d.id).attr("stroke", null))
                 .on("start.update drag.update end.update", this.scene.update));
     
   }
 
   update(){
     this.scene.vCells.attr("d", (d, i) => this.scene.voronoi.renderCell(i));
-    this.scene.robotToGoalLineSegs.forEach( (el,i) => {
-           el.attr("d", this.renderLineSeg(this.scene.robotPositions[i].x, this.scene.robotPositions[i].y, this.scene.goalPositions[i].x, this.scene.goalPositions[i].y))
-           });
+    this.scene.robotToGoalLineSegs.attr("d", d => this.renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y));
     this.scene.BvcMesh.attr("d", this.scene.voronoi.render());
     this.scene.VcMesh.attr("d", this.scene.voronoi.render());
-    this.scene.robotsCircles.attr("cx", d => d.x).attr("cy", d => d.y);
-    this.scene.goalsCircles.attr("cx", d => d.x).attr("cy", d => d.y);
+    this.scene.robotsCircles.attr("cx", d => d.position.x).attr("cy", d => d.position.y);
+    this.scene.goalsCircles.attr("cx", d => d.goal.x).attr("cy", d => d.goal.y);
   }
   
   renderLineSeg(x1,y1,x2,y2){
@@ -107,17 +107,18 @@ class Scene{
     this.svg = svg;
     this.width = svg.attr("width");
     this.height = svg.attr("height");
-    
     this.numOfRobots = numOfRobots;
     this.radius = robotRadius;
-    this.robotPositions = this.getRandSafePosRange(this.numOfRobots, this.radius, this.width, this.height);
-    this.goalPositions = this.getRandSafePosRange(this.numOfRobots, this.radius, this.width, this.height);
 
-    // Voronoi setup
+    // Initialize Robots
+    this.robots = this.initializeRobotsRange(this.numOfRobots, this.radius, this.width, this.height);
+
+    // Initialize Voronoi Diagram
     this.voronoi = Delaunay
-      .from(this.robotPositions, d => d.x, d => d.y)
+      .from(this.getCurRobotsPos(), d => d.x, d => d.y)
       .voronoi([0, 0, this.width, this.height]);
     
+    // Initialize Renderer
     this.renderer = new Renderer(svg, this);
   }
 
@@ -125,11 +126,26 @@ class Scene{
     // TODO: find alternative to using global gScene here instead of "this"
     // Using "this" is causing errors when update() is being called from svg on drag and drop oprations
     gScene.voronoi = Delaunay
-       .from(gScene.robotPositions, d => d.x, d => d.y)
+       .from(gScene.getCurRobotsPos(), d => d.x, d => d.y)
        .voronoi([0, 0, gScene.width, gScene.height]);
 
     gScene.renderer.update();
-    
+  }
+
+  getCurRobotsPos(){
+    return this.robots.map(r => r.position);
+  }
+
+  getCurGoalsPos(){
+    return this.robots.map(r => r.goal);
+  }
+
+  initializeRobotsRange(numOfRobots, radius, envWidth, envHeight){
+    return  d3.range(numOfRobots)
+              .map(i => new Robot(  i,
+                                    this.getRandSafePos(radius, envWidth, envHeight),
+                                    this.getRandSafePos(radius, envWidth, envHeight),
+                                    radius));    
   }
 
   getRandSafePos(radius, envWidth, envHeight){
@@ -143,7 +159,11 @@ class Scene{
 }
 
 class Robot{
-  constructor(position=[0,0], radius=5){
+  constructor(id, position=[0,0], goal=[0,0], radius=5){
+    this.id = id;
+    this.position = position;
+    this.goal = goal;
+    this.radius = radius;
   }
 }
 
