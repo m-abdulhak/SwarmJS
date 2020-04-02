@@ -1,9 +1,24 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
+  body{
+    font-size: 1.2em;
+    font-family: serif;
+  }
 
+  .key{
+    display: inline-block;
+    width: 500px;
+    color: #34a21a;
+    font-weight: 700;
+  }
 </style>
-<svg width="1600" height="1200"></svg>
+<svg width="1400" height="600"></svg>
+<br>
+<label><span class="key">Unique Collisions:</span> <span id="unique-collisions">0</span></label>
+<br>
+<label><span class="key">Total Collisions-Time Instances:</span> <spane id="total-collisions">0</spane></label>
+
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="libraries/d3-delaunay.js"></script>
 <script>
@@ -131,6 +146,10 @@ class Scene{
 
     // Simulation Speed
     this.timeScale = 0.1;
+
+    // Collision Detection
+    this.uniqueCollisions = [];
+    this.totalCollisionTimeInst = 0;
   }
 
   setTimeScale(scale){
@@ -142,11 +161,31 @@ class Scene{
     // Using "this" is causing errors when update() is being called from svg on drag and drop oprations
     gScene.robots.forEach(r => r.timeStep(gScene.timeScale));
 
+    gScene.checkCollision(false);
+
     gScene.voronoi = Delaunay
        .from(gScene.getCurRobotsPos(), d => d.x, d => d.y)
        .voronoi([0, 0, gScene.width, gScene.height]);
 
     gScene.renderer.update();
+  }
+
+  checkCollision(preventCollision = false){
+    let detectedCollisions = [];
+
+    this.robots.forEach((r,i) => r.getCollisionsAgainstRobots(this.robots.slice(i+1)).forEach(d => detectedCollisions.push(d)));
+    
+    if(detectedCollisions.length > 0){
+      this.totalCollisionTimeInst += detectedCollisions.length;
+      detectedCollisions.forEach(d => this.pushUniqueCollisions(this.uniqueCollisions,d));
+      //console.log(this.totalCollisionTimeInst, detectedCollisions, this.uniqueCollisions);
+    }
+  }
+
+  pushUniqueCollisions(collisionsArray, newCollision){
+    if(collisionsArray.findIndex(x => x[0]==newCollision[0] && x[1]==newCollision[1])==-1){
+      collisionsArray.push(newCollision);
+    }
   }
 
   getCurRobotsPos(){
@@ -199,6 +238,7 @@ class Robot{
 
   timeStep(timeDelta){
     this.updateVelocity();
+    this.limitGoal();
     this.position = this.limitPos({   x: this.position.x + this.velocity.x * timeDelta,
                                       y: this.position.y + this.velocity.y * timeDelta});
   }
@@ -258,20 +298,42 @@ class Robot{
   limitPos(position){
     const radius = this.radius;
     this.velocity.x = position.x <= radius || position.x >= this.envWidth-radius ? this.velocity.x * -1 : this.velocity.x; 
-    this.velocity.y = position.y <= radius || position.y >= this.envHeight-radius ? this.velocity.y * -1 : this.velocity.y; 
+    this.velocity.y = position.y <= radius || position.y >= this.envHeight-radius ? this.velocity.y * -1 : this.velocity.y;
 
-    return {  x: Math.min( Math.max(0, position.x), this.envWidth-radius),
-              y: Math.min( Math.max(0, position.y), this.envHeight-radius)};
+    return {  x: Math.min( Math.max(radius, position.x), this.envWidth-radius),
+              y: Math.min( Math.max(radius, position.y), this.envHeight-radius)};
+  }
+
+  limitGoal(){
+    const radius = this.radius;
+    this.goal = {   x: Math.min( Math.max(radius, this.goal.x), this.envWidth-radius),
+                    y: Math.min( Math.max(radius, this.goal.y), this.envHeight-radius)};  
+  }
+
+  collidingWithRobot(r){
+    return distanceBetween2Points(this.position,r.position) < this.radius*2;
+  }
+
+  getCollisionsAgainstRobots(robots){
+    let collisions = [];
+    robots.forEach(r => {
+      if(this.collidingWithRobot(r)){
+        collisions.push([Math.min(this.id, r.id), Math.max(this.id, r.id)]);
+      }
+    })
+    return collisions;
   }
 }
 
 // Setup
 var svg = d3.select("svg");
-var gScene = new Scene(svg, 20, 20);
+var gScene = new Scene(svg, 20, 10);
 gScene.setTimeScale(1);
 
 var renderScene = function(){
   gScene.update();
+  document.getElementById("unique-collisions").textContent = gScene.uniqueCollisions.length;
+  document.getElementById("total-collisions").textContent = gScene.totalCollisionTimeInst;
 
   requestAnimationFrame(renderScene);
 }
