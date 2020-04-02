@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+</style>
+<svg width="960" height="500"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="libraries/d3-delaunay.js"></script>
+<script>
+
+/**************************************************
+ ************* Helper Functions *******************
+ **************************************************/
+
+function getRandRobotPos(numOfRobots, radiusOfRobots, envWidth, envHeight){
+  return d3.range(numOfRobots).map(i => ({
+    x: Math.random() * (envWidth - radiusOfRobots * 2) + radiusOfRobots,
+    y: Math.random() * (envHeight - radiusOfRobots * 2) + radiusOfRobots,
+  }))
+}
+
+function renderLineSeg(x1,y1,x2,y2){
+  return `M${x1},${y1}L${x2},${y2}Z`
+}
+
+/**************************************************
+ ************* Voronoi Diagram ********************
+ **************************************************/
+
+// Canvas setup
+var svg = d3.select("svg");
+var width = svg.attr("width");
+var height = svg.attr("height");
+
+// Robors Setup
+var numOfRobots = 5;
+var radius = 20;
+var positions = getRandRobotPos(numOfRobots,radius,width,height);
+
+// Voronoi setup
+var voronoi = Delaunay
+  .from(positions, d => d.x, d => d.y)
+  .voronoi([0, 0, width, height]);
+
+// Voronoi cells edges
+var mesh2 = svg.append("path")
+      .attr("fill", "none")
+      .attr("stroke", "#000")
+      .attr("stroke-width", 1)
+      .attr("d", voronoi.render());
+
+// Voronoi cells
+var cell = svg.append("g")
+      .attr("fill", "none")
+      .attr("pointer-events", "all")
+      .selectAll("path")
+      .data(positions)
+      .enter()
+      .append("path")
+      .attr("d", (d, i) => voronoi.renderCell(i));
+
+// Robots
+var circle = svg.append("g")
+      .selectAll("circle")
+      .data(positions)
+      .enter()
+      .append("circle")
+      .attr("cx", d => d.x)
+      .attr("cy", d => d.y)
+      .attr("r", radius)
+      .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
+      .call(d3.drag()
+            .on("start", d => circle.filter(p => p === d).raise().attr("stroke", "black"))
+            .on("drag", d => (d.x = d3.event.x, d.y = d3.event.y))
+            .on("end", d => circle.filter(p => p === d).attr("stroke", null))
+            .on("start.update drag.update end.update", update));
+
+function update() {
+  voronoi = Delaunay.from(positions, d => d.x, d => d.y).voronoi([0, 0, width, height]);
+  cell.attr("d", (d, i) => voronoi.renderCell(i));
+  mesh.attr("d", voronoi.render());
+  circle.attr("cx", d => d.x).attr("cy", d => d.y);
+}
+</script>
