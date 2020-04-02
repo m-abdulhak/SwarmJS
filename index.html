@@ -3,7 +3,7 @@
 <style>
 
 </style>
-<svg width="960" height="500"></svg>
+<svg width="1600" height="1200"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="libraries/d3-delaunay.js"></script>
 <script>
@@ -120,11 +120,20 @@ class Scene{
     
     // Initialize Renderer
     this.renderer = new Renderer(svg, this);
+
+    // Simulation Speed
+    this.timeScale = 1;
+  }
+
+  setTimeScale(scale){
+    this.timeScale = scale;
   }
 
   update(){
     // TODO: find alternative to using global gScene here instead of "this"
     // Using "this" is causing errors when update() is being called from svg on drag and drop oprations
+    gScene.robots.forEach(r => r.timeStep(gScene.timeScale));
+
     gScene.voronoi = Delaunay
        .from(gScene.getCurRobotsPos(), d => d.x, d => d.y)
        .voronoi([0, 0, gScene.width, gScene.height]);
@@ -145,7 +154,9 @@ class Scene{
               .map(i => new Robot(  i,
                                     this.getRandSafePos(radius, envWidth, envHeight),
                                     this.getRandSafePos(radius, envWidth, envHeight),
-                                    radius));    
+                                    radius,
+                                    envWidth,
+                                    envHeight));    
   }
 
   getRandSafePos(radius, envWidth, envHeight){
@@ -159,16 +170,59 @@ class Scene{
 }
 
 class Robot{
-  constructor(id, position=[0,0], goal=[0,0], radius=5){
+  constructor(id, position, goal, radius, envWidth, envHeight){
+    // configs
+    this.MovementGoals = { Random: 0, 
+                          GoalStraight: 1, 
+                          GoalWithCollisionAvoidance: 2 };
+
     this.id = id;
     this.position = position;
     this.goal = goal;
     this.radius = radius;
+    this.envWidth = envWidth;
+    this.envHeight = envHeight;
+
+    this.movementGoal = this.MovementGoals.Random;
+    this.setMovement(this.movementGoal);
+
+  }
+
+  timeStep(timeDelta){
+    this.position = this.limitPos({   x: this.position.x + this.velocity.x * timeDelta,
+                                      y: this.position.y + this.velocity.y * timeDelta});
+  }
+
+  setMovement(movementGoal){
+    let vel = {};
+
+    if(movementGoal == this.MovementGoals.Random){
+      vel = {x: (Math.random()-0.5) * this.radius, y: (Math.random()-0.5) * this.radius};
+    }
+
+    this.velocity = vel;
+  }
+
+  limitPos(position){
+    this.velocity.x = position.x < 0 || position.x > this.envWidth ? this.velocity.x * -1 : this.velocity.x; 
+    this.velocity.y = position.y < 0 || position.y > this.envHeight ? this.velocity.y * -1 : this.velocity.y; 
+
+    return {  x: Math.min( Math.max(0, position.x), this.envWidth),
+              y: Math.min( Math.max(0, position.y), this.envHeight)};
   }
 }
 
 // Setup
 var svg = d3.select("svg");
-var gScene = new Scene(svg, 5, 20);
+var gScene = new Scene(svg, 50, 20);
+gScene.setTimeScale(0.2);
+
+var renderScene = function(){
+  gScene.update();
+
+  requestAnimationFrame(renderScene);
+}
+
+renderScene();
 
 </script>
