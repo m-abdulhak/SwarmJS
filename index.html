@@ -35,34 +35,53 @@ var height = svg.attr("height");
 // Robors Setup
 var numOfRobots = 5;
 var radius = 20;
-var positions = getRandRobotPos(numOfRobots,radius,width,height);
+var robotPositions = getRandRobotPos(numOfRobots,radius,width,height);
+var goalPositions = getRandRobotPos(numOfRobots,radius,width,height);
+var robotToGoalLineSegs = [];
+
+// Create line segments between robots and corresponding goal 
+robotPositions.forEach( (el,i) => {
+  robotToGoalLineSegs.push(svg.append("path")
+        .attr("fill", "none")
+        .attr("stroke", d3.schemeCategory10[i % 10])
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray","10,10")
+        .attr("d", renderLineSeg(el.x,el.y,goalPositions[i].x,goalPositions[i].y)));
+});
 
 // Voronoi setup
 var voronoi = Delaunay
-  .from(positions, d => d.x, d => d.y)
+  .from(robotPositions, d => d.x, d => d.y)
   .voronoi([0, 0, width, height]);
 
+// Buffered Voronoi cells edges
+var BvcMesh = svg.append("path")
+      .attr("fill", "none")
+      .attr("stroke", "#cccccc70")
+      .attr("stroke-width", radius*2)
+      .attr("d", voronoi.render());
+
 // Voronoi cells edges
-var mesh2 = svg.append("path")
+var VcMesh = svg.append("path")
       .attr("fill", "none")
       .attr("stroke", "#000")
       .attr("stroke-width", 1)
       .attr("d", voronoi.render());
 
 // Voronoi cells
-var cell = svg.append("g")
+var vCells = svg.append("g")
       .attr("fill", "none")
       .attr("pointer-events", "all")
       .selectAll("path")
-      .data(positions)
+      .data(robotPositions)
       .enter()
       .append("path")
       .attr("d", (d, i) => voronoi.renderCell(i));
 
 // Robots
-var circle = svg.append("g")
+var robotsCircles = svg.append("g")
       .selectAll("circle")
-      .data(positions)
+      .data(robotPositions)
       .enter()
       .append("circle")
       .attr("cx", d => d.x)
@@ -75,10 +94,30 @@ var circle = svg.append("g")
             .on("end", d => circle.filter(p => p === d).attr("stroke", null))
             .on("start.update drag.update end.update", update));
 
+// Goals
+var goalsCircles = svg.append("g")
+      .selectAll("circle")
+      .data(goalPositions)
+      .enter()
+      .append("circle")
+      .attr("cx", d => d.x)
+      .attr("cy", d => d.y)
+      .attr("r", 5)
+      .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
+      .call(d3.drag()
+            .on("start", d => circle.filter(p => p === d).raise().attr("stroke", "black"))
+            .on("drag", d => (d.x = d3.event.x, d.y = d3.event.y))
+            .on("end", d => circle.filter(p => p === d).attr("stroke", null))
+            .on("start.update drag.update end.update", update));
+
 function update() {
-  voronoi = Delaunay.from(positions, d => d.x, d => d.y).voronoi([0, 0, width, height]);
-  cell.attr("d", (d, i) => voronoi.renderCell(i));
-  mesh.attr("d", voronoi.render());
-  circle.attr("cx", d => d.x).attr("cy", d => d.y);
+  voronoi = Delaunay.from(robotPositions, d => d.x, d => d.y).voronoi([0, 0, width, height]);
+  vCells.attr("d", (d, i) => voronoi.renderCell(i));
+  robotToGoalLineSegs.forEach( (el,i) => {
+        el.attr("d", renderLineSeg(robotPositions[i].x,robotPositions[i].y,goalPositions[i].x,goalPositions[i].y))
+        });
+  BvcMesh.attr("d", voronoi.render());
+  VcMesh.attr("d", voronoi.render());
+  robotsCircles.attr("cx", d => d.x).attr("cy", d => d.y);
 }
 </script>
