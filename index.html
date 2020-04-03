@@ -102,7 +102,8 @@
     <select class="input-select input" id="algorithm-select" name="algorithms">
       <!-- <option value="0">Random</option> -->
       <option value="1">None (Straight To Goal)</option>
-      <option value="2" selected>Voronoi Cell</option>
+      <option value="2">Voronoi Cell</option>
+      <option value="3" selected>Buffered Voronoi Cell</option>
     </select>
   </div>
   <div class="ui-section">
@@ -354,10 +355,10 @@ class Renderer{
     this.svg.selectAll(".bvc-seg").remove();
     this.scene.BVCLineSegs = [];
     this.scene.robots.forEach((r,rIndex) => {
-      console.log(r);
+      //console.log(r);
       if(typeof(r.BVC) !== "undefined" && r.BVC.length>0){
         // Create line segments between robots and corresponding goal 
-        console.log(r.BVC);
+        //console.log(r.BVC);
         this.scene.BVCLineSegs.push(this.svg.append("g")
                 .selectAll("path")
                 .data(r.BVC)
@@ -368,10 +369,10 @@ class Renderer{
                 .attr("stroke", (d, i) => d3.schemeCategory10[rIndex % 10])
                 .attr("stroke-width", 1)
                 .attr("stroke-dasharray","10,10")
-                .attr("d", (d,i) => this.renderLineSeg(r.BVC[i].x, r.BVC[i].y, r.BVC[(i+1)%r.BVC.length].x, r.BVC[(i+1)%r.BVC.length].y))
+                .attr("d", (d,i) => this.renderLineSeg(r.BVC[i][0], r.BVC[i][1], r.BVC[(i+1)%r.BVC.length][0], r.BVC[(i+1)%r.BVC.length][1]))
                 );
       } else{
-        console.log("null");        
+        //console.log("null");        
       }
     });   
 
@@ -450,7 +451,7 @@ class Scene{
 
       for (let index = 0; index < cell.length-1; index++) {
         let lineSeg = [cell[index], cell[index+1]];
-        let shiftedLineSeg = shiftLineSegInDirOfPerpendicularBisector(lineSeg[0][0], lineSeg[0][1], lineSeg[1][0], lineSeg[1][1], r.radius);
+        let shiftedLineSeg = shiftLineSegInDirOfPerpendicularBisector(lineSeg[0][0], lineSeg[0][1], lineSeg[1][0], lineSeg[1][1], r.radius*1.2);
         shiftedLineSegs.push(shiftedLineSeg);
         //console.log("old:", lineSeg);
         //console.log("new:", shiftedLineSeg);
@@ -465,7 +466,7 @@ class Scene{
         let intersectionPoint = getIntersectionPoint( lineSeg1[0].x, lineSeg1[0].y, lineSeg1[1].x, lineSeg1[1].y,
                                                       lineSeg2[0].x, lineSeg2[0].y, lineSeg2[1].x, lineSeg2[1].y);
 
-        BVC.push(intersectionPoint);
+        BVC.push([intersectionPoint.x, intersectionPoint.y]);
         //console.log("old:", lineSeg1,lineSeg2);
         //console.log("new:", intersectionPoint);
       }    
@@ -558,7 +559,8 @@ class Robot{
     // configs
     this.MovementGoals = { Random: 0, 
                           GoalStraight: 1, 
-                          GoalWithVC: 2 };
+                          GoalWithVC: 2 , 
+                          GoalWithBVC: 3 };
 
     this.id = id;
     this.position = position;
@@ -598,7 +600,11 @@ class Robot{
         this.updateVelocity();
         break;
       case this.MovementGoals.GoalWithVC:
-        this.setTempGoalVC();
+        this.setTempGoalVC(this.VC);
+        this.updateVelocity();
+        break;
+      case this.MovementGoals.GoalWithBVC:
+        this.setTempGoalVC(this.BVC);
         this.updateVelocity();
         break;
       default:
@@ -619,7 +625,11 @@ class Robot{
         this.setVelocityTo(this.goal);
         break;
       case this.MovementGoals.GoalWithVC:
-        this.setTempGoalVC();
+        this.setTempGoalVC(this.VC);
+        this.setVelocityTo(this.tempGoal,3);
+        break;
+      case this.MovementGoals.GoalWithBVC:
+        this.setTempGoalVC(this.BVC);
         this.setVelocityTo(this.tempGoal,3);
         break;
       default:
@@ -646,13 +656,13 @@ class Robot{
     }
   }
 
-  setTempGoalVC(){
+  setTempGoalVC(cell){
     if(this.VcContains(this.goal)){
       this.tempGoal = this.goal;
       return;
     }
     
-    if(this.VC == null || this.VC.length<2){
+    if(cell == null || cell.length<2){
       this.tempGoal = this.goal;
       return;
     }
@@ -660,17 +670,17 @@ class Robot{
     var tempG = null;
     var minDist = null;
 
-    this.VC.forEach(vertex => {
-      let distGoalToVertex = distanceBetween2Points(this.goal,{x:vertex[0], y:vertex[1]});
-      if(tempG==null || distGoalToVertex < minDist){
-        tempG = {x:vertex[0], y:vertex[1]};
-        minDist = distGoalToVertex;
-      } 
-    });
+    // cell.forEach(vertex => {
+    //   let distGoalToVertex = distanceBetween2Points(this.goal,{x:vertex[0], y:vertex[1]});
+    //   if(tempG==null || distGoalToVertex < minDist){
+    //     tempG = {x:vertex[0], y:vertex[1]};
+    //     minDist = distGoalToVertex;
+    //   } 
+    // });
 
-    for (let index = 0; index < this.VC.length-1; index++) {
-      const v1 = this.VC[index];
-      const v2 = this.VC[index+1];
+    for (let index = 0; index < cell.length-1; index++) {
+      const v1 = cell[index];
+      const v2 = cell[index+1];
       let closestPointInLineSeg = closestPointInLineSegToPoint(this.goal.x, this.goal.y, v1[0], v1[1], v2[0], v2[1]);
 
       let distGoalToLineSeg = distanceBetween2Points(this.goal, closestPointInLineSeg);
@@ -685,7 +695,7 @@ class Robot{
   }
 
   VcContains(point){
-    return typeof(this.scene.voronoi) != undefined && this.scene.voronoi != null && 
+    return typeof(this.scene.voronoi) !== "undefined" && this.scene.voronoi != null && 
         this.scene.voronoi.contains(this.id, point.x, point.y);
   }
 
