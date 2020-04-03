@@ -62,7 +62,7 @@
 </div>
 <div class="ui-section">
 <label><span class="key">Timescale:</span></label>
-<input type="range" min="0.0001" max="5.0" value=".5" step="0.001" class="slider input" id="time-scale-slider">
+<input type="range" min="0.0001" max="5.0" value=".005" step="0.001" class="slider input" id="time-scale-slider">
 </div>
 <div class="ui-section">
 <label><span class="key">Robots:</span></label>
@@ -86,7 +86,8 @@
   **************************************************/
 
 function distanceBetween2Points(pos1, pos2){
-  return Math.sqrt( (pos1.x - pos2.x) * (pos1.x - pos2.x) + (pos1.y - pos2.y) * (pos1.y - pos2.y));
+  var ret =  Math.sqrt( (pos1.x - pos2.x) * (pos1.x - pos2.x) + (pos1.y - pos2.y) * (pos1.y - pos2.y));
+  return ret;
 }
 
 /**************************************************
@@ -150,6 +151,22 @@ class Renderer{
                 .on("end", d => this.scene.robotsCircles.filter(p => p.id === d.id).attr("stroke", null))
                 .on("start.update drag.update end.update", this.scene.update));
 
+    // Temp Goals
+    this.scene.tempGoalsCircles = svg.append("g")
+          .attr("fill-opacity", "40%")
+          .attr("stroke-width", 1)
+          .attr("stroke-dasharray","1,1")
+          .selectAll("circle")
+          .data(this.scene.robots)
+          .enter()
+          .append("circle")
+          .attr("cx", d => d.tempGoal.x)
+          .attr("cy", d => d.tempGoal.y)
+          .attr("id", d => d.id)
+          .attr("r", d => d.radius/1.5)
+          .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
+          .attr("stroke",  (d, i) => d3.schemeCategory10[i % 10]);
+    
     // Goals
     this.scene.goalsCircles = svg.append("g")
           .selectAll("circle")
@@ -175,6 +192,7 @@ class Renderer{
     this.scene.BvcMesh.attr("d", this.scene.voronoi.render());
     this.scene.VcMesh.attr("d", this.scene.voronoi.render());
     this.scene.robotsCircles.attr("cx", d => d.position.x).attr("cy", d => d.position.y);
+    this.scene.tempGoalsCircles.attr("cx", d => d.tempGoal.x).attr("cy", d => d.tempGoal.y);
     this.scene.goalsCircles.attr("cx", d => d.goal.x).attr("cy", d => d.goal.y);
   }
   
@@ -218,6 +236,8 @@ class Scene{
   update(){
     // TODO: find alternative to using global gScene here instead of "this"
     // Using "this" is causing errors when update() is being called from svg on drag and drop oprations
+    gScene.updateRobotsVC();
+
     gScene.robots.forEach(r => r.timeStep(gScene.timeScale));
 
     gScene.checkCollision(false);
@@ -227,6 +247,13 @@ class Scene{
        .voronoi([0, 0, gScene.width, gScene.height]);
 
     gScene.renderer.update();
+  }
+
+  updateRobotsVC(){
+    this.robots.forEach((r,i) => {
+      r.VC = this.voronoi.cellPolygon(i);
+      //console.log(r,i,this.voronoi.cellPolygon(i));
+    })
   }
 
   checkCollision(preventCollision = false){
@@ -264,7 +291,8 @@ class Scene{
                                     this.getRandCollisionFreePos(),
                                     radius,
                                     envWidth,
-                                    envHeight));    
+                                    envHeight,
+                                    this));    
   }
 
   getRandCollisionFreePos(){
@@ -303,23 +331,26 @@ class Scene{
 }
 
 class Robot{
-  constructor(id, position, goal, radius, envWidth, envHeight){
+  constructor(id, position, goal, radius, envWidth, envHeight, scene){
     // configs
     this.MovementGoals = { Random: 0, 
                           GoalStraight: 1, 
-                          GoalWithCollisionAvoidance: 2 };
+                          GoalWithVC: 2 };
 
     this.id = id;
     this.position = position;
     this.prevPosition = position;
     this.goal = goal;
+    this.tempGoal = null;
     this.radius = radius;
     this.envWidth = envWidth;
     this.envHeight = envHeight;
+    this.scene = scene;
+    this.VC = [];
 
     // Initialize velocity according to movement goal
     this.velocity = {x: 0, y: 0};
-    this.setMovementGoal(this.MovementGoals.GoalStraight);
+    this.setMovementGoal(this.MovementGoals.GoalWithVC);
 
   }
 
@@ -338,6 +369,13 @@ class Robot{
       case this.MovementGoals.Random:
         this.velocity = {x: (Math.random()-0.5) * this.radius, y: (Math.random()-0.5) * this.radius};
         break;
+      case this.MovementGoals.GoalStraight:
+        this.updateVelocity();
+        break;
+      case this.MovementGoals.GoalWithVC:
+        this.setTempGoalVC();
+        this.updateVelocity();
+        break;
       default:
         this.updateVelocity();
         break;
@@ -350,19 +388,23 @@ class Robot{
         // should not change random speed at each time step to avoid vibrating in place 
         break;
       case this.MovementGoals.GoalStraight:
-        this.setVelocityStraightToGoal();
+        this.setVelocityTo(this.goal);
+        break;
+      case this.MovementGoals.GoalWithVC:
+        this.setTempGoalVC();
+        this.setVelocityTo(this.tempGoal,3);
         break;
       default:
         break;
     }
   }
 
-  setVelocityStraightToGoal(){
-    if(this.reachedGoal()){
+  setVelocityTo(point, velocityScale = 20){
+    if(this.reached(point)){
       this.velocity = {x:0, y:0};
     } else{
-      const xDiff = this.goal.x - this.position.x;
-      const yDiff = this.goal.y - this.position.y;
+      const xDiff = point.x - this.position.x;
+      const yDiff = point.y - this.position.y;
 
       // this.velocity.x = Math.max( Math.abs(xDiff/20), this.radius/2);
       // this.velocity.y = Math.max( Math.abs(yDiff/20), this.radius/2);
@@ -370,17 +412,49 @@ class Robot{
       // this.velocity.x *= Math.sign(xDiff);
       // this.velocity.y *= Math.sign(yDiff);
       
-      this.velocity.x = xDiff/20;
-      this.velocity.y = yDiff/20;
+      this.velocity.x = xDiff/velocityScale;
+      this.velocity.y = yDiff/velocityScale;
     }
   }
 
-  reachedGoal(){
-    return this.getDistanceToGoal() <= this.radius/10;
+  setTempGoalVC(){
+    if(this.VcContains(this.goal)){
+      this.tempGoal = this.goal;
+      return;
+    }
+    
+    if(this.VC == null || this.VC.length<2){
+      this.tempGoal = this.goal;
+      return;
+    }
+
+    var tempG = null;
+    var minDist = null;
+
+    this.VC.forEach(vertex => {
+      let distGoalToVertex = distanceBetween2Points(this.goal,{x:vertex[0], y:vertex[1]});
+      if(tempG==null || distGoalToVertex < minDist){
+        tempG = {x:vertex[0], y:vertex[1]};
+        minDist = distGoalToVertex;
+      } 
+    });
+
+    this.tempGoal = tempG;
   }
 
-  getDistanceToGoal(){
-    return distanceBetween2Points(this.position, this.goal);
+  VcContains(point){
+    return typeof(this.scene.voronoi) != undefined && this.scene.voronoi != null && 
+        this.scene.voronoi.contains(this.id, point.x, point.y);
+  }
+
+  reached(point){
+    var ret = this.getDistanceTo(point) <= this.radius/10
+    return ret;
+  }
+
+  getDistanceTo(point){
+    var ret =  distanceBetween2Points(this.position, point);
+    return ret;
   }
 
   limitPos(position){
@@ -415,7 +489,7 @@ class Robot{
 
 // Setup
 var paused = false;
-var numberOfRobots = 80;
+var numberOfRobots = 2;
 var radiusOfRobots = 10;
 var svg = d3.select("svg");
 var gScene = new Scene(svg, numberOfRobots, radiusOfRobots);
