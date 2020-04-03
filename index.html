@@ -158,13 +158,85 @@ function distanceBetween2Points(pos1, pos2){
   return ret;
 }
 
+function midPointOfLineSeg(x1, y1, x2, y2){
+  return {x:(x1+x2)/2, y: (y1+y2)/2};
+}
+
+function slopeOfLineSeg(x1, y1, x2, y2){
+  if((x2-x1)==0){
+    return 99999999999;
+  }
+  return (y2-y1)/(x2-x1);
+}
+
+function slopeOfPerpendicularBisectorOfLineSeg(x1, y1, x2, y2){
+  return -1/slopeOfLineSeg(x1, y1, x2, y2);
+}
+
+function directionOfPerpendicularBisector(x1, y1, x2, y2, scale){
+  let length = distanceBetween2Points({x:x1,y:y1},{x:x2,y:y2});
+  return {x:scale*(y1-y2)/length, y:scale*(x2-x1)/length};
+}
+
+function translatePointInDirection(x1, y1, xVec, yVec){
+  return {x:x1+xVec, y:y1+yVec};
+}
+
+function shiftLineSegInDirOfPerpendicularBisector(x1, y1, x2, y2, scale){
+  let dir = directionOfPerpendicularBisector(x1, y1, x2, y2, scale);
+  let p1 = translatePointInDirection(x1, y1, dir.x, dir.y);
+  let p2 = translatePointInDirection(x2, y2, dir.x, dir.y);
+  return [p1,p2];
+}
+
+function getIntersectionPoint(line1StartX, line1StartY, line1EndX, line1EndY, line2StartX, line2StartY, line2EndX, line2EndY) {
+    // if the lines intersect, the result contains the x and y of the intersection (treating the lines as infinite) and booleans for whether line segment 1 or line segment 2 contain the point
+    var denominator, a, b, numerator1, numerator2, result = {
+        x: null,
+        y: null,
+        onLine1: false,
+        onLine2: false
+    };
+    denominator = ((line2EndY - line2StartY) * (line1EndX - line1StartX)) - ((line2EndX - line2StartX) * (line1EndY - line1StartY));
+    if (denominator == 0) {
+        return result;
+    }
+    a = line1StartY - line2StartY;
+    b = line1StartX - line2StartX;
+    numerator1 = ((line2EndX - line2StartX) * a) - ((line2EndY - line2StartY) * b);
+    numerator2 = ((line1EndX - line1StartX) * a) - ((line1EndY - line1StartY) * b);
+    a = numerator1 / denominator;
+    b = numerator2 / denominator;
+
+    // if we cast these lines infinitely in both directions, they intersect here:
+    result.x = line1StartX + (a * (line1EndX - line1StartX));
+    result.y = line1StartY + (a * (line1EndY - line1StartY));
+/*
+        // it is worth noting that this should be the same as:
+        x = line2StartX + (b * (line2EndX - line2StartX));
+        y = line2StartX + (b * (line2EndY - line2StartY));
+        */
+    // if line1 is a segment and line2 is infinite, they intersect if:
+    if (a > 0 && a < 1) {
+        result.onLine1 = true;
+    }
+    // if line2 is a segment and line1 is infinite, they intersect if:
+    if (b > 0 && b < 1) {
+        result.onLine2 = true;
+    }
+    // if line1 and line2 are segments, they intersect if both of the above are true
+    return result;
+};
+
 /**************************************************
  ******************* Classes **********************
  **************************************************/
 
 class Renderer{
   constructor(svg, scene){
+    this.svg = svg;
     this.scene = scene;
+    this.scene.BVCLineSegs = [];
 
     // Create line segments between robots and corresponding goal 
     this.scene.robotToGoalLineSegs = svg.append("g")
@@ -279,6 +351,30 @@ class Renderer{
   }
 
   update(){
+    this.svg.selectAll(".bvc-seg").remove();
+    this.scene.BVCLineSegs = [];
+    this.scene.robots.forEach((r,rIndex) => {
+      console.log(r);
+      if(typeof(r.BVC) !== "undefined" && r.BVC.length>0){
+        // Create line segments between robots and corresponding goal 
+        console.log(r.BVC);
+        this.scene.BVCLineSegs.push(this.svg.append("g")
+                .selectAll("path")
+                .data(r.BVC)
+                .enter()
+                .append("path")
+                .attr("class", "bvc-seg")
+                .attr("fill", "none")
+                .attr("stroke", (d, i) => d3.schemeCategory10[rIndex % 10])
+                .attr("stroke-width", 1)
+                .attr("stroke-dasharray","10,10")
+                .attr("d", (d,i) => this.renderLineSeg(r.BVC[i].x, r.BVC[i].y, r.BVC[(i+1)%r.BVC.length].x, r.BVC[(i+1)%r.BVC.length].y))
+                );
+      } else{
+        console.log("null");        
+      }
+    });   
+
     this.scene.vCells.attr("d", (d, i) => this.scene.voronoi.renderCell(i));
     this.scene.robotToGoalLineSegs.attr("d", d => this.renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y));
     this.scene.robotToTempGoalLineSegs.attr("d", d => this.renderLineSeg(d.position.x, d.position.y, d.tempGoal.x, d.tempGoal.y));
@@ -330,7 +426,7 @@ class Scene{
   update(){
     // TODO: find alternative to using global gScene here instead of "this"
     // Using "this" is causing errors when update() is being called from svg on drag and drop oprations
-    gScene.updateRobotsVC();
+    gScene.updateRobotsMeasurements();
 
     gScene.robots.forEach(r => r.timeStep(gScene.timeScale));
 
@@ -343,10 +439,42 @@ class Scene{
     gScene.renderer.update();
   }
 
-  updateRobotsVC(){
+  updateRobotsMeasurements(){
     this.robots.forEach((r,i) => {
-      r.VC = this.voronoi.cellPolygon(i);
+      let cell = this.voronoi.cellPolygon(i);
+      r.VC = cell;
+
+      //console.log("Robot:",i,"Cell",cell);
+      
+      let shiftedLineSegs = [];
+
+      for (let index = 0; index < cell.length-1; index++) {
+        let lineSeg = [cell[index], cell[index+1]];
+        let shiftedLineSeg = shiftLineSegInDirOfPerpendicularBisector(lineSeg[0][0], lineSeg[0][1], lineSeg[1][0], lineSeg[1][1], r.radius);
+        shiftedLineSegs.push(shiftedLineSeg);
+        //console.log("old:", lineSeg);
+        //console.log("new:", shiftedLineSeg);
+      }
+
+      let BVC = [];
+
+      for (let index = 0; index < shiftedLineSegs.length; index++) {
+        let lineSeg1 = shiftedLineSegs[index];
+        let lineSeg2 = shiftedLineSegs[(index+1)%shiftedLineSegs.length];
+
+        let intersectionPoint = getIntersectionPoint( lineSeg1[0].x, lineSeg1[0].y, lineSeg1[1].x, lineSeg1[1].y,
+                                                      lineSeg2[0].x, lineSeg2[0].y, lineSeg2[1].x, lineSeg2[1].y);
+
+        BVC.push(intersectionPoint);
+        //console.log("old:", lineSeg1,lineSeg2);
+        //console.log("new:", intersectionPoint);
+      }    
+      
+      r.BVC = BVC;
+
       //console.log(r,i,this.voronoi.cellPolygon(i));
+      //r.neighbors = Array.from(this.voronoi.neighbors(i)).map(i=> this.robots[i]);
+      //console.log(r,i,Array.from(this.voronoi.neighbors(i)).map(i=> this.robots[i]));
     })
   }
 
@@ -600,6 +728,10 @@ class Robot{
     return collisions;
   }
 }
+
+// var res = shiftLineSegInDirOfPerpendicularBisector(0,0,1,1);
+// console.log(res);
+// throw new Error("Something went badly wrong!");
 
 // Setup
 var paused = false;
