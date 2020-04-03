@@ -98,6 +98,14 @@
     <input type="range" min="2" max="50" value="10" step="1" class="slider input" id="robots-slider">
   </div>
   <div class="ui-section">
+    <label class="key">Montion Planning Algorithm:</label>
+    <select class="input-select input" id="algorithm-select" name="algorithms">
+      <!-- <option value="0">Random</option> -->
+      <option value="1">None (Straight To Goal)</option>
+      <option value="2" selected>Voronoi Cell</option>
+    </select>
+  </div>
+  <div class="ui-section">
     <label class="key">Reset:</label>
     <input type="button" value="Reset" class="input-button input" id="reset-button" onclick="resetSimulation()">
   </div>
@@ -288,7 +296,7 @@ class Renderer{
 }
 
 class Scene{
-  constructor(svg, numOfRobots, robotRadius){
+  constructor(svg, numOfRobots, robotRadius, motionPlanningAlgorithm){
     this.svg = svg;
     this.width = svg.attr("width");
     this.height = svg.attr("height");
@@ -297,7 +305,7 @@ class Scene{
     this.collisionFreePositions = this.getCollisionFreePositions(this.numOfRobots, this.radius, this.width, this.height);
 
     // Initialize Robots
-    this.robots = this.initializeRobotsRange(this.numOfRobots, this.radius, this.width, this.height);
+    this.robots = this.initializeRobotsRange(this.numOfRobots, this.radius, this.width, this.height, motionPlanningAlgorithm);
 
     // Initialize Voronoi Diagram
     this.voronoi = Delaunay
@@ -370,7 +378,7 @@ class Scene{
     return this.robots.map(r => r.goal);
   }
 
-  initializeRobotsRange(numOfRobots, radius, envWidth, envHeight){
+  initializeRobotsRange(numOfRobots, radius, envWidth, envHeight, motionPlanningAlgorithm){
     return  d3.range(numOfRobots)
               .map(i => new Robot(  i,
                                     this.getRandCollisionFreePos(),
@@ -378,7 +386,8 @@ class Scene{
                                     radius,
                                     envWidth,
                                     envHeight,
-                                    this));    
+                                    this,
+                                    motionPlanningAlgorithm));    
   }
 
   getRandCollisionFreePos(){
@@ -417,7 +426,7 @@ class Scene{
 }
 
 class Robot{
-  constructor(id, position, goal, radius, envWidth, envHeight, scene){
+  constructor(id, position, goal, radius, envWidth, envHeight, scene, motionPlanningAlgorithm){
     // configs
     this.MovementGoals = { Random: 0, 
                           GoalStraight: 1, 
@@ -436,7 +445,7 @@ class Robot{
 
     // Initialize velocity according to movement goal
     this.velocity = {x: 0, y: 0};
-    this.setMovementGoal(this.MovementGoals.GoalWithVC);
+    this.setMovementGoal(motionPlanningAlgorithm);
 
   }
 
@@ -453,9 +462,11 @@ class Robot{
 
     switch (this.movementGoal ) {
       case this.MovementGoals.Random:
+        this.tempGoal = this.goal;
         this.velocity = {x: (Math.random()-0.5) * this.radius, y: (Math.random()-0.5) * this.radius};
         break;
       case this.MovementGoals.GoalStraight:
+        this.tempGoal = this.goal;
         this.updateVelocity();
         break;
       case this.MovementGoals.GoalWithVC:
@@ -463,6 +474,7 @@ class Robot{
         this.updateVelocity();
         break;
       default:
+        this.tempGoal = this.goal;
         this.updateVelocity();
         break;
     }
@@ -471,9 +483,11 @@ class Robot{
   updateVelocity(){
     switch (this.movementGoal) {
       case this.MovementGoals.Random:
+        this.tempGoal = this.goal;
         // should not change random speed at each time step to avoid vibrating in place 
         break;
       case this.MovementGoals.GoalStraight:
+        this.tempGoal = this.goal;
         this.setVelocityTo(this.goal);
         break;
       case this.MovementGoals.GoalWithVC:
@@ -481,6 +495,7 @@ class Robot{
         this.setVelocityTo(this.tempGoal,3);
         break;
       default:
+        this.tempGoal = this.goal;
         break;
     }
   }
@@ -591,11 +606,13 @@ var paused = false;
 var numberOfRobots = 2;
 var radiusOfRobots = 10;
 var svg = d3.select("svg");
-var gScene = new Scene(svg, numberOfRobots, radiusOfRobots);
+let motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
+var gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm);
 
 var resetSimulation = function(){
   svg.selectAll("*").remove();
-  gScene = new Scene(svg, numberOfRobots, radiusOfRobots);
+  motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
+  gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm);
 }
 
 var pauseSimulation= function(){
