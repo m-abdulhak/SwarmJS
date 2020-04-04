@@ -6,6 +6,26 @@ function nxtCircIndx(i,length){
     return (i+1)%length;
   }
   
+  function closestPointInLineToPoint(x, y, x1, y1, x2, y2) {
+    var A = x - x1;
+    var B = y - y1;
+    var C = x2 - x1;
+    var D = y2 - y1;
+  
+    var dot = A * C + B * D;
+    var len_sq = C * C + D * D;
+    var param = -1;
+    if (len_sq != 0) //in case of 0 length line
+        param = dot / len_sq;
+  
+    var xx, yy;
+
+    xx = x1 + param * C;
+    yy = y1 + param * D;
+  
+    return {x:xx, y:yy};
+  }
+  
   function closestPointInLineSegToPoint(x, y, x1, y1, x2, y2) {
     var A = x - x1;
     var B = y - y1;
@@ -42,6 +62,11 @@ function nxtCircIndx(i,length){
   }
   
   
+  function distanceBetweenPointAndLine(point, point1LineSeg, point2LineSeg){
+    var ret =  distanceBetween2Points(point, closestPointInLineToPoint(point.x, point.y, point1LineSeg.x, point1LineSeg.y, point2LineSeg.x, point2LineSeg.y));
+    return ret;
+  }
+
   function distanceBetweenPointAndLineSeg(point, point1LineSeg, point2LineSeg){
     var ret =  distanceBetween2Points(point, closestPointInLineSegToPoint(point.x, point.y, point1LineSeg.x, point1LineSeg.y, point2LineSeg.x, point2LineSeg.y));
     return ret;

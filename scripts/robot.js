@@ -23,14 +23,16 @@ class Robot{
 
     // Initialize deadlock detection mechanisms
     this.deadLockDetectionEnabled = true;
-    this.deadLockDetectionDuration = 10;
+    this.deadLockDetectionDuration = 5;
     this.stuckAtTempGoalDuration = 0;
     this.detectedDeadLocksCount = 0;
     
     // Initialize deadlock recovery mechanisms
     this.deadLockRecoveryEnabled = true; 
-    this.deadLockRecoveryDuration = 30;
+    this.deadLockRecoveryDefaultDuration = 30;
+    this.deadLockRecoveryDuration = this.deadLockRecoveryDefaultDuration;
     this.performingDeadLockRecovery = 0;
+    this.consecutiveDeadlockManeuvers = 0;
   }
 
   timeStep(timeDelta){
@@ -120,7 +122,14 @@ class Robot{
       if(this.deadLockTempGoalStillValid()){
         return;
       } else{
-        this.performingDeadLockRecovery = 0;
+        if(this.detectedDeadLocksCount>1 && this.consecutiveDeadlockManeuvers == 0){
+          this.consecutiveDeadlockManeuvers += 1;
+          this.initiateDeadlockManeuver();
+          return;
+        } else{
+          this.consecutiveDeadlockManeuvers = 0;
+          this.performingDeadLockRecovery = 0;
+        }
       }
     } else if(this.deadLocked()){
       this.detectedDeadLocksCount += 1;
@@ -165,12 +174,31 @@ class Robot{
   }
 
   initiateDeadlockManeuver(){
-    this.tempGoal = this.getRandomVertex(this.BVC);
+    this.deadLockRecoveryDuration = (this.detectedDeadLocksCount+1) * this.deadLockRecoveryDefaultDuration ;
+    if(Math.random()>0.5){
+      this.tempGoal = this.getFurthestVertexFromLineSeg(this.BVC, this.position, this.goal);
+    } else{
+      this.tempGoal = this.getRandomVertex(this.BVC);
+    }
     this.performingDeadLockRecovery = this.deadLockRecoveryDuration;
   }
 
   deadLockTempGoalStillValid(){
-    return this.scene.voronoi.contains(this.id, this.tempGoal.x, this.tempGoal.y);
+    return !this.reached(this.tempGoal) && this.scene.voronoi.contains(this.id, this.tempGoal.x, this.tempGoal.y);
+  }
+
+  getFurthestVertexFromLineSeg(cell, linesSegP1, lineSegP2){
+    let bestVertex = cell[0];
+    let maxDist = null;
+
+    cell.forEach(vertex => {
+      let dist = distanceBetweenPointAndLine({x:vertex[0], y:vertex[1]}, linesSegP1, lineSegP2);
+      if(maxDist == null || dist > maxDist){
+        bestVertex = vertex;
+        maxDist = dist; 
+      }  
+    });
+    return {x:bestVertex[0], y:bestVertex[1]};
   }
 
   getRandomVertex(cell){
