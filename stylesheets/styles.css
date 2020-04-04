@@ -1,0 +1,77 @@
+body{
+    font-size: 1.2em;
+    font-family: serif;
+}
+.options{
+    text-align: center;
+}
+.ui-section{
+    position: relative;
+    min-height: 35px;
+    padding: 2PX;
+}
+.key{
+    display: inline-block;
+    position: absolute;
+    top: 2px;
+    left: 40px;
+    width: 300px;
+    color: #34a21a;
+    font-weight: 700;
+    line-height: 25px;
+}
+.input {
+    width: 40%;
+    margin: 0px;
+    background: #e7e7e7;
+    outline: none;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+.input:hover {
+    opacity: .8;
+}
+.input-text{
+    text-align: center;
+    border: none;
+}
+.input-button, .input-select, .input-text{
+    color: #4CAF50;
+    font-size: 0.8em;
+    font-weight: bold;
+    border: none;
+    height: 25PX;
+    margin-left: 2px;
+    text-align-last:center;
+}
+.input-button:active{
+    background-color: #5b5b5b;
+}
+.slider{
+    -webkit-appearance: none;
+    height: 25px;
+}
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: #4CAF50;
+    cursor: pointer;
+}
+.slider::-moz-range-thumb {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    background: #4CAF50;
+    cursor: pointer;
+}
+@media only screen and (max-width: 1023px) {
+    .ui-section{
+    min-height: 70px;
+    }
+    .key {
+    display: block;
+    position: inherit;
+    }
+}
