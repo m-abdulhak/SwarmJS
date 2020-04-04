@@ -21,6 +21,16 @@ class Robot{
     this.velocity = {x: 0, y: 0};
     this.setMovementGoal(motionPlanningAlgorithm);
 
+    // Initialize deadlock detection mechanisms
+    this.deadLockDetectionEnabled = true;
+    this.deadLockDetectionDuration = 10;
+    this.stuckAtTempGoalDuration = 0;
+    this.detectedDeadLocksCount = 0;
+    
+    // Initialize deadlock recovery mechanisms
+    this.deadLockRecoveryEnabled = true; 
+    this.deadLockRecoveryDuration = 30;
+    this.performingDeadLockRecovery = 0;
   }
 
   timeStep(timeDelta){
@@ -89,12 +99,6 @@ class Robot{
       const xDiff = point.x - this.position.x;
       const yDiff = point.y - this.position.y;
 
-      // this.velocity.x = Math.max( Math.abs(xDiff/20), this.radius/2);
-      // this.velocity.y = Math.max( Math.abs(yDiff/20), this.radius/2);
-
-      // this.velocity.x *= Math.sign(xDiff);
-      // this.velocity.y *= Math.sign(yDiff);
-      
       this.velocity.x = xDiff/velocityScale;
       this.velocity.y = yDiff/velocityScale;
     }
@@ -111,16 +115,28 @@ class Robot{
       return;
     }
 
+    if(this.performingDeadLockRecovery > 0){
+      this.performingDeadLockRecovery -= 1;
+      if(this.deadLockTempGoalStillValid()){
+        return;
+      } else{
+        this.performingDeadLockRecovery = 0;
+      }
+    } else if(this.deadLocked()){
+      this.detectedDeadLocksCount += 1;
+
+      if(this.deadLockRecoveryEnabled){
+        this.initiateDeadlockManeuver();
+        return;
+      }
+    }
+
+    this.tempGoal = this.findTempGoalInCell(cell);
+  }
+
+  findTempGoalInCell(cell){
     var tempG = null;
     var minDist = null;
-
-    // cell.forEach(vertex => {
-    //   let distGoalToVertex = distanceBetween2Points(this.goal,{x:vertex[0], y:vertex[1]});
-    //   if(tempG==null || distGoalToVertex < minDist){
-    //     tempG = {x:vertex[0], y:vertex[1]};
-    //     minDist = distGoalToVertex;
-    //   } 
-    // });
 
     for (let index = 0; index < cell.length; index++) {
       const v1 = cell[index];
@@ -135,7 +151,31 @@ class Robot{
       }
     }
 
-    this.tempGoal = tempG;
+    return tempG;
+  }
+
+  deadLocked(){
+    if(this.reached(this.tempGoal) && !this.reached(this.goal)){
+      this.stuckAtTempGoalDuration += 1;
+    } else{
+      this.stuckAtTempGoalDuration = 0;
+    }
+
+    return this.deadLockDetectionEnabled && this.stuckAtTempGoalDuration > this.deadLockDetectionDuration;
+  }
+
+  initiateDeadlockManeuver(){
+    this.tempGoal = this.getRandomVertex(this.BVC);
+    this.performingDeadLockRecovery = this.deadLockRecoveryDuration;
+  }
+
+  deadLockTempGoalStillValid(){
+    return this.scene.voronoi.contains(this.id, this.tempGoal.x, this.tempGoal.y);
+  }
+
+  getRandomVertex(cell){
+    let vertex = cell[Math.floor(Math.random()*cell.length)];
+    return {x:vertex[0], y:vertex[1]};
   }
 
   VcContains(point){
