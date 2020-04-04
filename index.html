@@ -8,6 +8,7 @@
 </head>
 <body>
   <svg width="1400" height="600"></svg>
+  <!-- <label id="mouse-pos"></label> -->
   <div class="options">
     <div class="ui-section">
       <label class="key">Unique Collisions:</label>
@@ -94,6 +95,10 @@ var changeDeadlockAlgorithm = function(){
 var pauseSimulation= function(){
   paused = !paused;
 }
+
+svg.on('mousemove', function() {
+      // document.getElementById("mouse-pos").textContent = d3.mouse(this);
+});
 
 var renderScene = function(){
   if(!paused){

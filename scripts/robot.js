@@ -31,10 +31,12 @@ class Robot{
     this.deadLockRecoveryEnabled = true; 
     this.deadLockRecoveryDefaultDuration = 30;
     this.deadLockRecoveryDuration = this.deadLockRecoveryDefaultDuration;
-    this.performingDeadLockRecovery = 0;
+    this.remainingDeadLockRecoveryTime = 0;
 
     this.multistepDeadlockEnabled = false;
-    this.consecutiveDeadlockManeuvers = 0;
+    this.remainingDeadlockManeuvers = 0;
+    this.maxConsecutiveDeadlockManeuvers = 3;
+    this.maneuverDirection = 0;
   }
 
   timeStep(timeDelta){
@@ -119,24 +121,38 @@ class Robot{
       return;
     }
 
-    if(this.performingDeadLockRecovery > 0){
-      this.performingDeadLockRecovery -= 1;
+    const continuingDeadlockRecovery = this.remainingDeadLockRecoveryTime > 0 || this.remainingDeadlockManeuvers>0;
+
+    if(continuingDeadlockRecovery){
+      this.remainingDeadLockRecoveryTime -= 1;
+
       if(this.deadLockTempGoalStillValid()){
         return;
       } else{
-        if(this.multistepDeadlockEnabled && this.detectedDeadLocksCount>1 && this.consecutiveDeadlockManeuvers == 0){
-          this.consecutiveDeadlockManeuvers += 1;
+        const shouldPerformAnotherManeuver =  this.multistepDeadlockEnabled && 
+                                              this.detectedDeadLocksCount>1 && 
+                                              this.remainingDeadlockManeuvers > 0;
+
+        if(shouldPerformAnotherManeuver){
+          this.remainingDeadlockManeuvers -= 1;
           this.initiateDeadlockManeuver();
           return;
         } else{
-          this.consecutiveDeadlockManeuvers = 0;
-          this.performingDeadLockRecovery = 0;
+          this.remainingDeadlockManeuvers = 0;
+          this.remainingDeadLockRecoveryTime = 0;
         }
       }
     } else if(this.deadLocked()){
       this.detectedDeadLocksCount += 1;
 
       if(this.deadLockRecoveryEnabled){
+        if(this.detectedDeadLocksCount>1){
+          this.remainingDeadlockManeuvers = this.maxConsecutiveDeadlockManeuvers;
+        }
+
+        let furthestPoint = this.getFurthestVertexFromLineSeg(cell, this.position, this.goal);
+        let furthestPointDir = pointOnRightSideOfVector(furthestPoint.x, furthestPoint.y, this.position.x, this.position.y, this.goal.x, this.goal.y);
+        this.maneuverDirection = furthestPointDir;
         this.initiateDeadlockManeuver();
         return;
       }
@@ -176,17 +192,35 @@ class Robot{
   }
 
   initiateDeadlockManeuver(){
-    this.deadLockRecoveryDuration = (this.detectedDeadLocksCount+1) * this.deadLockRecoveryDefaultDuration ;
+    this.deadLockRecoveryDuration = (this.detectedDeadLocksCount+1) * this.deadLockRecoveryDefaultDuration;
+    let vertecies = this.getVerteciesOnManeuverDir(this.BVC, this.position, this.goal)
     if(Math.random()>0.5){
-      this.tempGoal = this.getFurthestVertexFromLineSeg(this.BVC, this.position, this.goal);
+      this.tempGoal = this.getFurthestVertexFromLineSeg(vertecies, this.position, this.goal);
     } else{
-      this.tempGoal = this.getRandomVertex(this.BVC);
+      this.tempGoal = this.getRandomVertex(vertecies);
     }
-    this.performingDeadLockRecovery = this.deadLockRecoveryDuration;
+    this.remainingDeadLockRecoveryTime = this.deadLockRecoveryDuration;
   }
 
   deadLockTempGoalStillValid(){
     return !this.reached(this.tempGoal) && this.scene.voronoi.contains(this.id, this.tempGoal.x, this.tempGoal.y);
+  }
+
+  getVerteciesOnManeuverDir(cell, linesSegP1, lineSegP2){
+    let vertecies = [];
+
+    cell.forEach(vertex => {
+      let dir = pointOnRightSideOfVector(vertex[0], vertex[1], linesSegP1.x, linesSegP1.y, lineSegP2.x, lineSegP2.y);
+      if( dir == this.maneuverDirection){
+        vertecies.push(vertex);
+      }  
+    });
+    return vertecies;
+  }
+
+  getRandomVertex(cell){
+    let vertex = cell[Math.floor(Math.random()*cell.length)];
+    return {x:vertex[0], y:vertex[1]};
   }
 
   getFurthestVertexFromLineSeg(cell, linesSegP1, lineSegP2){
@@ -195,17 +229,12 @@ class Robot{
 
     cell.forEach(vertex => {
       let dist = distanceBetweenPointAndLine({x:vertex[0], y:vertex[1]}, linesSegP1, lineSegP2);
-      if(maxDist == null || dist > maxDist){
+      if( maxDist == null || dist > maxDist){
         bestVertex = vertex;
         maxDist = dist; 
       }  
     });
     return {x:bestVertex[0], y:bestVertex[1]};
-  }
-
-  getRandomVertex(cell){
-    let vertex = cell[Math.floor(Math.random()*cell.length)];
-    return {x:vertex[0], y:vertex[1]};
   }
 
   VcContains(point){
