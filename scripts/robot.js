@@ -32,6 +32,8 @@ class Robot{
     this.deadLockRecoveryDefaultDuration = 30;
     this.deadLockRecoveryDuration = this.deadLockRecoveryDefaultDuration;
     this.performingDeadLockRecovery = 0;
+
+    this.multistepDeadlockEnabled = false;
     this.consecutiveDeadlockManeuvers = 0;
   }
 
@@ -122,7 +124,7 @@ class Robot{
       if(this.deadLockTempGoalStillValid()){
         return;
       } else{
-        if(this.detectedDeadLocksCount>1 && this.consecutiveDeadlockManeuvers == 0){
+        if(this.multistepDeadlockEnabled && this.detectedDeadLocksCount>1 && this.consecutiveDeadlockManeuvers == 0){
           this.consecutiveDeadlockManeuvers += 1;
           this.initiateDeadlockManeuver();
           return;
@@ -248,5 +250,24 @@ class Robot{
       }
     });
     return collisions;
+  }
+  
+  setDeadlockAlgo(choice){
+    switch (choice) {
+      case 0:
+        this.deadLockRecoveryEnabled = false;
+        this.multistepDeadlockEnabled = false;    
+        break;
+      case 1:
+        this.deadLockRecoveryEnabled = true;
+        this.multistepDeadlockEnabled = false;    
+        break;
+      case 2:
+        this.deadLockRecoveryEnabled = true;
+        this.multistepDeadlockEnabled = true;    
+        break;
+      default:
+        break;
+    }
   }
 }

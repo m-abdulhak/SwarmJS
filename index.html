@@ -35,6 +35,15 @@
       </select>
     </div>
     <div class="ui-section">
+      <label class="key">Deadlock Recovery:</label>
+      <select class="input-select input" id="deadlock-select" name="deadlock" onchange="changeDeadlockAlgorithm()">
+        <!-- <option value="0">Random</option> -->
+        <option value="0" selected>None</option>
+        <option value="1">Simple</option>
+        <option value="2" >Advanced</option>
+      </select>
+    </div>
+    <div class="ui-section">
       <label class="key">Reset:</label>
       <input type="button" value="Reset" class="input-button input" id="reset-button" onclick="resetSimulation()">
     </div>
@@ -72,6 +81,14 @@ var resetSimulation = function(){
   svg.selectAll("*").remove();
   motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
   gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm);
+  changeDeadlockAlgorithm();
+}
+
+var changeDeadlockAlgorithm = function(){
+  let deadlockAlgorithm = parseInt(document.getElementById("deadlock-select").value);
+  gScene.robots.forEach(r => {
+    r.setDeadlockAlgo(deadlockAlgorithm);
+  });
 }
 
 var pauseSimulation= function(){
@@ -91,6 +108,7 @@ var renderScene = function(){
   requestAnimationFrame(renderScene);
 }
 
+changeDeadlockAlgorithm();
 renderScene();
 
 </script>
