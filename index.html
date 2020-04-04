@@ -124,6 +124,10 @@
  *************** Helper Functions *****************
  **************************************************/
 
+function nxtCircIndx(i,length){
+  return (i+1)%length;
+}
+
 function closestPointInLineSegToPoint(x, y, x1, y1, x2, y2) {
   var A = x - x1;
   var B = y - y1;
@@ -159,6 +163,12 @@ function distanceBetween2Points(pos1, pos2){
   return ret;
 }
 
+
+function distanceBetweenPointAndLineSeg(point, point1LineSeg, point2LineSeg){
+  var ret =  distanceBetween2Points(point, closestPointInLineSegToPoint(point.x, point.y, point1LineSeg.x, point1LineSeg.y, point2LineSeg.x, point2LineSeg.y));
+  return ret;
+}
+
 function midPointOfLineSeg(x1, y1, x2, y2){
   return {x:(x1+x2)/2, y: (y1+y2)/2};
 }
@@ -181,6 +191,12 @@ function directionOfPerpendicularBisector(x1, y1, x2, y2, scale){
 
 function translatePointInDirection(x1, y1, xVec, yVec){
   return {x:x1+xVec, y:y1+yVec};
+}
+
+function shiftPointOfLineSegInDirOfPerpendicularBisector(x, y, x1, y1, x2, y2, scale){
+  let dir = directionOfPerpendicularBisector(x1, y1, x2, y2, scale);
+  let p1 = translatePointInDirection(x, y, dir.x, dir.y);
+  return p1;
 }
 
 function shiftLineSegInDirOfPerpendicularBisector(x1, y1, x2, y2, scale){
@@ -369,7 +385,7 @@ class Renderer{
                 .attr("stroke", (d, i) => d3.schemeCategory10[rIndex % 10])
                 .attr("stroke-width", 1)
                 .attr("stroke-dasharray","10,10")
-                .attr("d", (d,i) => this.renderLineSeg(r.BVC[i][0], r.BVC[i][1], r.BVC[(i+1)%r.BVC.length][0], r.BVC[(i+1)%r.BVC.length][1]))
+                .attr("d", (d,i) => this.renderLineSeg(r.BVC[i][0], r.BVC[i][1], r.BVC[nxtCircIndx(i,r.BVC.length)][0], r.BVC[nxtCircIndx(i,r.BVC.length)][1]))
                 );
       } else{
         //console.log("null");        
@@ -444,8 +460,6 @@ class Scene{
     this.robots.forEach((r,i) => {
       let cell = this.voronoi.cellPolygon(i);
       r.VC = cell;
-
-      //console.log("Robot:",i,"Cell",cell);
       
       let shiftedLineSegs = [];
 
@@ -453,22 +467,43 @@ class Scene{
         let lineSeg = [cell[index], cell[index+1]];
         let shiftedLineSeg = shiftLineSegInDirOfPerpendicularBisector(lineSeg[0][0], lineSeg[0][1], lineSeg[1][0], lineSeg[1][1], r.radius*1.2);
         shiftedLineSegs.push(shiftedLineSeg);
-        //console.log("old:", lineSeg);
-        //console.log("new:", shiftedLineSeg);
       }
 
       let BVC = [];
+      let skipNext = false;
 
       for (let index = 0; index < shiftedLineSegs.length; index++) {
-        let lineSeg1 = shiftedLineSegs[index];
-        let lineSeg2 = shiftedLineSegs[(index+1)%shiftedLineSegs.length];
+        if(skipNext){
+          skipNext = false;
+          continue;
+        }
+        let vcIndx = index;
+        let vcIndx2 = nxtCircIndx(vcIndx,shiftedLineSegs.length);
+        let vcIndx3 = nxtCircIndx(vcIndx2,shiftedLineSegs.length);
+
+        let vcLineSeg1 = [{x:cell[vcIndx][0], y:cell[vcIndx][1]}, {x:cell[vcIndx2][0], y:cell[vcIndx2][1]}];
+
+        let lineSeg1 = shiftedLineSegs[vcIndx];
+        let lineSeg2 = shiftedLineSegs[vcIndx2];
+        let lineSeg3 = shiftedLineSegs[vcIndx3];
 
         let intersectionPoint = getIntersectionPoint( lineSeg1[0].x, lineSeg1[0].y, lineSeg1[1].x, lineSeg1[1].y,
                                                       lineSeg2[0].x, lineSeg2[0].y, lineSeg2[1].x, lineSeg2[1].y);
 
-        BVC.push([intersectionPoint.x, intersectionPoint.y]);
-        //console.log("old:", lineSeg1,lineSeg2);
-        //console.log("new:", intersectionPoint);
+        let intersectionPoint2 = getIntersectionPoint( lineSeg2[0].x, lineSeg2[0].y, lineSeg2[1].x, lineSeg2[1].y,
+                                                      lineSeg3[0].x, lineSeg3[0].y, lineSeg3[1].x, lineSeg3[1].y);
+
+        let dist1 = distanceBetweenPointAndLineSeg(intersectionPoint, vcLineSeg1[0], vcLineSeg1[1]);
+        let dist2 = distanceBetweenPointAndLineSeg(intersectionPoint2, vcLineSeg1[0], vcLineSeg1[1]);
+        let cond = dist2 < dist1;
+
+        if(shiftedLineSegs.length > 3 && cond){
+          // console.log("error");
+          BVC.push([intersectionPoint2.x, intersectionPoint2.y]);
+          skipNext = true;
+        }else{
+          BVC.push([intersectionPoint.x, intersectionPoint.y]);
+        }
       }    
       
       r.BVC = BVC;
