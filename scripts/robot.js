@@ -105,6 +105,11 @@ class Robot{
       const xDiff = point.x - this.position.x;
       const yDiff = point.y - this.position.y;
 
+      if(this.remainingDeadLockRecoveryTime>0){
+        this.velocity.x = xDiff;
+        this.velocity.y = xDiff;
+      }
+      
       this.velocity.x = xDiff/velocityScale;
       this.velocity.y = yDiff/velocityScale;
     }
@@ -243,7 +248,7 @@ class Robot{
   }
 
   reached(point){
-    var ret = this.getDistanceTo(point) <= this.radius/10
+    var ret = this.getDistanceTo(point) <= this.radius/10;
     return ret;
   }
 

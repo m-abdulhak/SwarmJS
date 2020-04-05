@@ -21,52 +21,6 @@ class Renderer{
             .attr("stroke-width", this.scene.radius*2)
             .attr("d", this.scene.voronoi.render());
   
-      // Robots
-      this.scene.robotsCircles = svg.append("g")
-            .selectAll("circle")
-            .data(this.scene.robots)
-            .enter()
-            .append("circle")
-            .attr("cx", d => d.position.x)
-            .attr("cy", d => d.position.y)
-            .attr("id", d => d.id)
-            .attr("r", d => d.radius)
-            .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
-            .call(d3.drag()
-                  .on("start", d => this.scene.robotsCircles.filter(p => p.id === d.id).raise().attr("stroke", "black"))
-                  .on("drag", d => (d.position.x = d3.event.x, d.position.y = d3.event.y))
-                  .on("end", d => this.scene.robotsCircles.filter(p => p.id === d.id).attr("stroke", null))
-                  .on("start.update drag.update end.update", this.scene.update));
-
-      // Goals
-      this.scene.goalsCircles = svg.append("g")
-            .selectAll("circle")
-            .data(this.scene.robots)
-            .enter()
-            .append("circle")
-            .attr("cx", d => d.goal.x)
-            .attr("cy", d => d.goal.y)
-            .attr("id", d => d.id)
-            .attr("r", d => d.radius/4)
-            .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
-            .call(d3.drag()
-                  .on("start", d => this.scene.goalsCircles.filter(p => p.id === d.id).raise().attr("stroke", "black"))
-                  .on("drag", d => (d.goal.x = d3.event.x, d.goal.y = d3.event.y))
-                  .on("end", d => this.scene.goalsCircles.filter(p => p.id === d.id).attr("stroke", null))
-                  .on("start.update drag.update end.update", this.scene.update));
-
-      // Line segments between robots and corresponding goal 
-      this.scene.robotToGoalLineSegs = svg.append("g")
-              .selectAll("path")
-              .data(this.scene.robots)
-              .enter()
-              .append("path")
-              .attr("fill", "none")
-              .attr("stroke", (d, i) => d3.schemeCategory10[i % 10])
-              .attr("stroke-width", 1)
-              .attr("stroke-dasharray","10,10")
-              .attr("d", d => this.renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y));
-  
       // Temp Goals
       this.scene.tempGoalsCircles = svg.append("g")
             .attr("fill-opacity", "40%")
@@ -106,6 +60,54 @@ class Renderer{
               .attr("stroke-width", 1)
               .attr("stroke-dasharray","1,10")
               .attr("d", d => this.renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y));    
+
+      // Robots
+      this.scene.robotsCircles = svg.append("g")
+            .selectAll("circle")
+            .data(this.scene.robots)
+            .enter()
+            .append("circle")
+            .attr("cx", d => d.position.x)
+            .attr("cy", d => d.position.y)
+            .attr("id", d => d.id)
+            .attr("r", d => d.radius)
+            .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
+            .call(d3.drag()
+                  .on("start", d => this.scene.robotsCircles.filter(p => p.id === d.id).raise().attr("stroke", "black"))
+                  .on("drag", d => (d.position.x = d3.event.x, d.position.y = d3.event.y))
+                  .on("end", d => this.scene.robotsCircles.filter(p => p.id === d.id).attr("stroke", null))
+                  .on("start.update drag.update end.update", this.scene.update));
+                  
+      // Line segments between robots and corresponding goal 
+      this.scene.robotToGoalLineSegs = svg.append("g")
+      .selectAll("path")
+      .data(this.scene.robots)
+      .enter()
+      .append("path")
+      .attr("fill", "none")
+      .attr("stroke", (d, i) => d3.schemeCategory10[i % 10])
+      .attr("stroke-width", 1)
+      .attr("stroke-dasharray","10,10")
+      .attr("d", d => this.renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y));
+
+      // Goals
+      this.scene.goalsCircles = svg.append("g")
+            .selectAll("circle")
+            .data(this.scene.robots)
+            .enter()
+            .append("circle")
+            .attr("cx", d => d.goal.x)
+            .attr("cy", d => d.goal.y)
+            .attr("id", d => d.id)
+            .attr("r", d => d.radius/4)
+            .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
+            .attr("stroke", "white")
+            .attr("stroke-dasharray","0.5,0.5")
+            .call(d3.drag()
+                  .on("start", d => this.scene.goalsCircles.filter(p => p.id === d.id).raise().attr("stroke", "black"))
+                  .on("drag", d => (d.goal.x = d3.event.x, d.goal.y = d3.event.y))
+                  .on("end", d => this.scene.goalsCircles.filter(p => p.id === d.id).attr("stroke", "lightgray"))
+                  .on("start.update drag.update end.update", this.scene.update));
     }
   
     update(activeElements){
@@ -137,23 +139,24 @@ class Renderer{
       this.scene.VcMesh.attr("d", this.scene.voronoi.render())
             .attr("stroke-opacity", activeElements.VC? "100%":"0%");
       
-      this.scene.robotsCircles.attr("cx", d => d.position.x).attr("cy", d => d.position.y)
-            .attr("stroke-opacity", activeElements.Robots? "100%":"0%")
-            .attr("fill-opacity", activeElements.Robots? "100%":"0%");
-      
-      this.scene.goalsCircles.attr("cx", d => d.goal.x).attr("cy", d => d.goal.y)
-            .attr("stroke-opacity", activeElements.Goals? "100%":"0%")
-            .attr("fill-opacity", activeElements.Goals? "100%":"0%");
-      this.scene.robotToGoalLineSegs.attr("d", d => this.renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y))
-            .attr("stroke-opacity", activeElements.Goals? "100%":"0%");
-      
       this.scene.tempGoalsCircles.attr("cx", d => d.tempGoal.x).attr("cy", d => d.tempGoal.y)
-            .attr("stroke-opacity", activeElements.TempGoals? "100%":"0%")
-            .attr("fill-opacity", activeElements.TempGoals? "100%":"0%");
+            .attr("stroke-opacity", activeElements.TempGoals? "40%":"0%")
+            .attr("fill-opacity", activeElements.TempGoals? "40%":"0%");
       this.scene.robotToTempGoalLineSegs.attr("d", d => this.renderLineSeg(d.position.x, d.position.y, d.tempGoal.x, d.tempGoal.y))
             .attr("stroke-opacity", activeElements.TempGoals? "100%":"0%");
       this.scene.tempGoalToGoalLineSegs.attr("d", d => this.renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y))
             .attr("stroke-opacity", activeElements.TempGoals? "100%":"0%");
+            
+      this.scene.robotsCircles.attr("cx", d => d.position.x).attr("cy", d => d.position.y)
+      .attr("stroke-opacity", activeElements.Robots? "100%":"0%")
+      .attr("fill-opacity", activeElements.Robots? "100%":"0%");
+      
+      this.scene.robotToGoalLineSegs.attr("d", d => this.renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y))
+            .attr("stroke-opacity", activeElements.Goals? "100%":"0%");
+      
+      this.scene.goalsCircles.attr("cx", d => d.goal.x).attr("cy", d => d.goal.y)
+            .attr("stroke-opacity", activeElements.Goals? "100%":"0%")
+            .attr("fill-opacity", activeElements.Goals? "100%":"0%");
     }
     
     renderLineSeg(x1,y1,x2,y2){
