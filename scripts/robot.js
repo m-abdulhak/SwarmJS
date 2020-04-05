@@ -224,8 +224,13 @@ class Robot{
   }
 
   getRandomVertex(cell){
-    let vertex = cell[Math.floor(Math.random()*cell.length)];
-    return {x:vertex[0], y:vertex[1]};
+    try {
+      let vertex = cell[Math.floor(Math.random()*cell.length)];
+      return {x:vertex[0], y:vertex[1]};
+      
+    } catch (error) {
+      return {x:cell[0][0], y:cell[0][1]};
+    }
   }
 
   getFurthestVertexFromLineSeg(cell, linesSegP1, lineSegP2){
