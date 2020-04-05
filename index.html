@@ -6,6 +6,8 @@
   <title>Buffered Voronoi Cell Collision Avoidance Demo</title>
   <link rel="stylesheet" href="stylesheets/styles.css">
 </head>
+<style>
+</style>
 <body>
   <svg width="1400" height="600"></svg>
   <!-- <label id="mouse-pos"></label> -->
@@ -27,6 +29,19 @@
       <input type="range" min="2" max="50" value="10" step="1" class="slider input" id="robots-slider">
     </div>
     <div class="ui-section">
+      <label class="key">Pause and Reset:</label>
+      <input type="button" value="Pause" class="input-button input half-btn" id="reset-button" onclick="pauseSimulation()">
+      <input type="button" value="Reset" class="input-button input half-btn" id="reset-button" onclick="resetSimulation()">
+    </div>
+    <div class="ui-section">
+      <label class="key">Show:</label>
+      <input type="button" value="Robots" class="input-button input small-btn active" id="robot-button" onclick="visualizeElementsChanged()">
+      <input type="button" value="Goals" class="input-button input small-btn active" id="goal-button" onclick="visualizeElementsChanged()">
+      <input type="button" value="Temp Goals" class="input-button input small-btn active" id="tempGoal-button" onclick="visualizeElementsChanged()">
+      <input type="button" value="VC" class="input-button input small-btn active" id="vc-button" onclick="visualizeElementsChanged()">
+      <input type="button" value="BVC" class="input-button input small-btn active" id="bvc-button" onclick="visualizeElementsChanged()">
+    </div>
+    <div class="ui-section">
       <label class="key">Montion Planning Algorithm:</label>
       <select class="input-select input" id="algorithm-select" name="algorithms">
         <!-- <option value="0">Random</option> -->
@@ -43,14 +58,6 @@
         <option value="1">Simple</option>
         <option value="2" >Advanced</option>
       </select>
-    </div>
-    <div class="ui-section">
-      <label class="key">Reset:</label>
-      <input type="button" value="Reset" class="input-button input" id="reset-button" onclick="resetSimulation()">
-    </div>
-    <div class="ui-section">
-      <label class="key">Pause:</label>
-      <input type="button" value="Pause" class="input-button input" id="reset-button" onclick="pauseSimulation()">
     </div>
   </div>
 
@@ -71,6 +78,7 @@
 // throw new Error("Something went badly wrong!");
 
 // Setup
+var activeElements = {Robots:1, Goals:1, TempGoals:1, VC:1, BVC:1};
 var paused = false;
 var numberOfRobots = 2;
 var radiusOfRobots = 10;
@@ -100,9 +108,22 @@ svg.on('mousemove', function() {
       // document.getElementById("mouse-pos").textContent = d3.mouse(this);
 });
 
+var visualizeElementsChanged = function(){  
+  document.getElementById(event.srcElement.id).classList.toggle("active");
+  activeElements = { Robots:elementActive("robot-button"), 
+                    Goals:elementActive("goal-button"), 
+                    TempGoals:elementActive("tempGoal-button"), 
+                    VC:elementActive("vc-button"), 
+                    BVC:elementActive("bvc-button")};
+}
+
+var elementActive = function(id){
+  return document.getElementById(id).classList.contains("active");
+}
+
 var renderScene = function(){
   if(!paused){
-    gScene.update();  
+    gScene.update(activeElements);  
   }
 
   numberOfRobots = document.getElementById("robots-slider").value;

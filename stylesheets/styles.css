@@ -47,6 +47,16 @@ body{
 .input-button:active{
     background-color: #5b5b5b;
 }
+.half-btn{
+    width: 19.8%;
+}
+.small-btn{
+    width: 7.6%;
+  }
+.small-btn.active{
+    background: #4CAF50;
+    color: white;
+}
 .slider{
     -webkit-appearance: none;
     height: 25px;

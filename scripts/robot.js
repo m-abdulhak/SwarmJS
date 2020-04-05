@@ -86,11 +86,11 @@ class Robot{
         break;
       case this.MovementGoals.GoalWithVC:
         this.setTempGoalVC(this.VC);
-        this.setVelocityTo(this.tempGoal,3);
+        this.setVelocityTo(this.tempGoal);
         break;
       case this.MovementGoals.GoalWithBVC:
         this.setTempGoalVC(this.BVC);
-        this.setVelocityTo(this.tempGoal,3);
+        this.setVelocityTo(this.tempGoal);
         break;
       default:
         this.tempGoal = this.goal;
@@ -98,7 +98,7 @@ class Robot{
     }
   }
 
-  setVelocityTo(point, velocityScale = 20){
+  setVelocityTo(point, velocityScale = 10){
     if(this.reached(point)){
       this.velocity = {x:0, y:0};
     } else{

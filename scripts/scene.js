@@ -30,7 +30,7 @@ class Scene{
       this.timeScale = scale/10;
     }
   
-    update(){
+    update(activeElements){
       // TODO: find alternative to using global gScene here instead of "this"
       // Using "this" is causing errors when update() is being called from svg on drag and drop oprations
       gScene.updateRobotsMeasurements();
@@ -43,7 +43,7 @@ class Scene{
          .from(gScene.getCurRobotsPos(), d => d.x, d => d.y)
          .voronoi([0, 0, gScene.width, gScene.height]);
   
-      gScene.renderer.update();
+      gScene.renderer.update(activeElements);
     }
   
     updateRobotsMeasurements(){
