@@ -160,3 +160,22 @@ function getIntersectionPoint(line1StartX, line1StartY, line1EndX, line1EndY, li
   // if line1 and line2 are segments, they intersect if both of the above are true
   return result;
 };
+
+function polygonArea(polygon) {
+  if(polygon == undefined || polygon.length < 3){
+    return 0;
+  }
+
+  area = 0;  // Accumulates area in the loop   
+  j = polygon.length-1;  // The last vertex is the 'previous' one to the first
+
+  for (i=0; i<polygon.length; i++)
+  { area = area +  (polygon[j][0]+polygon[i][0]) * (polygon[j][1]-polygon[i][1]); 
+      j = i;  //j is previous vertex to i
+  }   
+  return Math.abs(area/2); 
+}
+
+function circleArea(radius) {
+    return (radius * radius * Math.PI);
+}

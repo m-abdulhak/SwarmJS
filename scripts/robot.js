@@ -37,6 +37,10 @@ class Robot{
     this.remainingDeadlockManeuvers = 0;
     this.maxConsecutiveDeadlockManeuvers = 3;
     this.maneuverDirection = 0;
+
+    // Deadlock parameters
+    let robotArea = circleArea(this.radius);
+    this.bvcAreaThreshold = robotArea * 3;
   }
 
   timeStep(timeDelta){
@@ -157,7 +161,7 @@ class Robot{
 
         let furthestPoint = this.getFurthestVertexFromLineSeg(cell, this.position, this.goal);
         let furthestPointDir = pointOnRightSideOfVector(furthestPoint.x, furthestPoint.y, this.position.x, this.position.y, this.goal.x, this.goal.y);
-        this.maneuverDirection = furthestPointDir;
+        this.maneuverDirection = Math.random()>0.2 ? furthestPointDir : Math.random() > 0.5;
         this.initiateDeadlockManeuver();
         return;
       }
@@ -199,13 +203,16 @@ class Robot{
   initiateDeadlockManeuver(){
     this.deadLockRecoveryDuration = (this.detectedDeadLocksCount+1) * this.deadLockRecoveryDefaultDuration;
     let vertecies = this.getVerteciesOnManeuverDir(this.BVC, this.position, this.goal)
-    if(this.remainingDeadlockManeuvers == this.maxConsecutiveDeadlockManeuvers){
+    let bvcArea = polygonArea(this.BVC);
+    let firstStepInDeadlockRecovery = this.remainingDeadlockManeuvers == this.maxConsecutiveDeadlockManeuver;
+    let curBvcAreaIsTooSmall = bvcArea < this.bvcAreaThreshold;
+    if( firstStepInDeadlockRecovery || curBvcAreaIsTooSmall){
       this.tempGoal = this.getFurthestVertexFromLineSeg(vertecies, this.position, this.goal);
     } else{
-      if(Math.random()>0.1){
-        this.tempGoal = this.getClosestWideMidPointToGoal(this.BVC, this.position, this.goal);
-      } else{
+      if(Math.random()<0.1){
         this.tempGoal = this.getRandomVertex(vertecies);
+      } else{
+        this.tempGoal = this.getClosestWideMidPointToGoal(this.BVC, this.position, this.goal);
       }
     }
     this.remainingDeadLockRecoveryTime = this.deadLockRecoveryDuration;
