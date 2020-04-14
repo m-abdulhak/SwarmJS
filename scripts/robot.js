@@ -199,10 +199,14 @@ class Robot{
   initiateDeadlockManeuver(){
     this.deadLockRecoveryDuration = (this.detectedDeadLocksCount+1) * this.deadLockRecoveryDefaultDuration;
     let vertecies = this.getVerteciesOnManeuverDir(this.BVC, this.position, this.goal)
-    if(Math.random()>0.5){
+    if(this.remainingDeadlockManeuvers == this.maxConsecutiveDeadlockManeuvers){
       this.tempGoal = this.getFurthestVertexFromLineSeg(vertecies, this.position, this.goal);
     } else{
-      this.tempGoal = this.getRandomVertex(vertecies);
+      if(Math.random()>0.1){
+        this.tempGoal = this.getClosestWideMidPointToGoal(this.BVC, this.position, this.goal);
+      } else{
+        this.tempGoal = this.getRandomVertex(vertecies);
+      }
     }
     this.remainingDeadLockRecoveryTime = this.deadLockRecoveryDuration;
   }
@@ -229,8 +233,39 @@ class Robot{
       return {x:vertex[0], y:vertex[1]};
       
     } catch (error) {
-      return {x:cell[0][0], y:cell[0][1]};
+      if(cell !== undefined){
+        return {x:cell[0][0], y:cell[0][1]};
+      } else{
+        return this.position;
+      }
     }
+  }
+
+  getClosestWideMidPointToGoal(cell, position, goal){
+    let bestVertex = cell[0];
+    let minDist = null;
+
+    for (let index = 0; index < cell.length; index++) {
+      const p1 = cell[index];
+      const p2 = cell[nxtCircIndx(index,cell.length)];
+      const lineSegLength = distanceBetween2Points({x:p1[0], y:p1[1]}, {x:p2[0], y:p2[1]});
+      const midPoint = midPointOfLineSeg(p1[0], p1[1], p2[0], p2[1]);
+      const distToGoal = distanceBetween2Points(midPoint, goal);
+
+      if(lineSegLength < this.radius * 2 || (minDist !== null && distToGoal > minDist)){
+        continue;
+      } else {
+        bestVertex = midPoint;
+        minDist = distToGoal; 
+      }
+    }
+
+    if(minDist == null){
+      console.log("None found!");
+      bestVertex = {x:bestVertex[0], y:bestVertex[1]};
+    }
+
+    return bestVertex;
   }
 
   getFurthestVertexFromLineSeg(cell, linesSegP1, lineSegP2){

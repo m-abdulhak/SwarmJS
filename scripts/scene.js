@@ -50,6 +50,10 @@ class Scene{
       this.robots.forEach((r,i) => {
         let cell = this.voronoi.cellPolygon(i);
         r.VC = cell;
+
+        if(cell == null){
+          return;
+        }
         
         let shiftedLineSegs = [];
   
