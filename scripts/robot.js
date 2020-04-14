@@ -200,11 +200,25 @@ class Robot{
     return this.deadLockDetectionEnabled && this.stuckAtTempGoalDuration > this.deadLockDetectionDuration;
   }
 
+  deadLockExpected(){
+    if(this.reached(this.tempGoal) && !this.reached(this.goal)){
+      this.stuckAtTempGoalDuration += 1;
+    } else{
+      this.stuckAtTempGoalDuration = 0;
+    }
+
+    return this.deadLockDetectionEnabled && this.stuckAtTempGoalDuration > this.deadLockDetectionDuration;
+  }
+
+  neghiborsCloserToGoal(){
+
+  }
+
   initiateDeadlockManeuver(){
     this.deadLockRecoveryDuration = (this.detectedDeadLocksCount+1) * this.deadLockRecoveryDefaultDuration;
     let vertecies = this.getVerteciesOnManeuverDir(this.BVC, this.position, this.goal)
     let bvcArea = polygonArea(this.BVC);
-    let firstStepInDeadlockRecovery = this.remainingDeadlockManeuvers == this.maxConsecutiveDeadlockManeuver;
+    let firstStepInDeadlockRecovery = this.remainingDeadlockManeuvers == this.maxConsecutiveDeadlockManeuvers;
     let curBvcAreaIsTooSmall = bvcArea < this.bvcAreaThreshold;
     if( firstStepInDeadlockRecovery || curBvcAreaIsTooSmall){
       this.tempGoal = this.getFurthestVertexFromLineSeg(vertecies, this.position, this.goal);
