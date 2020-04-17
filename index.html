@@ -73,9 +73,8 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <script>
-// var res = shiftLineSegInDirOfPerpendicularBisector(0,0,1,1);
-// console.log(res);
-// throw new Error("Something went badly wrong!");
+  
+var timeInstance = 0;
 
 // Setup
 var activeElements = {Robots:1, Goals:1, TempGoals:1, VC:1, BVC:1};
@@ -87,6 +86,7 @@ let motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select
 var gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm);
 
 var resetSimulation = function(){
+  timeInstance = 0;
   svg.selectAll("*").remove();
   motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
   gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm);

@@ -4,7 +4,7 @@
 
 function nxtCircIndx(i,length){
     return (i+1)%length;
-  }
+}
 
 function pointOnRightSideOfVector(x, y, x1, y1, x2, y2) {
   let vec1 = {x:x-x1,y:-y+y1};
