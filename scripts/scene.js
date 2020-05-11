@@ -33,15 +33,15 @@ class Scene{
   update(activeElements){
     // TODO: find alternative to using global gScene here instead of "this"
     // Using "this" is causing errors when update() is being called from svg on drag and drop oprations
+    gScene.voronoi = Delaunay
+    .from(gScene.getCurRobotsPos(), d => d.x, d => d.y)
+    .voronoi([0, 0, gScene.width, gScene.height]);
+
     gScene.updateRobotsMeasurements();
 
     gScene.robots.forEach(r => r.timeStep(gScene.timeScale));
 
-    gScene.checkCollision(false);
-
-    gScene.voronoi = Delaunay
-        .from(gScene.getCurRobotsPos(), d => d.x, d => d.y)
-        .voronoi([0, 0, gScene.width, gScene.height]);
+    gScene.checkCollision();
 
     gScene.renderer.update(activeElements);
   }
@@ -55,57 +55,79 @@ class Scene{
         return;
       }
       
-      let shiftedLineSegs = [];
+      let shiftedCell = this.shiftPolygonInwardByLen(cell, r.radius*1.2);
 
-      for (let index = 0; index < cell.length-1; index++) {
-        let lineSeg = [cell[index], cell[index+1]];
-        let shiftedLineSeg = shiftLineSegInDirOfPerpendicularBisector(lineSeg[0][0], lineSeg[0][1], lineSeg[1][0], lineSeg[1][1], r.radius*1.2);
-        shiftedLineSegs.push(shiftedLineSeg);
-      }
-
-      let BVC = [];
-      let skipNext = false;
-
-      for (let index = 0; index < shiftedLineSegs.length; index++) {
-        if(skipNext){
-          skipNext = false;
-          continue;
-        }
-        let vcIndx = index;
-        let vcIndx2 = nxtCircIndx(vcIndx,shiftedLineSegs.length);
-        let vcIndx3 = nxtCircIndx(vcIndx2,shiftedLineSegs.length);
-
-        let vcLineSeg1 = [{x:cell[vcIndx][0], y:cell[vcIndx][1]}, {x:cell[vcIndx2][0], y:cell[vcIndx2][1]}];
-
-        let lineSeg1 = shiftedLineSegs[vcIndx];
-        let lineSeg2 = shiftedLineSegs[vcIndx2];
-        let lineSeg3 = shiftedLineSegs[vcIndx3];
-
-        let intersectionPoint = getIntersectionPoint( lineSeg1[0].x, lineSeg1[0].y, lineSeg1[1].x, lineSeg1[1].y,
-                                                      lineSeg2[0].x, lineSeg2[0].y, lineSeg2[1].x, lineSeg2[1].y);
-
-        let intersectionPoint2 = getIntersectionPoint( lineSeg2[0].x, lineSeg2[0].y, lineSeg2[1].x, lineSeg2[1].y,
-                                                      lineSeg3[0].x, lineSeg3[0].y, lineSeg3[1].x, lineSeg3[1].y);
-
-        let dist1 = distanceBetweenPointAndLineSeg(intersectionPoint, vcLineSeg1[0], vcLineSeg1[1]);
-        let dist2 = distanceBetweenPointAndLineSeg(intersectionPoint2, vcLineSeg1[0], vcLineSeg1[1]);
-        let cond = dist2 < dist1;
-
-        if(shiftedLineSegs.length > 3 && cond){
-          BVC.push([intersectionPoint2.x, intersectionPoint2.y]);
-          skipNext = true;
-        }else{
-          BVC.push([intersectionPoint.x, intersectionPoint.y]);
-        }
-      }    
-      
-      r.BVC = BVC;
+      r.BVC = this.getBvcFromShiftedCell(cell, shiftedCell);
     })
   }
 
-  checkCollision(preventCollision = false){
+  shiftPolygonInwardByLen(cell, len){
+    let shiftedLineSegs = [];
+
+    for (let index = 0; index < cell.length-1; index++) {
+      let lineSeg = [cell[index], cell[index+1]];
+      let shiftedLineSeg = shiftLineSegInDirOfPerpendicularBisector(lineSeg[0][0], lineSeg[0][1], lineSeg[1][0], lineSeg[1][1], len);
+      shiftedLineSegs.push(shiftedLineSeg);
+    }
+
+    return shiftedLineSegs;
+  }
+
+  getBvcFromShiftedCell(cell, shiftedCell){
+    let BVC = [];
+    let skipNext = false;
+
+    for (let index = 0; index < shiftedCell.length; index++) {
+      if(skipNext){
+        skipNext = false;
+        continue;
+      }
+      
+      let intersectionPoint = this.getIntersectionPoint(cell, shiftedCell, index, skipNext);
+      skipNext = intersectionPoint.next;
+      
+      BVC.push(intersectionPoint.point);
+    }   
+
+    return BVC;
+  }
+
+  getIntersectionPoint(cell, shiftedLineSegs, index, skipNext){
+    let vcIndx = index;
+    let vcIndx2 = nxtCircIndx(vcIndx,shiftedLineSegs.length);
+    let vcIndx3 = nxtCircIndx(vcIndx2,shiftedLineSegs.length);
+
+    let vcLineSeg1 = [{x:cell[vcIndx][0], y:cell[vcIndx][1]}, {x:cell[vcIndx2][0], y:cell[vcIndx2][1]}];
+
+    let lineSeg1 = shiftedLineSegs[vcIndx];
+    let lineSeg2 = shiftedLineSegs[vcIndx2];
+    let lineSeg3 = shiftedLineSegs[vcIndx3];
+
+    let intersectionPoint = getIntersectionPoint( lineSeg1[0].x, lineSeg1[0].y, lineSeg1[1].x, lineSeg1[1].y,
+                                                  lineSeg2[0].x, lineSeg2[0].y, lineSeg2[1].x, lineSeg2[1].y);
+
+    let intersectionPoint2 = getIntersectionPoint( lineSeg2[0].x, lineSeg2[0].y, lineSeg2[1].x, lineSeg2[1].y,
+                                                  lineSeg3[0].x, lineSeg3[0].y, lineSeg3[1].x, lineSeg3[1].y);
+
+    let dist1 = distanceBetweenPointAndLineSeg(intersectionPoint, vcLineSeg1[0], vcLineSeg1[1]);
+    let dist2 = distanceBetweenPointAndLineSeg(intersectionPoint2, vcLineSeg1[0], vcLineSeg1[1]);
+    let cond = dist2 < dist1;
+
+    if(shiftedLineSegs.length > 3 && cond){
+      skipNext = true;
+      
+      let intersectionPoint3 = getIntersectionPoint( lineSeg1[0].x, lineSeg1[0].y, lineSeg1[1].x, lineSeg1[1].y,
+                                                     lineSeg3[0].x, lineSeg3[0].y, lineSeg3[1].x, lineSeg3[1].y);
+
+      return {point: [intersectionPoint3.x, intersectionPoint3.y], next:skipNext};
+    } else{
+      return {point: [intersectionPoint.x, intersectionPoint.y], next:skipNext};
+    }
+  }
+
+  checkCollision(){
     timeInstance += 1/this.timeScale
-    console.log("TimeInstance",timeInstance);
+    //console.log("TimeInstance",timeInstance);
     
     let detectedCollisions = [];
 
