@@ -51,12 +51,22 @@ class Scene{
       let cell = this.voronoi.cellPolygon(i);
       r.VC = cell;
 
-      if(cell == null){
+      if(cell == null || cell == undefined || cell.length < 3){
         return;
       }
       
       var offset = new Offset();
-      var padding = offset.data(cell).padding(r.radius*1.2)[0];
+      var padding = [];
+      
+      try {
+        padding = offset.data(cell).padding(r.radius*1.2)[0]
+      }
+      catch(err) {
+        // On collisions, if voronoi cell is too small => BVC is undefined
+        // Should not occur in collision-free configurations
+        //console.log(err);
+        padding = [[r.position.x, r.position.y]];
+      }
       
       r.BVC = padding;
     })
