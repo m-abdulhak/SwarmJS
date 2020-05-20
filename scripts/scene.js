@@ -24,6 +24,9 @@ class Scene{
     // Collision Detection
     this.uniqueCollisions = [];
     this.totalCollisionTimeInst = 0;
+
+    // Total Robot-Goal Distances
+    this.distance = null;
   }
 
   setTimeScale(scale){
@@ -44,6 +47,8 @@ class Scene{
     gScene.checkCollision();
 
     gScene.renderer.update(activeElements);
+
+    gScene.updateDistance();
   }
 
   updateRobotsMeasurements(){
@@ -55,21 +60,25 @@ class Scene{
         return;
       }
       
-      var offset = new Offset();
-      var padding = [];
-      
-      try {
-        padding = offset.data(cell).padding(r.radius*1.2)[0]
-      }
-      catch(err) {
-        // On collisions, if voronoi cell is too small => BVC is undefined
-        // Should not occur in collision-free configurations
-        //console.log(err);
-        padding = [[r.position.x, r.position.y]];
-      }
-      
-      r.BVC = padding;
+      r.BVC = this.calculateBVCfromVC(cell, r);
     })
+  }
+
+  calculateBVCfromVC(cell, r){
+    var offset = new Offset();
+    var padding = [];
+    
+    try {
+      padding = offset.data(cell).padding(r.radius*1.2)[0]
+    }
+    catch(err) {
+      // On collisions, if voronoi cell is too small => BVC is undefined
+      // Should not occur in collision-free configurations
+      console.log(err);
+      padding = [[r.position.x, r.position.y]];
+    }
+
+    return padding;
   }
 
   checkCollision(){
@@ -92,6 +101,17 @@ class Scene{
     if(collisionsArray.findIndex(x => x[0]==newCollision[0] && x[1]==newCollision[1])==-1){
       collisionsArray.push(newCollision);
     }
+  }
+
+  updateDistance(){
+    let dis = 0;
+    
+    this.robots.forEach( r =>{
+      dis += r.getDistanceTo(r.goal)/100;
+    }
+    );
+
+    this.distance = dis;
   }
 
   getCurRobotsPos(){
