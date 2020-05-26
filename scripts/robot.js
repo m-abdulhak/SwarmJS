@@ -1,10 +1,8 @@
 class Robot{
   constructor(id, position, goal, radius, envWidth, envHeight, scene, motionPlanningAlgorithm){
     // configs
-    this.MovementGoals = { Random: 0, 
-                          GoalStraight: 1, 
-                          GoalWithVC: 2 , 
-                          GoalWithBVC: 3 };
+    this.MovementGoals = { Goal: 1,
+                          InBVC: 3 };
 
     this.id = id;
     this.position = position;
@@ -25,13 +23,10 @@ class Robot{
     this.deadLockDetectionEnabled = true;
     this.deadLockDetectionDuration = 5;
     this.stuckAtTempGoalDuration = 0;
-    this.detectedDeadLocksCount = 0;
     
     // Initialize deadlock recovery mechanisms
     this.deadLockRecoveryEnabled = true; 
-    this.deadLockRecoveryDefaultDuration = 30;
-    this.deadLockRecoveryDuration = this.deadLockRecoveryDefaultDuration;
-    this.remainingDeadLockRecoveryTime = 0;
+    this.deadLockManeuverInProgress = false;
 
     this.multistepDeadlockEnabled = false;
     this.remainingDeadlockManeuvers = 0;
@@ -43,32 +38,16 @@ class Robot{
     this.bvcAreaThreshold = robotArea * 3;
   }
 
-  timeStep(timeDelta){
-    this.updateVelocity();
-    this.limitGoal();
-    this.prevPosition = this.position;
-    this.position = this.limitPos({   x: this.position.x + this.velocity.x * timeDelta,
-                                      y: this.position.y + this.velocity.y * timeDelta});
-  }
-
   setMovementGoal(movementGoal){
     this.movementGoal = movementGoal;
 
     switch (this.movementGoal ) {
-      case this.MovementGoals.Random:
-        this.tempGoal = this.goal;
-        this.velocity = {x: (Math.random()-0.5) * this.radius, y: (Math.random()-0.5) * this.radius};
-        break;
-      case this.MovementGoals.GoalStraight:
+      case this.MovementGoals.Goal:
         this.tempGoal = this.goal;
         this.updateVelocity();
         break;
-      case this.MovementGoals.GoalWithVC:
-        this.setTempGoalVC(this.VC);
-        this.updateVelocity();
-        break;
-      case this.MovementGoals.GoalWithBVC:
-        this.setTempGoalVC(this.BVC);
+      case this.MovementGoals.InBVC:
+        this.setTempGoalInCell(this.BVC);
         this.updateVelocity();
         break;
       default:
@@ -78,22 +57,22 @@ class Robot{
     }
   }
 
+  timeStep(timeDelta){
+    this.updateVelocity();
+    this.limitGoal();
+    this.prevPosition = this.position;
+    this.position = this.limitPos({   x: this.position.x + this.velocity.x * timeDelta,
+                                      y: this.position.y + this.velocity.y * timeDelta});
+  }
+
   updateVelocity(){
     switch (this.movementGoal) {
-      case this.MovementGoals.Random:
-        this.tempGoal = this.goal;
-        // should not change random speed at each time step to avoid vibrating in place 
-        break;
-      case this.MovementGoals.GoalStraight:
+      case this.MovementGoals.Goal:
         this.tempGoal = this.goal;
         this.setVelocityTo(this.goal);
         break;
-      case this.MovementGoals.GoalWithVC:
-        this.setTempGoalVC(this.VC);
-        this.setVelocityTo(this.tempGoal);
-        break;
-      case this.MovementGoals.GoalWithBVC:
-        this.setTempGoalVC(this.BVC);
+      case this.MovementGoals.InBVC:
+        this.setTempGoalInCell(this.BVC);
         this.setVelocityTo(this.tempGoal);
         break;
       default:
@@ -109,7 +88,7 @@ class Robot{
       const xDiff = point.x - this.position.x;
       const yDiff = point.y - this.position.y;
 
-      if(this.remainingDeadLockRecoveryTime>0){
+      if(this.deadLockManeuverInProgress){
         this.velocity.x = xDiff;
         this.velocity.y = xDiff;
       }
@@ -119,58 +98,64 @@ class Robot{
     }
   }
 
-  setTempGoalVC(cell){
-    if(this.VcContains(this.goal)){
-      this.tempGoal = this.goal;
-      return;
-    }
-    
+  setTempGoalInCell(cell){
+    // If cell is undefined (shouldn't happen in collision-free configurations) => set localgoal = goal
     if(cell == null || cell.length<2){
       this.tempGoal = this.goal;
       return;
     }
 
-    const continuingDeadlockRecovery = this.remainingDeadLockRecoveryTime > 0 || this.remainingDeadlockManeuvers>0;
-
-    if(continuingDeadlockRecovery){
-      this.remainingDeadLockRecoveryTime -= 1;
-
-      if(this.deadLockTempGoalStillValid()){
-        return;
-      } else{
-        const shouldPerformAnotherManeuver =  this.multistepDeadlockEnabled && 
-                                              this.detectedDeadLocksCount>1 && 
-                                              this.remainingDeadlockManeuvers > 0;
-
-        if(shouldPerformAnotherManeuver){
-          this.remainingDeadlockManeuvers -= 1;
-          this.initiateDeadlockManeuver();
-          return;
-        } else{
-          this.remainingDeadlockManeuvers = 0;
-          this.remainingDeadLockRecoveryTime = 0;
-        }
-      }
-    } else if(this.deadLocked()){
-      this.detectedDeadLocksCount += 1;
-
-      if(this.deadLockRecoveryEnabled){
-        if(this.detectedDeadLocksCount>1){
-          this.remainingDeadlockManeuvers = this.maxConsecutiveDeadlockManeuvers;
-        }
-
-        let furthestPoint = this.getFurthestVertexFromLineSeg(cell, this.position, this.goal);
-        let furthestPointDir = pointOnRightSideOfVector(furthestPoint.x, furthestPoint.y, this.position.x, this.position.y, this.goal.x, this.goal.y);
-        this.maneuverDirection = Math.random()>0.2 ? furthestPointDir : Math.random() > 0.5;
-        this.initiateDeadlockManeuver();
-        return;
-      }
+    // If the goal is within the Voronoi cell => set localgoal = goal
+    if(this.VcContains(this.goal)){
+      this.tempGoal = this.goal;
+      return;
     }
 
-    this.tempGoal = this.findTempGoalInCell(cell);
+    // If deadlocked or deadlock is expected or currently recovering from deadlock
+    // set local goal according to deadlock recovery policies
+    if (this.setLocalGoalByDeadlockRecovery(cell)){
+      return;
+    }
+
+    // Default behavior: set local goal as the point in cell that is closest to the goal
+    this.tempGoal = this.findPointInCellClosestToGoal(cell);
   }
 
-  findTempGoalInCell(cell){
+  setLocalGoalByDeadlockRecovery(cell){
+    // tests whether local goal should be set according to deadlock recovery policies
+    // if so => sets local goal accordingly and returns true, else returns false
+    
+    // If currently recovering from deadlock
+    if(this.recoveringFromDeadLock()){      
+      // if current maneuver's tempGoal has not been reached (the current tempGoal is still valid) => do not change it, return true
+      if(this.deadLockTempGoalStillValid()){
+        return true;
+      }
+
+      // if current maneuver's tempGoal has been reached => end current maneuver
+      this.remainingDeadlockManeuvers -= 1;
+      this.deadLockManeuverInProgress = false;
+      
+      // if another maneuver is needed => initiate it, localGoal is set there so return true
+      if(this.shouldPerformAnotherManeuver()){
+        this.initiateDeadlockManeuver();
+        return true;
+      } else{
+        this.remainingDeadlockManeuvers = 0;
+      }
+    } 
+    // if not recovering from deadlock, test wether currently deadlocked
+    else if(this.deadLockRecoveryEnabled && this.deadLocked()){
+      // if deadlocked => start deadlock recovery, localGoal is set there so return true
+      this.startDeadlockRecovery(cell);
+      return true;
+    }
+
+    // If all condition fails => localGoal should not be set according to deadlock recovery policies
+    return false;
+  }
+
+  findPointInCellClosestToGoal(cell){
     var tempG = null;
     var minDist = null;
 
@@ -190,6 +175,10 @@ class Robot{
     return tempG;
   }
 
+  recoveringFromDeadLock(){
+    return this.deadLockManeuverInProgress || this.remainingDeadlockManeuvers>0;
+  }
+
   deadLocked(){
     if(this.reached(this.tempGoal) && !this.reached(this.goal)){
       this.stuckAtTempGoalDuration += 1;
@@ -201,26 +190,26 @@ class Robot{
   }
 
   deadLockExpected(){
-    if(this.reached(this.tempGoal) && !this.reached(this.goal)){
-      this.stuckAtTempGoalDuration += 1;
-    } else{
-      this.stuckAtTempGoalDuration = 0;
-    }
-
-    return this.deadLockDetectionEnabled && this.stuckAtTempGoalDuration > this.deadLockDetectionDuration;
+    // TODO
+    return false;
   }
 
-  neghiborsCloserToGoal(){
+  startDeadlockRecovery(cell){
+    this.remainingDeadlockManeuvers = this.maxConsecutiveDeadlockManeuvers;
 
+    let furthestPoint = this.getFurthestVertexFromLineSeg(cell, this.position, this.goal);
+    let furthestPointDir = pointOnRightSideOfVector(furthestPoint.x, furthestPoint.y, this.position.x, this.position.y, this.goal.x, this.goal.y);
+    this.maneuverDirection = Math.random()>0.2 ? furthestPointDir : Math.random() > 0.5;
+    this.initiateDeadlockManeuver();
   }
 
   initiateDeadlockManeuver(){
-    this.deadLockRecoveryDuration = (this.detectedDeadLocksCount+1) * this.deadLockRecoveryDefaultDuration;
     let vertecies = this.getVerteciesOnManeuverDir(this.BVC, this.position, this.goal)
     let bvcArea = polygonArea(this.BVC);
-    let firstStepInDeadlockRecovery = this.remainingDeadlockManeuvers == this.maxConsecutiveDeadlockManeuvers;
+    let firstDeadlockManeuver = this.remainingDeadlockManeuvers == this.maxConsecutiveDeadlockManeuvers;
     let curBvcAreaIsTooSmall = bvcArea < this.bvcAreaThreshold;
-    if( firstStepInDeadlockRecovery || curBvcAreaIsTooSmall){
+    
+    if( firstDeadlockManeuver || curBvcAreaIsTooSmall){
       this.tempGoal = this.getFurthestVertexFromLineSeg(vertecies, this.position, this.goal);
     } else{
       if(Math.random()<0.1){
@@ -229,7 +218,13 @@ class Robot{
         this.tempGoal = this.getClosestWideMidPointToGoal(this.BVC, this.position, this.goal);
       }
     }
-    this.remainingDeadLockRecoveryTime = this.deadLockRecoveryDuration;
+    
+    this.deadLockManeuverInProgress = true;
+  }
+
+  shouldPerformAnotherManeuver(){
+    return  this.multistepDeadlockEnabled &&
+            this.remainingDeadlockManeuvers > 0;
   }
 
   deadLockTempGoalStillValid(){
@@ -347,8 +342,8 @@ class Robot{
     return collisions;
   }
   
-  setDeadlockAlgo(choice){
-    switch (choice) {
+  setDeadlockAlgo(DeadlockAlgo){
+    switch (DeadlockAlgo) {
       case 0:
         this.deadLockRecoveryEnabled = false;
         this.multistepDeadlockEnabled = false;    

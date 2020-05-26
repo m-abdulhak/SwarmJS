@@ -132,7 +132,7 @@ var renderScene = function(){
   gScene.setTimeScale(document.getElementById("time-scale-slider").value);
   document.getElementById("unique-collisions").value = gScene.uniqueCollisions.length;
   document.getElementById("total-collisions").value = gScene.totalCollisionTimeInst;
-  document.getElementById("distance").textContent = gScene.distance;
+  document.getElementById("distance").textContent = Math.floor(gScene.distance) ;
 
   requestAnimationFrame(renderScene);
 }
