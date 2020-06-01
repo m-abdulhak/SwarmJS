@@ -1,8 +1,11 @@
 class Robot{
   constructor(id, position, goal, radius, envWidth, envHeight, scene, motionPlanningAlgorithm){
     // configs
-    this.MovementGoals = { Goal: 1,
-                          InBVC: 3 };
+    this.MovementGoals = {  Goal: 1,
+                            InBVC: 3 };
+    this.DeadLockRecovery = { None:0,
+                              Simple: 1,
+                              Advanced: 2 };
 
     this.id = id;
     this.position = position;
@@ -25,10 +28,9 @@ class Robot{
     this.stuckAtTempGoalDuration = 0;
     
     // Initialize deadlock recovery mechanisms
-    this.deadLockRecoveryEnabled = true; 
+    this.deadLockRecoveryAlgorithm = this.DeadLockRecovery.None;
     this.deadLockManeuverInProgress = false;
 
-    this.multistepDeadlockEnabled = false;
     this.remainingDeadlockManeuvers = 0;
     this.maxConsecutiveDeadlockManeuvers = 3;
     this.maneuverDirection = 0;
@@ -145,7 +147,7 @@ class Robot{
       }
     } 
     // if not recovering from deadlock, test wether currently deadlocked
-    else if(this.deadLockRecoveryEnabled && this.deadLocked()){
+    else if(this.deadLockRecoveryAlgorithm != this.DeadLockRecovery.None && this.deadLocked()){
       // if deadlocked => start deadlock recovery, localGoal is set there so return true
       this.startDeadlockRecovery(cell);
       return true;
@@ -223,7 +225,7 @@ class Robot{
   }
 
   shouldPerformAnotherManeuver(){
-    return  this.multistepDeadlockEnabled &&
+    return  this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Advanced &&
             this.remainingDeadlockManeuvers > 0;
   }
 
@@ -345,16 +347,13 @@ class Robot{
   setDeadlockAlgo(DeadlockAlgo){
     switch (DeadlockAlgo) {
       case 0:
-        this.deadLockRecoveryEnabled = false;
-        this.multistepDeadlockEnabled = false;    
+        this.deadLockRecoveryAlgorithm = this.DeadLockRecovery.None;   
         break;
       case 1:
-        this.deadLockRecoveryEnabled = true;
-        this.multistepDeadlockEnabled = false;    
+        this.deadLockRecoveryAlgorithm = this.DeadLockRecovery.Simple;   
         break;
       case 2:
-        this.deadLockRecoveryEnabled = true;
-        this.multistepDeadlockEnabled = true;    
+        this.deadLockRecoveryAlgorithm = this.DeadLockRecovery.Advanced;  
         break;
       default:
         break;
