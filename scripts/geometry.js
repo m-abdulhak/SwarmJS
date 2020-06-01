@@ -6,7 +6,7 @@ function nxtCircIndx(i,length){
     return (i+1)%length;
 }
 
-function pointOnRightSideOfVector(x, y, x1, y1, x2, y2) {
+function pointIsOnRightSideOfVector(x, y, x1, y1, x2, y2) {
   let vec1 = {x:x-x1,y:-y+y1};
   let rot90Vec1 = {x:-1*vec1.y, y:vec1.x}
   let vec2 = {x:x2-x1, y:-y2+y1};
@@ -178,4 +178,8 @@ function polygonArea(polygon) {
 
 function circleArea(radius) {
     return (radius * radius * Math.PI);
+}
+
+function xyPoint(p){
+  return {x:p[0],y:p[1]};
 }

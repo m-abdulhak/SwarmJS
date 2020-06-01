@@ -129,12 +129,11 @@ class Robot{
     
     // If currently recovering from deadlock
     if(this.recoveringFromDeadLock()){      
-      // if current maneuver's tempGoal has not been reached (the current tempGoal is still valid) => do not change it, return true
+      // if current maneuver's tempGoal is still valid (the current tempGoal has not been reached) => do not change it, return true
       if(this.deadLockTempGoalStillValid()){
         return true;
       }
-
-      // if current maneuver's tempGoal has been reached => end current maneuver
+      // if not, then current maneuver's tempGoal has been reached => end current maneuver
       this.remainingDeadlockManeuvers -= 1;
       this.deadLockManeuverInProgress = false;
       
@@ -198,15 +197,49 @@ class Robot{
 
   startDeadlockRecovery(cell){
     this.remainingDeadlockManeuvers = this.maxConsecutiveDeadlockManeuvers;
-
-    let furthestPoint = this.getFurthestVertexFromLineSeg(cell, this.position, this.goal);
-    let furthestPointDir = pointOnRightSideOfVector(furthestPoint.x, furthestPoint.y, this.position.x, this.position.y, this.goal.x, this.goal.y);
-    this.maneuverDirection = Math.random()>0.2 ? furthestPointDir : Math.random() > 0.5;
-    this.initiateDeadlockManeuver();
+    this.maneuverDirection = this.getManeuverDirAccToDLRecoveryAlgo(cell);
+    this.initiateDeadlockManeuver(cell);
   }
 
-  initiateDeadlockManeuver(){
-    let vertecies = this.getVerteciesOnManeuverDir(this.BVC, this.position, this.goal)
+  getManeuverDirAccToDLRecoveryAlgo(cell){
+    if(this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Simple){
+      return 1;
+    } else if(this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Advanced){
+      let furthestPoint = this.getFurthestVertexFromLineSeg(cell, this.position, this.goal);
+      let furthestPointDir = pointIsOnRightSideOfVector(furthestPoint.x, furthestPoint.y, 
+                                                        this.position.x, this.position.y, 
+                                                        this.goal.x, this.goal.y);
+      return furthestPointDir;
+    }
+  }
+
+  initiateDeadlockManeuver(cell){
+    if(this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Simple){
+      this.setTempGoalAccToSimpleDeadlockRec(cell);
+    } 
+    else if (this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Advanced){
+      this.setTempGoalAccToAdvancedDeadlockRec(cell);
+    }
+    
+    this.deadLockManeuverInProgress = true;
+  }
+
+  // returns temp goal according to simple deadlock recovery algorithm
+  setTempGoalAccToSimpleDeadlockRec(cell){
+    for (let index = cell.length-1; index>=1; index--) {
+      let point = xyPoint(cell[index]);
+      if(point.x == this.tempGoal.x && point.y == this.tempGoal.y){
+        this.tempGoal = xyPoint(cell[index-1]);
+        return;
+      }
+    }
+  }
+  
+  // returns temp goal according to advanced deadlock recovery algorithm
+  // vertices are the vertices of cell that lie on the current maneuver direction
+  setTempGoalAccToAdvancedDeadlockRec(cell){
+    let vertecies = this.getVerteciesOnManeuverDir(cell, this.position, this.goal)
+
     let bvcArea = polygonArea(this.BVC);
     let firstDeadlockManeuver = this.remainingDeadlockManeuvers == this.maxConsecutiveDeadlockManeuvers;
     let curBvcAreaIsTooSmall = bvcArea < this.bvcAreaThreshold;
@@ -220,8 +253,6 @@ class Robot{
         this.tempGoal = this.getClosestWideMidPointToGoal(this.BVC, this.position, this.goal);
       }
     }
-    
-    this.deadLockManeuverInProgress = true;
   }
 
   shouldPerformAnotherManeuver(){
@@ -237,7 +268,7 @@ class Robot{
     let vertecies = [];
 
     cell.forEach(vertex => {
-      let dir = pointOnRightSideOfVector(vertex[0], vertex[1], linesSegP1.x, linesSegP1.y, lineSegP2.x, lineSegP2.y);
+      let dir = pointIsOnRightSideOfVector(vertex[0], vertex[1], linesSegP1.x, linesSegP1.y, lineSegP2.x, lineSegP2.y);
       if( dir == this.maneuverDirection){
         vertecies.push(vertex);
       }  
