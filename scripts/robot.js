@@ -17,6 +17,7 @@ class Robot{
     this.envHeight = envHeight;
     this.scene = scene;
     this.VC = [];
+    this.neighbors = [];
 
     // Initialize velocity according to movement goal
     this.velocity = {x: 0, y: 0};
@@ -193,6 +194,9 @@ class Robot{
   deadLockExpected(){
     // TODO
     return false;
+  }
+
+  getNeighborsCloseTo(point, distance){
   }
 
   startDeadlockRecovery(cell){

@@ -10,7 +10,7 @@
 </style>
 <body>
   <svg width="1400" height="600"></svg>
-  <!-- <label id="mouse-pos"></label> -->
+  <label id="mouse-pos"></label>
   <label id="distance"></label>
   <div class="options">
     <div class="ui-section">
@@ -107,7 +107,7 @@ var pauseSimulation= function(){
 }
 
 svg.on('mousemove', function() {
-      // document.getElementById("mouse-pos").textContent = d3.mouse(this);
+      document.getElementById("mouse-pos").textContent = d3.mouse(this);
 });
 
 var visualizeElementsChanged = function(){  

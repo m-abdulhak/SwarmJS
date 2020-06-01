@@ -53,6 +53,8 @@ class Scene{
 
   updateRobotsMeasurements(){
     this.robots.forEach((r,i) => {
+      r.neighbors = this.getNeighborsOf(i);
+
       let cell = this.voronoi.cellPolygon(i);
       r.VC = cell;
 
@@ -166,4 +168,22 @@ class Scene{
 
     return positions;
   }
+
+  getNeighborsOf(robotIndex){
+    let neighbors = [];
+    try{
+      for(const neighborIndex of this.voronoi.delaunay.neighbors(robotIndex)){
+        neighbors.push(this.getRobotByIndex(neighborIndex));
+      }
+    } catch(error){
+      console.log("Error Exracting Neighbors: " + error);
+    }
+
+    return neighbors;
+  }
+  
+  getRobotByIndex(index){
+    return this.robots[index];
+  }
+
 }
