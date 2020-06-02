@@ -6,6 +6,29 @@ function nxtCircIndx(i,length){
     return (i+1)%length;
 }
 
+function allPointsAreOnSameSideOfVector(pointsArray, vecStart, vecEnd){
+  let prevSide = null;
+
+  for(var p of pointsArray){
+    let curSide = pointIsOnRightSideOfVector( p.x, p.y, 
+                                              vecStart.x, vecStart.y, 
+                                              vecEnd.x, vecEnd.y);
+
+    if(prevSide == null){
+      prevSide = pointIsOnRightSideOfVector(p.x, p.y, 
+                                        vecStart.x, vecStart.y, 
+                                        vecEnd.x, vecEnd.y);
+    } 
+    else{
+      if(curSide != prevSide){
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 function pointIsOnRightSideOfVector(x, y, x1, y1, x2, y2) {
   let vec1 = {x:x-x1,y:-y+y1};
   let rot90Vec1 = {x:-1*vec1.y, y:vec1.x}
