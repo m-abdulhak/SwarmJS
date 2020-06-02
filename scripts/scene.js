@@ -71,7 +71,7 @@ class Scene{
     var padding = [];
     
     try {
-      padding = offset.data(cell).padding(r.radius*1.2)[0]
+      padding = offset.data(cell).padding(r.radius*1)[0]
     }
     catch(err) {
       // On collisions, if voronoi cell is too small => BVC is undefined
