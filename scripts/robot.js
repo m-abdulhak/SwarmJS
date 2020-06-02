@@ -219,9 +219,12 @@ class Robot{
       const rNext = robotsCloseToTempGoal[nxtCircIndx(neighborIndex,robotsCloseToTempGoal.length)];
 
       if(distanceBetween2Points(r.position, rNext.position) < neighborNeighbordistanceThreshold){
-        this.lastDeadlockAreaRadius = maxDistance;
-        // console.log("Deadlock Expected With: " + robotsCloseToTempGoal.length + " Robots, with max Distance: " + maxDistance);
-        return true;
+
+        if(!allPointsAreOnSameSideOfVector([this.goal,this.tempGoal], r.position, rNext.position)){
+          this.lastDeadlockAreaRadius = maxDistance;
+          // console.log("Deadlock Expected With: " + robotsCloseToTempGoal.length + " Robots, with max Distance: " + maxDistance);
+          return true;
+        }
       }
     }
 
@@ -254,6 +257,8 @@ class Robot{
     if(this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Simple){
       return 1;
     } else if(this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Advanced){
+      // TODO: Decide whether to use righthand rule or furtherst point or implement another hybrid solution
+      // return 1;
       let furthestPoint = this.getFurthestVertexFromLineSeg(cell, this.position, this.goal);
       let furthestPointDir = pointIsOnRightSideOfVector(furthestPoint.x, furthestPoint.y, 
                                                         this.position.x, this.position.y, 
@@ -305,8 +310,6 @@ class Robot{
   }
 
   neighborsAvoided(){
-    let allRobotsOnSameSideOfLineToGoal = false;
-
     let robotsMeasurements = this.getNeighborsMeasurementsWithin(this.lastDeadlockPosition, this.lastDeadlockAreaRadius);
     let robots = robotsMeasurements.robots;
     let robotPositions = robots.map( r => ({x: r.position.x, y: r.position.y}));
