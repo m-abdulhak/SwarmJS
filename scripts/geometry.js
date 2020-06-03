@@ -6,6 +6,27 @@ function nxtCircIndx(i,length){
     return (i+1)%length;
 }
 
+function minDistanceToLine(pointsArray, vecStart, vecEnd){
+  let minDist = null;
+
+  for(var p of pointsArray){
+    let curDist = distanceBetweenPointAndLine( p, 
+                                               vecStart, 
+                                               vecEnd);
+
+    if(minDist == null){
+      minDist = curDist;
+    } 
+    else{
+      if(curDist < minDist){
+        minDist = curDist;
+      }
+    }
+  }
+
+  return minDist;
+}
+
 function allPointsAreOnSameSideOfVector(pointsArray, vecStart, vecEnd){
   let prevSide = null;
 

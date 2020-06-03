@@ -33,9 +33,10 @@ class Robot{
     this.deadLockManeuverInProgress = false;
     this.lastDeadlockPosition = null;
     this.lastDeadlockAreaRadius = null;
+    this.lastDeadlockNeighborsCount = null;
 
     this.remainingDeadlockManeuvers = 0;
-    this.maxConsecutiveDeadlockManeuvers = 3;
+    this.maxConsecutiveDeadlockManeuvers = 6;
     this.maneuverDirection = 0;
 
     // Deadlock parameters
@@ -203,7 +204,7 @@ class Robot{
     }
 
     const neighborGoaldistanceThreshold = this.radius*5;
-    const neighborNeighbordistanceThreshold = this.radius*4.2;
+    const neighborNeighbordistanceThreshold = this.radius*4;
 
     let neighborsMeasurements = this.getNeighborsMeasurementsWithin(tempGoal, neighborGoaldistanceThreshold);
     let robotsCloseToTempGoal = neighborsMeasurements.robots;
@@ -249,6 +250,7 @@ class Robot{
   startDeadlockRecovery(cell){
     this.remainingDeadlockManeuvers = this.maxConsecutiveDeadlockManeuvers;
     this.lastDeadlockPosition ={x:this.tempGoal.x, y:this.tempGoal.y};
+    this.lastDeadlockNeighborsCount = this.getNeighborsMeasurementsWithin(this.tempGoal,this.radius*5).robots.length;
     this.maneuverDirection = this.getManeuverDirAccToDLRecoveryAlgo(cell);
     this.initiateDeadlockManeuver(cell);
   }
@@ -258,7 +260,8 @@ class Robot{
       return 1;
     } else if(this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Advanced){
       // TODO: Decide whether to use righthand rule or furtherst point or implement another hybrid solution
-      // return 1;
+      if(Math.random()>0.7) return 1;
+      
       let furthestPoint = this.getFurthestVertexFromLineSeg(cell, this.position, this.goal);
       let furthestPointDir = pointIsOnRightSideOfVector(furthestPoint.x, furthestPoint.y, 
                                                         this.position.x, this.position.y, 
@@ -304,7 +307,8 @@ class Robot{
   deadLockTempGoalStillValid(){
     let tempGoalNotReached = !this.reached(this.tempGoal); 
     let currentVCellContainsTempGoal = this.scene.voronoi.contains(this.id, this.tempGoal.x, this.tempGoal.y);
-    let recoveryManeuverHasNotSucceeded = !(this.deadLockManeuverInProgress && this.neighborsAvoided());
+    let recoveryManeuverHasNotSucceeded = this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Advanced ? 
+                                          !(this.deadLockManeuverInProgress && this.neighborsAvoided()) : true;
 
     return tempGoalNotReached && currentVCellContainsTempGoal && recoveryManeuverHasNotSucceeded; 
   }
@@ -314,14 +318,17 @@ class Robot{
     let robots = robotsMeasurements.robots;
     let robotPositions = robots.map( r => ({x: r.position.x, y: r.position.y}));
     
-    if(robots.length < 2){
-      // console.log("Successfully Recovered From Deadlock! 1");
-      return true;
-    }
+    if(this.lastDeadlockNeighborsCount > 1){
+      if(robots.length < 2){
+        // console.log("Successfully Recovered From Deadlock! 1");
+        return true;
+      }
 
-    if(allPointsAreOnSameSideOfVector(robotPositions, this.position, this.goal)){
-      // console.log("Successfully Recovered From Deadlock! 2");
-      return true;
+      if(allPointsAreOnSameSideOfVector(robotPositions, this.position, this.goal) 
+        && minDistanceToLine(robotPositions, this.position, this.goal) > this.radius){
+        // console.log("Successfully Recovered From Deadlock! 2");
+        return true;
+      }
     }
 
     return false;
