@@ -19,7 +19,7 @@ class Scene{
     this.renderer = new Renderer(svg, this);
 
     // Simulation Speed
-    this.timeScale = 0.1;
+    this.timeDelta = 0.1;
 
     // Collision Detection
     this.uniqueCollisions = [];
@@ -30,7 +30,7 @@ class Scene{
   }
 
   setTimeScale(scale){
-    this.timeScale = scale/10;
+    this.timeDelta = scale/10;
   }
 
   update(activeElements){
@@ -42,7 +42,7 @@ class Scene{
 
     gScene.updateRobotsMeasurements();
 
-    gScene.robots.forEach(r => r.timeStep(gScene.timeScale));
+    gScene.robots.forEach(r => r.timeStep(gScene.timeDelta));
 
     gScene.checkCollision();
 
@@ -84,8 +84,8 @@ class Scene{
   }
 
   checkCollision(){
-    timeInstance += 1/this.timeScale
-    //console.log("TimeInstance",timeInstance);
+    // update global time variable
+    timeInstance += this.timeDelta;
     
     let detectedCollisions = [];
 
@@ -109,7 +109,7 @@ class Scene{
     let dis = 0;
     
     this.robots.forEach( r =>{
-      dis += r.getDistanceTo(r.goal)/100;
+      dis += r.getDistanceTo(r.goal)/10;
     }
     );
 

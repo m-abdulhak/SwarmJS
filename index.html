@@ -60,7 +60,11 @@
         <option value="2" >Advanced</option>
       </select>
     </div>
-  </div>
+    <div class="ui-section">
+      <label class="key">Start Benchmarking:</label>
+      <input  type="button" value="Benchmark" class="input-button input small-btn" id="benchmark-button" onclick="toggleBenchmarking()">
+    </div>
+  </div> 
 
   <script src="https://d3js.org/d3.v4.js"></script>
   <script src="libraries/d3-delaunay.js"></script>
@@ -75,69 +79,111 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <script>
-  
-var timeInstance = 0;
 
-// Setup
-var activeElements = {Robots:1, Goals:1, TempGoals:1, VC:1, BVC:1};
-var paused = false;
-var numberOfRobots = 2;
-var radiusOfRobots = 10;
-var svg = d3.select("svg");
-let motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
-var gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm);
+  function selectElement(id, valueToSelect) {    
+      let element = document.getElementById(id);
+      element.value = valueToSelect;
+  }
+    
+  var timeInstance = 0;
 
-var resetSimulation = function(){
-  timeInstance = 0;
-  svg.selectAll("*").remove();
-  motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
-  gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm);
-  changeDeadlockAlgorithm();
-}
+  // Benchmarking
+  var benchmarking = false;
+  var benchMaxTimesteps = 600;
+  var benchTimeScale = 30;
+  var benchRobotCount = 75;
+  var benchDeadlockAlgo = 1;
 
-var changeDeadlockAlgorithm = function(){
-  let deadlockAlgorithm = parseInt(document.getElementById("deadlock-select").value);
-  gScene.robots.forEach(r => {
-    r.setDeadlockAlgo(deadlockAlgorithm);
-  });
-}
+  // Setup
+  var activeElements = {Robots:1, Goals:1, TempGoals:1, VC:1, BVC:1};
+  var paused = false;
+  var numberOfRobots = 2;
+  var radiusOfRobots = 10;
+  var svg = d3.select("svg");
+  let motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
+  var gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm);
 
-var pauseSimulation= function(){
-  paused = !paused;
-}
-
-svg.on('mousemove', function() {
-      document.getElementById("mouse-pos").textContent = d3.mouse(this);
-});
-
-var visualizeElementsChanged = function(){  
-  document.getElementById(event.srcElement.id).classList.toggle("active");
-  activeElements = { Robots:elementActive("robot-button"), 
-                    Goals:elementActive("goal-button"), 
-                    TempGoals:elementActive("tempGoal-button"), 
-                    VC:elementActive("vc-button"), 
-                    BVC:elementActive("bvc-button")};
-}
-
-var elementActive = function(id){
-  return document.getElementById(id).classList.contains("active");
-}
-
-var renderScene = function(){
-  if(!paused){
-    gScene.update(activeElements);  
+  var resetSimulation = function(){
+    timeInstance = 0;
+    svg.selectAll("*").remove();
+    motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
+    gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm);
+    changeDeadlockAlgorithm();
   }
 
-  numberOfRobots = document.getElementById("robots-slider").value;
-  gScene.setTimeScale(document.getElementById("time-scale-slider").value);
-  document.getElementById("unique-collisions").value = gScene.uniqueCollisions.length;
-  document.getElementById("total-collisions").value = gScene.totalCollisionTimeInst;
-  document.getElementById("distance").textContent = Math.floor(gScene.distance) ;
+  var changeDeadlockAlgorithm = function(){
+    let deadlockAlgorithm = parseInt(document.getElementById("deadlock-select").value);
+    gScene.robots.forEach(r => {
+      r.setDeadlockAlgo(deadlockAlgorithm);
+    });
+  }
 
-  requestAnimationFrame(renderScene);
-}
+  var pauseSimulation = function(){
+    paused = !paused;
+  }
 
-changeDeadlockAlgorithm();
-renderScene();
+  var toggleBenchmarking = function(){
+    benchmarking = !benchmarking;
+    document.getElementById("benchmark-button").classList.toggle("active");
+
+    if(benchmarking){
+      startBenchmarkInstance();
+    }
+  }
+
+  var startBenchmarkInstance = function(){
+    document.getElementById("time-scale-slider").value = benchTimeScale;
+    document.getElementById("robots-slider").value = benchRobotCount;
+    syncSettings();
+
+    benchDeadlockAlgo = benchDeadlockAlgo == 1 ? 2 : 1;
+    selectElement('deadlock-select', benchDeadlockAlgo);
+
+    resetSimulation();
+  }
+
+  svg.on('mousemove', function() {
+    document.getElementById("mouse-pos").textContent = d3.mouse(this);
+  });
+
+  var visualizeElementsChanged = function(){  
+    document.getElementById(event.srcElement.id).classList.toggle("active");
+    activeElements = { Robots:elementActive("robot-button"), 
+                      Goals:elementActive("goal-button"), 
+                      TempGoals:elementActive("tempGoal-button"), 
+                      VC:elementActive("vc-button"), 
+                      BVC:elementActive("bvc-button")};
+  }
+
+  var elementActive = function(id){
+    return document.getElementById(id).classList.contains("active");
+  }
+
+  var syncSettings = function(){
+    numberOfRobots = document.getElementById("robots-slider").value;
+    gScene.setTimeScale(document.getElementById("time-scale-slider").value);
+    document.getElementById("unique-collisions").value = gScene.uniqueCollisions.length;
+    document.getElementById("total-collisions").value = gScene.totalCollisionTimeInst;
+    document.getElementById("distance").textContent = Math.floor(gScene.distance) ;
+  }
+
+  var renderScene = function(){
+    if(benchmarking && timeInstance > benchMaxTimesteps){
+      startBenchmarkInstance();
+    }
+    
+    if(!paused){
+      gScene.update(activeElements);  
+    }
+    
+    console.log("TimeInstance: ",timeInstance.toFixed(2), " Distance: ", Math.floor(gScene.distance));
+
+    syncSettings();
+
+    requestAnimationFrame(renderScene);
+  }
+
+  changeDeadlockAlgorithm();
+  renderScene();
 
 </script>

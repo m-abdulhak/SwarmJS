@@ -248,9 +248,10 @@ class Robot{
   }
 
   startDeadlockRecovery(cell){
-    this.remainingDeadlockManeuvers = this.maxConsecutiveDeadlockManeuvers;
     this.lastDeadlockPosition ={x:this.tempGoal.x, y:this.tempGoal.y};
     this.lastDeadlockNeighborsCount = this.getNeighborsMeasurementsWithin(this.tempGoal,this.radius*5).robots.length;
+    this.remainingDeadlockManeuvers = this.lastDeadlockNeighborsCount == 1 ? 
+                                      this.maxConsecutiveDeadlockManeuvers/2 : this.maxConsecutiveDeadlockManeuvers;
     this.maneuverDirection = this.getManeuverDirAccToDLRecoveryAlgo(cell);
     this.initiateDeadlockManeuver(cell);
   }
@@ -407,7 +408,7 @@ class Robot{
   }
 
   reached(point){
-    var ret = this.getDistanceTo(point) <= this.radius/10;
+    var ret = this.getDistanceTo(point) <= this.radius/100;
     return ret;
   }
 
