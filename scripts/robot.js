@@ -203,7 +203,7 @@ class Robot{
       return false;
     }
 
-    const neighborGoaldistanceThreshold = this.radius*5;
+    const neighborGoaldistanceThreshold = this.radius*3;
     const neighborNeighbordistanceThreshold = this.radius*4;
 
     let neighborsMeasurements = this.getNeighborsMeasurementsWithin(tempGoal, neighborGoaldistanceThreshold);
@@ -362,44 +362,52 @@ class Robot{
   }
 
   getClosestWideMidPointToGoal(cell, position, goal){
-    let bestVertex = cell[0];
-    let minDist = null;
+    try {
+      let bestVertex = cell[0];
+      let minDist = null;
 
-    for (let index = 0; index < cell.length; index++) {
-      const p1 = cell[index];
-      const p2 = cell[nxtCircIndx(index,cell.length)];
-      const lineSegLength = distanceBetween2Points({x:p1[0], y:p1[1]}, {x:p2[0], y:p2[1]});
-      const midPoint = midPointOfLineSeg(p1[0], p1[1], p2[0], p2[1]);
-      const distToGoal = distanceBetween2Points(midPoint, goal);
+      for (let index = 0; index < cell.length; index++) {
+        const p1 = cell[index];
+        const p2 = cell[nxtCircIndx(index,cell.length)];
+        const lineSegLength = distanceBetween2Points({x:p1[0], y:p1[1]}, {x:p2[0], y:p2[1]});
+        const midPoint = midPointOfLineSeg(p1[0], p1[1], p2[0], p2[1]);
+        const distToGoal = distanceBetween2Points(midPoint, goal);
 
-      if(lineSegLength < this.radius * 2 || (minDist !== null && distToGoal > minDist)){
-        continue;
-      } else {
-        bestVertex = midPoint;
-        minDist = distToGoal; 
+        if(lineSegLength < this.radius * 2 || (minDist !== null && distToGoal > minDist)){
+          continue;
+        } else {
+          bestVertex = midPoint;
+          minDist = distToGoal; 
+        }
       }
-    }
 
-    if(minDist == null){
-      console.log("None found!");
-      bestVertex = {x:bestVertex[0], y:bestVertex[1]};
-    }
+      if(minDist == null){
+        console.log("None found!");
+        bestVertex = {x:bestVertex[0], y:bestVertex[1]};
+      }
 
-    return bestVertex;
+      return bestVertex;
+    } catch (error) {
+        return this.position;
+    }
   }
 
   getFurthestVertexFromLineSeg(cell, linesSegP1, lineSegP2){
-    let bestVertex = cell[0];
-    let maxDist = null;
+    try{
+      let bestVertex = cell[0];
+      let maxDist = null;
 
-    cell.forEach(vertex => {
-      let dist = distanceBetweenPointAndLine({x:vertex[0], y:vertex[1]}, linesSegP1, lineSegP2);
-      if( maxDist == null || dist > maxDist){
-        bestVertex = vertex;
-        maxDist = dist; 
-      }  
-    });
-    return {x:bestVertex[0], y:bestVertex[1]};
+      cell.forEach(vertex => {
+        let dist = distanceBetweenPointAndLine({x:vertex[0], y:vertex[1]}, linesSegP1, lineSegP2);
+        if( maxDist == null || dist > maxDist){
+          bestVertex = vertex;
+          maxDist = dist; 
+        }  
+      });
+      return {x:bestVertex[0], y:bestVertex[1]};
+    } catch (error) {
+        return this.position;
+    }
   }
 
   VcContains(point){
