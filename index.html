@@ -84,6 +84,31 @@
       let element = document.getElementById(id);
       element.value = valueToSelect;
   }
+
+  function updateBenchSet(time){
+    if(benchmarking){
+      benchCurSet[Math.floor(time/10)] = gScene.distance;
+    }
+  }
+
+  function updateBenchData(){
+    if(benchmarking && benchCurSet.length != 0){
+      let data = benchDeadlockAlgo == 1 ? benchData.simple : benchData.advanced; 
+
+      if(data.means.length == 0){
+        data.means = benchCurSet;
+      } else{
+        let setCount = data.sets.length;
+        let newMeans = [];
+        for (let i = 0; i < data.means.length; i++) {
+          newMeans[i] = (data.means[i] * setCount + benchCurSet[i] ) / (setCount + 1);
+        }
+        data.means = newMeans;
+      }
+      data.sets.push(benchCurSet);
+    }
+    benchCurSet = [];
+  }
     
   var timeInstance = 0;
 
@@ -93,6 +118,16 @@
   var benchTimeScale = 30;
   var benchRobotCount = 75;
   var benchDeadlockAlgo = 1;
+  var benchData = { simple : {
+                      sets : [],
+                      means : []
+                    },
+                    advanced : {
+                      sets : [],
+                      means : []
+                    }
+                  };
+  var benchCurSet = []; 
 
   // Setup
   var activeElements = {Robots:1, Goals:1, TempGoals:1, VC:1, BVC:1};
@@ -132,6 +167,8 @@
   }
 
   var startBenchmarkInstance = function(){
+    updateBenchData();
+
     document.getElementById("time-scale-slider").value = benchTimeScale;
     document.getElementById("robots-slider").value = benchRobotCount;
     syncSettings();
@@ -176,7 +213,8 @@
       gScene.update(activeElements);  
     }
     
-    console.log("TimeInstance: ",timeInstance.toFixed(2), " Distance: ", Math.floor(gScene.distance));
+    updateBenchSet(timeInstance);
+    // console.log("TimeInstance: ",timeInstance.toFixed(2), " Distance: ", Math.floor(gScene.distance));
 
     syncSettings();
 
