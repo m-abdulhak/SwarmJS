@@ -27,7 +27,7 @@
     </div>
     <div class="ui-section">
       <label class="key">Robots:</label>
-      <input type="range" min="2" max="100" value="10" step="1" class="slider input" id="robots-slider">
+      <input type="range" min="2" max="200" value="10" step="1" class="slider input" id="robots-slider">
     </div>
     <div class="ui-section">
       <label class="key">Pause and Reset:</label>
@@ -66,18 +66,19 @@
     </div>
   </div> 
 
+	<div id="graph" class="aGraph" style="display: block;" width="1400" height="600"></div>
+
   <script src="https://d3js.org/d3.v4.js"></script>
   <script src="libraries/d3-delaunay.js"></script>
   <script src="libraries/offset.js"></script>
   <script src="scripts/geometry.js"></script>
   <script src="scripts/renderer.js"></script>
   <script src="scripts/scene.js"></script>
+  <script src="scripts/benchmark.js"></script>
   <script src="scripts/robot.js"></script>
 </body>
 </html>
 
-<!DOCTYPE html>
-<meta charset="utf-8">
 <script>
 
   function selectElement(id, valueToSelect) {    
@@ -85,51 +86,8 @@
       element.value = valueToSelect;
   }
 
-  function updateBenchSet(time){
-    if(benchmarking){
-      benchCurSet[Math.floor(time/10)] = gScene.distance;
-    }
-  }
-
-  function updateBenchData(){
-    if(benchmarking && benchCurSet.length != 0){
-      let data = benchDeadlockAlgo == 1 ? benchData.simple : benchData.advanced; 
-
-      if(data.means.length == 0){
-        data.means = benchCurSet;
-      } else{
-        let setCount = data.sets.length;
-        let newMeans = [];
-        for (let i = 0; i < data.means.length; i++) {
-          newMeans[i] = (data.means[i] * setCount + benchCurSet[i] ) / (setCount + 1);
-        }
-        data.means = newMeans;
-      }
-      data.sets.push(benchCurSet);
-    }
-    benchCurSet = [];
-  }
-    
-  var timeInstance = 0;
-
-  // Benchmarking
-  var benchmarking = false;
-  var benchMaxTimesteps = 600;
-  var benchTimeScale = 30;
-  var benchRobotCount = 75;
-  var benchDeadlockAlgo = 1;
-  var benchData = { simple : {
-                      sets : [],
-                      means : []
-                    },
-                    advanced : {
-                      sets : [],
-                      means : []
-                    }
-                  };
-  var benchCurSet = []; 
-
   // Setup
+  var timeInstance = 0;
   var activeElements = {Robots:1, Goals:1, TempGoals:1, VC:1, BVC:1};
   var paused = false;
   var numberOfRobots = 2;
@@ -137,6 +95,7 @@
   var svg = d3.select("svg");
   let motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
   var gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm);
+  var bench = new Benchmark();
 
   var resetSimulation = function(){
     timeInstance = 0;
@@ -153,30 +112,12 @@
     });
   }
 
+  var toggleBenchmarking = function(){
+    bench.toggleBenchmarking();
+  }
+
   var pauseSimulation = function(){
     paused = !paused;
-  }
-
-  var toggleBenchmarking = function(){
-    benchmarking = !benchmarking;
-    document.getElementById("benchmark-button").classList.toggle("active");
-
-    if(benchmarking){
-      startBenchmarkInstance();
-    }
-  }
-
-  var startBenchmarkInstance = function(){
-    updateBenchData();
-
-    document.getElementById("time-scale-slider").value = benchTimeScale;
-    document.getElementById("robots-slider").value = benchRobotCount;
-    syncSettings();
-
-    benchDeadlockAlgo = benchDeadlockAlgo == 1 ? 2 : 1;
-    selectElement('deadlock-select', benchDeadlockAlgo);
-
-    resetSimulation();
   }
 
   svg.on('mousemove', function() {
@@ -205,15 +146,15 @@
   }
 
   var renderScene = function(){
-    if(benchmarking && timeInstance > benchMaxTimesteps){
-      startBenchmarkInstance();
+    if(bench.benchmarking && timeInstance > bench.benchMaxTimesteps){
+      bench.startBenchmarkInstance();
     }
     
     if(!paused){
       gScene.update(activeElements);  
     }
     
-    updateBenchSet(timeInstance);
+    bench.updateBenchSet(timeInstance);
     // console.log("TimeInstance: ",timeInstance.toFixed(2), " Distance: ", Math.floor(gScene.distance));
 
     syncSettings();
