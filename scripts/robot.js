@@ -112,8 +112,8 @@ class Robot{
       return;
     }
 
-    // If the goal is within the Voronoi cell => set localgoal = goal
-    if(this.VcContains(this.goal)){
+    // If the goal is within the Buffered Voronoi cell => set localgoal = goal
+    if(this.bvcContains(this.goal)){
       this.tempGoal = this.goal;
       return;
     }
@@ -439,9 +439,9 @@ class Robot{
     }
   }
 
-  VcContains(point){
-    return typeof(this.scene.voronoi) !== "undefined" && this.scene.voronoi != null && 
-        this.scene.voronoi.contains(this.id, point.x, point.y);
+  bvcContains(point){
+    return  typeof(this.BVC) !== "undefined" && this.BVC != null && 
+            pointIsInsidePolygon(this.goal, this.BVC);
   }
 
   reached(point){

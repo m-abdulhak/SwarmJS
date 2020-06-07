@@ -205,6 +205,25 @@ function getIntersectionPoint(line1StartX, line1StartY, line1EndX, line1EndY, li
   return result;
 };
 
+function pointIsInsidePolygon(point, polygon){
+    // ray-casting algorithm based on
+    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+
+    var x = point.x, y = point.y;
+
+    var inside = false;
+    for (var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        var xi = polygon[i][0], yi = polygon[i][1];
+        var xj = polygon[j][0], yj = polygon[j][1];
+
+        var intersect = ((yi > y) != (yj > y))
+            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+
+    return inside;
+}
+
 function polygonArea(polygon) {
   if(polygon == undefined || polygon.length < 3){
     return 0;
