@@ -34,6 +34,7 @@ class Robot{
     this.lastDeadlockPosition = null;
     this.lastDeadlockAreaRadius = null;
     this.lastDeadlockNeighborsCount = null;
+    this.rightHandPoint = null;
 
     this.remainingDeadlockManeuvers = 0;
     this.maxConsecutiveDeadlockManeuvers = 6;
@@ -99,8 +100,8 @@ class Robot{
         this.velocity.y = xDiff;
       }
       
-      this.velocity.x = xDiff/velocityScale;
-      this.velocity.y = yDiff/velocityScale;
+      this.velocity.x = 2 * xDiff/velocityScale;
+      this.velocity.y = 2 * yDiff/velocityScale;
     }
   }
 
@@ -124,7 +125,7 @@ class Robot{
     }
 
     // Default behavior: set local goal as the point in cell that is closest to the goal
-    this.tempGoal = this.findPointInCellClosestToGoal(cell);
+    this.tempGoal = this.findPointInCellClosestToGoal(cell, this.goal);
   }
 
   setLocalGoalByDeadlockRecovery(cell){
@@ -147,6 +148,7 @@ class Robot{
         return true;
       } else{
         this.remainingDeadlockManeuvers = 0;
+        this.rightHandPoint = null;
       }
     } 
     // if not recovering from deadlock, test wether currently deadlocked
@@ -164,16 +166,16 @@ class Robot{
     return this.deadLockRecoveryAlgorithm != this.DeadLockRecovery.None;
   }
 
-  findPointInCellClosestToGoal(cell){
+  findPointInCellClosestToGoal(cell, goal){
     var tempG = null;
     var minDist = null;
 
     for (let index = 0; index < cell.length; index++) {
       const v1 = cell[index];
       const v2 = cell[nxtCircIndx(index,cell.length)];
-      let closestPointInLineSeg = closestPointInLineSegToPoint(this.goal.x, this.goal.y, v1[0], v1[1], v2[0], v2[1]);
+      let closestPointInLineSeg = closestPointInLineSegToPoint(goal.x, goal.y, v1[0], v1[1], v2[0], v2[1]);
 
-      let distGoalToLineSeg = distanceBetween2Points(this.goal, closestPointInLineSeg);
+      let distGoalToLineSeg = distanceBetween2Points(goal, closestPointInLineSeg);
       
       if(tempG==null || distGoalToLineSeg < minDist){
         tempG = {x:closestPointInLineSeg.x, y:closestPointInLineSeg.y};
@@ -199,37 +201,60 @@ class Robot{
   }
 
   deadLockExpected(tempGoal){
-    if(this.deadLockRecoveryAlgorithm != this.DeadLockRecovery.Advanced){
-      return false;
+    if(this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Simple){
+      if(this.facingRobot()){
+        this.rightHandPoint = shiftPointOfLineSegInDirOfPerpendicularBisector(
+          this.position.x, this.position.y, 
+          this.position.x, this.position.y,
+          this.goal.x, this.goal.y,
+          this.radius * 3
+        );
+        return true;
+      }
     }
+    else if (this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Advanced){
+      const neighborGoaldistanceThreshold = this.radius*3;
+      const neighborNeighbordistanceThreshold = this.radius*4;
 
-    const neighborGoaldistanceThreshold = this.radius*3;
-    const neighborNeighbordistanceThreshold = this.radius*4;
+      let neighborsMeasurements = this.getNeighborsMeasurementsWithin(tempGoal, neighborGoaldistanceThreshold);
+      let robotsCloseToTempGoal = neighborsMeasurements.robots;
+      let maxDistance = neighborsMeasurements.maxDistance;
 
-    let neighborsMeasurements = this.getNeighborsMeasurementsWithin(tempGoal, neighborGoaldistanceThreshold);
-    let robotsCloseToTempGoal = neighborsMeasurements.robots;
-    let maxDistance = neighborsMeasurements.maxDistance;
+      // TODO: Handle case for 1 robot in the way on the edge of environment leading to Deadlock, currently it will be ignored
+      if(robotsCloseToTempGoal.length < 2){
+        return false;
+      }
 
-    // TODO: Handle case for 1 robot in the way on the edge of environment leading to Deadlock, currently it will be ignored
-    if(robotsCloseToTempGoal.length < 2){
-      return false;
-    }
+      for (let neighborIndex = 0; neighborIndex < robotsCloseToTempGoal.length ; neighborIndex++) {
+        const r = robotsCloseToTempGoal[neighborIndex];
+        const rNext = robotsCloseToTempGoal[nxtCircIndx(neighborIndex,robotsCloseToTempGoal.length)];
 
-    for (let neighborIndex = 0; neighborIndex < robotsCloseToTempGoal.length ; neighborIndex++) {
-      const r = robotsCloseToTempGoal[neighborIndex];
-      const rNext = robotsCloseToTempGoal[nxtCircIndx(neighborIndex,robotsCloseToTempGoal.length)];
+        if(distanceBetween2Points(r.position, rNext.position) < neighborNeighbordistanceThreshold){
 
-      if(distanceBetween2Points(r.position, rNext.position) < neighborNeighbordistanceThreshold){
-
-        if(!allPointsAreOnSameSideOfVector([this.goal,this.tempGoal], r.position, rNext.position)){
-          this.lastDeadlockAreaRadius = maxDistance;
-          // console.log("Deadlock Expected With: " + robotsCloseToTempGoal.length + " Robots, with max Distance: " + maxDistance);
-          return true;
+          if(!allPointsAreOnSameSideOfVector([this.goal,this.tempGoal], r.position, rNext.position)){
+            this.lastDeadlockAreaRadius = maxDistance;
+            // console.log("Deadlock Expected With: " + robotsCloseToTempGoal.length + " Robots, with max Distance: " + maxDistance);
+            return true;
+          }
         }
       }
     }
 
     return false;
+  }
+
+  facingRobot(){
+    const curPos = this.position;
+    const finalGoal = this.goal;
+    const distanceToGoal =  distanceBetween2Points(curPos, finalGoal);
+    
+    let neighborsMeasurements = this.getNeighborsMeasurementsWithin(this.position, this.radius*3);
+
+    let robotsCloserToGoal = neighborsMeasurements.robots.filter( r => distanceBetween2Points(r.position, finalGoal) < distanceToGoal);
+    
+    let facingRobots = robotsCloserToGoal.filter( n => distanceBetweenPointAndLineSeg(n.position, curPos, finalGoal) < this.radius);
+
+    return facingRobots.length > 0;
   }
 
   getNeighborsMeasurementsWithin(point, distance){
@@ -273,7 +298,11 @@ class Robot{
 
   initiateDeadlockManeuver(cell){
     if(this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Simple){
-      this.setTempGoalAccToSimpleDeadlockRec(cell);
+      if(this.rightHandPoint != null){
+        this.tempGoal = this.findPointInCellClosestToGoal(cell, this.rightHandPoint);
+      } else{
+        this.setTempGoalAccToSimpleDeadlockRec(cell);
+      }
     } 
     else if (this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Advanced){
       this.setTempGoalAccToAdvancedDeadlockRec(cell);
@@ -448,6 +477,7 @@ class Robot{
     let collisions = [];
     robots.forEach(r => {
       if(this.collidingWithRobot(r)){
+        this.scene.collisions.push({x: (r.position.x + this.position.x)/2, y:(r.position.y + this.position.y)/2});
         collisions.push([Math.min(this.id, r.id), Math.max(this.id, r.id)]);
       }
     });

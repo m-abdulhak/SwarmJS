@@ -4,9 +4,9 @@ class Benchmark{
         this.plotColors = { 1: "blue",
                             2: "green"}
         this.benchmarking = false;
-        this.benchMaxTimesteps = 1300;
+        this.benchMaxTimesteps = 800;
         this.benchTimeScale = 60;
-        this.benchRobotCount = 150;
+        this.benchRobotCount = 100;
         this.benchDeadlockAlgo = 1;
         this.benchData = {  simple : {
                                 sets : [],

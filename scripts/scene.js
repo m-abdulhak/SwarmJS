@@ -1,11 +1,17 @@
 class Scene{
-  constructor(svg, numOfRobots, robotRadius, motionPlanningAlgorithm){
+  constructor(svg, numOfRobots, robotRadius, motionPlanningAlgorithm, enableRendering){
     this.svg = svg;
     this.width = svg.attr("width");
     this.height = svg.attr("height");
     this.numOfRobots = numOfRobots;
     this.radius = robotRadius;
     this.collisionFreePositions = this.getCollisionFreePositions(this.numOfRobots, this.radius, this.width, this.height);
+
+    // Rendering option
+    this.renderingEnabled = enableRendering;
+
+    // Collision instances
+    this.collisions = [];
 
     // Initialize Robots
     this.robots = this.initializeRobotsRange(this.numOfRobots, this.radius, this.width, this.height, motionPlanningAlgorithm);
@@ -46,7 +52,9 @@ class Scene{
 
     gScene.checkCollision();
 
-    gScene.renderer.update(activeElements);
+    if(this.renderingEnabled){
+      gScene.renderer.update(activeElements);
+    }
 
     gScene.updateDistance();
   }

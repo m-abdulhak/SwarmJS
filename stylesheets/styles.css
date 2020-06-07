@@ -17,11 +17,12 @@ body{
     left: 40px;
     width: 300px;
     color: #34a21a;
+    text-align: left;
     font-weight: 700;
     line-height: 25px;
 }
 .input {
-    width: 40%;
+    width: 50%;
     margin: 0px;
     background: #e7e7e7;
     outline: none;
@@ -48,10 +49,10 @@ body{
     background-color: #5b5b5b;
 }
 .half-btn{
-    width: 19.8%;
+    width: 24.7%;
 }
 .small-btn{
-    width: 7.6%;
+    width: 6.7%;
   }
 .small-btn.active{
     background: #4CAF50;
@@ -75,6 +76,9 @@ body{
     height: 25px;
     background: #4CAF50;
     cursor: pointer;
+}
+.hidden{
+    display: none;
 }
 @media only screen and (max-width: 1023px) {
     .ui-section{

@@ -9,17 +9,24 @@
 <style>
 </style>
 <body>
-  <svg width="1400" height="600"></svg>
-  <label id="mouse-pos"></label>
-  <label id="distance"></label>
+  <svg width="800" height="500"></svg>
+  <br>
   <div class="options">
-    <div class="ui-section">
-      <label class="key">Unique Collisions:</label>
-      <input type="text" class="input-text input" id="unique-collisions" disabled>
+    <div class="ui-section hidden">
+      <label class="key">Mouse Position:</label>
+      <label class="input-text" id="mouse-pos"></label>
     </div>
     <div class="ui-section">
-      <label class="key">Total Collisions-Time Instances:</label>
-      <input type="text" class="input-text input" id="total-collisions" disabled>
+      <label class="key">Time: </label>
+      <label class="input-text" id="time"></label>
+    </div>
+    <div class="ui-section">
+      <label class="key">Robot-Goal Distances: </label>
+      <label class="input-text" id="distance"></label>
+    </div>
+    <div class="ui-section">
+      <label class="key">Collisions (Unique / Total):</label>
+      <label class="input-text" id="collision-count"></label>
     </div>
     <div class="ui-section">
       <label class="key">Timescale:</label>
@@ -27,7 +34,7 @@
     </div>
     <div class="ui-section">
       <label class="key">Robots:</label>
-      <input type="range" min="2" max="200" value="10" step="1" class="slider input" id="robots-slider">
+      <input type="range" min="2" max="150" value="10" step="1" class="slider input" id="robots-slider">
     </div>
     <div class="ui-section">
       <label class="key">Pause and Reset:</label>
@@ -36,14 +43,16 @@
     </div>
     <div class="ui-section">
       <label class="key">Show:</label>
-      <input type="button" value="Robots" class="input-button input small-btn active" id="robot-button" onclick="visualizeElementsChanged()">
-      <input type="button" value="Goals" class="input-button input small-btn active" id="goal-button" onclick="visualizeElementsChanged()">
-      <input type="button" value="Temp Goals" class="input-button input small-btn active" id="tempGoal-button" onclick="visualizeElementsChanged()">
+      <input type="button" value="All" class="input-button input small-btn active" id="redndering-button" onclick="visualizeElementsChanged()">
+      <input type="button" value="Robot" class="input-button input small-btn active" id="robot-button" onclick="visualizeElementsChanged()">
+      <input type="button" value="Goal" class="input-button input small-btn active" id="goal-button" onclick="visualizeElementsChanged()">
+      <input type="button" value="Local Goal" class="input-button input small-btn active" id="tempGoal-button" onclick="visualizeElementsChanged()">
       <input type="button" value="VC" class="input-button input small-btn active" id="vc-button" onclick="visualizeElementsChanged()">
       <input type="button" value="BVC" class="input-button input small-btn active" id="bvc-button" onclick="visualizeElementsChanged()">
+      <input type="button" value="Collisions" class="input-button input small-btn active" id="collisions-button" onclick="visualizeElementsChanged()">
     </div>
     <div class="ui-section">
-      <label class="key">Montion Planning Algorithm:</label>
+      <label class="key">Montion Planning:</label>
       <select class="input-select input" id="algorithm-select" name="algorithms">
         <!-- <option value="0">Random</option> -->
         <option value="1">None (Straight To Goal)</option>
@@ -62,7 +71,7 @@
     </div>
     <div class="ui-section">
       <label class="key">Start Benchmarking:</label>
-      <input  type="button" value="Benchmark" class="input-button input small-btn" id="benchmark-button" onclick="toggleBenchmarking()">
+      <input  type="button" value="Benchmark" class="input-button input small-btn" id="benchmark-button" onclick="toggleBenchmarking()" style="width: 50%;">
     </div>
   </div> 
 
@@ -88,20 +97,20 @@
 
   // Setup
   var timeInstance = 0;
-  var activeElements = {Robots:1, Goals:1, TempGoals:1, VC:1, BVC:1};
+  var activeElements = {All:1, Robots:1, Goals:1, TempGoals:1, VC:1, BVC:1, Collisions:1};
   var paused = false;
   var numberOfRobots = 2;
   var radiusOfRobots = 10;
   var svg = d3.select("svg");
   let motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
-  var gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm);
+  var gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm, activeElements.All);
   var bench = new Benchmark();
 
   var resetSimulation = function(){
     timeInstance = 0;
     svg.selectAll("*").remove();
     motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
-    gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm);
+    gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm, activeElements.All);
     changeDeadlockAlgorithm();
   }
 
@@ -126,11 +135,14 @@
 
   var visualizeElementsChanged = function(){  
     document.getElementById(event.srcElement.id).classList.toggle("active");
-    activeElements = { Robots:elementActive("robot-button"), 
-                      Goals:elementActive("goal-button"), 
-                      TempGoals:elementActive("tempGoal-button"), 
-                      VC:elementActive("vc-button"), 
-                      BVC:elementActive("bvc-button")};
+    activeElements = {  All:elementActive("redndering-button"),
+                        Robots:elementActive("robot-button"), 
+                        Goals:elementActive("goal-button"), 
+                        TempGoals:elementActive("tempGoal-button"), 
+                        VC:elementActive("vc-button"), 
+                        BVC:elementActive("bvc-button"),
+                        Collisions:elementActive("collisions-button")};
+    gScene.renderingEnabled = activeElements.All;
   }
 
   var elementActive = function(id){
@@ -140,8 +152,8 @@
   var syncSettings = function(){
     numberOfRobots = document.getElementById("robots-slider").value;
     gScene.setTimeScale(document.getElementById("time-scale-slider").value);
-    document.getElementById("unique-collisions").value = gScene.uniqueCollisions.length;
-    document.getElementById("total-collisions").value = gScene.totalCollisionTimeInst;
+    document.getElementById("collision-count").textContent = gScene.uniqueCollisions.length + " / " + gScene.totalCollisionTimeInst;
+    document.getElementById("time").textContent = timeInstance.toFixed(2);
     document.getElementById("distance").textContent = Math.floor(gScene.distance) ;
   }
 
