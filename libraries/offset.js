@@ -851,8 +851,8 @@ function possibleIntersection(se1, se2, queue) {
 
   if (nintersections === 2 && se1.isSubject === se2.isSubject){
     if(se1.contourId === se2.contourId){
-    console.warn('Edges of the same polygon overlap',
-      se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
+    // console.warn('Edges of the same polygon overlap',
+    //   se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
     }
     //throw new Error('Edges of the same polygon overlap');
     return 0;
@@ -941,7 +941,7 @@ function divideSegment(se, p, queue)  {
   var l = new SweepEvent(p, true,  se.otherEvent, se.isSubject);
 
   if (equals(se.point, se.otherEvent.point)) {
-    console.warn('what is that?', se);
+    // console.warn('what is that?', se);
   }
 
   r.contourId = l.contourId = se.contourId;
@@ -1026,7 +1026,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 
       // Cannot get out of the tree what we just put there
       if (!prev || !next) {
-        console.log('brute');
+        // console.log('brute');
         var iterators = findIterBrute(sweepLine);
         prev = iterators[0];
         next = iterators[1];
