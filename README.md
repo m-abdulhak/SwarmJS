@@ -1,8 +1,8 @@
 # Buffered Voronoi Cell Collision Avoidance Algorithm Simulation
 
 - Interactive simulation of the Buffered Voronoi Cell based distributed collision avoidance algorithm 
-- Soure code: https://github.com/m-abdulhak/BVC
-- Demo: https://m-abdulhak.github.io/BVC/
+- Soure code: https://github.com/m-abdulhak/Buffered-Voronoi-Cell
+- Demo: https://m-abdulhak.github.io/Buffered-Voronoi-Cell/
 
 - Developed by Mohammed Abdullhak (m_abdulhak@outlook.com)
 
