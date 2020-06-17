@@ -38,7 +38,7 @@
     </div>
     <div class="ui-section">
       <label class="key">Pause and Reset:</label>
-      <input type="button" value="Pause" class="input-button input half-btn" id="reset-button" onclick="pauseSimulation()">
+      <input type="button" value="Pause" class="input-button input half-btn" id="pause-button" onclick="pauseSimulation()">
       <input type="button" value="Reset" class="input-button input half-btn" id="reset-button" onclick="resetSimulation()">
     </div>
     <div class="ui-section">
@@ -70,6 +70,15 @@
       </select>
     </div>
     <div class="ui-section">
+      <label class="key">Starting Positions:</label>
+      <select class="input-select input" id="starting-positions-select" name="starting-positions" onchange="changeStartingPositions()">
+        <option value="0" selected>Random</option>
+        <option value="1">Circle</option>
+        <option value="2" >Square 1</option>
+        <option value="3" >Square 2</option>
+      </select>
+    </div>
+    <div class="ui-section">
       <label class="key">Start Benchmarking:</label>
       <input  type="button" value="Benchmark" class="input-button input small-btn" id="benchmark-button" onclick="toggleBenchmarking()" style="width: 50%;">
     </div>
@@ -90,9 +99,37 @@
 
 <script>
 
+  var uiElements = ["time-scale-slider",
+                    "robots-slider",
+                    "reset-button",
+                    "algorithm-select",
+                    "deadlock-select",
+                    "starting-positions-select"];
+
   function selectElement(id, valueToSelect) {    
       let element = document.getElementById(id);
       element.value = valueToSelect;
+  }
+
+  var getStartingPositionsSettings = function(){
+    const startPositions = parseInt(document.getElementById("starting-positions-select").value);
+    
+    switch (startPositions) {
+      case 0:
+        return Scene.StartingPositions.Random;
+      case 1:
+        return Scene.StartingPositions.Circle;
+      case 2:
+        return Scene.StartingPositions.InvertedSquare;
+      case 3:
+        return Scene.StartingPositions.InvertedSquare2;
+      default:
+        return Scene.StartingPositions.Random;
+    }
+  }
+
+  var getBenchmarkSettings = function(){
+    return parseInt(document.getElementById("starting-positions-select").value);
   }
 
   // Setup
@@ -103,15 +140,35 @@
   var radiusOfRobots = 10;
   var svg = d3.select("svg");
   let motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
-  var gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm, activeElements.All);
-  var bench = new Benchmark();
+  var gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm, activeElements.All, getStartingPositionsSettings());
+  var bench = new Benchmark(getBenchmarkSettings());
 
   var resetSimulation = function(){
     timeInstance = 0;
     svg.selectAll("*").remove();
     motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
-    gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm, activeElements.All);
+    gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm, activeElements.All, getStartingPositionsSettings());
     changeDeadlockAlgorithm();
+  }
+
+  var changeStartingPositions = function(){
+    let startingPositions = parseInt(document.getElementById("starting-positions-select").value);
+
+    switch (startingPositions) {
+      case 0:
+          radiusOfRobots = 10;
+          document.getElementById("robots-slider").max = 150;
+          document.getElementById("robots-slider").value =  100;
+        break;
+      case 1:
+          radiusOfRobots = 3;
+          document.getElementById("robots-slider").max = 100;
+          document.getElementById("robots-slider").value =  100;
+        break;
+      default:
+          radiusOfRobots = 10;
+        break;
+    }
   }
 
   var changeDeadlockAlgorithm = function(){
@@ -122,6 +179,12 @@
   }
 
   var toggleBenchmarking = function(){
+    uiElements.forEach( e => {
+      let docEl = document.getElementById(e); 
+      docEl.disabled = !docEl.disabled;
+    });
+    bench.setSettings(getBenchmarkSettings());
+    bench.benchCurSet = [];
     bench.toggleBenchmarking();
   }
 

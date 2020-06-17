@@ -1,13 +1,29 @@
 class Benchmark{
-    constructor(){              
+    constructor(benchSettings){              
         // Benchmarking
         this.plotColors = { 1: "blue",
                             2: "green"}
+        this.defaultSettings = [
+            // Random : 
+            {
+                benchMaxTimesteps : 800,
+                benchTimeScale : 60,
+                benchRobotCount : 100,
+            },
+            // Circle : 
+            {
+                benchMaxTimesteps : 800,
+                benchTimeScale : 60,
+                benchRobotCount : 100,
+            }
+        ];
+
+        this.setSettings(benchSettings);
+
         this.benchmarking = false;
-        this.benchMaxTimesteps = 800;
-        this.benchTimeScale = 60;
-        this.benchRobotCount = 100;
+        
         this.benchDeadlockAlgo = 1;
+
         this.benchData = {  simple : {
                                 sets : [],
                                 means : []
@@ -17,11 +33,32 @@ class Benchmark{
                                 means : []
                             }
                         };
+
         this.benchCurSet = []; 
         this.simplePlot = null;
         this.advancedPlot = null;
 
         this.initGraph();
+    }
+
+    setSettings(benchSettings){
+        this.settings = this.defaultSettings[benchSettings];
+        
+        this.benchMaxTimesteps = this.settings.benchMaxTimesteps;
+        this.benchTimeScale = this.settings.benchTimeScale;
+        this.benchRobotCount = this.settings.benchRobotCount;
+        
+        this.benchData = {  simple : {
+                            sets : [],
+                            means : []
+                            },
+                            advanced : {
+                                sets : [],
+                                means : []
+                            }
+                        };
+
+        this.benchCurSet = []; 
     }
     
     updateBenchSet(time){
@@ -35,7 +72,7 @@ class Benchmark{
         document.getElementById("benchmark-button").classList.toggle("active");
 
         if(this.benchmarking){
-        this.startBenchmarkInstance();
+            this.startBenchmarkInstance();
         }
     }
     
@@ -53,7 +90,7 @@ class Benchmark{
     }
 
     updateBenchData(){
-        if(this.benchmarking && this.benchCurSet.length != 0){
+        if(this.benchmarking && this.benchCurSet.length == 1 + Math.floor(this.benchMaxTimesteps / 10)){
             let data = this.benchDeadlockAlgo == 1 ? this.benchData.simple : this.benchData.advanced; 
 
             if(data.means.length == 0){

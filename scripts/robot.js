@@ -445,7 +445,7 @@ class Robot{
   }
 
   reached(point){
-    var ret = this.getDistanceTo(point) <= this.radius/100;
+    var ret = this.getDistanceTo(point) <= this.radius/50;
     return ret;
   }
 

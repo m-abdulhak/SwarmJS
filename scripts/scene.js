@@ -1,11 +1,21 @@
 class Scene{
-  constructor(svg, numOfRobots, robotRadius, motionPlanningAlgorithm, enableRendering){
+  // Initial Configurations
+  static StartingPositions = {
+    Random: "getRandomCollisionFreePositions",
+    Circle: "getCircleCollisionFreePositions",
+    InvertedSquare: "",
+    InvertedSquare2: "",
+  }
+
+  constructor(svg, numOfRobots, robotRadius, motionPlanningAlgorithm, enableRendering, startingPositionsConfig){
     this.svg = svg;
     this.width = svg.attr("width");
     this.height = svg.attr("height");
     this.numOfRobots = numOfRobots;
     this.radius = robotRadius;
-    this.collisionFreePositions = this.getCollisionFreePositions(this.numOfRobots, this.radius, this.width, this.height);
+       
+    // Starting and Goal Positions
+    this.robotsStartingPositions = this[startingPositionsConfig](this.numOfRobots, this.radius, this.width, this.height);
 
     // Rendering option
     this.renderingEnabled = enableRendering;
@@ -135,8 +145,8 @@ class Scene{
   initializeRobotsRange(numOfRobots, radius, envWidth, envHeight, motionPlanningAlgorithm){
     return  d3.range(numOfRobots)
               .map(i => new Robot(  i,
-                                    this.getRandCollisionFreePos(),
-                                    this.getRandCollisionFreePos(),
+                                    this.getAnInitialPos(),
+                                    this.getAnInitialPos(),
                                     radius,
                                     envWidth,
                                     envHeight,
@@ -144,11 +154,11 @@ class Scene{
                                     motionPlanningAlgorithm));    
   }
 
-  getRandCollisionFreePos(){
-    return this.collisionFreePositions.pop();
+  getAnInitialPos(){
+    return this.robotsStartingPositions.pop();
   }
 
-  getCollisionFreePositions(numOfRobots, radius, envWidth, envHeight){
+  getRandomCollisionFreePositions(numOfRobots, radius, envWidth, envHeight){
     const resolution = (radius*2.1);
     let xCount = envWidth / resolution;
     let yCount = envHeight / resolution;
@@ -160,14 +170,47 @@ class Scene{
     let positions = [];
     let i = 0;
     while (positions.length<numOfRobots*3  && i<numOfRobots*100) {
-      const newX = Math.max(radius,Math.min(envWidth-radius,Math.floor(Math.random()*xCount)*resolution));
-      const newY = Math.max(radius,Math.min(envHeight-radius,Math.floor(Math.random()*yCount)*resolution));
+      const newX = Math.max(radius*2,Math.min(envWidth-radius*2,Math.floor(Math.random()*xCount)*resolution));
+      const newY = Math.max(radius*2,Math.min(envHeight-radius*2,Math.floor(Math.random()*yCount)*resolution));
       const newPos = {x:newX, y:newY};
 
       if(positions.findIndex(x => distanceBetween2Points(x,newPos)<radius*2.5) == -1){
         positions.push(newPos);
       }      
       i++;
+    }
+    
+    if(positions.length<numOfRobots*2){
+      throw "Invalid inputs, number and size of robots are too high for this environment size!"
+    }
+
+    return positions;
+  }
+
+  getCircleCollisionFreePositions(numOfRobots, radius, envWidth, envHeight){
+    const circleRadius = Math.min(envWidth,envHeight) * 20 / 42;
+    const resolution = Math.PI * 2 / numOfRobots;
+    const envCenter = {x: envWidth / 2, y: envHeight / 2};
+    
+    if(circleRadius*resolution < radius*4){
+      throw "Invalid inputs, number and size of robots are too high for this environment size!"
+    }
+
+    let positions = [];
+    const start = Math.random() * Math.PI * 2
+    let i = start;
+    while (i< start + Math.PI * 2) {
+      const newX = envCenter.x + circleRadius * Math.cos(i);
+      const newY = envCenter.y + circleRadius * Math.sin(i);
+      const newGoalX = envCenter.x - circleRadius * Math.cos(i);
+      const newGoalY = envCenter.y - circleRadius * Math.sin(i);
+      const newPos = {x:newX, y:newY};
+      const newGoalPos = {x:newGoalX, y:newGoalY};
+
+      positions.push(newPos);
+      positions.push(newGoalPos);
+
+      i+=resolution;
     }
     
     if(positions.length<numOfRobots*2){
