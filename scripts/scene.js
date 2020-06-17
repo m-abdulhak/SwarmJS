@@ -3,8 +3,8 @@ class Scene{
   static StartingPositions = {
     Random: "getRandomCollisionFreePositions",
     Circle: "getCircleCollisionFreePositions",
-    InvertedSquare: "",
-    InvertedSquare2: "",
+    InvertedSquare: "getSquarePositionsConfig1",
+    InvertedSquare2: "getSquarePositionsConfig2",
   }
 
   constructor(svg, numOfRobots, robotRadius, motionPlanningAlgorithm, enableRendering, startingPositionsConfig){
@@ -200,6 +200,7 @@ class Scene{
     const start = Math.random() * Math.PI * 2
     let i = start;
     while (i< start + Math.PI * 2) {
+
       const newX = envCenter.x + circleRadius * Math.cos(i);
       const newY = envCenter.y + circleRadius * Math.sin(i);
       const newGoalX = envCenter.x - circleRadius * Math.cos(i);
@@ -210,7 +211,52 @@ class Scene{
       positions.push(newPos);
       positions.push(newGoalPos);
 
-      i+=resolution;
+      i+= resolution;
+    }
+    
+    if(positions.length<numOfRobots*2){
+      throw "Invalid inputs, number and size of robots are too high for this environment size!"
+    }
+
+    return positions;
+  }
+
+  getSquarePositionsConfig1(numOfRobots, radius, envWidth, envHeight){
+    const distanceBetweenPositions = radius * 4.2;
+    return this.getSquareCollisionFreePositions(numOfRobots, radius, envWidth, envHeight, distanceBetweenPositions, false);
+  }
+
+  getSquarePositionsConfig2(numOfRobots, radius, envWidth, envHeight){
+    const distanceBetweenPositions = radius * 4.6;
+    return this.getSquareCollisionFreePositions(numOfRobots, radius, envWidth, envHeight, distanceBetweenPositions, true);
+  }
+  
+  getSquareCollisionFreePositions(numOfRobots, radius, envWidth, envHeight, distanceBetweenPositions, invertVertically){
+    const resolution = distanceBetweenPositions;
+    const robotStart = {x: radius * 10, y: radius * 20};
+    const goalsStart = {x: envWidth - radius * 10, y: !invertVertically? radius * 20 : radius * 20 + resolution * 9};
+
+    if(robotStart.x + resolution * 10 > envWidth / 2 || robotStart.y + resolution * 10 > envHeight){
+      throw "Invalid inputs, number and size of robots are too high for this environment size!"
+    }
+
+    let positions = [];
+    
+    for (var row = 0; row < 10 ; row++){
+      for (var col = 0; col < 10; col ++){
+        const newX = robotStart.x + resolution * col + Math.random()*radius/100 + radius/50;
+        const newY = robotStart.y + resolution * row + Math.random()*radius/100 + radius/50;
+        const newGoalX = goalsStart.x - resolution * col + Math.random()*radius/100 + radius/50;
+        const newGoalY = !invertVertically?
+                          goalsStart.y + resolution * row + Math.random()*radius/100 + radius/50 :
+                          goalsStart.y - resolution * row + Math.random()*radius/100 + radius/50;
+
+        const newPos = {x:newX, y:newY};
+        const newGoalPos = {x:newGoalX, y:newGoalY};
+  
+        positions.push(newGoalPos);
+        positions.push(newPos);
+      }
     }
     
     if(positions.length<numOfRobots*2){

@@ -15,6 +15,18 @@ class Benchmark{
                 benchMaxTimesteps : 800,
                 benchTimeScale : 60,
                 benchRobotCount : 100,
+            },
+            // Square 1 : 
+            {
+                benchMaxTimesteps : 800,
+                benchTimeScale : 60,
+                benchRobotCount : 100,
+            },
+            // Square 1 : 
+            {
+                benchMaxTimesteps : 1600,
+                benchTimeScale : 60,
+                benchRobotCount : 100,
             }
         ];
 
@@ -115,6 +127,8 @@ class Benchmark{
         this.width = 1400 - this.margin.left - this.margin.right,
         this.height = 600 - this.margin.top - this.margin.bottom;
 
+        
+        d3.select("#graph").selectAll().remove();
         this.svgGraph = d3.select("#graph")
         .append("svg")
         .attr("width", this.width + this.margin.left + this.margin.right)
@@ -125,7 +139,7 @@ class Benchmark{
 
         // X scale will fit all values from data[] within pixels 0-width
         this.x = d3.scaleLinear()
-        .domain( [0, 1 + this.benchMaxTimesteps/10])
+        .domain( [0, 1 + this.benchMaxTimesteps])
         .range([ 0, this.width ]);
 
         this.svgGraph.append("g")
@@ -166,7 +180,7 @@ class Benchmark{
             .attr("stroke-width", 1.5)
             .attr("d", d3.line()
             .x(function(d,i) { 
-                return bench.x(i); 
+                return bench.x(i)*10; 
             })
             .y(function(d) { 
                 return bench.y(d); 
@@ -179,7 +193,7 @@ class Benchmark{
         plot.datum(data)
             .attr("d", d3.line()
             .x(function(d,i) { 
-                return bench.x(i); 
+                return bench.x(i)*10; 
             })
             .y(function(d) { 
                 return bench.y(d); 

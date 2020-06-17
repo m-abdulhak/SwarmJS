@@ -74,8 +74,8 @@
       <select class="input-select input" id="starting-positions-select" name="starting-positions" onchange="changeStartingPositions()">
         <option value="0" selected>Random</option>
         <option value="1">Circle</option>
-        <option value="2" >Square 1</option>
-        <option value="3" >Square 2</option>
+        <option value="2" >Square (Inverted Horizontally)</option>
+        <option value="3" >Square (Inverted Vertically and Horizontally)</option>
       </select>
     </div>
     <div class="ui-section">
@@ -84,7 +84,9 @@
     </div>
   </div> 
 
-	<div id="graph" class="aGraph" style="display: block;" width="1400" height="600"></div>
+  <div id="graph-container">
+    <div id="graph" class="aGraph" style="display: block;" width="1400" height="600"></div>
+  </div>
 
   <script src="https://d3js.org/d3.v4.js"></script>
   <script src="libraries/d3-delaunay.js"></script>
@@ -165,10 +167,24 @@
           document.getElementById("robots-slider").max = 100;
           document.getElementById("robots-slider").value =  100;
         break;
+      case 2:
+          radiusOfRobots = 5;
+          document.getElementById("robots-slider").max = 100;
+          document.getElementById("robots-slider").value =  100;
+        break;
+      case 3:
+          radiusOfRobots = 5;
+          document.getElementById("robots-slider").max = 100;
+          document.getElementById("robots-slider").value =  100;
+        break;
       default:
           radiusOfRobots = 10;
         break;
     }
+    document.getElementById("graph-container").innerHTML = 
+      '<div id="graph" class="aGraph" style="display: block;" width="1400" height="600"></div>';
+
+    bench = new Benchmark(getBenchmarkSettings());
   }
 
   var changeDeadlockAlgorithm = function(){
