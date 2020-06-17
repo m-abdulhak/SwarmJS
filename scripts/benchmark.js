@@ -135,7 +135,7 @@ class Benchmark{
 
     initGraph(){
         // set the dimensions and margins of the graph
-        this.margin = {top: 30, right: 30, bottom: 30, left: 50},
+        this.margin = {top: 30, right: 30, bottom: 80, left: 60},
         this.width = 1400 - this.margin.left - this.margin.right,
         this.height = 600 - this.margin.top - this.margin.bottom;
 
@@ -158,6 +158,14 @@ class Benchmark{
         .attr("transform", "translate(0," + this.height + ")")
         .call(d3.axisBottom(this.x));
 
+        // text label for the x axis
+        this.svgGraph.append("text")             
+        .attr("transform",
+                "translate(" + (this.width/2) + " ," + 
+                            (this.height + this.margin.top + 20) + ")")
+        .style("text-anchor", "middle")
+        .text("Time");
+
         // Y scale will fit values from 0-10 within pixels height-0 
         this.y = d3.scaleLinear()
         .domain( [0, 500])
@@ -165,6 +173,15 @@ class Benchmark{
 
         this.svgGraph.append("g")
         .call(d3.axisLeft(this.y));
+        
+        // text label for the y axis
+        this.svgGraph.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - this.margin.left)
+        .attr("x",0 - (this.height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Distance");  
 
         const y1 = this.height - this.robotRadius*2;
         const y2 = this.height - this.robotRadius*2;
