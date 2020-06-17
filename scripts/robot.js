@@ -473,15 +473,30 @@ class Robot{
     return distanceBetween2Points(this.position,r.position) < this.radius*2;
   }
 
-  getCollisionsAgainstRobots(robots, prevent=false){
+  getNeighborRobotsDistanceMeasurements(robots, prevent=false){
     let collisions = [];
+    let minDist = -1;
+
     robots.forEach(r => {
-      if(this.collidingWithRobot(r)){
+      const distance = distanceBetween2Points(this.position,r.position);
+      
+      // If first or closest neighbor, set distanceas min distance 
+      if(minDist == -1 || distance < minDist){
+        minDist = distance;
+      } 
+
+      if (Math.abs(distance - 14.778354236459801) < 0.001){
+        let c = 0;
+      }
+
+      // Colliding With Robot r
+      if(distance < this.radius*2){
         this.scene.collisions.push({x: (r.position.x + this.position.x)/2, y:(r.position.y + this.position.y)/2});
         collisions.push([Math.min(this.id, r.id), Math.max(this.id, r.id)]);
       }
     });
-    return collisions;
+
+    return {collisions: collisions, minDistance: minDist};
   }
   
   setDeadlockAlgo(DeadlockAlgo){

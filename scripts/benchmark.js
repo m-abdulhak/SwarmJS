@@ -9,46 +9,40 @@ class Benchmark{
                 benchMaxTimesteps : 800,
                 benchTimeScale : 60,
                 benchRobotCount : 100,
+                robotRadius : 10,
             },
             // Circle : 
             {
                 benchMaxTimesteps : 800,
                 benchTimeScale : 60,
                 benchRobotCount : 100,
+                robotRadius : 3,
             },
             // Square 1 : 
             {
                 benchMaxTimesteps : 800,
                 benchTimeScale : 60,
                 benchRobotCount : 100,
+                robotRadius : 5,
             },
             // Square 1 : 
             {
                 benchMaxTimesteps : 1600,
                 benchTimeScale : 60,
                 benchRobotCount : 100,
+                robotRadius : 5,
             }
         ];
 
         this.setSettings(benchSettings);
 
         this.benchmarking = false;
-        
         this.benchDeadlockAlgo = 1;
 
-        this.benchData = {  simple : {
-                                sets : [],
-                                means : []
-                            },
-                            advanced : {
-                                sets : [],
-                                means : []
-                            }
-                        };
-
-        this.benchCurSet = []; 
-        this.simplePlot = null;
-        this.advancedPlot = null;
+        this.simpleTotalDistancePlot = null;
+        this.simpleMinDistancePlot = null;
+        this.advancedTotalDistancePlot = null;
+        this.advancedMinDistancePlot = null;
 
         this.initGraph();
     }
@@ -59,23 +53,32 @@ class Benchmark{
         this.benchMaxTimesteps = this.settings.benchMaxTimesteps;
         this.benchTimeScale = this.settings.benchTimeScale;
         this.benchRobotCount = this.settings.benchRobotCount;
+        this.robotRadius = this.settings.robotRadius;
         
         this.benchData = {  simple : {
-                            sets : [],
-                            means : []
-                            },
-                            advanced : {
-                                sets : [],
-                                means : []
-                            }
-                        };
+                sets : [],
+                means : [],
+                midDistanceMeans : [] 
+            },
+            advanced : {
+                sets : [],
+                means : [],
+                midDistanceMeans : []
+            }
+        };
 
-        this.benchCurSet = []; 
+        this.curTotalDistanceSet = []; 
+        this.curMinDistanceSet = []; 
     }
     
     updateBenchSet(time){
         if(this.benchmarking){
-            this.benchCurSet[Math.floor(time/10)] = gScene.distance;
+            this.curTotalDistanceSet[Math.floor(time/10)] = gScene.distance;
+
+            this.curMinDistanceSet[Math.floor(time/10)] = gScene.minDistance;
+            if(this.curMinDistanceSet[Math.floor((time+3)/10)] == undefined){
+                gScene.minDistance = null;
+            } 
         }
     }
 
@@ -102,23 +105,32 @@ class Benchmark{
     }
 
     updateBenchData(){
-        if(this.benchmarking && this.benchCurSet.length == 1 + Math.floor(this.benchMaxTimesteps / 10)){
+        if(this.benchmarking && this.curTotalDistanceSet.length == 1 + Math.floor(this.benchMaxTimesteps / 10)){
             let data = this.benchDeadlockAlgo == 1 ? this.benchData.simple : this.benchData.advanced; 
 
             if(data.means.length == 0){
-                data.means = this.benchCurSet;
+                data.means = this.curTotalDistanceSet;
+                data.midDistanceMeans = this.curMinDistanceSet;
             } else{
                 let setCount = data.sets.length;
                 let newMeans = [];
+                let newMinDistanceMeans = [];
+
                 for (let i = 0; i < data.means.length; i++) {
-                    newMeans[i] = (data.means[i] * setCount + this.benchCurSet[i] ) / (setCount + 1);
+                    newMeans[i] = (data.means[i] * setCount + this.curTotalDistanceSet[i] ) / (setCount + 1);
+                    newMinDistanceMeans[i] = (data.midDistanceMeans[i] * setCount + this.curMinDistanceSet[i] ) / (setCount + 1);
                 }
+
                 data.means = newMeans;
-                this.updateGraph(this.benchDeadlockAlgo, data.means);
+                data.midDistanceMeans = newMinDistanceMeans;
+
+                this.updateGraph(this.benchDeadlockAlgo, data.means, data.midDistanceMeans);
             }
-            data.sets.push(this.benchCurSet);
+
+            data.sets.push(this.curTotalDistanceSet);
         }
-        this.benchCurSet = [];
+        this.curTotalDistanceSet = [];
+        this.curMinDistanceSet = [];
     }
 
     initGraph(){
@@ -153,38 +165,56 @@ class Benchmark{
 
         this.svgGraph.append("g")
         .call(d3.axisLeft(this.y));
+
+        const y1 = this.height - this.robotRadius*2;
+        const y2 = this.height - this.robotRadius*2;
+        const x1 = 0;
+        const x2 = 999999;
+
+        this.svgGraph.append("path")
+            .attr("fill", "none")
+            .attr("stroke", "red")
+            .attr("stroke-width", 1.5)
+            .attr("stroke-dasharray", "10,10")
+            .attr("d", `M${x1},${y1}L${x2},${y2}Z`);
+
     }
 
-    updateGraph(algo, data){   
+    updateGraph(algo, totalDistance, minDistance){   
         if(algo == 1){
-            if(this.simplePlot == null){
-                this.simplePlot = this.createPlot(algo, data);
+            if(this.simpleTotalDistancePlot == null){
+                this.simpleTotalDistancePlot = this.createPlot(algo, totalDistance);
+                this.simpleMinDistancePlot = this.createPlot(algo, minDistance, true);
             } else{
-                this.updatePlot(this.simplePlot, data);
+                this.updatePlot(this.simpleTotalDistancePlot, totalDistance);
+                this.updatePlot(this.simpleMinDistancePlot, minDistance);
             }
         } else{
-            if(this.advancedPlot == null){
-                this.advancedPlot = this.createPlot(algo, data);
+            if(this.advancedTotalDistancePlot == null){
+                this.advancedTotalDistancePlot = this.createPlot(algo, totalDistance);
+                this.advancedMinDistancePlot = this.createPlot(algo, minDistance, true);
             } else{
-                this.updatePlot(this.advancedPlot, data);
+                this.updatePlot(this.advancedTotalDistancePlot, totalDistance);
+                this.updatePlot(this.advancedMinDistancePlot, minDistance);
             }
         }
     }
 
-    createPlot(algo, data){
+    createPlot(algo, data, dashed = false){
         // Add the line
         return this.svgGraph.append("path")
             .datum(data)
             .attr("fill", "none")
             .attr("stroke", bench.plotColors[algo])
             .attr("stroke-width", 1.5)
+            .attr("stroke-dasharray", dashed ? "10,10" : "10,0")
             .attr("d", d3.line()
-            .x(function(d,i) { 
-                return bench.x(i)*10; 
-            })
-            .y(function(d) { 
-                return bench.y(d); 
-            })
+                .x(function(d,i) { 
+                    return bench.x(i)*10; 
+                })
+                .y(function(d) { 
+                    return bench.y(d); 
+                })
             );
     }
 
@@ -192,12 +222,12 @@ class Benchmark{
         // update the line
         plot.datum(data)
             .attr("d", d3.line()
-            .x(function(d,i) { 
-                return bench.x(i)*10; 
-            })
-            .y(function(d) { 
-                return bench.y(d); 
-            })
+                .x(function(d,i) { 
+                    return bench.x(i)*10; 
+                })
+                .y(function(d) { 
+                    return bench.y(d); 
+                })
             );
     }  
 }

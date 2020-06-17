@@ -43,6 +43,9 @@ class Scene{
 
     // Total Robot-Goal Distances
     this.distance = null;
+
+    // Minimum Robot-Robot Distanc
+    this.minDistance = null;
   }
 
   setTimeScale(scale){
@@ -106,14 +109,25 @@ class Scene{
     timeInstance += this.timeDelta;
     
     let detectedCollisions = [];
+    let minDist = null;
 
     this.robots.forEach((r,i) => {
-        r.getCollisionsAgainstRobots(this.robots.slice(i+1), 0).forEach(d => detectedCollisions.push(d))
+        const distanceMeasurements = r.getNeighborRobotsDistanceMeasurements(this.robots.slice(i+1), 0);
+
+        distanceMeasurements.collisions.forEach(d => detectedCollisions.push(d));
+        
+        if(minDist == null || distanceMeasurements.minDist < minDist){
+          minDist = distanceMeasurements.minDistance; 
+        }
       });
     
     if(detectedCollisions.length > 0){
       this.totalCollisionTimeInst += detectedCollisions.length;
       detectedCollisions.forEach(d => this.pushUniqueCollisions(this.uniqueCollisions,d));
+    }
+
+    if(this.minDistance == null || minDist < this.minDistance){
+      this.minDistance = minDist; 
     }
   }
 
