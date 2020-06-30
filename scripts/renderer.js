@@ -160,21 +160,21 @@ class Renderer{
 
             
       // Collisions
-      this.scene.collisionCircles = svg.append("g")
-      .selectAll("circle")
-      .data(this.scene.collisions)
-      .enter()
-      .append("circle")
-      .attr("class", "collision")
-      .attr("cx", d => d.x)
-      .attr("cy", d => d.y)
-      .attr("r", 10)
-      .attr("fill", "#ff00f5")
-      .attr("fill-opacity", "10%")
-      .attr("stroke-width", 5)
-      .attr("stroke", "#02ff00")
-      .attr("stroke-dasharray","0.2,0.8")
-      .attr("stroke-opacity", "10%")
+      // this.scene.collisionCircles = svg.append("g")
+      // .selectAll("circle")
+      // .data(this.scene.collisions)
+      // .enter()
+      // .append("circle")
+      // .attr("class", "collision")
+      // .attr("cx", d => d.x)
+      // .attr("cy", d => d.y)
+      // .attr("r", 10)
+      // .attr("fill", "#ff00f5")
+      // .attr("fill-opacity", "10%")
+      // .attr("stroke-width", 5)
+      // .attr("stroke", "#02ff00")
+      // .attr("stroke-dasharray","0.2,0.8")
+      // .attr("stroke-opacity", "10%")
     }
     
     renderLineSeg(x1,y1,x2,y2){

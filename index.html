@@ -24,10 +24,10 @@
       <label class="key">Robot-Goal Distances: </label>
       <label class="input-text" id="distance"></label>
     </div>
-    <div class="ui-section">
+    <!-- <div class="ui-section">
       <label class="key">Collisions (Unique / Total):</label>
       <label class="input-text" id="collision-count"></label>
-    </div>
+    </div> -->
     <div class="ui-section">
       <label class="key">Timescale:</label>
       <input type="range" min="0.0001" max="30.0" value=".005" step="0.001" class="slider input" id="time-scale-slider">
@@ -49,7 +49,7 @@
       <input type="button" value="Local Goal" class="input-button input small-btn active" id="tempGoal-button" onclick="visualizeElementsChanged()">
       <input type="button" value="VC" class="input-button input small-btn active" id="vc-button" onclick="visualizeElementsChanged()">
       <input type="button" value="BVC" class="input-button input small-btn active" id="bvc-button" onclick="visualizeElementsChanged()">
-      <input type="button" value="Collisions" class="input-button input small-btn active" id="collisions-button" onclick="visualizeElementsChanged()">
+      <!-- <input type="button" value="Collisions" class="input-button input small-btn active" id="collisions-button" onclick="visualizeElementsChanged()"> -->
     </div>
     <div class="ui-section">
       <label class="key">Montion Planning:</label>
@@ -242,7 +242,8 @@
                         TempGoals:elementActive("tempGoal-button"), 
                         VC:elementActive("vc-button"), 
                         BVC:elementActive("bvc-button"),
-                        Collisions:elementActive("collisions-button")};
+                        // Collisions:elementActive("collisions-button")
+                      };
     gScene.renderingEnabled = activeElements.All;
   }
 
@@ -253,7 +254,7 @@
   var syncSettings = function(){
     numberOfRobots = document.getElementById("robots-slider").value;
     gScene.setTimeScale(document.getElementById("time-scale-slider").value);
-    document.getElementById("collision-count").textContent = gScene.uniqueCollisions.length + " / " + gScene.totalCollisionTimeInst;
+    //document.getElementById("collision-count").textContent = gScene.uniqueCollisions.length + " / " + gScene.totalCollisionTimeInst;
     document.getElementById("time").textContent = timeInstance.toFixed(2);
     document.getElementById("distance").textContent = Math.floor(gScene.distance) ;
   }

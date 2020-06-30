@@ -225,7 +225,7 @@ class Scene{
       positions.push(newPos);
       positions.push(newGoalPos);
 
-      i+= resolution;
+      i+= resolution + Math.random()*resolution/100-resolution/50;
     }
     
     if(positions.length<numOfRobots*2){
