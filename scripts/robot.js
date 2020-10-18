@@ -40,6 +40,9 @@ class Robot{
     this.maxConsecutiveDeadlockManeuvers = 6;
     this.maneuverDirection = 0;
 
+    this.detourPointToOutermostPointRatio = 0.3;
+    this.detourPointMaxDistance = 6 * this.radius;
+
     // Deadlock parameters
     let robotArea = circleArea(this.radius);
     this.bvcAreaThreshold = robotArea * 3;
@@ -326,7 +329,15 @@ class Robot{
   // vertices are the vertices of cell that lie on the current maneuver direction
   setTempGoalAccToAdvancedDeadlockRec(cell){
     let vertecies = this.getVerteciesOnManeuverDir(cell, this.position, this.goal);
-    this.tempGoal = this.getFurthestVertexFromLineSeg(vertecies, this.position, this.goal);
+    let outermostPoint = this.getFurthestVertexFromLineSeg(vertecies, this.position, this.goal);
+    let distanceToOuterMostPoint = distanceBetween2Points(this.position, outermostPoint);
+    if(distanceToOuterMostPoint < this.detourPointMaxDistance){
+      this.tempGoal = outermostPoint;
+    } else {
+      let defaultRatioLongerThanMax = distanceToOuterMostPoint*this.detourPointToOutermostPointRatio > this.detourPointMaxDistance;
+      let detourRatio = defaultRatioLongerThanMax ? this.detourPointMaxDistance/distanceToOuterMostPoint : this.detourPointToOutermostPointRatio;
+      this.tempGoal = pointOnLineSegmentPerRatio(this.position, outermostPoint, detourRatio);
+    }
   }
 
   shouldPerformAnotherManeuver(){
