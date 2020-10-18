@@ -24,10 +24,6 @@
       <label class="key">Robot-Goal Distances: </label>
       <label class="input-text" id="distance"></label>
     </div>
-    <!-- <div class="ui-section">
-      <label class="key">Collisions (Unique / Total):</label>
-      <label class="input-text" id="collision-count"></label>
-    </div> -->
     <div class="ui-section">
       <label class="key">Timescale:</label>
       <input type="range" min="0.0001" max="30.0" value=".005" step="0.001" class="slider input" id="time-scale-slider">
@@ -46,31 +42,26 @@
       <input type="button" value="All" class="input-button input small-btn active" id="redndering-button" onclick="visualizeElementsChanged()">
       <input type="button" value="Robot" class="input-button input small-btn active" id="robot-button" onclick="visualizeElementsChanged()">
       <input type="button" value="Goal" class="input-button input small-btn active" id="goal-button" onclick="visualizeElementsChanged()">
-      <input type="button" value="Local Goal" class="input-button input small-btn active" id="tempGoal-button" onclick="visualizeElementsChanged()">
-      <input type="button" value="VC" class="input-button input small-btn active" id="vc-button" onclick="visualizeElementsChanged()">
-      <input type="button" value="BVC" class="input-button input small-btn active" id="bvc-button" onclick="visualizeElementsChanged()">
-      <!-- <input type="button" value="Collisions" class="input-button input small-btn active" id="collisions-button" onclick="visualizeElementsChanged()"> -->
+      <input type="button" value="Waypoint" class="input-button input small-btn active" id="tempGoal-button" onclick="visualizeElementsChanged()">
+      <input type="button" value="Voronoi Cell" class="input-button input small-btn active" id="vc-button" onclick="visualizeElementsChanged()">
+      <input type="button" value="Buffered VC" class="input-button input small-btn active" id="bvc-button" onclick="visualizeElementsChanged()">
     </div>
     <div class="ui-section">
-      <label class="key">Montion Planning:</label>
+      <label class="key">Path Planning:</label>
       <select class="input-select input" id="algorithm-select" name="algorithms">
-        <!-- <option value="0">Random</option> -->
-        <option value="1">None (Straight To Goal)</option>
-        <!-- <option value="2">Voronoi Cell</option> -->
         <option value="3" selected>Buffered Voronoi Cell</option>
       </select>
     </div>
     <div class="ui-section">
       <label class="key">Deadlock Recovery:</label>
       <select class="input-select input" id="deadlock-select" name="deadlock" onchange="changeDeadlockAlgorithm()">
-        <!-- <option value="0">Random</option> -->
         <option value="0" selected>None</option>
-        <option value="1">Simple</option>
-        <option value="2" >Advanced</option>
+        <option value="1">Right-Hand Heuristics</option>
+        <option value="2">Novel Deadlock Prediction and Recovery Algorithms</option>
       </select>
     </div>
     <div class="ui-section">
-      <label class="key">Starting Positions:</label>
+      <label class="key">Positions:</label>
       <select class="input-select input" id="starting-positions-select" name="starting-positions" onchange="changeStartingPositions()">
         <option value="0" selected>Random</option>
         <option value="1">Circle</option>
@@ -81,6 +72,11 @@
     <div class="ui-section">
       <label class="key">Start Benchmarking:</label>
       <input  type="button" value="Benchmark" class="input-button input small-btn" id="benchmark-button" onclick="toggleBenchmarking()" style="width: 50%;">
+    </div>
+    <div class="ui-section">
+      <label class="key">Save Benchmark As PNG :</label>
+      <input  type="button" value="Save" class="input-button input small-btn" onclick="bench.downloadImage()" style="width: 50%;">
+      <input  type="button" value="Auto Save" class="hidden input-button input small-btn" onclick="bench.autoDownloadImage()" style="width: 50%;">
     </div>
   </div> 
 
@@ -112,6 +108,7 @@
   <script src="https://d3js.org/d3.v4.js"></script>
   <script src="libraries/d3-delaunay.js"></script>
   <script src="libraries/offset.js"></script>
+  <script src="libraries/svg-to-image.js"></script>
   <script src="scripts/geometry.js"></script>
   <script src="scripts/renderer.js"></script>
   <script src="scripts/scene.js"></script>

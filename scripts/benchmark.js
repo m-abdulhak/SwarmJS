@@ -1,11 +1,14 @@
 class Benchmark{
     constructor(benchSettings){              
         // Benchmarking
-        this.plotColors = { 1: "blue",
+        this.plotColors = { 1: "midnightblue",
                             2: "green"}
+        this.backgroundPlotsColors = { 1: "cornflowerblue",
+                            2: "darkseagreen"}
         this.defaultSettings = [
             // Random : 
             {
+                type: "Random",
                 benchMaxTimesteps : 800,
                 benchTimeScale : 60,
                 benchRobotCount : 100,
@@ -13,6 +16,7 @@ class Benchmark{
             },
             // Circle : 
             {
+                type: "Circle",
                 benchMaxTimesteps : 800,
                 benchTimeScale : 60,
                 benchRobotCount : 100,
@@ -20,6 +24,7 @@ class Benchmark{
             },
             // Square 1 : 
             {
+                type: "SquareHor",
                 benchMaxTimesteps : 800,
                 benchTimeScale : 60,
                 benchRobotCount : 100,
@@ -27,6 +32,7 @@ class Benchmark{
             },
             // Square 1 : 
             {
+                type: "SquareHorVer",
                 benchMaxTimesteps : 1600,
                 benchTimeScale : 60,
                 benchRobotCount : 100,
@@ -44,7 +50,13 @@ class Benchmark{
         this.advancedTotalDistancePlot = null;
         this.advancedMinDistancePlot = null;
 
+        this.autoSaveImageAfterEachRep = true;
+
         this.initGraph();
+    }
+
+    autoDownloadImage(){
+        this.autoSaveImageAfterEachRep = !this.autoSaveImageAfterEachRep;
     }
 
     setSettings(benchSettings){
@@ -123,11 +135,14 @@ class Benchmark{
 
                 data.means = newMeans;
                 data.midDistanceMeans = newMinDistanceMeans;
-
-                this.updateGraph(this.benchDeadlockAlgo, data.means, data.midDistanceMeans);
             }
 
+            this.updateGraph(this.benchDeadlockAlgo, data.means, data.midDistanceMeans, this.curTotalDistanceSet);
+
             data.sets.push(this.curTotalDistanceSet);
+            if(this.autoSaveImageAfterEachRep){
+                this.downloadImage(data.sets.length);
+            }
         }
         this.curTotalDistanceSet = [];
         this.curMinDistanceSet = [];
@@ -197,33 +212,34 @@ class Benchmark{
 
     }
 
-    updateGraph(algo, totalDistance, minDistance){   
+    updateGraph(algo, totalDistanceSet, minDistance, newSet){   
+        this.createPlot(bench.backgroundPlotsColors[algo], newSet, false, true);
         if(algo == 1){
             if(this.simpleTotalDistancePlot == null){
-                this.simpleTotalDistancePlot = this.createPlot(algo, totalDistance);
-                this.simpleMinDistancePlot = this.createPlot(algo, minDistance, true);
+                this.simpleTotalDistancePlot = this.createPlot(bench.plotColors[algo], totalDistanceSet);
+                this.simpleMinDistancePlot = this.createPlot(bench.plotColors[algo], minDistance, true);
             } else{
-                this.updatePlot(this.simpleTotalDistancePlot, totalDistance);
+                this.updatePlot(this.simpleTotalDistancePlot, totalDistanceSet);
                 this.updatePlot(this.simpleMinDistancePlot, minDistance);
             }
         } else{
             if(this.advancedTotalDistancePlot == null){
-                this.advancedTotalDistancePlot = this.createPlot(algo, totalDistance);
-                this.advancedMinDistancePlot = this.createPlot(algo, minDistance, true);
+                this.advancedTotalDistancePlot = this.createPlot(bench.plotColors[algo], totalDistanceSet);
+                this.advancedMinDistancePlot = this.createPlot(bench.plotColors[algo], minDistance, true);
             } else{
-                this.updatePlot(this.advancedTotalDistancePlot, totalDistance);
+                this.updatePlot(this.advancedTotalDistancePlot, totalDistanceSet);
                 this.updatePlot(this.advancedMinDistancePlot, minDistance);
             }
         }
     }
 
-    createPlot(algo, data, dashed = false){
+    createPlot(color, data, dashed = false, background = false){
         // Add the line
         return this.svgGraph.append("path")
             .datum(data)
             .attr("fill", "none")
-            .attr("stroke", bench.plotColors[algo])
-            .attr("stroke-width", 1.5)
+            .attr("stroke", color)
+            .attr("stroke-width", dashed? 1.5: background? 1:5)
             .attr("stroke-dasharray", dashed ? "10,10" : "10,0")
             .attr("d", d3.line()
                 .x(function(d,i) { 
@@ -246,5 +262,19 @@ class Benchmark{
                     return bench.y(d); 
                 })
             );
+        let el = plot._groups[0][0];
+        el.parentNode.appendChild(el);
     }  
+
+    downloadImage(reps = null){
+        let repsSec = reps == null ? "" : "__Reps-" + reps;
+        let fileN = "Benchmark_" + this.settings.type +  
+                        repsSec + 
+                        "__Steps-" + this.settings.benchMaxTimesteps +
+                        "__Robots-" + this.settings.benchRobotCount + 
+                        "__Radius-" + this.settings.robotRadius +
+                        "__Env-" + gScene.width + "-" + gScene.height;
+
+            saveSvgAsPng(document.getElementById("graph").children[0], fileN + "" +".png", {scale: 5});
+    }
 }
