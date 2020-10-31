@@ -1,6 +1,5 @@
 # Interactive simulation of a Collision Avoidance Algorithm with Deadlock Prediction and Recovery Based on Buffered Voronoi Cells. 
 
-- Interactive simulation of the Buffered Voronoi Cell based distributed collision avoidance algorithm 
 - Soure code: https://github.com/m-abdulhak/Buffered-Voronoi-Cell-Deadlock-Avoidance
 - Demo: https://m-abdulhak.github.io/Buffered-Voronoi-Cell-Deadlock-Avoidance/
 
