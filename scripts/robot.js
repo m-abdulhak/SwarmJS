@@ -289,7 +289,7 @@ class Robot{
       return 1;
     } else if(this.deadLockRecoveryAlgorithm == this.DeadLockRecovery.Advanced){
       // TODO: Decide whether to use righthand rule or furtherst point or implement another hybrid solution
-      if(Math.random()>0.7) return 1;
+      if(Math.random()>0.8) return Math.random()>0.5;
       
       let furthestPoint = this.getFurthestVertexFromLineSeg(cell, this.position, this.goal);
       let furthestPointDir = pointIsOnRightSideOfVector(furthestPoint.x, furthestPoint.y, 
@@ -330,12 +330,12 @@ class Robot{
   setTempGoalAccToAdvancedDeadlockRec(cell){
     let vertecies = this.getVerteciesOnManeuverDir(cell, this.position, this.goal);
     let outermostPoint = this.getFurthestVertexFromLineSeg(vertecies, this.position, this.goal);
-    let distanceToOuterMostPoint = distanceBetween2Points(this.position, outermostPoint);
-    if(distanceToOuterMostPoint < this.detourPointMaxDistance){
+    let distanceToOutermostPoint = this.getDistanceTo(outermostPoint);
+    if(distanceToOutermostPoint < this.detourPointMaxDistance){
       this.tempGoal = outermostPoint;
     } else {
-      let defaultRatioLongerThanMax = distanceToOuterMostPoint*this.detourPointToOutermostPointRatio > this.detourPointMaxDistance;
-      let detourRatio = defaultRatioLongerThanMax ? this.detourPointMaxDistance/distanceToOuterMostPoint : this.detourPointToOutermostPointRatio;
+      let defaultRatioLongerThanMax = distanceToOutermostPoint*this.detourPointToOutermostPointRatio > this.detourPointMaxDistance;
+      let detourRatio = defaultRatioLongerThanMax ? this.detourPointMaxDistance/distanceToOutermostPoint : this.detourPointToOutermostPointRatio;
       this.tempGoal = pointOnLineSegmentPerRatio(this.position, outermostPoint, detourRatio);
     }
   }
@@ -361,14 +361,14 @@ class Robot{
     
     if(this.lastDeadlockNeighborsCount > 1){
       if(robots.length < 2){
-        // console.log("Successfully Recovered From Deadlock! 1");
-        return true;
+        //console.log("Successfully Recovered From Deadlock! 1");
+        //return Math.random() > 0.3;
       }
 
       if(allPointsAreOnSameSideOfVector(robotPositions, this.position, this.goal) 
-        && minDistanceToLine(robotPositions, this.position, this.goal) > this.radius){
-        // console.log("Successfully Recovered From Deadlock! 2");
-        return true;
+        && minDistanceToLine(robotPositions, this.position, this.goal) > this.radius * 1.5){
+        console.log("Successfully Recovered From Deadlock! 2");
+        return Math.random() > 0.1;
       }
     }
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Buffered Voronoi Cell Collision Avoidance Demo</title>
+  <title>Deadlock Prediction and Recovery for Distributed Collision Avoidance with Buffered Voronoi Cells</title>
   <link rel="stylesheet" href="stylesheets/styles.css">
 </head>
 <style>
@@ -46,8 +46,8 @@
       <input type="button" value="Voronoi Cell" class="input-button input small-btn active" id="vc-button" onclick="visualizeElementsChanged()">
       <input type="button" value="Buffered VC" class="input-button input small-btn active" id="bvc-button" onclick="visualizeElementsChanged()">
     </div>
-    <div class="ui-section">
-      <label class="key">Path Planning:</label>
+    <div class="ui-section hidden">
+      <label class="key">Collision Avoidance:</label>
       <select class="input-select input" id="algorithm-select" name="algorithms">
         <option value="3" selected>Buffered Voronoi Cell</option>
       </select>
@@ -56,8 +56,8 @@
       <label class="key">Deadlock Recovery:</label>
       <select class="input-select input" id="deadlock-select" name="deadlock" onchange="changeDeadlockAlgorithm()">
         <option value="0" selected>None</option>
-        <option value="1">Right-Hand Heuristics</option>
-        <option value="2">Novel Deadlock Prediction and Recovery Algorithms</option>
+        <option value="1">Right-Hand Heuristic</option>
+        <option value="2">Proposed Deadlock Prediction and Recovery Algorithm</option>
       </select>
     </div>
     <div class="ui-section">
@@ -85,18 +85,18 @@
   </div>
 
   <div style="width: 1400px; height:600px;">
-    <div style="margin:auto; width:550px; padding: 10px; border: solid 1px black;">
-      <p style="display: inline-block; width: 100px; color: blue;">_______</p> 
-      <p style="display: inline-block;"> Total Robot-Goal Distance (Simple) </p>
+    <div style="margin:auto; width:1000px; padding: 10px; border: solid 1px black;">
+      <p style="display: inline-block; width: 100px; color: blue;">_______</p>
+      <p style="display: inline-block;"> Total Robot-Goal Distance (Right-Hand Heuristic) </p>
       <br>
       <p style="display: inline-block; width: 100px; color: green;">_______</p> 
-      <p style="display: inline-block;"> Total Robot-Goal Distance (Advanced) </p>
+      <p style="display: inline-block;"> Total Robot-Goal Distance (Proposed Deadlock Prediction and Recovery Algorithm) </p>
       <br>
       <p style="display: inline-block; width: 100px; color: blue;">_ _ _ _ _</p> 
-      <p style="display: inline-block;"> Minimum Robot-Robot Distance (Simple) </p>
+      <p style="display: inline-block;"> Minimum Robot-Robot Distance (Right-Hand Heuristic) </p>
       <br>
       <p style="display: inline-block; width: 100px; color: green;">_ _ _ _ _</p> 
-      <p style="display: inline-block;"> Minimum Robot-Robot Distance (Advanced) </p>
+      <p style="display: inline-block;"> Minimum Robot-Robot Distance (Proposed Deadlock Prediction and Recovery Algorithm) </p>
       <br>
       <p style="display: inline-block; width: 100px; color: red;">_ _ _ _ _</p> 
       <p style="display: inline-block;"> Safety Distance </p>

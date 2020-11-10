@@ -50,7 +50,7 @@ class Benchmark{
         this.advancedTotalDistancePlot = null;
         this.advancedMinDistancePlot = null;
 
-        this.autoSaveImageAfterEachRep = true;
+        this.autoSaveImageAfterEachRep = false;
 
         this.initGraph();
     }
