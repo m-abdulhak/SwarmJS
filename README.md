@@ -11,7 +11,7 @@ Bio-inspired Robotics Lab (BOTS)\
 http://bots.cs.mun.ca/ \
 Memorial University of Newfoundland
 
-Soure code: https://github.com/m-abdulhak/Buffered-Voronoi-Cell-Deadlock-Avoidance
+Source code: https://github.com/m-abdulhak/Buffered-Voronoi-Cell-Deadlock-Avoidance
 
 Demo: https://m-abdulhak.github.io/Buffered-Voronoi-Cell-Deadlock-Avoidance/ 
 

@@ -1,0 +1,28 @@
+{
+  "name": "swarm",
+  "version": "1.0.0",
+  "description": "Simulation of a distributed multi-robot collision avoidance algorithm based on the concept of Buffered Voronoi Cells (BVC)*.\\\r An algorithm for deadlock prediction, deadlock recovery, and deadlock recovery success prediction is proposed and implemented.\\\r Deadlock avoidance with right-hand heuristics is also implemented for comparison.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/m-abdulhak/Buffered-Voronoi-Cell-Deadlock-Avoidance.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/m-abdulhak/Buffered-Voronoi-Cell-Deadlock-Avoidance/issues"
+  },
+  "homepage": "https://github.com/m-abdulhak/Buffered-Voronoi-Cell-Deadlock-Avoidance#readme",
+  "devDependencies": {
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  },
+  "dependencies": {
+    "standard": "^16.0.3"
+  }
+}

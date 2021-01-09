@@ -25,8 +25,8 @@
       <label class="input-text" id="distance"></label>
     </div>
     <div class="ui-section">
-      <label class="key">Timescale:</label>
-      <input type="range" min="0.0001" max="30.0" value=".005" step="0.001" class="slider input" id="time-scale-slider">
+      <label class="key">Speed:</label>
+      <input type="range" min=".1" max="60.0" value="20" step=".1" class="slider input" id="speed-slider">
     </div>
     <div class="ui-section">
       <label class="key">Robots:</label>
@@ -55,9 +55,9 @@
     <div class="ui-section">
       <label class="key">Deadlock Recovery:</label>
       <select class="input-select input" id="deadlock-select" name="deadlock" onchange="changeDeadlockAlgorithm()">
-        <option value="0" selected>None</option>
+        <option value="0">None</option>
         <option value="1">Right-Hand Heuristic</option>
-        <option value="2">Proposed Deadlock Prediction and Recovery Algorithm</option>
+        <option value="2" selected>Proposed Deadlock Prediction and Recovery Algorithm</option>
       </select>
     </div>
     <div class="ui-section">
@@ -104,7 +104,8 @@
     </div>
   </div>
 
-
+  
+  <script src="libraries/matter.js"></script>
   <script src="https://d3js.org/d3.v4.js"></script>
   <script src="libraries/d3-delaunay.js"></script>
   <script src="libraries/offset.js"></script>
@@ -118,8 +119,14 @@
 </html>
 
 <script>
+  
+    // Matter.js Physics Engine Aliases
+    var Engine = Matter.Engine,
+        World = Matter.World,
+        Bodies = Matter.Bodies,
+        Body = Matter.Body;
 
-  var uiElements = ["time-scale-slider",
+  var uiElements = ["speed-slider",
                     "robots-slider",
                     "reset-button",
                     "algorithm-select",
@@ -250,7 +257,7 @@
 
   var syncSettings = function(){
     numberOfRobots = document.getElementById("robots-slider").value;
-    gScene.setTimeScale(document.getElementById("time-scale-slider").value);
+    gScene.setSpeed(document.getElementById("speed-slider").value);
     //document.getElementById("collision-count").textContent = gScene.uniqueCollisions.length + " / " + gScene.totalCollisionTimeInst;
     document.getElementById("time").textContent = timeInstance.toFixed(2);
     document.getElementById("distance").textContent = Math.floor(gScene.distance) ;
