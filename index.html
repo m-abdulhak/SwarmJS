@@ -9,7 +9,7 @@
 <style>
 </style>
 <body>
-  <svg width="800" height="500"></svg>
+  <svg width="800" height="500" style="border: #bfbebe solid 3px;"></svg>
   <br>
   <div class="options">
     <div class="ui-section hidden">
@@ -30,7 +30,7 @@
     </div>
     <div class="ui-section">
       <label class="key">Robots:</label>
-      <input type="range" min="2" max="150" value="10" step="1" class="slider input" id="robots-slider">
+      <input type="range" min="2" max="20" value="10" step="1" class="slider input" id="robots-slider">
     </div>
     <div class="ui-section">
       <label class="key">Pause and Reset:</label>
@@ -103,7 +103,6 @@
       <br>
     </div>
   </div>
-
   
   <script src="libraries/matter.js"></script>
   <script src="https://d3js.org/d3.v4.js"></script>
@@ -115,172 +114,7 @@
   <script src="scripts/scene.js"></script>
   <script src="scripts/benchmark.js"></script>
   <script src="scripts/robot.js"></script>
+  <script src="scripts/puck.js"></script>
+  <script src="scripts/main.js"></script>
 </body>
 </html>
-
-<script>
-  
-    // Matter.js Physics Engine Aliases
-    var Engine = Matter.Engine,
-        World = Matter.World,
-        Bodies = Matter.Bodies,
-        Body = Matter.Body;
-
-  var uiElements = ["speed-slider",
-                    "robots-slider",
-                    "reset-button",
-                    "algorithm-select",
-                    "deadlock-select",
-                    "starting-positions-select"];
-
-  function selectElement(id, valueToSelect) {    
-      let element = document.getElementById(id);
-      element.value = valueToSelect;
-  }
-
-  var getStartingPositionsSettings = function(){
-    const startPositions = parseInt(document.getElementById("starting-positions-select").value);
-    
-    switch (startPositions) {
-      case 0:
-        return Scene.StartingPositions.Random;
-      case 1:
-        return Scene.StartingPositions.Circle;
-      case 2:
-        return Scene.StartingPositions.InvertedSquare;
-      case 3:
-        return Scene.StartingPositions.InvertedSquare2;
-      default:
-        return Scene.StartingPositions.Random;
-    }
-  }
-
-  var getBenchmarkSettings = function(){
-    return parseInt(document.getElementById("starting-positions-select").value);
-  }
-
-  // Setup
-  var timeInstance = 0;
-  var activeElements = {All:1, Robots:1, Goals:1, TempGoals:1, VC:1, BVC:1, Collisions:1};
-  var paused = false;
-  var numberOfRobots = 2;
-  var radiusOfRobots = 10;
-  var svg = d3.select("svg");
-  let motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
-  var gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm, activeElements.All, getStartingPositionsSettings());
-  var bench = new Benchmark(getBenchmarkSettings());
-
-  var resetSimulation = function(){
-    timeInstance = 0;
-    svg.selectAll("*").remove();
-    motionPlanningAlgorithm = parseInt(document.getElementById("algorithm-select").value);
-    gScene = new Scene(svg, numberOfRobots, radiusOfRobots, motionPlanningAlgorithm, activeElements.All, getStartingPositionsSettings());
-    changeDeadlockAlgorithm();
-  }
-
-  var changeStartingPositions = function(){
-    let startingPositions = parseInt(document.getElementById("starting-positions-select").value);
-
-    switch (startingPositions) {
-      case 0:
-          radiusOfRobots = 10;
-          document.getElementById("robots-slider").max = 150;
-          document.getElementById("robots-slider").value =  100;
-        break;
-      case 1:
-          radiusOfRobots = 3;
-          document.getElementById("robots-slider").max = 100;
-          document.getElementById("robots-slider").value =  100;
-        break;
-      case 2:
-          radiusOfRobots = 5;
-          document.getElementById("robots-slider").max = 100;
-          document.getElementById("robots-slider").value =  100;
-        break;
-      case 3:
-          radiusOfRobots = 5;
-          document.getElementById("robots-slider").max = 100;
-          document.getElementById("robots-slider").value =  100;
-        break;
-      default:
-          radiusOfRobots = 10;
-        break;
-    }
-    document.getElementById("graph-container").innerHTML = 
-      '<div id="graph" class="aGraph" style="display: block;" width="1400" height="600"></div>';
-
-    bench = new Benchmark(getBenchmarkSettings());
-  }
-
-  var changeDeadlockAlgorithm = function(){
-    let deadlockAlgorithm = parseInt(document.getElementById("deadlock-select").value);
-    gScene.robots.forEach(r => {
-      r.setDeadlockAlgo(deadlockAlgorithm);
-    });
-  }
-
-  var toggleBenchmarking = function(){
-    uiElements.forEach( e => {
-      let docEl = document.getElementById(e); 
-      docEl.disabled = !docEl.disabled;
-    });
-    bench.setSettings(getBenchmarkSettings());
-    bench.curTotalDistanceSet = [];
-    bench.curMinDistanceSet = [];
-    bench.toggleBenchmarking();
-  }
-
-  var pauseSimulation = function(){
-    paused = !paused;
-  }
-
-  svg.on('mousemove', function() {
-    document.getElementById("mouse-pos").textContent = d3.mouse(this);
-  });
-
-  var visualizeElementsChanged = function(){  
-    document.getElementById(event.srcElement.id).classList.toggle("active");
-    activeElements = {  All:elementActive("redndering-button"),
-                        Robots:elementActive("robot-button"), 
-                        Goals:elementActive("goal-button"), 
-                        TempGoals:elementActive("tempGoal-button"), 
-                        VC:elementActive("vc-button"), 
-                        BVC:elementActive("bvc-button"),
-                        // Collisions:elementActive("collisions-button")
-                      };
-    gScene.renderingEnabled = activeElements.All;
-  }
-
-  var elementActive = function(id){
-    return document.getElementById(id).classList.contains("active");
-  }
-
-  var syncSettings = function(){
-    numberOfRobots = document.getElementById("robots-slider").value;
-    gScene.setSpeed(document.getElementById("speed-slider").value);
-    //document.getElementById("collision-count").textContent = gScene.uniqueCollisions.length + " / " + gScene.totalCollisionTimeInst;
-    document.getElementById("time").textContent = timeInstance.toFixed(2);
-    document.getElementById("distance").textContent = Math.floor(gScene.distance) ;
-  }
-
-  var renderScene = function(){
-    if(bench.benchmarking && timeInstance > bench.benchMaxTimesteps){
-      bench.startBenchmarkInstance();
-    }
-    
-    if(!paused){
-      gScene.update(activeElements);  
-    }
-    
-    bench.updateBenchSet(timeInstance);
-    // console.log("TimeInstance: ",timeInstance.toFixed(2), " Distance: ", Math.floor(gScene.distance));
-
-    syncSettings();
-
-    requestAnimationFrame(renderScene);
-  }
-
-  changeDeadlockAlgorithm();
-  renderScene();
-
-</script>

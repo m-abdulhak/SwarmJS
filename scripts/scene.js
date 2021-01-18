@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-console */
 /* eslint-disable no-throw-literal */
@@ -7,25 +8,22 @@
 /* eslint-disable no-undef */
 // eslint-disable-next-line no-unused-vars
 class Scene {
-  // Initial Configurations
-  static StartingPositions = {
-    Random: "getRandomCollisionFreePositions",
-    Circle: "getCircleCollisionFreePositions",
-    InvertedSquare: "getSquarePositionsConfig1",
-    InvertedSquare2: "getSquarePositionsConfig2",
-  };
-
-  constructor(svg,
+  constructor(
+    svg,
     numOfRobots,
     robotRadius,
     motionPlanningAlgorithm,
     enableRendering,
-    startingPositionsConfig) {
+    startingPositionsConfig,
+    pucksGroups,
+  ) {
     this.svg = svg;
-    this.width = svg.attr('width');
-    this.height = svg.attr('height');
+    this.width = parseInt(svg.attr('width'), 10);
+    this.height = parseInt(svg.attr('height'), 10);
     this.numOfRobots = numOfRobots;
-    this.radius = robotRadius;
+    this.robotRadius = robotRadius;
+    this.pucksGroups = pucksGroups;
+    this.numOfPucks = this.pucksGroups.reduce((total, puckGroup) => total + puckGroup.count, 0);
 
     // Create Matter.js Physics Engine
     this.engine = Engine.create();
@@ -34,20 +32,32 @@ class Scene {
     this.world.gravity.x = 0;
 
     // Starting and Goal Positions
-    this.robotsStartingPositions = this[startingPositionsConfig](this.numOfRobots,
-      this.radius,
+    this.robotsStartingPositions = this[startingPositionsConfig](
+      this.numOfRobots,
+      this.robotRadius,
       this.width,
-      this.height);
+      this.height,
+      this.numOfPucks,
+    );
 
     // Rendering option
     this.renderingEnabled = enableRendering;
 
     // Initialize Robots
-    this.robots = this.initializeRobotsRange(this.numOfRobots,
-      this.radius,
+    this.robots = this.initializeRobotsRange(
+      this.numOfRobots,
+      this.robotRadius,
       this.width,
       this.height,
-      motionPlanningAlgorithm);
+      motionPlanningAlgorithm,
+    );
+      
+    // Initialize Pucks
+    this.pucks = this.initializePucksRange(
+      this.pucksGroups,
+      this.width,
+      this.height,
+    );
 
     // Initialize Voronoi Diagram
     this.voronoi = Delaunay
@@ -65,9 +75,8 @@ class Scene {
 
     // Minimum Robot-Robot Distanc
     this.minDistance = null;
-
-    // Bind update function to "this" object's context
-    this.update = this.update.bind(this);
+    
+    this.addEnvBoundryObjects(this.width, this.height);
   }
 
   setSpeed(scale) {
@@ -76,12 +85,13 @@ class Scene {
 
   update(activeElements) {
     this.voronoi = Delaunay
-      .from(this.getCurRobotsPos(), (d) => d.x, (d) => d.y)
+      .from(gScene.getCurRobotsPos(), (d) => d.x, (d) => d.y)
       .voronoi([0, 0, this.width, this.height]);
 
     this.updateRobotsMeasurements();
 
     this.robots.forEach((r) => r.timeStep());
+    this.pucks.forEach((p) => p.timeStep());
 
     gScene.checkCollision();
 
@@ -176,22 +186,49 @@ class Scene {
         motionPlanningAlgorithm));
   }
 
+  initializePucksRange(pucksGroups, envWidth, envHeight) {
+    const pucks = [];
+    let id = 0;
+
+    pucksGroups.forEach((puckGroup) => {
+     pucks.push(
+      ...d3
+      .range(puckGroup.count)
+      .map((i) => new Puck(
+        i+id,
+        this.getAnInitialPos(),
+        puckGroup.goal,
+        puckGroup.radius,
+        envWidth,
+        envHeight,
+        this,
+        puckGroup.color,
+      ))
+    );
+
+      id += puckGroup.count;
+    });
+
+    return pucks;
+  }
+
   getAnInitialPos() {
     return this.robotsStartingPositions.pop();
   }
 
-  getRandomCollisionFreePositions(numOfRobots, radius, envWidth, envHeight) {
+  getRandomCollisionFreePositions(numOfRobots, radius, envWidth, envHeight, numOfPucks) {
     const resolution = (radius * 2.1);
     const xCount = envWidth / resolution;
     const yCount = envHeight / resolution;
+    const totalPositionsCount = parseInt(numOfRobots, 10)  + parseInt(numOfPucks, 10);
 
-    if (xCount * yCount < numOfRobots * 4) {
-      throw 'Invalid inputs, number and size of robots are too high for this environment size!';
+    if (xCount * yCount < totalPositionsCount * 4) {
+      throw 'Invalid inputs, number and size of robots and pucks are too high for this environment size!';
     }
 
     const positions = [];
     let i = 0;
-    while (positions.length < numOfRobots * 3 && i < numOfRobots * 100) {
+    while (positions.length < totalPositionsCount * 3 && i < totalPositionsCount * 100) {
       const newX = Math.max(
         radius * 2,
         Math.min(envWidth - radius * 2, Math.floor(Math.random() * xCount) * resolution),
@@ -208,117 +245,117 @@ class Scene {
       i += 1;
     }
 
-    if (positions.length < numOfRobots * 2) {
+    if (positions.length < totalPositionsCount * 2) {
       throw 'Invalid inputs, number and size of robots are too high for this environment size!';
     }
 
     return positions;
   }
 
-  getCircleCollisionFreePositions(numOfRobots, radius, envWidth, envHeight) {
-    const circleRadius = (Math.min(envWidth, envHeight) * 20) / 42;
-    const resolution = (Math.PI * 2) / numOfRobots;
-    const envCenter = { x: envWidth / 2, y: envHeight / 2 };
+  // getCircleCollisionFreePositions(numOfRobots, radius, envWidth, envHeight) {
+  //   const circleRadius = (Math.min(envWidth, envHeight) * 20) / 42;
+  //   const resolution = (Math.PI * 2) / numOfRobots;
+  //   const envCenter = { x: envWidth / 2, y: envHeight / 2 };
 
-    if (circleRadius * resolution < radius * 4) {
-      throw 'Invalid inputs, number and size of robots are too high for this environment size!';
-    }
+  //   if (circleRadius * resolution < radius * 4) {
+  //     throw 'Invalid inputs, number and size of robots are too high for this environment size!';
+  //   }
 
-    const positions = [];
-    const start = Math.random() * Math.PI * 2;
-    let i = start;
-    while (i < start + Math.PI * 2) {
-      const newX = envCenter.x + circleRadius * Math.cos(i);
-      const newY = envCenter.y + circleRadius * Math.sin(i);
-      const newGoalX = envCenter.x - circleRadius * Math.cos(i);
-      const newGoalY = envCenter.y - circleRadius * Math.sin(i);
-      const newPos = { x: newX, y: newY };
-      const newGoalPos = { x: newGoalX, y: newGoalY };
+  //   const positions = [];
+  //   const start = Math.random() * Math.PI * 2;
+  //   let i = start;
+  //   while (i < start + Math.PI * 2) {
+  //     const newX = envCenter.x + circleRadius * Math.cos(i);
+  //     const newY = envCenter.y + circleRadius * Math.sin(i);
+  //     const newGoalX = envCenter.x - circleRadius * Math.cos(i);
+  //     const newGoalY = envCenter.y - circleRadius * Math.sin(i);
+  //     const newPos = { x: newX, y: newY };
+  //     const newGoalPos = { x: newGoalX, y: newGoalY };
 
-      positions.push(newPos);
-      positions.push(newGoalPos);
+  //     positions.push(newPos);
+  //     positions.push(newGoalPos);
 
-      i += resolution + (Math.random() * resolution) / 100 - resolution / 50;
-    }
+  //     i += resolution + (Math.random() * resolution) / 100 - resolution / 50;
+  //   }
 
-    if (positions.length < numOfRobots * 2) {
-      throw 'Invalid inputs, number and size of robots are too high for this environment size!';
-    }
+  //   if (positions.length < numOfRobots * 2) {
+  //     throw 'Invalid inputs, number and size of robots are too high for this environment size!';
+  //   }
 
-    return positions;
-  }
+  //   return positions;
+  // }
 
-  getSquarePositionsConfig1(numOfRobots, radius, envWidth, envHeight) {
-    const distanceBetweenPositions = radius * 4.2;
-    return this.getSquareCollisionFreePositions(
-      numOfRobots,
-      radius,
-      envWidth,
-      envHeight,
-      distanceBetweenPositions,
-      false,
-    );
-  }
+  // getSquarePositionsConfig1(numOfRobots, radius, envWidth, envHeight) {
+  //   const distanceBetweenPositions = radius * 4.2;
+  //   return this.getSquareCollisionFreePositions(
+  //     numOfRobots,
+  //     radius,
+  //     envWidth,
+  //     envHeight,
+  //     distanceBetweenPositions,
+  //     false,
+  //   );
+  // }
 
-  getSquarePositionsConfig2(numOfRobots, radius, envWidth, envHeight) {
-    const distanceBetweenPositions = radius * 4.6;
-    return this.getSquareCollisionFreePositions(
-      numOfRobots,
-      radius,
-      envWidth,
-      envHeight,
-      distanceBetweenPositions,
-      true,
-    );
-  }
+  // getSquarePositionsConfig2(numOfRobots, radius, envWidth, envHeight) {
+  //   const distanceBetweenPositions = radius * 4.6;
+  //   return this.getSquareCollisionFreePositions(
+  //     numOfRobots,
+  //     radius,
+  //     envWidth,
+  //     envHeight,
+  //     distanceBetweenPositions,
+  //     true,
+  //   );
+  // }
 
-  getSquareCollisionFreePositions(
-    numOfRobots,
-    radius,
-    envWidth,
-    envHeight,
-    distanceBetweenPositions,
-    invertVertically,
-  ) {
-    const resolution = distanceBetweenPositions;
-    const robotStart = { x: radius * 10, y: radius * 20 };
-    const goalsStart = {
-      x: envWidth - radius * 10,
-      y: !invertVertically ? radius * 20 : radius * 20 + resolution * 9,
-    };
+  // getSquareCollisionFreePositions(
+  //   numOfRobots,
+  //   radius,
+  //   envWidth,
+  //   envHeight,
+  //   distanceBetweenPositions,
+  //   invertVertically,
+  // ) {
+  //   const resolution = distanceBetweenPositions;
+  //   const robotStart = { x: radius * 10, y: radius * 20 };
+  //   const goalsStart = {
+  //     x: envWidth - radius * 10,
+  //     y: !invertVertically ? radius * 20 : radius * 20 + resolution * 9,
+  //   };
 
-    const condEnVLengthTooSmall = robotStart.x + resolution * 10 > envWidth / 2;
-    const condEnVHeightTooSmall = robotStart.y + resolution * 10 > envHeight;
-    if (condEnVLengthTooSmall || condEnVHeightTooSmall) {
-      throw 'Invalid inputs, number and size of robots are too high for this environment size!';
-    }
+  //   const condEnVLengthTooSmall = robotStart.x + resolution * 10 > envWidth / 2;
+  //   const condEnVHeightTooSmall = robotStart.y + resolution * 10 > envHeight;
+  //   if (condEnVLengthTooSmall || condEnVHeightTooSmall) {
+  //     throw 'Invalid inputs, number and size of robots are too high for this environment size!';
+  //   }
 
-    const positions = [];
+  //   const positions = [];
 
-    for (let row = 0; row < 10; row += 1) {
-      for (let col = 0; col < 10; col += 1) {
-        const newX = robotStart.x + resolution * col + (Math.random() * radius) / 100 + radius / 50;
-        const newY = robotStart.y + resolution * row + (Math.random() * radius) / 100 + radius / 50;
-        const newGoalX = goalsStart.x - resolution * col
-        + (Math.random() * radius) / 100 + radius / 50;
-        const newGoalY = !invertVertically
-          ? goalsStart.y + resolution * row + (Math.random() * radius) / 100 + radius / 50
-          : goalsStart.y - resolution * row + (Math.random() * radius) / 100 + radius / 50;
+  //   for (let row = 0; row < 10; row += 1) {
+  //     for (let col = 0; col < 10; col += 1) {
+  //       const newX = robotStart.x + resolution * col + (Math.random() * radius) / 100 + radius / 50;
+  //       const newY = robotStart.y + resolution * row + (Math.random() * radius) / 100 + radius / 50;
+  //       const newGoalX = goalsStart.x - resolution * col
+  //       + (Math.random() * radius) / 100 + radius / 50;
+  //       const newGoalY = !invertVertically
+  //         ? goalsStart.y + resolution * row + (Math.random() * radius) / 100 + radius / 50
+  //         : goalsStart.y - resolution * row + (Math.random() * radius) / 100 + radius / 50;
 
-        const newPos = { x: newX, y: newY };
-        const newGoalPos = { x: newGoalX, y: newGoalY };
+  //       const newPos = { x: newX, y: newY };
+  //       const newGoalPos = { x: newGoalX, y: newGoalY };
 
-        positions.push(newGoalPos);
-        positions.push(newPos);
-      }
-    }
+  //       positions.push(newGoalPos);
+  //       positions.push(newPos);
+  //     }
+  //   }
 
-    if (positions.length < numOfRobots * 2) {
-      throw 'Invalid inputs, number and size of robots are too high for this environment size!';
-    }
+  //   if (positions.length < numOfRobots * 2) {
+  //     throw 'Invalid inputs, number and size of robots are too high for this environment size!';
+  //   }
 
-    return positions;
-  }
+  //   return positions;
+  // }
 
   getNeighborsOf(robotIndex) {
     const neighbors = [];
@@ -336,4 +373,22 @@ class Scene {
   getRobotByIndex(index) {
     return this.robots[index];
   }
+
+  addEnvBoundryObjects(envWidth, envHeight){
+    World.add(this.world, [
+      // walls
+      Bodies.rectangle(envWidth / 2,   -10,          envWidth,  20, { isStatic: true }),
+      Bodies.rectangle(envWidth / 2,   envHeight+10, envWidth,  20, { isStatic: true }),
+      Bodies.rectangle(-10,            envHeight/2,  20,        envHeight, { isStatic: true }),
+      Bodies.rectangle(envWidth + 10,  envHeight/2,  20,        envHeight, { isStatic: true }),
+    ]);
+  }
+
+  // Initial Configurations
+  static StartingPositions = {
+    Random: "getRandomCollisionFreePositions",
+    // Circle: "getCircleCollisionFreePositions",
+    // InvertedSquare: "getSquarePositionsConfig1",
+    // InvertedSquare2: "getSquarePositionsConfig2",
+  };
 }
