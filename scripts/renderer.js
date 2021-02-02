@@ -13,6 +13,29 @@ class Renderer {
     // Buffered voronoi cells line segments (as calculated by robots)
     this.scene.BVCLineSegs = [];
 
+    // Static Circles
+    this.scene.staticCircles = svg.append('g')
+      .selectAll('circle')
+      .data(this.scene.staticObjects.circles)
+      .enter()
+      .append('circle')
+      .attr('cx', (d) => d.center.x)
+      .attr('cy', (d) => d.center.y)
+      .attr('r', (d) => d.radius)
+      .attr('fill', '#000000');
+
+    // Static Rectangles
+    this.scene.staticCircles = svg.append('g')
+      .selectAll('rect')
+      .data(this.scene.staticObjects.rectangles)
+      .enter()
+      .append('rect')
+      .attr('x', (d) => d.center.x - d.width / 2)
+      .attr('y', (d) => d.center.y - d.height / 2)
+      .attr('width', (d) => d.width)
+      .attr('height', (d) => d.height)
+      .attr('fill', '#000000');
+
     // Voronoi cells edges (Voronoi Diagram)
     this.scene.VcMesh = svg.append('path')
       .attr('fill', 'none')
