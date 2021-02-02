@@ -1,6 +1,8 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-undef */
+
 // eslint-disable-next-line no-unused-vars
 class Robot {
   constructor(id, position, goal, radius, envWidth, envHeight, scene, motionPlanningAlgorithm) {
@@ -64,6 +66,14 @@ class Robot {
     // Deadlock parameters
     const robotArea = circleArea(this.radius);
     this.bvcAreaThreshold = robotArea * 3;
+
+    // Pucks
+    this.updateGoal = updateGoal(this);
+    this.lastRandGoal = null;
+    this.nearbyPucks = [];
+    this.bestPuck = null;
+    this.puckSelectedTimeSteps = 0;
+    this.minPuckSelectedTimeSteps = 100;
   }
 
   setMovementGoal(movementGoal) {
@@ -88,8 +98,9 @@ class Robot {
   timeStep() {
     this.prevPosition = this.position;
     this.position = this.body.position;
-    this.updateVelocity();
+    this.updateGoal();
     this.limitGoal();
+    this.updateVelocity();
   }
 
   updateVelocity() {

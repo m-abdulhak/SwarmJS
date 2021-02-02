@@ -19,7 +19,7 @@ class Puck {
     // Create Matter.js body and attach it to world
     this.body = Bodies.circle(position.x, position.y, this.radius);
     // this.body.friction = 0;
-    this.body.frictionAir = 0.05;
+    this.body.frictionAir = 1;
     // this.body.frictionStatic = 0;
     // this.body.restitution = 0;
     World.add(this.world, this.body);
@@ -35,8 +35,12 @@ class Puck {
     this.limitGoal();
   }
 
+  reachedGoal() {
+    return this.reached(this.goal);
+  }
+
   reached(point) {
-    const ret = this.getDistanceTo(point) <= this.radius / 50;
+    const ret = this.getDistanceTo(point) <= this.radius * 10;
     return ret;
   }
 

@@ -58,6 +58,7 @@ class Scene {
       this.width,
       this.height,
     );
+    this.maxNearbyPuckDistance = this.robotRadius * 10;
 
     // Initialize Voronoi Diagram
     this.voronoi = Delaunay
@@ -109,18 +110,29 @@ class Scene {
   }
 
   updateRobotsMeasurements() {
+    // For each robot
     this.robots.forEach((r, i) => {
+      // 1. Find Pucks within a certain distance to the robot
+      r.nearbyPucks = this.pucks.filter(p => r.getDistanceTo(p.position) < this.maxNearbyPuckDistance);
+
+      // 2. Update the robot's neighbors
       r.neighbors = this.getNeighborsOf(i);
 
+      // 3. Update the robot's cell
       const cell = this.voronoi.cellPolygon(i);
       r.VC = cell;
 
+
+      // If cell is not defined => no need to update the BVC
       if (cell == null || cell === undefined || cell.length < 3) {
         return;
       }
 
+      // 4. Update BVC
       r.BVC = this.calculateBVCfromVC(cell, r);
     });
+
+
   }
 
   calculateBVCfromVC(cell, r) {
