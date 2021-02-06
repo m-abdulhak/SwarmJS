@@ -36,29 +36,23 @@ var pucksGroups = [
 ];
 
 // Static Objects
-var staticWorldObjects = {
-  rectangles: [
-    // {
-    //   center: { x: 150, y: 150 },
-    //   width: 100,
-    //   height: 100,
-    // },
-  ],
-  circles: [
-    {
-      center: { x: 350, y: 350 },
-      radius: 50,
-    },
-    {
-      center: { x: 650, y: 170 },
-      radius: 50,
-    },
-    {
-      center: { x: 450, y: 200 },
-      radius: 50,
-    },
-  ],
-};
+var staticObjectsDefinitions = [
+  {
+    type: 'circle',
+    center: { x: 350, y: 350 },
+    radius: 50,
+  },
+  {
+    type: 'circle',
+    center: { x: 650, y: 170 },
+    radius: 50,
+  },
+  {
+    type: 'circle',
+    center: { x: 450, y: 200 },
+    radius: 50,
+  },
+];
 
 // Initialize Matter.js objects
 var Engine = Matter.Engine;
@@ -107,7 +101,7 @@ var gScene = new Scene(
   activeElements.All,
   getStartingPositionsSettings(),
   pucksGroups,
-  staticWorldObjects,
+  staticObjectsDefinitions,
 );
 var bench = new Benchmark(getBenchmarkSettings());
 
@@ -123,7 +117,7 @@ var resetSimulation = function () {
     activeElements.All,
     getStartingPositionsSettings(),
     pucksGroups,
-    staticWorldObjects,
+    staticObjectsDefinitions,
   );
   changeDeadlockAlgorithm();
 };

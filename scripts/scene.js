@@ -16,7 +16,7 @@ class Scene {
     enableRendering,
     startingPositionsConfig,
     pucksGroups,
-    staticWorldObjects,
+    staticObjectsDefinitions,
   ) {
     this.svg = svg;
     this.width = parseInt(svg.attr('width'), 10);
@@ -24,7 +24,6 @@ class Scene {
     this.numOfRobots = numOfRobots;
     this.robotRadius = robotRadius;
     this.pucksGroups = pucksGroups;
-    this.staticObjects = staticWorldObjects;
     this.numOfPucks = this.pucksGroups.reduce((total, puckGroup) => total + puckGroup.count, 0);
 
     // Create Matter.js Physics Engine
@@ -37,7 +36,7 @@ class Scene {
     this.addEnvBoundryObjects(this.width, this.height);
     
     // Add Environment Boundries To World
-    this.addEnvStaticObjects(this.staticObjects);
+    this.staticObjects = staticObjectsDefinitions.map((def) => generateStaticObject(def, this));
 
     // Starting and Goal Positions
     this.robotsStartingPositions = this[startingPositionsConfig](
@@ -128,6 +127,8 @@ class Scene {
       // 3. Update the robot's cell
       const cell = this.voronoi.cellPolygon(i);
       r.VC = cell;
+
+      r.trimVCwithStaticObstacles();
 
       // If cell is not defined => no need to update the BVC
       if (cell == null || cell === undefined || cell.length < 3) {
@@ -400,19 +401,6 @@ class Scene {
       Bodies.rectangle(-10,            envHeight/2,  20,        envHeight, { isStatic: true }),
       Bodies.rectangle(envWidth + 10,  envHeight/2,  20,        envHeight, { isStatic: true }),
     ]);
-  }
-
-  addEnvStaticObjects({circles, rectangles}){
-    World.add(this.world, 
-      rectangles.map((rect) => {
-        return Bodies.rectangle(rect.center.x, rect.center.y, rect.width, rect.height, { isStatic: true });
-      })
-    );
-    World.add(this.world, 
-      circles.map((rect) => {
-        return Bodies.circle(rect.center.x, rect.center.y, rect.radius, { isStatic: true });
-      })
-    );
   }
 
   // Initial Configurations

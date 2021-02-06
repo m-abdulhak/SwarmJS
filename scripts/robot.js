@@ -74,6 +74,9 @@ class Robot {
     this.bestPuck = null;
     this.puckSelectedTimeSteps = 0;
     this.minPuckSelectedTimeSteps = 100;
+
+    // Obstacles
+    this.obstacleSensingRadius = this.radius * 10;
   }
 
   setMovementGoal(movementGoal) {
@@ -534,6 +537,25 @@ class Robot {
     } catch (error) {
       return this.position;
     }
+  }
+
+  // Static Obstacles
+  getNearbyObstacles() {
+    // TODO: Add obstacles other than circles
+    return this.scene.staticObjects.filter(
+      (obj) => obj.getDistanceToBorder(this.position) < this.obstacleSensingRadius,
+    );
+  }
+
+  getClosestPointsToNearbyObstacles() {
+    return this.getNearbyObstacles().map(
+      (circle) => getLineCircleIntersectionPoint(circle.center, circle.radius, this.position),
+    );
+  }
+
+  trimVCwithStaticObstacles() {
+    // eslint-disable-next-line arrow-body-style
+    const closestPoints = this.getClosestPointsToNearbyObstacles();
   }
 
   bvcContains(point) {

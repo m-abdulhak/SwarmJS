@@ -221,7 +221,7 @@ function shiftLineSegInDirOfPerpendicularBisector(x1, y1, x2, y2, scale) {
   return [p1, p2];
 }
 
-function getIntersectionPoint(
+function getLineLineIntersectionPoint(
   line1StartX,
   line1StartY,
   line1EndX,
@@ -321,3 +321,28 @@ function circleArea(radius) {
 function xyPoint(p) {
   return { x: p[0], y: p[1] };
 }
+
+// Static obstacles
+
+/**
+ * Finds the intersection between a circles border
+ * and a line from the origin to the otherLineEndPoint.
+ * @param  {Vector} center            - center of the circle and start of the line
+ * @param  {number} radius            - radius of the circle
+ * @param  {Vector} otherLineEndPoint - end of the line
+ * @return {Vector}                   - point of the intersection
+ */
+function getLineCircleIntersectionPoint(center, radius, otherLineEndPoint) {
+  let v = { x: otherLineEndPoint.x - center.x, y: otherLineEndPoint.y - center.y };
+  const lineLength = distanceBetween2Points(v, { x: 0, y: 0 });
+  if (lineLength === 0) {
+    throw new Error('Cannot get intersection point between line and circle, end point is same as center!');
+  }
+  v = { x: v.x / lineLength, y: v.y / lineLength };
+  return { x: center.x + v.x * radius, y: center.y + v.y * radius };
+}
+
+// console.log('0,1', getLineCircleIntersectionPoint({ x: 0, y: 0 }, 1, { x: 0, y: 10 }));
+// console.log('0,5', getLineCircleIntersectionPoint({ x: 0, y: 0 }, 5, { x: 0, y: 10 }));
+// console.log('0,-5', getLineCircleIntersectionPoint({ x: 0, y: -10 }, 5, { x: 0, y: 10 }));
+// console.log('7,0', getLineCircleIntersectionPoint({ x: 10, y: 0 }, 3, { x: 0, y: 0 }));
