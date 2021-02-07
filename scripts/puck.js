@@ -26,6 +26,11 @@ class Puck {
 
     // Initialize velocity according to movement goal
     this.velocity = { x: 0, y: 0 };
+
+    //
+    this.blockedDistance = this.radius * 1.5;
+    this.goalReachedDist = this.radius * 10;
+    this.deepInGoalDist = this.radius * 7;
   }
 
   timeStep() {
@@ -35,12 +40,43 @@ class Puck {
     this.limitGoal();
   }
 
+  isBlocked() {
+    let blocked = false;
+
+    const closestPointToEnvBounds = closestPointInPolygonToPoint(
+      this.scene.environmentBounds,
+      this.position,
+    );
+    const distToEnvBounds = this.getDistanceTo(closestPointToEnvBounds);
+    if (distToEnvBounds < this.blockedDistance * 2) {
+      blocked = true;
+    }
+
+    for (let index = 0; !blocked && index < this.scene.staticObjects.length; index += 1) {
+      const staticObj = this.scene.staticObjects[index];
+      if (staticObj.getDistanceToBorder(this.position) < this.blockedDistance) {
+        blocked = true;
+      }
+    }
+
+    return blocked;
+  }
+
   reachedGoal() {
-    return this.reached(this.goal);
+    return this.reachedDist(this.goal, this.goalReachedDist);
+  }
+
+  deepInGoal() {
+    return this.reachedDist(this.goal, this.deepInGoalDist);
   }
 
   reached(point) {
     const ret = this.getDistanceTo(point) <= this.radius * 10;
+    return ret;
+  }
+
+  reachedDist(point, distance) {
+    const ret = this.getDistanceTo(point) <= distance;
     return ret;
   }
 
@@ -54,6 +90,14 @@ class Puck {
     this.goal = {
       x: Math.min(Math.max(radius, this.goal.x), this.envWidth - radius),
       y: Math.min(Math.max(radius, this.goal.y), this.envHeight - radius),
+    };
+  }
+
+  generateStaticObjectDefinition() {
+    return {
+      type: 'circle',
+      center: this.position,
+      radius: this.radius,
     };
   }
 }

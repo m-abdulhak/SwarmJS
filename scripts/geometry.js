@@ -94,6 +94,33 @@ function pointIsOnRightSideOfVector(x, y, x1, y1, x2, y2) {
   return dot2 > 0;
 }
 
+function closestPointInPolygonToPoint(polygon, point) {
+  let closestPoint = null;
+  let minDist = null;
+
+  for (let index = 0; index < polygon.length; index += 1) {
+    const v1 = polygon[index];
+    const v2 = polygon[nxtCircIndx(index, polygon.length)];
+    const closestPointInLineSeg = closestPointInLineSegToPoint(
+      point.x,
+      point.y,
+      v1[0],
+      v1[1],
+      v2[0],
+      v2[1],
+    );
+
+    const distGoalToLineSeg = distanceBetween2Points(point, closestPointInLineSeg);
+
+    if (closestPoint == null || distGoalToLineSeg < minDist) {
+      closestPoint = { x: closestPointInLineSeg.x, y: closestPointInLineSeg.y };
+      minDist = distGoalToLineSeg;
+    }
+  }
+
+  return closestPoint;
+}
+
 function closestPointInLineToPoint(x, y, x1, y1, x2, y2) {
   const A = x - x1;
   const B = y - y1;

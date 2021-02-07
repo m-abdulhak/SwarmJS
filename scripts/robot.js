@@ -201,30 +201,7 @@ class Robot {
   }
 
   findPointInCellClosestToGoal(cell, goal) {
-    let tempG = null;
-    let minDist = null;
-
-    for (let index = 0; index < cell.length; index += 1) {
-      const v1 = cell[index];
-      const v2 = cell[nxtCircIndx(index, cell.length)];
-      const closestPointInLineSeg = closestPointInLineSegToPoint(
-        goal.x,
-        goal.y,
-        v1[0],
-        v1[1],
-        v2[0],
-        v2[1],
-      );
-
-      const distGoalToLineSeg = distanceBetween2Points(goal, closestPointInLineSeg);
-
-      if (tempG == null || distGoalToLineSeg < minDist) {
-        tempG = { x: closestPointInLineSeg.x, y: closestPointInLineSeg.y };
-        minDist = distGoalToLineSeg;
-      }
-    }
-
-    return tempG;
+    return closestPointInPolygonToPoint(cell, goal);
   }
 
   recoveringFromDeadLock() {
@@ -542,20 +519,109 @@ class Robot {
   // Static Obstacles
   getNearbyObstacles() {
     // TODO: Add obstacles other than circles
-    return this.scene.staticObjects.filter(
+    const staticObstacles = [...this.scene.staticObjects.filter(
       (obj) => obj.getDistanceToBorder(this.position) < this.obstacleSensingRadius,
-    );
+    )];
+
+    // Add pucks that reached goal as obstacles
+    this.nearbyPucks.forEach((puck) => {
+      if (puck.deepInGoal() && this.getDistanceTo(puck.position) > this.radius) {
+        const staticObstacleDefinition = puck.generateStaticObjectDefinition();
+        staticObstacles.push(generateStaticObject(staticObstacleDefinition, this.scene, false));
+      }
+    });
+
+    return staticObstacles;
   }
 
-  getClosestPointsToNearbyObstacles() {
+  getAllClosestPointsToNearbyObstacles() {
     return this.getNearbyObstacles().map(
       (circle) => getLineCircleIntersectionPoint(circle.center, circle.radius, this.position),
     );
   }
 
+  getClosestPointToNearbyObstacles() {
+    const points = this.getAllClosestPointsToNearbyObstacles();
+
+    if (points.length === 0) {
+      return null;
+    }
+
+    return points.reduce((acc, point) => {
+      if (acc === null || this.getDistanceTo(point) < this.getDistanceTo(acc)) {
+        return point;
+      }
+      return acc;
+    }, null);
+  }
+
+  closePolygon(poly) {
+    if (poly.length < 2) {
+      return poly;
+    }
+
+    const firstPoint = poly[0];
+    const lastPoint = poly[poly.length - 1];
+
+    if (firstPoint[0] !== lastPoint[0] || firstPoint[1] !== lastPoint[1]) {
+      poly.push(firstPoint);
+    }
+
+    return poly;
+  }
+
   trimVCwithStaticObstacles() {
     // eslint-disable-next-line arrow-body-style
-    const closestPoints = this.getClosestPointsToNearbyObstacles();
+    const closestPoint = this.getClosestPointToNearbyObstacles();
+
+    if (closestPoint === null) {
+      return;
+    }
+
+    const secondLinePoint = shiftPointOfLineSegInDirOfPerpendicularBisector(
+      closestPoint.x,
+      closestPoint.y,
+      closestPoint.x,
+      closestPoint.y,
+      this.position.x,
+      this.position.y,
+      1,
+    );
+    const splittingLineParams = getLineEquationParams(closestPoint, secondLinePoint);
+    const splitPolygonParts = splitPolygon(this.VC, splittingLineParams).map(
+      (poly) => this.closePolygon(poly),
+    );
+
+    if (pointIsInsidePolygon(this.position, splitPolygonParts[0])) {
+      this.VC = splitPolygonParts[0];
+    } else {
+      this.VC = splitPolygonParts[1];
+    }
+  }
+
+  pointIsReachable(goalPoint) {
+    let reachable = true;
+
+    const closestPointInEnvBoundsToGoalPoint = closestPointInPolygonToPoint(
+      this.scene.environmentBounds,
+      goalPoint,
+    );
+    const pointDistToEnvBounds = distanceBetween2Points(
+      goalPoint,
+      closestPointInEnvBoundsToGoalPoint,
+    );
+
+    if (pointDistToEnvBounds <= this.radius * 1.1) {
+      reachable = Math.random() > 0.05;
+    }
+
+    this.scene.staticObjects.forEach((staticObj) => {
+      if (reachable && !staticObj.pointIsReachableByRobot(goalPoint, this)) {
+        reachable = false;
+      }
+    });
+
+    return reachable;
   }
 
   bvcContains(point) {
@@ -588,10 +654,18 @@ class Robot {
 
   limitGoal() {
     const { radius } = this;
-    this.goal = {
+    let newGoal = {
       x: Math.min(Math.max(radius, this.goal.x), this.envWidth - radius),
       y: Math.min(Math.max(radius, this.goal.y), this.envHeight - radius),
     };
+
+    // this.scene.staticObjects.forEach((staticObj) => {
+    //   if (!staticObj.pointIsReachableByRobot(newGoal, this)) {
+    //     newGoal = this.findPointInCellClosestToGoal(this.BVC, newGoal);
+    //   }
+    // });
+
+    this.goal = newGoal;
   }
 
   collidingWithRobot(r) {

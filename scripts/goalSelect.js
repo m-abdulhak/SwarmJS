@@ -89,6 +89,12 @@ function updateGoal(robot) {
     );
     // }
 
+    if (!robot.pointIsReachable(newGoal)) {
+      newGoalX = (Math.random() * 0.8 + 0.1) * robot.scene.width;
+      newGoalY = (Math.random() * 0.8 + 0.1) * robot.scene.height;
+      newGoal = { x: newGoalX, y: newGoalY };
+    }
+
     robot.lastRandGoal = newGoal;
     return robot.lastRandGoal;
   }
@@ -130,7 +136,9 @@ function updateGoal(robot) {
     const puckGoalDistRatings = [];
 
     robot.nearbyPucks
-      .filter((p) => !p.reachedGoal())
+      .filter((p) => !p.reachedGoal()
+                     && !p.isBlocked()
+                     && robot.pointIsReachable(getGoalFromPuck(p)))
       .forEach((p) => {
         angleRatings.push([p, angleBetweenThreePointsDeg(robot.position, p.position, p.goal)]);
         distanceRatings.push([p, robot.getDistanceTo(p.position)]);

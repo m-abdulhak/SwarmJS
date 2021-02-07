@@ -21,6 +21,7 @@ class Scene {
     this.svg = svg;
     this.width = parseInt(svg.attr('width'), 10);
     this.height = parseInt(svg.attr('height'), 10);
+    this.environmentBounds = [[0, 0], [this.width, 0], [this.width, this.height], [0, this.height], [0, 0]];
     this.numOfRobots = numOfRobots;
     this.robotRadius = robotRadius;
     this.pucksGroups = pucksGroups;
@@ -36,7 +37,7 @@ class Scene {
     this.addEnvBoundryObjects(this.width, this.height);
     
     // Add Environment Boundries To World
-    this.staticObjects = staticObjectsDefinitions.map((def) => generateStaticObject(def, this));
+    this.staticObjects = staticObjectsDefinitions.map((def) => generateStaticObject(def, this, true));
 
     // Starting and Goal Positions
     this.robotsStartingPositions = this[startingPositionsConfig](
@@ -100,7 +101,7 @@ class Scene {
     this.robots.forEach((r) => r.timeStep());
     this.pucks.forEach((p) => p.timeStep());
 
-    gScene.checkCollision();
+    gScene.updateMinRobotRobotDistMesurements();
 
     Engine.update(this.engine, this.timeDelta);
 
@@ -136,7 +137,7 @@ class Scene {
       }
 
       // 4. Update BVC
-      r.BVC = this.calculateBVCfromVC(cell, r);
+      r.BVC = this.calculateBVCfromVC(r.VC, r);
     });
 
 
@@ -159,7 +160,7 @@ class Scene {
     return padding;
   }
 
-  checkCollision() {
+  updateMinRobotRobotDistMesurements() {
     let minDist = null;
 
     this.robots.forEach((r, i) => {

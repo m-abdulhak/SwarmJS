@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 // eslint-disable-next-line no-unused-vars
 class StaticCircle {
-  constructor(def, scene) {
+  constructor(def, scene, shouldAddToWorld) {
     this.def = def;
     this.scene = scene;
     this.world = scene.world;
@@ -11,7 +11,9 @@ class StaticCircle {
     this.center = this.def.center;
     this.radius = this.def.radius;
 
-    this.addToWorld();
+    if (shouldAddToWorld) {
+      this.addToWorld();
+    }
   }
 
   // Static Obstaccle Interface
@@ -23,8 +25,8 @@ class StaticCircle {
   }
 
   // Static Obstaccle Interface
-  pointIsReachableByRobotWithRadius(point, robot) {
-    return this.getDistanceToBorder(point) < robot.radius;
+  pointIsReachableByRobot(point, robot) {
+    return this.getDistanceToBorder(point) > robot.radius;
   }
 
   // Static Obstaccle Interface
