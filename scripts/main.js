@@ -49,7 +49,7 @@ var staticObjectsDefinitions = [
   },
   {
     type: 'circle',
-    center: { x: 450, y: 200 },
+    center: { x: 450, y: 150 },
     radius: 50,
   },
 ];

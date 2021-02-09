@@ -69,11 +69,10 @@ class Robot {
 
     // Pucks
     this.updateGoal = updateGoal(this);
-    this.lastRandGoal = null;
     this.nearbyPucks = [];
     this.bestPuck = null;
-    this.puckSelectedTimeSteps = 0;
-    this.minPuckSelectedTimeSteps = 100;
+    this.curGoalTimeSteps = 0;
+    this.minCurGoalTimeSteps = 100;
 
     // Obstacles
     this.obstacleSensingRadius = this.radius * 10;
@@ -392,10 +391,9 @@ class Robot {
 
   deadLockTempGoalStillValid() {
     const tempGoalNotReached = !this.reached(this.tempGoal);
-    const currentVCellContainsTempGoal = this.scene.voronoi.contains(
-      this.id,
-      this.tempGoal.x,
-      this.tempGoal.y,
+    const currentVCellContainsTempGoal = pointIsInsidePolygon(
+      this.BVC,
+      this.tempGoal,
     );
     const condCurAlgoIsAdvanced = this.deadLockRecoveryAlgorithm === this.DeadLockRecovery.Advanced;
     const recoveryManeuverHasNotSucceeded = condCurAlgoIsAdvanced
@@ -526,8 +524,13 @@ class Robot {
     // Add pucks that reached goal as obstacles
     this.nearbyPucks.forEach((puck) => {
       if (puck.deepInGoal() && this.getDistanceTo(puck.position) > this.radius) {
+        // Add chance to ignore object if it is close to the current goal puck
+        // if (this.bestPuck
+        //     && this.bestPuck.position
+        //     && puck.getDistanceTo(this.bestPuck.position) > this.radius * 1) {
         const staticObstacleDefinition = puck.generateStaticObjectDefinition();
         staticObstacles.push(generateStaticObject(staticObstacleDefinition, this.scene, false));
+        // }
       }
     });
 
@@ -599,7 +602,7 @@ class Robot {
     }
   }
 
-  pointIsReachable(goalPoint) {
+  pointIsReachableInEnvBounds(goalPoint) {
     let reachable = true;
 
     const closestPointInEnvBoundsToGoalPoint = closestPointInPolygonToPoint(
@@ -612,8 +615,14 @@ class Robot {
     );
 
     if (pointDistToEnvBounds <= this.radius * 1.1) {
-      reachable = Math.random() > 0.05;
+      reachable = Math.random() > 0.1;
     }
+
+    return reachable;
+  }
+
+  pointIsReachableOutsideStaticObs(goalPoint) {
+    let reachable = true;
 
     this.scene.staticObjects.forEach((staticObj) => {
       if (reachable && !staticObj.pointIsReachableByRobot(goalPoint, this)) {
@@ -627,6 +636,11 @@ class Robot {
   bvcContains(point) {
     return typeof (this.BVC) !== 'undefined' && this.BVC != null
             && pointIsInsidePolygon(point, this.BVC);
+  }
+
+  reachedGoal() {
+    const ret = this.reached(this.goal);
+    return ret;
   }
 
   reached(point) {
@@ -654,16 +668,21 @@ class Robot {
 
   limitGoal() {
     const { radius } = this;
-    let newGoal = {
+    const newGoal = {
       x: Math.min(Math.max(radius, this.goal.x), this.envWidth - radius),
       y: Math.min(Math.max(radius, this.goal.y), this.envHeight - radius),
     };
 
-    // this.scene.staticObjects.forEach((staticObj) => {
-    //   if (!staticObj.pointIsReachableByRobot(newGoal, this)) {
-    //     newGoal = this.findPointInCellClosestToGoal(this.BVC, newGoal);
-    //   }
-    // });
+    this.scene.staticObjects.forEach((staticObj) => {
+      let diffX = null;
+      let diffY = null;
+      while (!staticObj.pointIsReachableByRobot(newGoal, this)) {
+        diffX = diffX || newGoal.x - this.position.x;
+        diffY = diffY || newGoal.y - this.position.y;
+        newGoal.x += diffX;
+        newGoal.y += diffY;
+      }
+    });
 
     this.goal = newGoal;
   }
