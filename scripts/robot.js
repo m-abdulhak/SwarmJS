@@ -392,8 +392,8 @@ class Robot {
   deadLockTempGoalStillValid() {
     const tempGoalNotReached = !this.reached(this.tempGoal);
     const currentVCellContainsTempGoal = pointIsInsidePolygon(
-      this.BVC,
       this.tempGoal,
+      this.BVC,
     );
     const condCurAlgoIsAdvanced = this.deadLockRecoveryAlgorithm === this.DeadLockRecovery.Advanced;
     const recoveryManeuverHasNotSucceeded = condCurAlgoIsAdvanced
@@ -609,13 +609,14 @@ class Robot {
       this.scene.environmentBounds,
       goalPoint,
     );
+
     const pointDistToEnvBounds = distanceBetween2Points(
       goalPoint,
       closestPointInEnvBoundsToGoalPoint,
     );
 
     if (pointDistToEnvBounds <= this.radius * 1.1) {
-      reachable = Math.random() > 0.1;
+      reachable = Math.random() < 0.1;
     }
 
     return reachable;

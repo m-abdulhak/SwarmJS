@@ -148,9 +148,7 @@ function updateGoal(robot) {
       return closestPointInLine;
     }
 
-    // if (angle < 25) {
     return getRandGoal(robot);
-    // }
   }
 
   function selectBestNearbyPuck() {
@@ -167,7 +165,10 @@ function updateGoal(robot) {
       .filter((p) => {
         if (!p.reachedGoal() && !p.isBlocked()) {
           const g = getGoalFromPuck(p);
-          return robot.pointIsReachableInEnvBounds(g) && robot.pointIsReachableOutsideStaticObs(g);
+          const condInRobotVorCell = pointIsInsidePolygon(p.position, robot.VC);
+          const condReachableInEnv = robot.pointIsReachableInEnvBounds(g);
+          const condReachableOutOfStaticObs = robot.pointIsReachableOutsideStaticObs(g);
+          return condInRobotVorCell && condReachableInEnv && condReachableOutOfStaticObs;
         }
         return false;
       })
@@ -178,7 +179,7 @@ function updateGoal(robot) {
       });
 
     angleRatings.sort((a, b) => b[1] - a[1]);
-    distanceRatings.sort((a, b) => 1[1] - b[1]);
+    distanceRatings.sort((a, b) => a[1] - b[1]);
     puckGoalDistRatings.sort((a, b) => b[1] - a[1]);
 
     const angleRatsExist = angleRatings.length > 0;
@@ -200,6 +201,7 @@ function updateGoal(robot) {
     }
 
     robot.bestPuck = bestPuck;
+
     if (bestPuck !== null) {
       robot.curGoalTimeSteps = 0;
     }

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-undef */
 // eslint-disable-next-line no-unused-vars
@@ -36,7 +37,7 @@ class Puck {
   timeStep() {
     this.prevPosition = this.position;
     this.position = this.body.position;
-    // this.updateVelocity();
+    console.log(`puck ${this.id} updated!`);
     this.limitGoal();
   }
 
