@@ -9,6 +9,7 @@
 <style>
 </style>
 <body>
+  <canvas id="mapCanvas" width="800" height="500"></canvas>
   <svg width="800" height="500" style="border: #bfbebe solid 3px;"></svg>
   <br>
   <div class="options">
@@ -112,6 +113,8 @@
   <script src="libraries/clip-poly.js"></script>
   <script src="scripts/geometry.js"></script>
   <script src="scripts/renderer.js"></script>
+  <script src="scripts/distanceTransform/goalDistanceTransform.js"></script>
+  <script src="scripts/distanceTransform/distanceTransform.js"></script>
   <script src="scripts/staticObjects/staticCircle.js"></script>
   <script src="scripts/staticObjects/staticObjectFactory.js"></script>
   <script src="scripts/scene.js"></script>
@@ -120,5 +123,24 @@
   <script src="scripts/robot.js"></script>
   <script src="scripts/puck.js"></script>
   <script src="scripts/main.js"></script>
+
+  
+  <script>
+    // Meijster distance
+		// method : 'EDT' (Euclidean) 'MDT' (Manhattan) 'CDT' (Chessboard)
+		// Everything is integer math, hence Math.floor()
+		
+    // var x = new Array(256*256).fill(0);
+    // console.log(x);
+    // x[256*256/2-128] = 1;
+
+    // console.log(x[128][128]);
+
+    // //Distance transform x in the Euclidean metric
+    // const dt = distanceFromBooleanImage(x, 256, 256, 'EDT')
+
+    // console.log(dt);
+    // console.log(dt[129][129]);
+  </script>
 </body>
 </html>

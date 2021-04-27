@@ -8,17 +8,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/m-abdulhak/Buffered-Voronoi-Cell-Deadlock-Avoidance.git"
+    "url": "git+https://github.com/m-abdulhak/swarm.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/m-abdulhak/Buffered-Voronoi-Cell-Deadlock-Avoidance/issues"
+    "url": "https://github.com/m-abdulhak/swarm/issues"
   },
-  "homepage": "https://github.com/m-abdulhak/Buffered-Voronoi-Cell-Deadlock-Avoidance#readme",
+  "homepage": "https://github.com/m-abdulhak/swarm#readme",
   "devDependencies": {
-    "eslint": "^7.2.0",
+    "eslint": "^7.24.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1"
   },

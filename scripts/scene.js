@@ -21,7 +21,9 @@ class Scene {
     this.svg = svg;
     this.width = parseInt(svg.attr('width'), 10);
     this.height = parseInt(svg.attr('height'), 10);
-    this.environmentBounds = [[0, 0], [this.width, 0], [this.width, this.height], [0, this.height], [0, 0]];
+    this.environmentBounds = [
+      [0, 0], [this.width, 0], [this.width, this.height], [0, this.height], [0, 0],
+    ];
     this.numOfRobots = numOfRobots;
     this.robotRadius = robotRadius;
     this.pucksGroups = pucksGroups;
@@ -35,9 +37,11 @@ class Scene {
 
     // Add Environment Boundries To World
     this.addEnvBoundryObjects(this.width, this.height);
-    
-    // Add Environment Boundries To World
-    this.staticObjects = staticObjectsDefinitions.map((def) => generateStaticObject(def, this, true));
+
+    // Add Static Obstacles To World
+    this.staticObjects = staticObjectsDefinitions.map(
+      (def) => generateStaticObject(def, this, true),
+    );
 
     // Starting and Goal Positions
     this.robotsStartingPositions = this[startingPositionsConfig](
@@ -59,7 +63,7 @@ class Scene {
       this.height,
       motionPlanningAlgorithm,
     );
-      
+
     // Initialize Pucks
     this.pucks = this.initializePucksRange(
       this.pucksGroups,
@@ -84,7 +88,26 @@ class Scene {
 
     // Minimum Robot-Robot Distanc
     this.minDistance = null;
+
+    this.mapArray = mapSceneToArr(this.width, this.height, this.staticObjects);
+
+    // Distance Transform to obstacles
+    // this.distanceTransformMap = distanceFromBooleanImage(this.mapArray, this.width, this.height, 'EDT');
     
+    // drawMap(document.getElementById('mapCanvas'), this.mapArray, false);
+
+    // Distance Transforms to Puck Goals, taking obstacles into consideration
+    this.puckMaps = this.pucksGroups.map(
+      (group) => ({
+        id: group.id, 
+        map: getDistanceTransformTo(this.mapArray, this.width / 4, this.height / 4, group.goal)
+      })
+    );
+
+    console.log(this.puckMaps);
+
+    // drawMap(document.getElementById('mapCanvas'), this.distanceTransformMap, true);
+    drawMap(document.getElementById('mapCanvas'), this.puckMaps[0].map, true);
   }
 
   setSpeed(scale) {
@@ -120,7 +143,9 @@ class Scene {
     // For each robot
     this.robots.forEach((r, i) => {
       // 1. Find Pucks within a certain distance to the robot
-      r.nearbyPucks = this.pucks.filter(p => r.getDistanceTo(p.position) < this.maxNearbyPuckDistance);
+      r.nearbyPucks = this.pucks.filter(
+        (p) => r.getDistanceTo(p.position) < this.maxNearbyPuckDistance,
+      );
 
       // 2. Update the robot's neighbors
       r.neighbors = this.getNeighborsOf(i);
@@ -139,8 +164,6 @@ class Scene {
       // 4. Update BVC
       r.BVC = this.calculateBVCfromVC(r.VC, r);
     });
-
-
   }
 
   calculateBVCfromVC(cell, r) {
@@ -211,20 +234,19 @@ class Scene {
     let id = 0;
 
     pucksGroups.forEach((puckGroup) => {
-     pucks.push(
-      ...d3
-      .range(puckGroup.count)
-      .map((i) => new Puck(
-        i+id,
-        this.getAnInitialPos(),
-        puckGroup.goal,
-        puckGroup.radius,
-        envWidth,
-        envHeight,
-        this,
-        puckGroup.color,
-      ))
-    );
+      pucks.push(
+        ...d3.range(puckGroup.count)
+          .map((i) => new Puck(
+            i + id,
+            this.getAnInitialPos(),
+            puckGroup.goal,
+            puckGroup.radius,
+            envWidth,
+            envHeight,
+            this,
+            puckGroup.color,
+          )),
+      );
 
       id += puckGroup.count;
     });
@@ -240,7 +262,7 @@ class Scene {
     const resolution = (radius * 2.1);
     const xCount = envWidth / resolution;
     const yCount = envHeight / resolution;
-    const totalPositionsCount = parseInt(numOfRobots, 10)  + parseInt(numOfPucks, 10);
+    const totalPositionsCount = parseInt(numOfRobots, 10) + parseInt(numOfPucks, 10);
 
     if (xCount * yCount < totalPositionsCount * 4) {
       throw 'Invalid inputs, number and size of robots and pucks are too high for this environment size!';
@@ -354,8 +376,10 @@ class Scene {
 
   //   for (let row = 0; row < 10; row += 1) {
   //     for (let col = 0; col < 10; col += 1) {
-  //       const newX = robotStart.x + resolution * col + (Math.random() * radius) / 100 + radius / 50;
-  //       const newY = robotStart.y + resolution * row + (Math.random() * radius) / 100 + radius / 50;
+  //       const newX = robotStart.x +
+  //                    resolution * col + (Math.random() * radius) / 100 + radius / 50;
+  //       const newY = robotStart.y +
+  //                    resolution * row + (Math.random() * radius) / 100 + radius / 50;
   //       const newGoalX = goalsStart.x - resolution * col
   //       + (Math.random() * radius) / 100 + radius / 50;
   //       const newGoalY = !invertVertically
@@ -394,13 +418,37 @@ class Scene {
     return this.robots[index];
   }
 
-  addEnvBoundryObjects(envWidth, envHeight){
+  addEnvBoundryObjects(envWidth, envHeight) {
     World.add(this.world, [
       // walls
-      Bodies.rectangle(envWidth / 2,   -10,          envWidth,  20, { isStatic: true }),
-      Bodies.rectangle(envWidth / 2,   envHeight+10, envWidth,  20, { isStatic: true }),
-      Bodies.rectangle(-10,            envHeight/2,  20,        envHeight, { isStatic: true }),
-      Bodies.rectangle(envWidth + 10,  envHeight/2,  20,        envHeight, { isStatic: true }),
+      Bodies.rectangle(
+        envWidth / 2,
+        -10,
+        envWidth,
+        20,
+        { isStatic: true },
+      ),
+      Bodies.rectangle(
+        envWidth / 2,
+        envHeight + 10,
+        envWidth,
+        20,
+        { isStatic: true },
+      ),
+      Bodies.rectangle(
+        -10,
+        envHeight / 2,
+        20,
+        envHeight,
+        { isStatic: true },
+      ),
+      Bodies.rectangle(
+        envWidth + 10,
+        envHeight / 2,
+        20,
+        envHeight,
+        { isStatic: true },
+      ),
     ]);
   }
 

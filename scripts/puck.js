@@ -37,7 +37,6 @@ class Puck {
   timeStep() {
     this.prevPosition = this.position;
     this.position = this.body.position;
-    console.log(`puck ${this.id} updated!`);
     this.limitGoal();
   }
 
