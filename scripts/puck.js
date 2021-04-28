@@ -3,11 +3,12 @@
 /* eslint-disable no-undef */
 // eslint-disable-next-line no-unused-vars
 class Puck {
-  constructor(id, position, goal, radius, envWidth, envHeight, scene, color) {
+  constructor(id, position, goal, radius, envWidth, envHeight, scene, color, map) {
     this.id = id;
     this.position = position;
     this.prevPosition = position;
     this.velocityScale = 1;
+    this.groupGoal = { ...goal };
     this.goal = goal;
     this.radius = radius;
     this.color = color;
@@ -16,6 +17,7 @@ class Puck {
     this.scene = scene;
     this.engine = this.scene.engine;
     this.world = this.scene.world;
+    this.map = map;
 
     // Create Matter.js body and attach it to world
     this.body = Bodies.circle(position.x, position.y, this.radius);
@@ -28,7 +30,7 @@ class Puck {
     // Initialize velocity according to movement goal
     this.velocity = { x: 0, y: 0 };
 
-    //
+    // Distances Configurations
     this.blockedDistance = this.radius * 1.5;
     this.goalReachedDist = this.radius * 10;
     this.deepInGoalDist = this.radius * 7;
@@ -37,33 +39,50 @@ class Puck {
   timeStep() {
     this.prevPosition = this.position;
     this.position = this.body.position;
+    this.updateGoal();
     this.limitGoal();
   }
 
+  updateGoal() {
+    if (this.reachedGoal()) {
+      this.goal = this.groupGoal;
+    } else {
+      const mapY = Math.min(this.map.length, Math.max(0, Math.floor(this.position.y / 4)));
+      const mapX = Math.min(this.map[0].length, Math.max(0, Math.floor(this.position.x / 4)));
+      const dir = this.map[mapY][mapX];
+      this.goal = {
+        x: this.position.x + dir[0] * this.radius * 10,
+        y: this.position.y + dir[1] * this.radius * 10,
+      };
+    }
+  }
+
   isBlocked() {
-    let blocked = false;
+    return false;
 
-    const closestPointToEnvBounds = closestPointInPolygonToPoint(
-      this.scene.environmentBounds,
-      this.position,
-    );
-    const distToEnvBounds = this.getDistanceTo(closestPointToEnvBounds);
-    if (distToEnvBounds < this.blockedDistance * 2) {
-      blocked = true;
-    }
+    // let blocked = false;
 
-    for (let index = 0; !blocked && index < this.scene.staticObjects.length; index += 1) {
-      const staticObj = this.scene.staticObjects[index];
-      if (staticObj.getDistanceToBorder(this.position) < this.blockedDistance) {
-        blocked = true;
-      }
-    }
+    // const closestPointToEnvBounds = closestPointInPolygonToPoint(
+    //   this.scene.environmentBounds,
+    //   this.position,
+    // );
+    // const distToEnvBounds = this.getDistanceTo(closestPointToEnvBounds);
+    // if (distToEnvBounds < this.blockedDistance * 2) {
+    //   blocked = true;
+    // }
 
-    return blocked;
+    // for (let index = 0; !blocked && index < this.scene.staticObjects.length; index += 1) {
+    //   const staticObj = this.scene.staticObjects[index];
+    //   if (staticObj.getDistanceToBorder(this.position) < this.blockedDistance) {
+    //     blocked = true;
+    //   }
+    // }
+
+    // return blocked;
   }
 
   reachedGoal() {
-    return this.reachedDist(this.goal, this.goalReachedDist);
+    return this.reachedDist(this.groupGoal, this.goalReachedDist);
   }
 
   deepInGoal() {

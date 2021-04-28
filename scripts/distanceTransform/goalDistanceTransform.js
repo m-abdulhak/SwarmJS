@@ -46,12 +46,8 @@ const getNeighborsGenerator = (map, width, height) => (x, y) => {
       const notSameElement = i !== x || j !== y;
       const isNotObstacle = map[i + j * width] !== 1;
 
-      if (!isNotObstacle) {
-        const test = "test";
-      }
-
       if (iValid && jValid && notSameElement && isNotObstacle) {
-        neighbors.push({ x: i, y: j });
+        neighbors.push([i, j]);
       }
     }
   }
@@ -67,19 +63,20 @@ const arrTo2dArrWrapper = (mapArr, width) => ({
   ),
 });
 
-const getElemKey = (el) => `${el.x}-${el.y}`;
+const getElemKey = (el) => `${el[0]}-${el[1]}`;
 
-const getDistanceTransformTo = (mapArr, width, height, goalPosition) => {
+const getDistanceTransformTo = (mapArr, width, height, goalPosition, scale) => {
   const map = arrTo2dArrWrapper(mapArr, width);
   const dtMap = new Array(height).fill(null).map(() => Array(width).fill(NaN));
+  const goalMap = new Array(height).fill(null).map(() => Array(width).fill(NaN));
   const neighbors = getNeighborsGenerator(mapArr, width, height);
 
   const elementsMemory = [];
   let currentElements = [
-    {
-      x: Math.floor(goalPosition.x / 4),
-      y: Math.floor(goalPosition.y / 4),
-    },
+    [
+      Math.floor(goalPosition.x),
+      Math.floor(goalPosition.y),
+    ],
   ];
 
   let curDistance = 0;
@@ -92,11 +89,11 @@ const getDistanceTransformTo = (mapArr, width, height, goalPosition) => {
       const key = getElemKey(el);
 
       if (elementsMemory.indexOf(key) < 0) {
-        dtMap[el.y][el.x] = map.get(el.x, el.y) === 1 ? NaN : curDistance;
+        dtMap[el[1]][el[0]] = map.get(el[0], el[1]) === 1 ? NaN : curDistance;
 
         elementsMemory.push(key);
 
-        const ns = neighbors(el.x, el.y);
+        const ns = neighbors(el[0], el[1]);
 
         newElements.push(
           ...ns.filter(
@@ -106,37 +103,51 @@ const getDistanceTransformTo = (mapArr, width, height, goalPosition) => {
       }
     }
 
-    // currentElements.forEach((el) => {
-    //   const key = getElemKey(el);
-
-    //   if (elementsMemory.indexOf(key) >= 0) {
-    //     return;
-    //   }
-
-    //   dtMap[el.y][el.x] = map.get(el.x, el.y) === 1 ? NaN : curDistance;
-
-    //   elementsMemory.push(key);
-
-    //   const ns = neighbors(el.x, el.y);
-
-    //   newElements.push(
-    //     ...ns.filter(
-    //       (n) => elementsMemory.indexOf(getElemKey(n)) < 0,
-    //     ),
-    //   );
-    // });
-
     currentElements = newElements;
     curDistance += 1;
   }
 
-  return dtMap;
+  for (let y = 0; y < dtMap.length; y += 1) {
+    for (let x = 0; x < dtMap[0].length; x += 1) {
+      const element = dtMap[y][x];
+
+      if (!element || Number.isNaN(element)) {
+        goalMap[y][x] = [x, y];
+      } else {
+        const ns = neighbors(x, y);
+
+        let closestDistance = null;
+        let closestNeighbors = [];
+
+        for (let index = 0; index < ns.length; index += 1) {
+          const n = ns[index];
+          const dist = dtMap[n[1]][n[0]];
+
+          if (closestDistance === null || dist === closestDistance) {
+            closestDistance = dist;
+            closestNeighbors.push(n);
+          } else if (dist < closestDistance) {
+            closestDistance = dist;
+            closestNeighbors = [n];
+          }
+        }
+
+        const av = (list) => list.reduce((acc, r) => acc + r, 0) / list.length;
+
+        goalMap[y][x] = [
+          av(closestNeighbors.map((n) => n[0])) - x,
+          av(closestNeighbors.map((n) => n[1])) - y,
+        ];
+      }
+    }
+  }
+
+  return goalMap;
 };
 
-const drawMap = (canvas, arr, is2D) => {
-  const scale = 4;
-  const w = 800 / scale;
-  const h = 500 / scale;
+const drawMap = (canvas, arr, scale, is2D) => {
+  const w = 800 * scale;
+  const h = 500 * scale;
   const c2 = canvas;
   const ctx2 = c2.getContext('2d');
 

@@ -9,7 +9,7 @@
 <style>
 </style>
 <body>
-  <canvas id="mapCanvas" width="800" height="500"></canvas>
+  <!-- <canvas id="mapCanvas" width="800" height="500"></canvas> -->
   <svg width="800" height="500" style="border: #bfbebe solid 3px;"></svg>
   <br>
   <div class="options">
@@ -27,11 +27,11 @@
     </div>
     <div class="ui-section">
       <label class="key">Speed:</label>
-      <input type="range" min=".1" max="40.0" value="5" step=".1" class="slider input" id="speed-slider">
+      <input type="range" min=".1" max="40.0" value="15" step=".1" class="slider input" id="speed-slider">
     </div>
     <div class="ui-section">
       <label class="key">Robots:</label>
-      <input type="range" min="1" max="20" value="1" step="1" class="slider input" id="robots-slider">
+      <input type="range" min="1" max="30" value="20" step="1" class="slider input" id="robots-slider">
     </div>
     <div class="ui-section">
       <label class="key">Pause and Reset:</label>
@@ -123,24 +123,5 @@
   <script src="scripts/robot.js"></script>
   <script src="scripts/puck.js"></script>
   <script src="scripts/main.js"></script>
-
-  
-  <script>
-    // Meijster distance
-		// method : 'EDT' (Euclidean) 'MDT' (Manhattan) 'CDT' (Chessboard)
-		// Everything is integer math, hence Math.floor()
-		
-    // var x = new Array(256*256).fill(0);
-    // console.log(x);
-    // x[256*256/2-128] = 1;
-
-    // console.log(x[128][128]);
-
-    // //Distance transform x in the Euclidean metric
-    // const dt = distanceFromBooleanImage(x, 256, 256, 'EDT')
-
-    // console.log(dt);
-    // console.log(dt[129][129]);
-  </script>
 </body>
 </html>

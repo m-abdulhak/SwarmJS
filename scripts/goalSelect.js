@@ -175,31 +175,23 @@ function updateGoal(robot) {
       .forEach((p) => {
         angleRatings.push([p, angleBetweenThreePointsDeg(robot.position, p.position, p.goal)]);
         distanceRatings.push([p, robot.getDistanceTo(p.position)]);
-        puckGoalDistRatings.push([p, p.getDistanceTo(p.goal)]);
       });
 
     angleRatings.sort((a, b) => b[1] - a[1]);
     distanceRatings.sort((a, b) => a[1] - b[1]);
-    puckGoalDistRatings.sort((a, b) => b[1] - a[1]);
 
     const angleRatsExist = angleRatings.length > 0;
     const distRatsExist = distanceRatings.length > 0;
-    const puckGoalRatsExist = puckGoalDistRatings.length > 0;
 
     let bestPuck = null;
 
     if (distRatsExist && distanceRatings[0][1] < robot.radius * 3) {
       bestPuck = distanceRatings[0][0];
-    // } else if (puckGoalRatsExist && distanceRatings[0][1] > distanceRatings[0].radius * 100) {
-    //   bestPuck = puckGoalDistRatings[0][0];
     } else if (angleRatsExist && Math.random() < 0.3) {
       bestPuck = angleRatings[0][0];
-    } else if (distRatsExist && Math.random() < 0.5) {
+    } else if (distRatsExist) {
       bestPuck = distanceRatings[0][0];
-    } else if (puckGoalRatsExist) {
-      bestPuck = puckGoalDistRatings[0][0];
     }
-
     robot.bestPuck = bestPuck;
 
     if (bestPuck !== null) {

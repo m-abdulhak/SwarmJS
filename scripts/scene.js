@@ -64,11 +64,34 @@ class Scene {
       motionPlanningAlgorithm,
     );
 
+    // Generate Binary Scene Map
+    this.mapArray = mapSceneToArr(this.width, this.height, this.staticObjects);
+
+    // Distance Transforms to Puck Goals, taking obstacles into consideration
+    this.puckMapScale = 1 / 4;
+    this.puckMaps = this.pucksGroups.map(
+      (group) => (getDistanceTransformTo(
+        this.mapArray,
+        Math.floor(this.width * this.puckMapScale),
+        Math.floor(this.height * this.puckMapScale),
+        {
+          x: Math.floor(group.goal.x * this.puckMapScale),
+          y: Math.floor(group.goal.y * this.puckMapScale),
+        },
+        this.puckMapScale,
+      )
+      ),
+    );
+
+    // drawMap(document.getElementById('mapCanvas'), this.distanceTransformMap, true);
+    // drawMap(document.getElementById('mapCanvas'), this.puckMaps[0].map, this.puckMapScale, true);
+
     // Initialize Pucks
     this.pucks = this.initializePucksRange(
       this.pucksGroups,
       this.width,
       this.height,
+      this.puckMaps,
     );
     this.maxNearbyPuckDistance = this.robotRadius * 10;
 
@@ -88,26 +111,6 @@ class Scene {
 
     // Minimum Robot-Robot Distanc
     this.minDistance = null;
-
-    this.mapArray = mapSceneToArr(this.width, this.height, this.staticObjects);
-
-    // Distance Transform to obstacles
-    // this.distanceTransformMap = distanceFromBooleanImage(this.mapArray, this.width, this.height, 'EDT');
-    
-    // drawMap(document.getElementById('mapCanvas'), this.mapArray, false);
-
-    // Distance Transforms to Puck Goals, taking obstacles into consideration
-    this.puckMaps = this.pucksGroups.map(
-      (group) => ({
-        id: group.id, 
-        map: getDistanceTransformTo(this.mapArray, this.width / 4, this.height / 4, group.goal)
-      })
-    );
-
-    console.log(this.puckMaps);
-
-    // drawMap(document.getElementById('mapCanvas'), this.distanceTransformMap, true);
-    drawMap(document.getElementById('mapCanvas'), this.puckMaps[0].map, true);
   }
 
   setSpeed(scale) {
@@ -229,7 +232,7 @@ class Scene {
         motionPlanningAlgorithm));
   }
 
-  initializePucksRange(pucksGroups, envWidth, envHeight) {
+  initializePucksRange(pucksGroups, envWidth, envHeight, maps) {
     const pucks = [];
     let id = 0;
 
@@ -245,6 +248,7 @@ class Scene {
             envHeight,
             this,
             puckGroup.color,
+            maps[puckGroup.id],
           )),
       );
 
@@ -293,113 +297,6 @@ class Scene {
 
     return positions;
   }
-
-  // getCircleCollisionFreePositions(numOfRobots, radius, envWidth, envHeight) {
-  //   const circleRadius = (Math.min(envWidth, envHeight) * 20) / 42;
-  //   const resolution = (Math.PI * 2) / numOfRobots;
-  //   const envCenter = { x: envWidth / 2, y: envHeight / 2 };
-
-  //   if (circleRadius * resolution < radius * 4) {
-  //     throw 'Invalid inputs, number and size of robots are too high for this environment size!';
-  //   }
-
-  //   const positions = [];
-  //   const start = Math.random() * Math.PI * 2;
-  //   let i = start;
-  //   while (i < start + Math.PI * 2) {
-  //     const newX = envCenter.x + circleRadius * Math.cos(i);
-  //     const newY = envCenter.y + circleRadius * Math.sin(i);
-  //     const newGoalX = envCenter.x - circleRadius * Math.cos(i);
-  //     const newGoalY = envCenter.y - circleRadius * Math.sin(i);
-  //     const newPos = { x: newX, y: newY };
-  //     const newGoalPos = { x: newGoalX, y: newGoalY };
-
-  //     positions.push(newPos);
-  //     positions.push(newGoalPos);
-
-  //     i += resolution + (Math.random() * resolution) / 100 - resolution / 50;
-  //   }
-
-  //   if (positions.length < numOfRobots * 2) {
-  //     throw 'Invalid inputs, number and size of robots are too high for this environment size!';
-  //   }
-
-  //   return positions;
-  // }
-
-  // getSquarePositionsConfig1(numOfRobots, radius, envWidth, envHeight) {
-  //   const distanceBetweenPositions = radius * 4.2;
-  //   return this.getSquareCollisionFreePositions(
-  //     numOfRobots,
-  //     radius,
-  //     envWidth,
-  //     envHeight,
-  //     distanceBetweenPositions,
-  //     false,
-  //   );
-  // }
-
-  // getSquarePositionsConfig2(numOfRobots, radius, envWidth, envHeight) {
-  //   const distanceBetweenPositions = radius * 4.6;
-  //   return this.getSquareCollisionFreePositions(
-  //     numOfRobots,
-  //     radius,
-  //     envWidth,
-  //     envHeight,
-  //     distanceBetweenPositions,
-  //     true,
-  //   );
-  // }
-
-  // getSquareCollisionFreePositions(
-  //   numOfRobots,
-  //   radius,
-  //   envWidth,
-  //   envHeight,
-  //   distanceBetweenPositions,
-  //   invertVertically,
-  // ) {
-  //   const resolution = distanceBetweenPositions;
-  //   const robotStart = { x: radius * 10, y: radius * 20 };
-  //   const goalsStart = {
-  //     x: envWidth - radius * 10,
-  //     y: !invertVertically ? radius * 20 : radius * 20 + resolution * 9,
-  //   };
-
-  //   const condEnVLengthTooSmall = robotStart.x + resolution * 10 > envWidth / 2;
-  //   const condEnVHeightTooSmall = robotStart.y + resolution * 10 > envHeight;
-  //   if (condEnVLengthTooSmall || condEnVHeightTooSmall) {
-  //     throw 'Invalid inputs, number and size of robots are too high for this environment size!';
-  //   }
-
-  //   const positions = [];
-
-  //   for (let row = 0; row < 10; row += 1) {
-  //     for (let col = 0; col < 10; col += 1) {
-  //       const newX = robotStart.x +
-  //                    resolution * col + (Math.random() * radius) / 100 + radius / 50;
-  //       const newY = robotStart.y +
-  //                    resolution * row + (Math.random() * radius) / 100 + radius / 50;
-  //       const newGoalX = goalsStart.x - resolution * col
-  //       + (Math.random() * radius) / 100 + radius / 50;
-  //       const newGoalY = !invertVertically
-  //         ? goalsStart.y + resolution * row + (Math.random() * radius) / 100 + radius / 50
-  //         : goalsStart.y - resolution * row + (Math.random() * radius) / 100 + radius / 50;
-
-  //       const newPos = { x: newX, y: newY };
-  //       const newGoalPos = { x: newGoalX, y: newGoalY };
-
-  //       positions.push(newGoalPos);
-  //       positions.push(newPos);
-  //     }
-  //   }
-
-  //   if (positions.length < numOfRobots * 2) {
-  //     throw 'Invalid inputs, number and size of robots are too high for this environment size!';
-  //   }
-
-  //   return positions;
-  // }
 
   getNeighborsOf(robotIndex) {
     const neighbors = [];
@@ -454,9 +351,6 @@ class Scene {
 
   // Initial Configurations
   static StartingPositions = {
-    Random: "getRandomCollisionFreePositions",
-    // Circle: "getCircleCollisionFreePositions",
-    // InvertedSquare: "getSquarePositionsConfig1",
-    // InvertedSquare2: "getSquarePositionsConfig2",
+    Random: 'getRandomCollisionFreePositions',
   };
 }

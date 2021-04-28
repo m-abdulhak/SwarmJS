@@ -16,25 +16,32 @@ var activeElements = {
 var paused = false;
 
 // Robots Setup
-var numberOfRobots = 2;
-var radiusOfRobots = 15;
+var numberOfRobots = 20;
+var radiusOfRobots = 10;
 
 // Pucks Setup
 var pucksGroups = [
   {
     id: 0,
     count: 20,
-    radius: 10,
-    goal: { x: 350, y: 250 },
+    radius: 13,
+    goal: { x: 150, y: 250 },
     color: 'red',
   },
-  // {
-  //   id: 1,
-  //   count: 20,
-  //   radius: 10,
-  //   goal: { x: 650, y: 250 },
-  //   color: 'blue',
-  // },
+  {
+    id: 1,
+    count: 20,
+    radius: 13,
+    goal: { x: 650, y: 250 },
+    color: 'blue',
+  },
+  {
+    id: 2,
+    count: 20,
+    radius: 13,
+    goal: { x: 400, y: 350 },
+    color: 'green',
+  },
 ];
 
 // Static Objects
@@ -54,11 +61,6 @@ var staticObjectsDefinitions = [
     center: { x: 450, y: 150 },
     radius: 50,
   },
-  // {
-  //   type: 'circle',
-  //   center: { x: 0, y: 0 },
-  //   radius: 50,
-  // },
 ];
 
 // Initialize Matter.js objects
