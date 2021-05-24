@@ -142,6 +142,7 @@ const getDistanceTransformTo = (mapArr, width, height, goalPosition, scale) => {
     }
   }
 
+  // return dtMap;
   return goalMap;
 };
 

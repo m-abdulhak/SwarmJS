@@ -15,6 +15,9 @@ var activeElements = {
 };
 var paused = false;
 
+// Global Map Memory
+var gMaps = [];
+
 // Robots Setup
 var numberOfRobots = 20;
 var radiusOfRobots = 10;

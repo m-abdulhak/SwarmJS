@@ -159,15 +159,15 @@ function updateGoal(robot) {
 
     const angleRatings = [];
     const distanceRatings = [];
-    const puckGoalDistRatings = [];
 
     robot.nearbyPucks
       .filter((p) => {
         if (!p.reachedGoal() && !p.isBlocked()) {
           const g = getGoalFromPuck(p);
-          const condInRobotVorCell = pointIsInsidePolygon(p.position, robot.VC);
+          const condInRobotVorCell = pointIsInsidePolygon(p.position, robot.BVC);
           const condReachableInEnv = robot.pointIsReachableInEnvBounds(g);
-          const condReachableOutOfStaticObs = robot.pointIsReachableOutsideStaticObs(g);
+          // TODO: disabel after global planning was implemented
+          const condReachableOutOfStaticObs = true; // robot.pointIsReachableOutsideStaticObs(g);
           return condInRobotVorCell && condReachableInEnv && condReachableOutOfStaticObs;
         }
         return false;
