@@ -20,28 +20,28 @@ var gMaps = [];
 
 // Robots Setup
 var numberOfRobots = 20;
-var radiusOfRobots = 10;
+var radiusOfRobots = 8;
 
 // Pucks Setup
 var pucksGroups = [
   {
     id: 0,
-    count: 20,
-    radius: 13,
+    count: 25,
+    radius: 10,
     goal: { x: 150, y: 250 },
     color: 'red',
   },
   {
     id: 1,
-    count: 20,
-    radius: 13,
+    count: 25,
+    radius: 10,
     goal: { x: 650, y: 250 },
     color: 'blue',
   },
   {
     id: 2,
-    count: 20,
-    radius: 13,
+    count: 25,
+    radius: 10,
     goal: { x: 400, y: 350 },
     color: 'green',
   },
@@ -51,12 +51,12 @@ var pucksGroups = [
 var staticObjectsDefinitions = [
   {
     type: 'circle',
-    center: { x: 350, y: 350 },
+    center: { x: 250, y: 350 },
     radius: 50,
   },
   {
     type: 'circle',
-    center: { x: 650, y: 170 },
+    center: { x: 650, y: 120 },
     radius: 50,
   },
   {
@@ -99,7 +99,8 @@ var getStartingPositionsSettings = function () {
 };
 
 var getBenchmarkSettings = function () {
-  return parseInt(document.getElementById('starting-positions-select').value, 10);
+  return 0;
+  // return parseInt(document.getElementById('starting-positions-select').value, 10);
 };
 
 // Initializations

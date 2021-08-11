@@ -11,39 +11,17 @@ class Benchmark {
     this.backgroundPlotsColors = {
       1: 'cornflowerblue',
       2: 'darkseagreen',
+      3: 'cornflowerblue',
+      4: 'darkseagreen',
     };
     this.defaultSettings = [
       // Random:
       {
         type: 'Random',
-        benchMaxTimesteps: 4000,
+        benchMaxTimesteps: 50000,
         benchTimeScale: 60,
-        benchRobotCount: 100,
-        robotRadius: 10,
-      },
-      // Circle:
-      {
-        type: 'Circle',
-        benchMaxTimesteps: 4000,
-        benchTimeScale: 60,
-        benchRobotCount: 100,
-        robotRadius: 3,
-      },
-      // Square 1:
-      {
-        type: 'SquareHor',
-        benchMaxTimesteps: 4000,
-        benchTimeScale: 60,
-        benchRobotCount: 100,
-        robotRadius: 5,
-      },
-      // Square 1:
-      {
-        type: 'SquareHorVer',
-        benchMaxTimesteps: 8000,
-        benchTimeScale: 60,
-        benchRobotCount: 100,
-        robotRadius: 5,
+        benchRobotCount: 25,
+        robotRadius: 8,
       },
     ];
 
@@ -62,7 +40,7 @@ class Benchmark {
     this.initGraph();
   }
 
-  autoDownloadImage() {
+  toggleAutoDownloadImage() {
     this.autoSaveImageAfterEachRep = !this.autoSaveImageAfterEachRep;
   }
 
@@ -153,8 +131,9 @@ class Benchmark {
     document.getElementById('robots-slider').value = this.benchRobotCount;
     syncSettings();
 
-    this.benchDeadlockAlgo = this.benchDeadlockAlgo === 1 ? 2 : 1;
-    selectElement('deadlock-select', this.benchDeadlockAlgo);
+    this.benchDeadlockAlgo = 1;
+    // this.benchDeadlockAlgo = this.benchDeadlockAlgo === 1 ? 2 : 1;
+    // selectElement('deadlock-select', this.benchDeadlockAlgo);
 
     resetSimulation();
   }
@@ -188,7 +167,8 @@ class Benchmark {
       this.updateGraph(this.benchDeadlockAlgo,
         data.means,
         data.midDistanceMeans,
-        this.curTotalDistanceSet);
+        this.curTotalDistanceSet,
+        this.curMinDistanceSet);
 
       data.sets.push(this.curTotalDistanceSet);
       if (this.autoSaveImageAfterEachRep) {
@@ -237,7 +217,7 @@ class Benchmark {
 
     // Y scale will fit values from 0-10 within pixels height-0
     this.y = d3.scaleLinear()
-      .domain([0, 500])
+      .domain([0, 200])
       .range([this.height, 0]);
 
     this.svgGraph.append('g')
@@ -250,35 +230,36 @@ class Benchmark {
       .attr('x', 0 - (this.height / 2))
       .attr('dy', '1em')
       .style('text-anchor', 'middle')
-      .text('Distance');
+      .text('Number of Pucks - Distance');
 
-    const y1 = this.height - this.robotRadius * 2;
-    const y2 = this.height - this.robotRadius * 2;
-    const x1 = 0;
-    const x2 = 999999;
+    // const y1 = this.height - this.robotRadius * 2;
+    // const y2 = this.height - this.robotRadius * 2;
+    // const x1 = 0;
+    // const x2 = 999999;
 
-    this.svgGraph.append('path')
-      .attr('fill', 'none')
-      .attr('stroke', 'red')
-      .attr('stroke-width', 1.5)
-      .attr('stroke-dasharray', '10,10')
-      .attr('d', `M${x1},${y1}L${x2},${y2}Z`);
+    // this.svgGraph.append('path')
+    //   .attr('fill', 'none')
+    //   .attr('stroke', 'red')
+    //   .attr('stroke-width', 1.5)
+    //   .attr('stroke-dasharray', '10,10')
+    //   .attr('d', `M${x1},${y1}L${x2},${y2}Z`);
   }
 
-  updateGraph(algo, totalDistanceSet, minDistance, newSet) {
+  updateGraph(algo, totalDistanceSet, minDistance, newSet, newMinSet) {
     this.createPlot(bench.backgroundPlotsColors[algo], newSet, false, true);
+    this.createPlot(bench.backgroundPlotsColors[algo + 1], newMinSet, false, true);
 
     if (algo === 1) {
       if (this.simpleTotalDistancePlot === null) {
         this.simpleTotalDistancePlot = this.createPlot(bench.plotColors[algo], totalDistanceSet);
-        this.simpleMinDistancePlot = this.createPlot(bench.plotColors[algo], minDistance, true);
+        this.simpleMinDistancePlot = this.createPlot(bench.plotColors[algo + 1], minDistance);
       } else {
         this.updatePlot(this.simpleTotalDistancePlot, totalDistanceSet);
         this.updatePlot(this.simpleMinDistancePlot, minDistance);
       }
     } else if (this.advancedTotalDistancePlot === null) {
       this.advancedTotalDistancePlot = this.createPlot(bench.plotColors[algo], totalDistanceSet);
-      this.advancedMinDistancePlot = this.createPlot(bench.plotColors[algo], minDistance, true);
+      this.advancedMinDistancePlot = this.createPlot(bench.plotColors[algo + 1], minDistance);
     } else {
       this.updatePlot(this.advancedTotalDistancePlot, totalDistanceSet);
       this.updatePlot(this.advancedMinDistancePlot, minDistance);
@@ -292,7 +273,7 @@ class Benchmark {
       .attr('fill', 'none')
       .attr('stroke', color)
       // eslint-disable-next-line no-nested-ternary
-      .attr('stroke-width', dashed ? 1.5 : background ? 1 : 5)
+      .attr('stroke-width', dashed ? 1.5 : (background ? 1 : 5))
       .attr('stroke-dasharray', dashed ? '10,10' : '10,0')
       .attr('d', d3.line().x((d, i) => bench.x(i) * 10).y((d) => bench.y(d)));
   }

@@ -65,9 +65,9 @@
       <label class="key">Positions:</label>
       <select class="input-select input" id="starting-positions-select" name="starting-positions" onchange="changeStartingPositions()">
         <option value="0" selected>Random</option>
-        <option value="1">Circle</option>
+        <!-- <option value="1">Circle</option>
         <option value="2" >Square (Inverted Horizontally)</option>
-        <option value="3" >Square (Inverted Vertically and Horizontally)</option>
+        <option value="3" >Square (Inverted Vertically and Horizontally)</option> -->
       </select>
     </div>
     <div class="ui-section">
@@ -77,7 +77,7 @@
     <div class="ui-section">
       <label class="key">Save Benchmark As PNG :</label>
       <input  type="button" value="Save" class="input-button input small-btn" onclick="bench.downloadImage()" style="width: 50%;">
-      <input  type="button" value="Auto Save" class="hidden input-button input small-btn" onclick="bench.autoDownloadImage()" style="width: 50%;">
+      <input  type="button" value="Auto Save" class="hidden input-button input small-btn" onclick="bench.toggleAutoDownloadImage()" style="width: 50%;">
     </div>
   </div> 
 
@@ -88,20 +88,20 @@
   <div style="width: 1400px; height:600px;">
     <div style="margin:auto; width:1000px; padding: 10px; border: solid 1px black;">
       <p style="display: inline-block; width: 100px; color: blue;">_______</p>
-      <p style="display: inline-block;"> Total Robot-Goal Distance (Right-Hand Heuristic) </p>
+      <p style="display: inline-block;"> Total Puck-Goal Distance</p>
       <br>
       <p style="display: inline-block; width: 100px; color: green;">_______</p> 
-      <p style="display: inline-block;"> Total Robot-Goal Distance (Proposed Deadlock Prediction and Recovery Algorithm) </p>
+      <p style="display: inline-block;"> Number of Pucks Outside of Goal Area</p>
       <br>
-      <p style="display: inline-block; width: 100px; color: blue;">_ _ _ _ _</p> 
-      <p style="display: inline-block;"> Minimum Robot-Robot Distance (Right-Hand Heuristic) </p>
-      <br>
-      <p style="display: inline-block; width: 100px; color: green;">_ _ _ _ _</p> 
+      <!-- <p style="display: inline-block; width: 100px; color: blue;">_ _ _ _ _</p> 
+      <p style="display: inline-block;"> Number of Pucks Outside of Goal Area</p>
+      <br> -->
+      <!-- <p style="display: inline-block; width: 100px; color: green;">_ _ _ _ _</p> 
       <p style="display: inline-block;"> Minimum Robot-Robot Distance (Proposed Deadlock Prediction and Recovery Algorithm) </p>
-      <br>
-      <p style="display: inline-block; width: 100px; color: red;">_ _ _ _ _</p> 
+      <br> -->
+      <!-- <p style="display: inline-block; width: 100px; color: red;">_ _ _ _ _</p> 
       <p style="display: inline-block;"> Safety Distance </p>
-      <br>
+      <br> -->
     </div>
   </div>
   
@@ -113,7 +113,7 @@
   <script src="libraries/clip-poly.js"></script>
   <script src="scripts/geometry.js"></script>
   <script src="scripts/renderer.js"></script>
-  <script src="scripts/distanceTransform/goalDistanceTransform.js"></script>
+  <script src="scripts/distanceTransform/globalPlanning.js"></script>
   <script src="scripts/distanceTransform/distanceTransform.js"></script>
   <script src="scripts/staticObjects/staticCircle.js"></script>
   <script src="scripts/staticObjects/staticObjectFactory.js"></script>

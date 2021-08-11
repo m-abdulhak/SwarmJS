@@ -11,6 +11,13 @@ class StaticCircle {
     this.center = this.def.center;
     this.radius = this.def.radius;
 
+    this.body = Bodies.circle(this.center.x, this.center.y, this.radius, { isStatic: true });
+    // this.body.collisionFilter = {
+    //   group: 1,
+    //   category: 1,
+    //   mask: 1,
+    // };
+
     if (shouldAddToWorld) {
       this.addToWorld();
     }
@@ -20,7 +27,7 @@ class StaticCircle {
   addToWorld() {
     World.add(
       this.world,
-      Bodies.circle(this.center.x, this.center.y, this.radius, { isStatic: true }),
+      this.body,
     );
   }
 

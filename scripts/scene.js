@@ -18,7 +18,6 @@ class Scene {
     pucksGroups,
     staticObjectsDefinitions,
   ) {
-    this.svg = svg;
     this.width = parseInt(svg.attr('width'), 10);
     this.height = parseInt(svg.attr('height'), 10);
     this.environmentBounds = [
@@ -78,7 +77,7 @@ class Scene {
       this.puckMaps = gMaps.puckMaps;
     } else {
       this.puckMaps = this.pucksGroups.map(
-        (group) => (getDistanceTransformTo(
+        (group) => (getPucksGoalMap(
           this.mapArray,
           Math.floor(this.width * this.puckMapScale),
           Math.floor(this.height * this.puckMapScale),
@@ -137,7 +136,8 @@ class Scene {
     this.robots.forEach((r) => r.timeStep());
     this.pucks.forEach((p) => p.timeStep());
 
-    gScene.updateMinRobotRobotDistMesurements();
+    gScene.updatePucksOutsideOfGoalMesurements();
+    // gScene.updateMinRobotRobotDistMesurements();
 
     Engine.update(this.engine, this.timeDelta);
 
@@ -212,11 +212,20 @@ class Scene {
     }
   }
 
+  updatePucksOutsideOfGoalMesurements() {
+    let minDist = this.pucks.map((p) => p.reachedGoal()).reduce((acc, cur) => acc + (cur ? 0 : 1), 0);
+
+    if (this.minDistance == null || minDist < this.minDistance) {
+      this.minDistance = minDist;
+    }
+  }
+
   updateDistance() {
     let dis = 0;
 
-    this.robots.forEach((r) => {
-      dis += r.getDistanceTo(r.goal) / 10;
+    this.pucks.forEach((p) => {
+      const distToGoal = p.getDistanceTo(p.groupGoal);
+      dis += distToGoal > p.goalReachedDist ? (distToGoal - p.goalReachedDist) / 100 : 0;
     });
 
     this.distance = dis;

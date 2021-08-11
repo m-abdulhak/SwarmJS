@@ -25,15 +25,20 @@ class Puck {
     this.body.frictionAir = 1;
     // this.body.frictionStatic = 0;
     // this.body.restitution = 0;
+    // this.body.collisionFilter = {
+    //   group: -1,
+    //   category: 1,
+    //   mask: 1,
+    // };
     World.add(this.world, this.body);
 
     // Initialize velocity according to movement goal
     this.velocity = { x: 0, y: 0 };
 
     // Distances Configurations
-    this.blockedDistance = this.radius * 1.5;
-    this.goalReachedDist = this.radius * 10;
-    this.deepInGoalDist = this.radius * 7;
+    // this.blockedDistance = this.radius * 1.5;
+    this.goalReachedDist = this.radius * 12;
+    this.deepInGoalDist = this.radius * 8;
   }
 
   timeStep() {
@@ -49,7 +54,9 @@ class Puck {
     } else {
       const mapY = Math.min(this.map.length, Math.max(0, Math.floor(this.position.y / 4)));
       const mapX = Math.min(this.map[0].length, Math.max(0, Math.floor(this.position.x / 4)));
-      const dir = this.map[mapY][mapX];
+      const dir = this.map != null && this.map[mapY] != null && this.map[mapY][mapX] != null
+        ? this.map[mapY][mapX]
+        : [1, 1];
       this.goal = {
         x: this.position.x + dir[0] * this.radius * 10,
         y: this.position.y + dir[1] * this.radius * 10,

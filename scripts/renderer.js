@@ -11,10 +11,10 @@ class Renderer {
     this.scene = scene;
 
     // Buffered voronoi cells line segments (as calculated by robots)
-    this.scene.BVCLineSegs = [];
+    this.BVCLineSegs = [];
 
     // Static Circles
-    this.scene.staticCircles = svg.append('g')
+    this.staticCircles = svg.append('g')
       .selectAll('circle')
       .data(this.scene.staticObjects.filter((obj) => obj.def.type === 'circle'))
       .enter()
@@ -25,7 +25,7 @@ class Renderer {
       .attr('fill', '#000000');
 
     // Static Rectangles
-    // this.scene.staticCircles = svg.append('g')
+    // this.staticCircles = svg.append('g')
     //   .selectAll('rect')
     //   .data(this.scene.staticObjects.rectangles)
     //   .enter()
@@ -37,21 +37,21 @@ class Renderer {
     //   .attr('fill', '#000000');
 
     // Voronoi cells edges (Voronoi Diagram)
-    this.scene.VcMesh = svg.append('path')
+    this.VcMesh = svg.append('path')
       .attr('fill', 'none')
       .attr('stroke', '#000')
       .attr('stroke-width', 1)
       .attr('d', this.scene.voronoi.render());
 
     // Buffered Voronoi cells edges (from Voronoi Diagram)
-    this.scene.BvcMesh = svg.append('path')
+    this.BvcMesh = svg.append('path')
       .attr('fill', 'none')
       .attr('stroke', '#cccccc70')
       .attr('stroke-width', this.scene.radius * 2)
       .attr('d', this.scene.voronoi.render());
 
     // Temp Goals
-    this.scene.tempGoalsCircles = svg.append('g')
+    this.tempGoalsCircles = svg.append('g')
       .attr('fill-opacity', '40%')
       .attr('stroke-width', 1)
       .attr('stroke-dasharray', '1,1')
@@ -67,7 +67,7 @@ class Renderer {
       .attr('stroke', (d, i) => d3.schemeCategory10[i % 10]);
 
     // Line segments between robots and corresponding temp goal
-    this.scene.robotToTempGoalLineSegs = svg.append('g')
+    this.robotToTempGoalLineSegs = svg.append('g')
       .selectAll('path')
       .data(this.scene.robots)
       .enter()
@@ -79,7 +79,7 @@ class Renderer {
       .attr('d', (d) => this.renderLineSeg(d.position.x, d.position.y, d.tempGoal.x, d.tempGoal.y));
 
     // Line segments between each robot's temp goal and goal
-    this.scene.tempGoalToGoalLineSegs = svg.append('g')
+    this.tempGoalToGoalLineSegs = svg.append('g')
       .selectAll('path')
       .data(this.scene.robots)
       .enter()
@@ -91,7 +91,7 @@ class Renderer {
       .attr('d', (d) => this.renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y));
 
     // Robots
-    this.scene.robotsCircles = svg.append('g')
+    this.robotsCircles = svg.append('g')
       .selectAll('circle')
       .data(this.scene.robots)
       .enter()
@@ -100,10 +100,11 @@ class Renderer {
       .attr('cy', (d) => d.position.y)
       .attr('id', (d) => d.id)
       .attr('r', (d) => d.radius)
-      .attr('fill', (d, i) => d3.schemeCategory10[i % 10]);
+      .attr('fill', '#FFC53A');
+    // .attr('fill', (d, i) => d3.schemeCategory10[i % 10]);
 
     // Puck
-    this.scene.pucksCircles = svg.append('g')
+    this.pucksCircles = svg.append('g')
       .selectAll('circle')
       .data(this.scene.pucks)
       .enter()
@@ -115,7 +116,7 @@ class Renderer {
       .attr('fill', (d) => d.color);
 
     // Puck Goals
-    this.scene.puckGoalsCircles = svg.append('g')
+    this.puckGoalsCircles = svg.append('g')
       .selectAll('circle')
       .data(this.scene.pucksGroups)
       .enter()
@@ -123,12 +124,12 @@ class Renderer {
       .attr('cx', (d) => d.goal.x)
       .attr('cy', (d) => d.goal.y)
       .attr('id', (d, i) => i)
-      .attr('r', (d) => d.radius * 10)
+      .attr('r', (d) => d.radius * 12)
       .attr('fill', (d) => d.color)
       .attr('fill-opacity', '10%');
 
     // Line segments between robots and corresponding goal
-    this.scene.robotToGoalLineSegs = svg.append('g')
+    this.robotToGoalLineSegs = svg.append('g')
       .selectAll('path')
       .data(this.scene.robots)
       .enter()
@@ -140,7 +141,7 @@ class Renderer {
       .attr('d', (d) => this.renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y));
 
     // Goals
-    this.scene.goalsCircles = svg.append('g')
+    this.goalsCircles = svg.append('g')
       .selectAll('circle')
       .data(this.scene.robots)
       .enter()
@@ -153,28 +154,28 @@ class Renderer {
       .attr('stroke', 'white')
       .attr('stroke-dasharray', '0.5,0.5')
       .call(d3.drag()
-        .on('start', (d) => this.scene.goalsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black'))
+        .on('start', (d) => this.goalsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black'))
         .on('drag', (d) => (d.goal.x = d3.event.x, d.goal.y = d3.event.y))
-        .on('end', (d) => this.scene.goalsCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray'))
+        .on('end', (d) => this.goalsCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray'))
         .on('start.update drag.update end.update', this.scene.update));
   }
 
   removeElements(selectionQuery) {
-    let selection = this.scene.svg.selectAll(selectionQuery).node();
+    let selection = this.svg.selectAll(selectionQuery).node();
     while (selection) {
       selection.parentNode.remove();
-      selection = this.scene.svg.selectAll(selectionQuery).node();
+      selection = this.svg.selectAll(selectionQuery).node();
     }
   }
 
   update(activeElements) {
     this.removeElements('.bvc-seg');
 
-    this.scene.BVCLineSegs = [];
+    this.BVCLineSegs = [];
 
     this.scene.robots.forEach((r, rIndex) => {
       if (typeof (r.BVC) !== 'undefined' && r.BVC.length > 0) {
-        this.scene.BVCLineSegs.push(
+        this.BVCLineSegs.push(
           this.svg.append('g')
             .selectAll('path')
             .data(r.BVC)
@@ -198,34 +199,34 @@ class Renderer {
       }
     });
 
-    this.scene.BvcMesh.attr('d', this.scene.voronoi.render())
+    this.BvcMesh.attr('d', this.scene.voronoi.render())
       .attr('stroke-opacity', activeElements.VC ? '100%' : '0%');
 
-    this.scene.VcMesh.attr('d', this.scene.voronoi.render())
+    this.VcMesh.attr('d', this.scene.voronoi.render())
       .attr('stroke-opacity', activeElements.VC ? '100%' : '0%');
 
-    this.scene.tempGoalsCircles.attr('cx', (d) => d.tempGoal.x).attr('cy', (d) => d.tempGoal.y)
+    this.tempGoalsCircles.attr('cx', (d) => d.tempGoal.x).attr('cy', (d) => d.tempGoal.y)
       .attr('stroke-opacity', activeElements.TempGoals ? '40%' : '0%')
       .attr('fill-opacity', activeElements.TempGoals ? '40%' : '0%');
 
-    this.scene.robotToTempGoalLineSegs.attr('d', (d) => this.renderLineSeg(d.position.x, d.position.y, d.tempGoal.x, d.tempGoal.y))
+    this.robotToTempGoalLineSegs.attr('d', (d) => this.renderLineSeg(d.position.x, d.position.y, d.tempGoal.x, d.tempGoal.y))
       .attr('stroke-opacity', activeElements.TempGoals ? '100%' : '0%');
 
-    this.scene.tempGoalToGoalLineSegs.attr('d', (d) => this.renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y))
+    this.tempGoalToGoalLineSegs.attr('d', (d) => this.renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y))
       .attr('stroke-opacity', activeElements.TempGoals ? '100%' : '0%');
 
-    this.scene.robotsCircles.attr('cx', (d) => d.position.x).attr('cy', (d) => d.position.y)
+    this.robotsCircles.attr('cx', (d) => d.position.x).attr('cy', (d) => d.position.y)
       .attr('stroke-opacity', activeElements.Robots ? '100%' : '0%')
       .attr('fill-opacity', activeElements.Robots ? '100%' : '0%');
 
-    this.scene.pucksCircles.attr('cx', (d) => d.position.x).attr('cy', (d) => d.position.y)
+    this.pucksCircles.attr('cx', (d) => d.position.x).attr('cy', (d) => d.position.y)
       .attr('stroke-opacity', activeElements.Robots ? '100%' : '0%')
       .attr('fill-opacity', activeElements.Robots ? '100%' : '0%');
 
-    this.scene.robotToGoalLineSegs.attr('d', (d) => this.renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y))
+    this.robotToGoalLineSegs.attr('d', (d) => this.renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y))
       .attr('stroke-opacity', activeElements.Goals ? '100%' : '0%');
 
-    this.scene.goalsCircles.attr('cx', (d) => d.goal.x).attr('cy', (d) => d.goal.y)
+    this.goalsCircles.attr('cx', (d) => d.goal.x).attr('cy', (d) => d.goal.y)
       .attr('stroke-opacity', activeElements.Goals ? '100%' : '0%')
       .attr('fill-opacity', activeElements.Goals ? '100%' : '0%');
   }
