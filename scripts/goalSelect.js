@@ -92,7 +92,14 @@ function updateGoal(robot) {
       envRectSides.push([environmentBounds[index], environmentBounds[nextIndx]]);
     }
 
-    const closestPointsToSides = envRectSides.map(
+    const allSides = [...envRectSides];
+
+    robot.scene.staticObjects
+      .filter((obj) => !obj.def.skipOrbit)
+      .map((ob) => ob.sides)
+      .forEach((sides) => allSides.push(...sides));
+
+    const closestPointsToSides = allSides.map(
       (side) => closestPointInLineSegToPoint(
         robot.position.x,
         robot.position.y,
@@ -185,11 +192,9 @@ function updateGoal(robot) {
 
     let bestPuck = null;
 
-    if (distRatsExist && distanceRatings[0][1] < robot.radius * 3) {
-      bestPuck = distanceRatings[0][0];
-    } else if (angleRatsExist && Math.random() < 0.3) {
+    if (angleRatsExist) {
       bestPuck = angleRatings[0][0];
-    } else if (distRatsExist) {
+    } else if (distRatsExist && Math.random() < 0.1) {
       bestPuck = distanceRatings[0][0];
     }
     robot.bestPuck = bestPuck;

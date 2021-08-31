@@ -544,8 +544,9 @@ class Robot {
   }
 
   getAllClosestPointsToNearbyObstacles() {
-    return this.getNearbyObstacles().map(
-      (circle) => getLineCircleIntersectionPoint(circle.center, circle.radius, this.position),
+    const closeObstacles = this.getNearbyObstacles();
+    return closeObstacles.map(
+      (staticObs) => staticObs.getIntersectionPoint(this.position),
     );
   }
 
@@ -583,7 +584,7 @@ class Robot {
     // eslint-disable-next-line arrow-body-style
     const closestPoint = this.getClosestPointToNearbyObstacles();
 
-    if (closestPoint === null) {
+    if (closestPoint == null) {
       return;
     }
 

@@ -10,6 +10,22 @@ class StaticCircle {
     // Circle Spicific Properties
     this.center = this.def.center;
     this.radius = this.def.radius;
+    this.points = [
+      { x: this.center.x - (2 * this.radius) / 3, y: this.center.y + (2 * this.radius) / 3 },
+      { x: this.center.x - this.radius, y: this.center.y },
+      { x: this.center.x - (2 * this.radius) / 3, y: this.center.y - (2 * this.radius) / 3 },
+      { x: this.center.x, y: this.center.y - this.radius },
+      { x: this.center.x + (2 * this.radius) / 3, y: this.center.y - (2 * this.radius) / 3 },
+      { x: this.center.x + this.radius, y: this.center.y },
+      { x: this.center.x + (2 * this.radius) / 3, y: this.center.y + (2 * this.radius) / 3 },
+      { x: this.center.x, y: this.center.y + this.radius },
+    ];
+
+    this.sides = [];
+    for (let index = 0; index < this.points.length; index += 1) {
+      const nextIndx = (index + 1) % this.points.length;
+      this.sides.push([this.points[index], this.points[nextIndx]]);
+    }
 
     this.body = Bodies.circle(this.center.x, this.center.y, this.radius, { isStatic: true });
     // this.body.collisionFilter = {
@@ -29,6 +45,11 @@ class StaticCircle {
       this.world,
       this.body,
     );
+  }
+
+  // Static Obstacles Interface
+  getIntersectionPoint(point) {
+    return getLineCircleIntersectionPoint(this.center, this.radius, point);
   }
 
   // Static Obstaccle Interface

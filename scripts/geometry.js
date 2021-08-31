@@ -175,6 +175,14 @@ function closestPointInLineSegToPoint(x, y, x1, y1, x2, y2) {
 }
 
 function distanceBetween2Points(pos1, pos2) {
+  if (
+    pos1 == null || pos2 == null
+    || pos1.x == null || pos1.y == null
+    || pos2.x == null || pos2.y == null
+  ) {
+    return null;
+  }
+
   const ret = Math.sqrt(
     (pos1.x - pos2.x) * (pos1.x - pos2.x) + (pos1.y - pos2.y) * (pos1.y - pos2.y),
   );

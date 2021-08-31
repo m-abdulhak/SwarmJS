@@ -35,7 +35,7 @@ var pucksGroups = [
     id: 1,
     count: 25,
     radius: 10,
-    goal: { x: 650, y: 250 },
+    goal: { x: 650, y: 375 },
     color: 'blue',
   },
   {
@@ -50,19 +50,33 @@ var pucksGroups = [
 // Static Objects
 var staticObjectsDefinitions = [
   {
-    type: 'circle',
-    center: { x: 250, y: 350 },
-    radius: 50,
+    type: 'rectangle',
+    center: { x: 400, y: 100 },
+    width: 50,
+    height: 225,
+  },
+  {
+    type: 'rectangle',
+    center: { x: 550, y: 225 },
+    width: 350,
+    height: 50,
+  },
+  {
+    type: 'rectangle',
+    center: { x: 750, y: 100 },
+    width: 350,
+    height: 50,
   },
   {
     type: 'circle',
-    center: { x: 650, y: 120 },
+    center: { x: 100, y: 150 },
     radius: 50,
+    skipOrbit: true,
   },
   {
     type: 'circle',
-    center: { x: 450, y: 150 },
-    radius: 50,
+    center: { x: 300, y: 500 },
+    radius: 150,
   },
 ];
 

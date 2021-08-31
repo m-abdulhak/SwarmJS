@@ -213,6 +213,8 @@ class Scene {
   }
 
   updatePucksOutsideOfGoalMesurements() {
+    // Calculate the number of pucks outside of their goal area
+    // TODO: rename minDist 
     let minDist = this.pucks.map((p) => p.reachedGoal()).reduce((acc, cur) => acc + (cur ? 0 : 1), 0);
 
     if (this.minDistance == null || minDist < this.minDistance) {

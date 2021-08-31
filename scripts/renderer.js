@@ -25,16 +25,16 @@ class Renderer {
       .attr('fill', '#000000');
 
     // Static Rectangles
-    // this.staticCircles = svg.append('g')
-    //   .selectAll('rect')
-    //   .data(this.scene.staticObjects.rectangles)
-    //   .enter()
-    //   .append('rect')
-    //   .attr('x', (d) => d.center.x - d.width / 2)
-    //   .attr('y', (d) => d.center.y - d.height / 2)
-    //   .attr('width', (d) => d.width)
-    //   .attr('height', (d) => d.height)
-    //   .attr('fill', '#000000');
+    this.staticRectangles = svg.append('g')
+      .selectAll('rect')
+      .data(this.scene.staticObjects.filter((obj) => obj.def.type === 'rectangle'))
+      .enter()
+      .append('rect')
+      .attr('x', (d) => d.center.x - d.width / 2)
+      .attr('y', (d) => d.center.y - d.height / 2)
+      .attr('width', (d) => d.width)
+      .attr('height', (d) => d.height)
+      .attr('fill', '#000000');
 
     // Voronoi cells edges (Voronoi Diagram)
     this.VcMesh = svg.append('path')
