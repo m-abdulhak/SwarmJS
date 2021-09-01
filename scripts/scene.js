@@ -12,7 +12,7 @@ class Scene {
     svg,
     numOfRobots,
     robotRadius,
-    motionPlanningAlgorithm,
+    algorithm,
     enableRendering,
     startingPositionsConfig,
     pucksGroups,
@@ -60,7 +60,7 @@ class Scene {
       this.robotRadius,
       this.width,
       this.height,
-      motionPlanningAlgorithm,
+      algorithm,
     );
 
     // Generate Binary Scene Map
@@ -115,11 +115,15 @@ class Scene {
     // Simulation Speed
     this.timeDelta = 16.666;
 
+    // Benchmark Data :
     // Total Robot-Goal Distances
     this.distance = null;
-
     // Minimum Robot-Robot Distanc
     this.minDistance = null;
+    // Pucks Outside Goal Count;
+    this.pucksOutsideGoalCount = null;
+    
+    // Change Options Based on algorithm
   }
 
   setSpeed(scale) {
@@ -214,12 +218,8 @@ class Scene {
 
   updatePucksOutsideOfGoalMesurements() {
     // Calculate the number of pucks outside of their goal area
-    // TODO: rename minDist 
-    let minDist = this.pucks.map((p) => p.reachedGoal()).reduce((acc, cur) => acc + (cur ? 0 : 1), 0);
-
-    if (this.minDistance == null || minDist < this.minDistance) {
-      this.minDistance = minDist;
-    }
+    let pucksOutsideGoalCount = this.pucks.map((p) => p.reachedGoal()).reduce((acc, cur) => acc + (cur ? 0 : 1), 0);
+    this.pucksOutsideGoalCount = pucksOutsideGoalCount;
   }
 
   updateDistance() {
@@ -241,7 +241,7 @@ class Scene {
     return this.robots.map((r) => r.goal);
   }
 
-  initializeRobotsRange(numOfRobots, radius, envWidth, envHeight, motionPlanningAlgorithm) {
+  initializeRobotsRange(numOfRobots, radius, envWidth, envHeight, algorithm) {
     return d3.range(numOfRobots)
       .map((i) => new Robot(i,
         this.getAnInitialPos(),
@@ -250,7 +250,7 @@ class Scene {
         envWidth,
         envHeight,
         this,
-        motionPlanningAlgorithm));
+        algorithm));
   }
 
   initializePucksRange(pucksGroups, envWidth, envHeight, maps) {

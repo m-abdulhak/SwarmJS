@@ -5,7 +5,7 @@
 
 // eslint-disable-next-line no-unused-vars
 class Robot {
-  constructor(id, position, goal, radius, envWidth, envHeight, scene, motionPlanningAlgorithm) {
+  constructor(id, position, goal, radius, envWidth, envHeight, scene, algorithm) {
     // configs
     this.MovementGoals = {
       Goal: 1,
@@ -47,7 +47,7 @@ class Robot {
 
     // Initialize velocity according to movement goal
     this.velocity = { x: 0, y: 0 };
-    this.setMovementGoal(motionPlanningAlgorithm);
+    this.setMovementGoal(this.MovementGoals.InBVC);
 
     // Initialize deadlock detection mechanisms
     this.deadLockDetectionEnabled = true;
@@ -82,6 +82,8 @@ class Robot {
 
     // Obstacles
     this.obstacleSensingRadius = this.radius * 10;
+
+    // Change Options Based on algorithm
   }
 
   setMovementGoal(movementGoal) {

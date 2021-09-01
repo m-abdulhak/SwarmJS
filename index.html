@@ -47,27 +47,17 @@
       <input type="button" value="Voronoi Cell" class="input-button input small-btn active" id="vc-button" onclick="visualizeElementsChanged()">
       <input type="button" value="Buffered VC" class="input-button input small-btn active" id="bvc-button" onclick="visualizeElementsChanged()">
     </div>
-    <div class="ui-section hidden">
-      <label class="key">Collision Avoidance:</label>
-      <select class="input-select input" id="algorithm-select" name="algorithms">
-        <option value="3" selected>Buffered Voronoi Cell</option>
-      </select>
-    </div>
     <div class="ui-section">
-      <label class="key">Deadlock Recovery:</label>
-      <select class="input-select input" id="deadlock-select" name="deadlock" onchange="changeDeadlockAlgorithm()">
-        <option value="0">None</option>
-        <option value="1">Right-Hand Heuristic</option>
-        <option value="2" selected>Proposed Deadlock Prediction and Recovery Algorithm</option>
+      <label class="key">Algorithm:</label>
+      <select class="input-select input" id="algo-select" name="deadlock" onchange="changeAlgorithm()">
+        <option value="1">Simple Sorting</option>
+        <option value="2" selected>Full Sorting</option>
       </select>
     </div>
     <div class="ui-section">
       <label class="key">Positions:</label>
       <select class="input-select input" id="starting-positions-select" name="starting-positions" onchange="changeStartingPositions()">
         <option value="0" selected>Random</option>
-        <!-- <option value="1">Circle</option>
-        <option value="2" >Square (Inverted Horizontally)</option>
-        <option value="3" >Square (Inverted Vertically and Horizontally)</option> -->
       </select>
     </div>
     <div class="ui-section">
@@ -82,7 +72,8 @@
   </div> 
 
   <div id="graph-container">
-    <div id="graph" class="aGraph" style="display: block;" width="1400" height="600"></div>
+    <div id="total-distance-graph" class="aGraph" style="display: block;" width="1400" height="600"></div>
+    <div id="pucks-count-graph" class="aGraph" style="display: block;" width="1400" height="600"></div>
   </div>
 
   <div style="width: 1400px; height:600px;">

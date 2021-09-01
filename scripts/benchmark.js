@@ -1,5 +1,21 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-undef */
+
+const createPlot = (graph, color, data, dashed = false, background = false) => graph.svg.append('path')
+  .datum(data)
+  .attr('fill', 'none')
+  .attr('stroke', color)
+  // eslint-disable-next-line no-nested-ternary
+  .attr('stroke-width', dashed ? 1.5 : (background ? 1 : 5))
+  .attr('stroke-dasharray', dashed ? '10,10' : '10,0')
+  .attr('d', d3.line().x((d, i) => graph.x(i) * 10).y((d) => graph.y(d)));
+
+const updatePlot = (graph, plot, data) => {
+  plot.datum(data).attr('d', d3.line().x((d, i) => graph.x(i) * 10).y((d) => graph.y(d)));
+  const el = plot._groups[0][0];
+  el.parentNode.appendChild(el);
+};
+
 // eslint-disable-next-line no-unused-vars
 class Benchmark {
   constructor(benchSettings) {
@@ -28,16 +44,21 @@ class Benchmark {
     this.setSettings(benchSettings);
 
     this.benchmarking = false;
-    this.benchDeadlockAlgo = 1;
+    this.bencAlgo = 1;
 
     this.simpleTotalDistancePlot = null;
-    this.simpleMinDistancePlot = null;
+    this.simplePucksOutsideGoalCountPlot = null;
     this.advancedTotalDistancePlot = null;
-    this.advancedMinDistancePlot = null;
+    this.advancedPucksOutsideGoalCountPlot = null;
 
     this.autoSaveImageAfterEachRep = false;
 
-    this.initGraph();
+    // TODO: Add number of pucks to use in init val
+    this.totalDistanceGraph = this.initGraph('#total-distance-graph');
+    this.pucksCountGraph = this.initGraph('#pucks-count-graph');
+
+    // Add object containing mean plots that will need to be repeatedly updated
+    this.plots = {};
   }
 
   toggleAutoDownloadImage() {
@@ -55,18 +76,18 @@ class Benchmark {
     this.benchData = {
       simple: {
         sets: [],
-        means: [],
-        midDistanceMeans: [],
+        totalDistanceMeans: [],
+        puckCountMeans: [],
       },
       advanced: {
         sets: [],
-        means: [],
-        midDistanceMeans: [],
+        totalDistanceMeans: [],
+        puckCountMeans: [],
       },
     };
 
     this.curTotalDistanceSet = [];
-    this.curMinDistanceSet = [];
+    this.curPucksCountSet = [];
   }
 
   fillUnchangedBenchSet(indx) {
@@ -85,17 +106,18 @@ class Benchmark {
       lastDefinedIndex += 1;
     }
 
-    this.curMinDistanceSet[0] = valAtZeroIndx === undefined ? 10000 : valAtZeroIndx;
+    // TODO: replace 10000 with suitable pucks count
+    this.curPucksCountSet[0] = valAtZeroIndx === undefined ? 10000 : valAtZeroIndx;
 
     lastDefinedIndex = indx;
-    while (lastDefinedIndex > 0 && this.curMinDistanceSet[lastDefinedIndex] === undefined) {
+    while (lastDefinedIndex > 0 && this.curPucksCountSet[lastDefinedIndex] === undefined) {
       lastDefinedIndex -= 1;
     }
 
-    const lastMinVal = this.curMinDistanceSet[lastDefinedIndex];
+    const lastPuckCountVal = this.curPucksCountSet[lastDefinedIndex];
 
     while (lastDefinedIndex <= indx) {
-      this.curMinDistanceSet[lastDefinedIndex] = lastMinVal;
+      this.curPucksCountSet[lastDefinedIndex] = lastPuckCountVal;
       lastDefinedIndex += 1;
     }
   }
@@ -107,11 +129,11 @@ class Benchmark {
       this.fillUnchangedBenchSet(newIndx - 1);
 
       this.curTotalDistanceSet[newIndx] = gScene.distance;
-      this.curMinDistanceSet[newIndx] = gScene.minDistance;
+      this.curPucksCountSet[newIndx] = gScene.pucksOutsideGoalCount;
 
-      if (this.curMinDistanceSet[Math.floor((time + 3) / 10)] === undefined) {
-        gScene.minDistance = null;
-      }
+      // if (this.curPucksCountSet[Math.floor((time + 3) / 10)] === undefined) {
+      //   gScene.minDistance = null;
+      // }
     }
   }
 
@@ -131,9 +153,14 @@ class Benchmark {
     document.getElementById('robots-slider').value = this.benchRobotCount;
     syncSettings();
 
-    this.benchDeadlockAlgo = 1;
-    // this.benchDeadlockAlgo = this.benchDeadlockAlgo === 1 ? 2 : 1;
-    // selectElement('deadlock-select', this.benchDeadlockAlgo);
+    this.benchAlgo = this.benchAlgo === 1 ? 2 : 1;
+
+    const selectElement = (id, valueToSelect) => {
+      const element = document.getElementById(id);
+      element.value = valueToSelect;
+    };
+
+    selectElement('algo-select', this.benchAlgo);
 
     resetSimulation();
   }
@@ -143,32 +170,42 @@ class Benchmark {
     const dataSetLengthIsValid = this.curTotalDistanceSet.length === correctDataSetLength;
 
     if (this.benchmarking && dataSetLengthIsValid) {
-      const data = this.benchDeadlockAlgo === 1 ? this.benchData.simple : this.benchData.advanced;
+      const data = this.benchAlgo === 1 ? this.benchData.simple : this.benchData.advanced;
 
-      if (data.means.length === 0) {
-        data.means = this.curTotalDistanceSet;
-        data.midDistanceMeans = this.curMinDistanceSet;
+      if (data.totalDistanceMeans.length === 0) {
+        data.totalDistanceMeans = this.curTotalDistanceSet;
+        data.puckCountMeans = this.curPucksCountSet;
       } else {
         const setCount = data.sets.length;
         const newMeans = [];
-        const newMinDistanceMeans = [];
+        const newPuckCountMeans = [];
 
-        for (let i = 0; i < data.means.length; i += 1) {
-          const newMeansTotal = data.means[i] * setCount + this.curTotalDistanceSet[i];
+        for (let i = 0; i < data.totalDistanceMeans.length; i += 1) {
+          const newMeansTotal = data.totalDistanceMeans[i] * setCount + this.curTotalDistanceSet[i];
           newMeans[i] = newMeansTotal / (setCount + 1);
-          const newMinDistTotal = data.midDistanceMeans[i] * setCount + this.curMinDistanceSet[i];
-          newMinDistanceMeans[i] = newMinDistTotal / (setCount + 1);
+          const newMinDistTotal = data.puckCountMeans[i] * setCount + this.curPucksCountSet[i];
+          newPuckCountMeans[i] = newMinDistTotal / (setCount + 1);
         }
 
-        data.means = newMeans;
-        data.midDistanceMeans = newMinDistanceMeans;
+        data.totalDistanceMeans = newMeans;
+        data.puckCountMeans = newPuckCountMeans;
       }
 
-      this.updateGraph(this.benchDeadlockAlgo,
-        data.means,
-        data.midDistanceMeans,
+      this.updateGraphs(
+        this.totalDistanceGraph,
+        this.benchAlgo,
+        data.totalDistanceMeans,
         this.curTotalDistanceSet,
-        this.curMinDistanceSet);
+        'totalDistance',
+      );
+
+      this.updateGraphs(
+        this.pucksCountGraph,
+        this.benchAlgo,
+        data.puckCountMeans,
+        this.curPucksCountSet,
+        'PuckCounts',
+      );
 
       data.sets.push(this.curTotalDistanceSet);
       if (this.autoSaveImageAfterEachRep) {
@@ -176,10 +213,10 @@ class Benchmark {
       }
     }
     this.curTotalDistanceSet = [];
-    this.curMinDistanceSet = [];
+    this.curPucksCountSet = [];
   }
 
-  initGraph() {
+  initGraph(id) {
     // set the dimensions and margins of the graph
     this.margin = {
       top: 30,
@@ -190,8 +227,12 @@ class Benchmark {
     this.width = 1400 - this.margin.left - this.margin.right;
     this.height = 600 - this.margin.top - this.margin.bottom;
 
-    d3.select('#graph').selectAll().remove();
-    this.svgGraph = d3.select('#graph')
+    const elem = d3.select(id);
+    elem.selectAll().remove();
+
+    const graph = {};
+
+    graph.svg = elem
       .append('svg')
       .attr('width', this.width + this.margin.left + this.margin.right)
       .attr('height', this.height + this.margin.top + this.margin.bottom)
@@ -200,31 +241,31 @@ class Benchmark {
         `translate(${this.margin.left}, ${this.margin.top})`);
 
     // X scale will fit all values from data[] within pixels 0-width
-    this.x = d3.scaleLinear()
+    graph.x = d3.scaleLinear()
       .domain([0, 1 + this.benchMaxTimesteps])
       .range([0, this.width]);
 
-    this.svgGraph.append('g')
+    graph.svg.append('g')
       .attr('transform', `translate(0,${this.height})`)
-      .call(d3.axisBottom(this.x));
+      .call(d3.axisBottom(graph.x));
 
     // text label for the x axis
-    this.svgGraph.append('text')
+    graph.svg.append('text')
       .attr('transform',
         `translate(${this.width / 2} ,${this.height + this.margin.top + 20})`)
       .style('text-anchor', 'middle')
       .text('Time');
 
     // Y scale will fit values from 0-10 within pixels height-0
-    this.y = d3.scaleLinear()
+    graph.y = d3.scaleLinear()
       .domain([0, 200])
       .range([this.height, 0]);
 
-    this.svgGraph.append('g')
-      .call(d3.axisLeft(this.y));
+    graph.svg.append('g')
+      .call(d3.axisLeft(graph.y));
 
     // text label for the y axis
-    this.svgGraph.append('text')
+    graph.svg.append('text')
       .attr('transform', 'rotate(-90)')
       .attr('y', 0 - this.margin.left)
       .attr('x', 0 - (this.height / 2))
@@ -232,12 +273,14 @@ class Benchmark {
       .style('text-anchor', 'middle')
       .text('Number of Pucks - Distance');
 
+    return graph;
+
     // const y1 = this.height - this.robotRadius * 2;
     // const y2 = this.height - this.robotRadius * 2;
     // const x1 = 0;
     // const x2 = 999999;
 
-    // this.svgGraph.append('path')
+    // graph.svg.append('path')
     //   .attr('fill', 'none')
     //   .attr('stroke', 'red')
     //   .attr('stroke-width', 1.5)
@@ -245,46 +288,22 @@ class Benchmark {
     //   .attr('d', `M${x1},${y1}L${x2},${y2}Z`);
   }
 
-  updateGraph(algo, totalDistanceSet, minDistance, newSet, newMinSet) {
-    this.createPlot(bench.backgroundPlotsColors[algo], newSet, false, true);
-    this.createPlot(bench.backgroundPlotsColors[algo + 1], newMinSet, false, true);
+  updateGraphs(graph, algo, means, newSet, plotName) {
+    this.updateGraph(graph, `${plotName}-${algo}-Means`, algo, means, newSet);
+  }
 
-    if (algo === 1) {
-      if (this.simpleTotalDistancePlot === null) {
-        this.simpleTotalDistancePlot = this.createPlot(bench.plotColors[algo], totalDistanceSet);
-        this.simpleMinDistancePlot = this.createPlot(bench.plotColors[algo + 1], minDistance);
-      } else {
-        this.updatePlot(this.simpleTotalDistancePlot, totalDistanceSet);
-        this.updatePlot(this.simpleMinDistancePlot, minDistance);
-      }
-    } else if (this.advancedTotalDistancePlot === null) {
-      this.advancedTotalDistancePlot = this.createPlot(bench.plotColors[algo], totalDistanceSet);
-      this.advancedMinDistancePlot = this.createPlot(bench.plotColors[algo + 1], minDistance);
+  updateGraph(graph, meansPlotName, algo, meansSet, newSet) {
+    createPlot(graph, this.backgroundPlotsColors[algo], newSet, false, true);
+
+    if (this.plots[meansPlotName] == null) {
+      this.plots[meansPlotName] = createPlot(
+        graph, this.plotColors[algo], meansSet,
+      );
     } else {
-      this.updatePlot(this.advancedTotalDistancePlot, totalDistanceSet);
-      this.updatePlot(this.advancedMinDistancePlot, minDistance);
+      updatePlot(
+        graph, this.plots[meansPlotName], meansSet,
+      );
     }
-  }
-
-  createPlot(color, data, dashed = false, background = false) {
-    // Add the line
-    return this.svgGraph.append('path')
-      .datum(data)
-      .attr('fill', 'none')
-      .attr('stroke', color)
-      // eslint-disable-next-line no-nested-ternary
-      .attr('stroke-width', dashed ? 1.5 : (background ? 1 : 5))
-      .attr('stroke-dasharray', dashed ? '10,10' : '10,0')
-      .attr('d', d3.line().x((d, i) => bench.x(i) * 10).y((d) => bench.y(d)));
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  updatePlot(plot, data) {
-    // update the line
-    plot.datum(data)
-      .attr('d', d3.line().x((d, i) => bench.x(i) * 10).y((d) => bench.y(d)));
-    const el = plot._groups[0][0];
-    el.parentNode.appendChild(el);
   }
 
   downloadImage(reps = null) {

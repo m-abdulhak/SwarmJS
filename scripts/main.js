@@ -90,8 +90,7 @@ var uiElements = [
   'speed-slider',
   'robots-slider',
   'reset-button',
-  'algorithm-select',
-  'deadlock-select',
+  'algo-select',
   'starting-positions-select',
 ];
 
@@ -113,12 +112,12 @@ var getBenchmarkSettings = function () {
 
 // Initializations
 var svg = d3.select('svg');
-let motionPlanningAlgorithm = parseInt(document.getElementById('algorithm-select').value, 10);
+let algorithm = parseInt(document.getElementById('algo-select').value, 10);
 var gScene = new Scene(
   svg,
   numberOfRobots,
   radiusOfRobots,
-  motionPlanningAlgorithm,
+  algorithm,
   activeElements.All,
   getStartingPositionsSettings(),
   pucksGroups,
@@ -129,18 +128,18 @@ var bench = new Benchmark(getBenchmarkSettings());
 var resetSimulation = function () {
   timeInstance = 0;
   svg.selectAll('*').remove();
-  motionPlanningAlgorithm = parseInt(document.getElementById('algorithm-select').value, 10);
+  algorithm = parseInt(document.getElementById('algo-select').value, 10);
   gScene = new Scene(
     svg,
     numberOfRobots,
     radiusOfRobots,
-    motionPlanningAlgorithm,
+    algorithm,
     activeElements.All,
     getStartingPositionsSettings(),
     pucksGroups,
     staticObjectsDefinitions,
   );
-  changeDeadlockAlgorithm();
+  changeAlgorithm();
 };
 
 var changeStartingPositions = function () {
@@ -159,11 +158,9 @@ var changeStartingPositions = function () {
   bench = new Benchmark(getBenchmarkSettings());
 };
 
-var changeDeadlockAlgorithm = function () {
-  const deadlockAlgorithm = parseInt(document.getElementById('deadlock-select').value, 10);
-  gScene.robots.forEach((r) => {
-    r.setDeadlockAlgo(deadlockAlgorithm);
-  });
+var changeAlgorithm = function () {
+  // const algo = parseInt(document.getElementById('algo-select').value, 10);
+
 };
 
 var toggleBenchmarking = function () {
@@ -173,7 +170,7 @@ var toggleBenchmarking = function () {
   });
   bench.setSettings(getBenchmarkSettings());
   bench.curTotalDistanceSet = [];
-  bench.curMinDistanceSet = [];
+  bench.curPucksCountSet = [];
   bench.toggleBenchmarking();
 };
 
@@ -230,5 +227,5 @@ var renderScene = function () {
   requestAnimationFrame(renderScene);
 };
 
-changeDeadlockAlgorithm();
+changeAlgorithm();
 renderScene();
