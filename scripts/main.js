@@ -101,12 +101,6 @@ var getStartingPositionsSettings = function () {
   switch (startPositions) {
     case 0:
       return Scene.StartingPositions.Random;
-    case 1:
-      return Scene.StartingPositions.Circle;
-    case 2:
-      return Scene.StartingPositions.InvertedSquare;
-    case 3:
-      return Scene.StartingPositions.InvertedSquare2;
     default:
       return Scene.StartingPositions.Random;
   }
@@ -155,23 +149,6 @@ var changeStartingPositions = function () {
   switch (startingPositions) {
     case 0:
       radiusOfRobots = 10;
-      document.getElementById('robots-slider').max = 150;
-      document.getElementById('robots-slider').value = 100;
-      break;
-    case 1:
-      radiusOfRobots = 3;
-      document.getElementById('robots-slider').max = 100;
-      document.getElementById('robots-slider').value = 100;
-      break;
-    case 2:
-      radiusOfRobots = 5;
-      document.getElementById('robots-slider').max = 100;
-      document.getElementById('robots-slider').value = 100;
-      break;
-    case 3:
-      radiusOfRobots = 5;
-      document.getElementById('robots-slider').max = 100;
-      document.getElementById('robots-slider').value = 100;
       break;
     default:
       radiusOfRobots = 10;

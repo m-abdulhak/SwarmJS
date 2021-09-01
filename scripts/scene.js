@@ -305,8 +305,11 @@ class Scene {
         Math.min(envHeight - radius * 2, Math.floor(Math.random() * yCount) * resolution),
       );
       const newPos = { x: newX, y: newY };
+      const doesNotCollideWithRobots = positions.findIndex((x) => distanceBetween2Points(x, newPos) < radius * 2.2) === -1;
+      const doesNotCollideWithObstacles = this.staticObjects
+        .reduce((acc, cur) => !cur.containsPoint(newPos) && cur.getDistanceToBorder(newPos) > radius && acc, true);
 
-      if (positions.findIndex((x) => distanceBetween2Points(x, newPos) < radius * 2.5) === -1) {
+      if (doesNotCollideWithRobots && doesNotCollideWithObstacles) {
         positions.push(newPos);
       }
       i += 1;
