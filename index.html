@@ -22,7 +22,7 @@
       <label class="input-text" id="time"></label>
     </div>
     <div class="ui-section">
-      <label class="key">Robot-Goal Distances: </label>
+      <label class="key">Puck-Goal Distances: </label>
       <label class="input-text" id="distance"></label>
     </div>
     <div class="ui-section">
@@ -50,8 +50,8 @@
     <div class="ui-section">
       <label class="key">Algorithm:</label>
       <select class="input-select input" id="algo-select" name="deadlock" onchange="changeAlgorithm()">
-        <option value="1">Simple Sorting</option>
-        <option value="2" selected>Full Sorting</option>
+        <option value="1">Baseline Sorting Algorithm</option>
+        <option value="2" selected>Proposed Sorting Algorithm</option>
       </select>
     </div>
     <div class="ui-section">
@@ -65,34 +65,53 @@
       <input  type="button" value="Benchmark" class="input-button input small-btn" id="benchmark-button" onclick="toggleBenchmarking()" style="width: 50%;">
     </div>
     <div class="ui-section">
-      <label class="key">Save Benchmark As PNG :</label>
-      <input  type="button" value="Save" class="input-button input small-btn" onclick="bench.downloadImage()" style="width: 50%;">
+      <label class="key">Save Benchmark Image:</label>
+      <input  type="button" value="Save" class="input-button input small-btn" onclick="bench.downloadImages()" style="width: 50%;">
       <input  type="button" value="Auto Save" class="hidden input-button input small-btn" onclick="bench.toggleAutoDownloadImage()" style="width: 50%;">
     </div>
   </div> 
-
-  <div id="graph-container">
-    <div id="total-distance-graph" class="aGraph" style="display: block;" width="1400" height="600"></div>
-    <div id="pucks-count-graph" class="aGraph" style="display: block;" width="1400" height="600"></div>
-  </div>
-
-  <div style="width: 1400px; height:600px;">
-    <div style="margin:auto; width:1000px; padding: 10px; border: solid 1px black;">
-      <p style="display: inline-block; width: 100px; color: blue;">_______</p>
-      <p style="display: inline-block;"> Total Puck-Goal Distance</p>
-      <br>
-      <p style="display: inline-block; width: 100px; color: green;">_______</p> 
-      <p style="display: inline-block;"> Number of Pucks Outside of Goal Area</p>
-      <br>
-      <!-- <p style="display: inline-block; width: 100px; color: blue;">_ _ _ _ _</p> 
-      <p style="display: inline-block;"> Number of Pucks Outside of Goal Area</p>
-      <br> -->
-      <!-- <p style="display: inline-block; width: 100px; color: green;">_ _ _ _ _</p> 
-      <p style="display: inline-block;"> Minimum Robot-Robot Distance (Proposed Deadlock Prediction and Recovery Algorithm) </p>
-      <br> -->
-      <!-- <p style="display: inline-block; width: 100px; color: red;">_ _ _ _ _</p> 
-      <p style="display: inline-block;"> Safety Distance </p>
-      <br> -->
+  
+  <div id="graph-container" style="position: absolute; left: 10px;">
+    <div style="margin:auto; width:1400px; padding: 10px; border: solid 1px black;">
+      <div style="width: fit-content; margin: auto;">
+        <p style="font-weight: 900;">Total Puck-Goal Distances</p>
+      </div>
+      <div id="total-distance-graph" class="aGraph" style="display: block;" width="1400" height="600"></div>
+      <div style="width: fit-content; margin: auto;">
+        <p style="display: inline-block; margin-right: 20px;">Proposed Sorting Algorithm:</p>
+        <p style="display: inline-block; width: fit-content; color: green; margin: 0px; margin-right: 5px; position: relative; top: -12px; font-size: xx-large; font-weight: 900;">____</p>
+        <p style="display: inline-block; margin-right: 20px;">Means</p>
+        <p style="display: inline-block; width: fit-content; color: darkseagreen; margin-right: 5px; position: relative;top: -9px;">_______</p>
+        <p style="display: inline-block; margin-right: 20px;">Individual</p>
+      </div>
+      <div style="width: fit-content; margin: auto;">
+        <p style="display: inline-block; margin-right: 20px;">Baseline Algorithm:</p>
+        <p style="display: inline-block; width: fit-content; color: midnightblue; margin: 0px; margin-right: 5px; position: relative; top: -12px; font-size: xx-large; font-weight: 900;">____</p>
+        <p style="display: inline-block; margin-right: 20px;">Means</p>
+        <p style="display: inline-block; width: fit-content; color: cornflowerblue; margin-right: 5px; position: relative;top: -9px;">______</p>
+        <p style="display: inline-block; margin-right: 20px;">Individual</p>
+      </div>
+    </div>
+    <br>
+    <div style="margin:auto; width:1400px; padding: 10px; border: solid 1px black;">
+      <div style="width: fit-content; margin: auto;">
+        <p style="font-weight: 900;">Pucks Outside Goal Areas</p>
+      </div>
+      <div id="pucks-count-graph" class="aGraph" style="display: block;" width="1400" height="600"></div>
+      <div style="width: fit-content; margin: auto;">
+        <p style="display: inline-block; margin-right: 20px;">Proposed Sorting Algorithm:</p>
+        <p style="display: inline-block; width: fit-content; color: green; margin: 0px; margin-right: 5px; position: relative; top: -12px; font-size: xx-large; font-weight: 900;">____</p>
+        <p style="display: inline-block; margin-right: 20px;">Means</p>
+        <p style="display: inline-block; width: fit-content; color: darkseagreen; margin-right: 5px; position: relative;top: -9px;">_______</p>
+        <p style="display: inline-block; margin-right: 20px;">Individual</p>
+      </div>
+      <div style="width: fit-content; margin: auto;">
+        <p style="display: inline-block; margin-right: 20px;">Baseline Algorithm:</p>
+        <p style="display: inline-block; width: fit-content; color: midnightblue; margin: 0px; margin-right: 5px; position: relative; top: -12px; font-size: xx-large; font-weight: 900;">____</p>
+        <p style="display: inline-block; margin-right: 20px;">Means</p>
+        <p style="display: inline-block; width: fit-content; color: cornflowerblue; margin-right: 5px; position: relative;top: -9px;">______</p>
+        <p style="display: inline-block; margin-right: 20px;">Individual</p>
+      </div>
     </div>
   </div>
   

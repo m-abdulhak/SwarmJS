@@ -19,7 +19,6 @@ function updateGoal(robot) {
       y: ((closestPoint.y - robot.position.y) * robot.radius) / (len * 10),
     };
 
-    // eslint-disable-next-line prefer-const
     let midPoint = translatePointInDirection(
       robot.position.x,
       robot.position.y,
@@ -46,7 +45,6 @@ function updateGoal(robot) {
       translationVec.x *= -1;
       translationVec.y *= -1;
 
-      // eslint-disable-next-line prefer-const
       midPoint = translatePointInDirection(
         robot.position.x,
         robot.position.y,
@@ -171,7 +169,12 @@ function updateGoal(robot) {
       .filter((p) => {
         if (!p.reachedGoal() && !p.isBlocked()) {
           const g = getGoalFromPuck(p);
-          const condInRobotVorCell = pointIsInsidePolygon(p.position, robot.BVC);
+
+          // Only Test this condition if enabled by robot algorithm options
+          const condInRobotVorCell = robot.algorithmOptions.limitPuckSelectionToBVC
+            ? pointIsInsidePolygon(p.position, robot.BVC)
+            : true;
+
           const condReachableInEnv = robot.pointIsReachableInEnvBounds(g);
           // TODO: disabel after global planning was implemented
           const condReachableOutOfStaticObs = true; // robot.pointIsReachableOutsideStaticObs(g);
@@ -192,7 +195,11 @@ function updateGoal(robot) {
 
     let bestPuck = null;
 
-    if (angleRatsExist) {
+    if (robot.algorithmOptions.limitPuckSelectionToBVC) {
+      if (distRatsExist) {
+        bestPuck = distanceRatings[0][0];
+      }
+    } else if (angleRatsExist) {
       bestPuck = angleRatings[0][0];
     } else if (distRatsExist && Math.random() < 0.1) {
       bestPuck = distanceRatings[0][0];

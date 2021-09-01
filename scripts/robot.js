@@ -6,7 +6,7 @@
 // eslint-disable-next-line no-unused-vars
 class Robot {
   constructor(id, position, goal, radius, envWidth, envHeight, scene, algorithm) {
-    // configs
+    // Configs
     this.MovementGoals = {
       Goal: 1,
       InBVC: 3,
@@ -16,6 +16,20 @@ class Robot {
       Simple: 1,
       Advanced: 2,
     };
+
+    // Change Options Based on algorithm
+    this.defaultOptions = {
+      // Baseline Algorithm Features
+      1: {
+        limitPuckSelectionToBVC: false,
+      },
+      // Proposed Algorithm Features
+      2: {
+        limitPuckSelectionToBVC: true,
+      },
+    };
+    this.algorithmOptions = this.defaultOptions[algorithm];
+
     this.id = id;
     this.position = position;
     this.prevPosition = position;
@@ -82,8 +96,6 @@ class Robot {
 
     // Obstacles
     this.obstacleSensingRadius = this.radius * 10;
-
-    // Change Options Based on algorithm
   }
 
   setMovementGoal(movementGoal) {
@@ -568,7 +580,7 @@ class Robot {
   }
 
   closePolygon(poly) {
-    if (poly.length < 2) {
+    if (!poly || poly.length < 2) {
       return poly;
     }
 

@@ -1,6 +1,78 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-undef */
 
+const initGraph = (id, maxTimeSteps, xAxixTitle, yAxisTitle, yScale) => {
+  const elem = d3.select(id);
+  elem.selectAll().remove();
+
+  const graph = {};
+
+  // set the dimensions and margins of the graph
+  graph.margin = {
+    top: 30,
+    right: 30,
+    bottom: 80,
+    left: 60,
+  };
+  graph.width = 1400 - graph.margin.left - graph.margin.right;
+  graph.height = 600 - graph.margin.top - graph.margin.bottom;
+
+  graph.svg = elem
+    .append('svg')
+    .attr('width', graph.width + graph.margin.left + graph.margin.right)
+    .attr('height', graph.height + graph.margin.top + graph.margin.bottom)
+    .append('g')
+    .attr('transform',
+      `translate(${graph.margin.left}, ${graph.margin.top})`);
+
+  // X scale will fit all values from data[] within pixels 0-width
+  graph.x = d3.scaleLinear()
+    .domain([0, 1 + maxTimeSteps])
+    .range([0, graph.width]);
+
+  graph.svg.append('g')
+    .attr('transform', `translate(0,${graph.height})`)
+    .call(d3.axisBottom(graph.x));
+
+  // text label for the x axis
+  graph.svg.append('text')
+    .attr('transform',
+      `translate(${graph.width / 2} ,${graph.height + graph.margin.top + 20})`)
+    .style('text-anchor', 'middle')
+    .text(xAxixTitle);
+
+  // Y scale will fit values within pixels height-0
+  graph.y = d3.scaleLinear()
+    .domain(yScale)
+    .range([graph.height, 0]);
+
+  graph.svg.append('g')
+    .call(d3.axisLeft(graph.y));
+
+  // text label for the y axis
+  graph.svg.append('text')
+    .attr('transform', 'rotate(-90)')
+    .attr('y', 0 - graph.margin.left)
+    .attr('x', 0 - (graph.height / 2))
+    .attr('dy', '1em')
+    .style('text-anchor', 'middle')
+    .text(yAxisTitle);
+
+  // const y1 = graph.height - graph.robotRadius * 2;
+  // const y2 = graph.height - graph.robotRadius * 2;
+  // const x1 = 0;
+  // const x2 = 999999;
+
+  // graph.svg.append('path')
+  //   .attr('fill', 'none')
+  //   .attr('stroke', 'red')
+  //   .attr('stroke-width', 1.5)
+  //   .attr('stroke-dasharray', '10,10')
+  //   .attr('d', `M${x1},${y1}L${x2},${y2}Z`);
+
+  return graph;
+};
+
 const createPlot = (graph, color, data, dashed = false, background = false) => graph.svg.append('path')
   .datum(data)
   .attr('fill', 'none')
@@ -54,8 +126,14 @@ class Benchmark {
     this.autoSaveImageAfterEachRep = false;
 
     // TODO: Add number of pucks to use in init val
-    this.totalDistanceGraph = this.initGraph('#total-distance-graph');
-    this.pucksCountGraph = this.initGraph('#pucks-count-graph');
+
+    // Create Graphs
+    this.totalDistanceGraph = initGraph(
+      '#total-distance-graph', this.benchMaxTimesteps, 'Time', 'Total Pucks To Goals Distance', [0, 200],
+    );
+    this.pucksCountGraph = initGraph(
+      '#pucks-count-graph', this.benchMaxTimesteps, 'Time', 'Number of Pucks Outside Goal Areas', [0, 80],
+    );
 
     // Add object containing mean plots that will need to be repeatedly updated
     this.plots = {};
@@ -209,83 +287,12 @@ class Benchmark {
 
       data.sets.push(this.curTotalDistanceSet);
       if (this.autoSaveImageAfterEachRep) {
-        this.downloadImage(data.sets.length);
+        this.downloadImages(data.sets.length);
       }
     }
+
     this.curTotalDistanceSet = [];
     this.curPucksCountSet = [];
-  }
-
-  initGraph(id) {
-    // set the dimensions and margins of the graph
-    this.margin = {
-      top: 30,
-      right: 30,
-      bottom: 80,
-      left: 60,
-    };
-    this.width = 1400 - this.margin.left - this.margin.right;
-    this.height = 600 - this.margin.top - this.margin.bottom;
-
-    const elem = d3.select(id);
-    elem.selectAll().remove();
-
-    const graph = {};
-
-    graph.svg = elem
-      .append('svg')
-      .attr('width', this.width + this.margin.left + this.margin.right)
-      .attr('height', this.height + this.margin.top + this.margin.bottom)
-      .append('g')
-      .attr('transform',
-        `translate(${this.margin.left}, ${this.margin.top})`);
-
-    // X scale will fit all values from data[] within pixels 0-width
-    graph.x = d3.scaleLinear()
-      .domain([0, 1 + this.benchMaxTimesteps])
-      .range([0, this.width]);
-
-    graph.svg.append('g')
-      .attr('transform', `translate(0,${this.height})`)
-      .call(d3.axisBottom(graph.x));
-
-    // text label for the x axis
-    graph.svg.append('text')
-      .attr('transform',
-        `translate(${this.width / 2} ,${this.height + this.margin.top + 20})`)
-      .style('text-anchor', 'middle')
-      .text('Time');
-
-    // Y scale will fit values from 0-10 within pixels height-0
-    graph.y = d3.scaleLinear()
-      .domain([0, 200])
-      .range([this.height, 0]);
-
-    graph.svg.append('g')
-      .call(d3.axisLeft(graph.y));
-
-    // text label for the y axis
-    graph.svg.append('text')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', 0 - this.margin.left)
-      .attr('x', 0 - (this.height / 2))
-      .attr('dy', '1em')
-      .style('text-anchor', 'middle')
-      .text('Number of Pucks - Distance');
-
-    return graph;
-
-    // const y1 = this.height - this.robotRadius * 2;
-    // const y2 = this.height - this.robotRadius * 2;
-    // const x1 = 0;
-    // const x2 = 999999;
-
-    // graph.svg.append('path')
-    //   .attr('fill', 'none')
-    //   .attr('stroke', 'red')
-    //   .attr('stroke-width', 1.5)
-    //   .attr('stroke-dasharray', '10,10')
-    //   .attr('d', `M${x1},${y1}L${x2},${y2}Z`);
   }
 
   updateGraphs(graph, algo, means, newSet, plotName) {
@@ -306,9 +313,14 @@ class Benchmark {
     }
   }
 
-  downloadImage(reps = null) {
+  downloadImages(reps = null) {
+    this.downloadImage('total-distance-graph', reps);
+    this.downloadImage('pucks-count-graph', reps);
+  }
+
+  downloadImage(graphId, reps = null) {
     const repsSec = reps == null ? '' : `__Reps-${reps}`;
     const fileN = `Benchmark_${this.settings.type}${repsSec}__Steps-${this.settings.benchMaxTimesteps}__Robots-${this.settings.benchRobotCount}__Radius-${this.settings.robotRadius}__Env-${gScene.width}-${gScene.height}`;
-    saveSvgAsPng(document.getElementById('graph').children[0], `${fileN}.png`, { scale: 5 });
+    saveSvgAsPng(document.getElementById(graphId).children[0], `${fileN}.png`, { scale: 5 });
   }
 }

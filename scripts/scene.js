@@ -116,14 +116,25 @@ class Scene {
     this.timeDelta = 16.666;
 
     // Benchmark Data :
-    // Total Robot-Goal Distances
-    this.distance = null;
     // Minimum Robot-Robot Distanc
     this.minDistance = null;
+    // Total Puck-Goal Distances
+    this.distance = null;
     // Pucks Outside Goal Count;
     this.pucksOutsideGoalCount = null;
     
     // Change Options Based on algorithm
+    this.defaultOptions = {
+      // Baseline Algorithm Features
+      1: {
+        testEnabled: false,
+      },
+      // Proposed Algorithm Features
+      2: {
+        testEnabled: true,
+      },
+    };
+    this.algoOptions = this.defaultOptions[algorithm];
   }
 
   setSpeed(scale) {
