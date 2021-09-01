@@ -218,6 +218,9 @@ function lerpW(a, wa, b, wb) {
 }
 
 function splitPolygon(points, plane) {
+  if (points == null) {
+    return [points, []];
+  }
   const pos = [];
   const neg = [];
   let a = planeT(points[points.length - 1], plane);
