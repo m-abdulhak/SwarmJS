@@ -9,6 +9,7 @@ class Renderer {
   constructor(svg, scene) {
     this.svg = svg;
     this.scene = scene;
+    this.pauseStateOnDragStart = null;
 
     // Buffered voronoi cells line segments (as calculated by robots)
     this.BVCLineSegs = [];
@@ -90,31 +91,6 @@ class Renderer {
       .attr('stroke-dasharray', '1,10')
       .attr('d', (d) => this.renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y));
 
-    // Robots
-    this.robotsCircles = svg.append('g')
-      .selectAll('circle')
-      .data(this.scene.robots)
-      .enter()
-      .append('circle')
-      .attr('cx', (d) => d.position.x)
-      .attr('cy', (d) => d.position.y)
-      .attr('id', (d) => d.id)
-      .attr('r', (d) => d.radius)
-      .attr('fill', '#FFC53A');
-    // .attr('fill', (d, i) => d3.schemeCategory10[i % 10]);
-
-    // Puck
-    this.pucksCircles = svg.append('g')
-      .selectAll('circle')
-      .data(this.scene.pucks)
-      .enter()
-      .append('circle')
-      .attr('cx', (d) => d.position.x)
-      .attr('cy', (d) => d.position.y)
-      .attr('id', (d) => d.id)
-      .attr('r', (d) => d.radius)
-      .attr('fill', (d) => d.color);
-
     // Puck Goals
     this.puckGoalsCircles = svg.append('g')
       .selectAll('circle')
@@ -127,6 +103,34 @@ class Renderer {
       .attr('r', (d) => d.radius * 12)
       .attr('fill', (d) => d.color)
       .attr('fill-opacity', '10%');
+
+    // Robots
+    this.robotsCircles = svg.append('g')
+      .selectAll('circle')
+      .data(this.scene.robots)
+      .enter()
+      .append('circle')
+      .attr('cx', (d) => d.position.x)
+      .attr('cy', (d) => d.position.y)
+      .attr('id', (d) => d.id)
+      .attr('r', (d) => d.radius)
+      .attr('fill', '#FFC53A')
+      .attr('stroke', 'black')
+      .attr('stroke-width', 1)
+      .call(d3.drag()
+        .on('start', (d) => {
+          this.robotsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'green');
+          this.pauseStateOnDragStart = paused;
+          paused = true;
+        })
+        .on('drag', (d) => {
+          Matter.Body.set(d.body, 'position', { x: d3.event.x, y: d3.event.y });
+          this.update(activeElements);
+        })
+        .on('end', (d) => {
+          this.robotsCircles.filter((p) => p.id === d.id).attr('stroke', 'black');
+          paused = this.pauseStateOnDragStart == null ? false : this.pauseStateOnDragStart;
+        }));
 
     // Line segments between robots and corresponding goal
     this.robotToGoalLineSegs = svg.append('g')
@@ -154,10 +158,46 @@ class Renderer {
       .attr('stroke', 'white')
       .attr('stroke-dasharray', '0.5,0.5')
       .call(d3.drag()
-        .on('start', (d) => this.goalsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black'))
-        .on('drag', (d) => (d.goal.x = d3.event.x, d.goal.y = d3.event.y))
-        .on('end', (d) => this.goalsCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray'))
-        .on('start.update drag.update end.update', this.scene.update));
+        .on('start', (d) => {
+          this.goalsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
+          this.pauseStateOnDragStart = paused;
+          paused = true;
+        })
+        .on('drag', (d) => {
+          d.goal.x = d3.event.x;
+          d.goal.y = d3.event.y;
+          this.update(activeElements);
+        })
+        .on('end', (d) => {
+          this.goalsCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray');
+          paused = this.pauseStateOnDragStart == null ? false : this.pauseStateOnDragStart;
+        }));
+
+    // Puck
+    this.pucksCircles = svg.append('g')
+      .selectAll('circle')
+      .data(this.scene.pucks)
+      .enter()
+      .append('circle')
+      .attr('cx', (d) => d.position.x)
+      .attr('cy', (d) => d.position.y)
+      .attr('id', (d) => d.id)
+      .attr('r', (d) => d.radius)
+      .attr('fill', (d) => d.color)
+      .call(d3.drag()
+        .on('start', (d) => {
+          this.pucksCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
+          this.pauseStateOnDragStart = paused;
+          paused = true;
+        })
+        .on('drag', (d) => {
+          Matter.Body.set(d.body, 'position', { x: d3.event.x, y: d3.event.y });
+          this.update(activeElements);
+        })
+        .on('end', (d) => {
+          this.pucksCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray');
+          paused = this.pauseStateOnDragStart == null ? false : this.pauseStateOnDragStart;
+        }));
   }
 
   removeElements(selectionQuery) {
