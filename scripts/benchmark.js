@@ -106,7 +106,7 @@ class Benchmark {
       // Random:
       {
         type: 'Random',
-        benchMaxTimesteps: 50000,
+        benchMaxTimesteps: 25000,
         benchTimeScale: 60,
         benchRobotCount: 25,
         robotRadius: 8,
@@ -129,10 +129,10 @@ class Benchmark {
 
     // Create Graphs
     this.totalDistanceGraph = initGraph(
-      '#total-distance-graph', this.benchMaxTimesteps, 'Time', 'Total Pucks To Goals Distance', [0, 200],
+      '#total-distance-graph', this.benchMaxTimesteps, 'Time', 'Total Pucks To Goals Distance', [0, 120],
     );
     this.pucksCountGraph = initGraph(
-      '#pucks-count-graph', this.benchMaxTimesteps, 'Time', 'Number of Pucks Outside Goal Areas', [0, 80],
+      '#pucks-count-graph', this.benchMaxTimesteps, 'Time', 'Number of Pucks Outside Goal Areas', [0, 40],
     );
 
     // Add object containing mean plots that will need to be repeatedly updated
@@ -232,6 +232,7 @@ class Benchmark {
     syncSettings();
 
     this.benchAlgo = this.benchAlgo === 1 ? 2 : 1;
+    // this.benchAlgo = 2;
 
     const selectElement = (id, valueToSelect) => {
       const element = document.getElementById(id);

@@ -134,7 +134,7 @@ class Scene {
         testEnabled: true,
       },
     };
-    this.algoOptions = this.defaultOptions[algorithm];
+    this.algorithmOptions = this.defaultOptions[algorithm];
   }
 
   setSpeed(scale) {

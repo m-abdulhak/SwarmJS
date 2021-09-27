@@ -21,11 +21,13 @@ class Robot {
     this.defaultOptions = {
       // Baseline Algorithm Features
       1: {
-        limitPuckSelectionToBVC: false,
+        limitPuckSelectionToBVC: true,
+        environmentOrbit: false,
       },
       // Proposed Algorithm Features
       2: {
         limitPuckSelectionToBVC: true,
+        environmentOrbit: true,
       },
     };
     this.algorithmOptions = this.defaultOptions[algorithm];

@@ -127,7 +127,9 @@ function updateGoal(robot) {
       }
     }
 
-    const newGoal = getGoalFromClosestPointToEnvBounds(closestPoint);
+    const newGoal = robot.algorithmOptions.environmentOrbit
+      ? getGoalFromClosestPointToEnvBounds(closestPoint)
+      : getRandPoint();
 
     return newGoal;
   }
@@ -195,13 +197,9 @@ function updateGoal(robot) {
 
     let bestPuck = null;
 
-    if (robot.algorithmOptions.limitPuckSelectionToBVC) {
-      if (distRatsExist) {
-        bestPuck = distanceRatings[0][0];
-      }
-    } else if (angleRatsExist) {
+    if (angleRatsExist) {
       bestPuck = angleRatings[0][0];
-    } else if (distRatsExist && Math.random() < 0.1) {
+    } else if (distRatsExist && Math.random() < 0.3) {
       bestPuck = distanceRatings[0][0];
     }
     robot.bestPuck = bestPuck;

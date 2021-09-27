@@ -26,25 +26,25 @@ var radiusOfRobots = 8;
 var pucksGroups = [
   {
     id: 0,
-    count: 25,
+    count: 20,
     radius: 10,
     goal: { x: 150, y: 250 },
     color: 'red',
   },
   {
     id: 1,
-    count: 25,
+    count: 20,
     radius: 10,
     goal: { x: 650, y: 375 },
     color: 'blue',
   },
-  {
-    id: 2,
-    count: 25,
-    radius: 10,
-    goal: { x: 400, y: 350 },
-    color: 'green',
-  },
+  // {
+  //   id: 2,
+  //   count: 20,
+  //   radius: 10,
+  //   goal: { x: 400, y: 350 },
+  //   color: 'green',
+  // },
 ];
 
 // Static Objects
@@ -73,10 +73,22 @@ var staticObjectsDefinitions = [
     radius: 50,
     skipOrbit: true,
   },
+  // {
+  //   type: 'circle',
+  //   center: { x: 300, y: 500 },
+  //   radius: 50,
+  // },
   {
-    type: 'circle',
-    center: { x: 300, y: 500 },
-    radius: 150,
+    type: 'rectangle',
+    center: { x: 350, y: 425 },
+    width: 50,
+    height: 150,
+  },
+  {
+    type: 'rectangle',
+    center: { x: 250, y: 375 },
+    width: 250,
+    height: 50,
   },
 ];
 
