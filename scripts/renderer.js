@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-sequences */
@@ -122,6 +123,7 @@ class Renderer {
           this.robotsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'green');
           this.pauseStateOnDragStart = paused;
           paused = true;
+          console.log(`Moving Robot ${d.id}`);
         })
         .on('drag', (d) => {
           Matter.Body.set(d.body, 'position', { x: d3.event.x, y: d3.event.y });
@@ -162,6 +164,7 @@ class Renderer {
           this.goalsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
           this.pauseStateOnDragStart = paused;
           paused = true;
+          console.log(`Moving Goal For Robot ${d.id}`);
         })
         .on('drag', (d) => {
           d.goal.x = d3.event.x;
@@ -189,6 +192,7 @@ class Renderer {
           this.pucksCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
           this.pauseStateOnDragStart = paused;
           paused = true;
+          console.log(`Moving Puck ${d.id}`);
         })
         .on('drag', (d) => {
           Matter.Body.set(d.body, 'position', { x: d3.event.x, y: d3.event.y });

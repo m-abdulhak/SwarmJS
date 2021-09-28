@@ -4,6 +4,17 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 // eslint-disable-next-line no-unused-vars
 function updateGoal(robot) {
+  let lastPosition;
+  let durationAtCurPosition = 0;
+  let stuck = false;
+  let avoidingStuckDuration = 0;
+  MIN_STUCK_MANEUVER_DURATION = 30;
+  const SAME_POSITION_DISTANCE_THRESHOLD = robot.radius / 50;
+  const STUCK_DURATION_THRESHOLD = 30;
+
+  const ANGLE_OPTIMAL_THRESHOLD = 15;
+  const ANGLE_ACCEPTABLE_THRESHOLD = 75;
+
   function getRandPoint() {
     return {
       x: (Math.random() * 0.8 + 0.1) * robot.scene.width,
@@ -72,7 +83,7 @@ function updateGoal(robot) {
     return newGoal;
   }
 
-  function getRandGoal() {
+  function getGoalFromEnvOrbit() {
     if (robot.curGoalTimeSteps < robot.minCurGoalTimeSteps && !robot.reachedGoal()) {
       robot.curGoalTimeSteps += 1;
       return robot.goal;
@@ -134,11 +145,33 @@ function updateGoal(robot) {
     return newGoal;
   }
 
-  function getGoalFromPuck(puck) {
+  function getGoalFromStuckManeuver() {
+    const envOrbitGoal = getGoalFromEnvOrbit();
+    const vecToEnvOrbitGoal = {
+      x: envOrbitGoal.x - robot.position.x,
+      y: envOrbitGoal.y - robot.position.y,
+    };
+    const rotatedEnvOribtGoal = {
+      x: -1 * vecToEnvOrbitGoal.y,
+      y: vecToEnvOrbitGoal.x,
+    };
+    const newGoal = {
+      x: robot.position.x + rotatedEnvOribtGoal.x,
+      y: robot.position.y + rotatedEnvOribtGoal.y,
+    };
+    return newGoal;
+  }
+
+  function getNormalizedAngleToPuck(puck) {
     const angle = angleBetweenThreePointsDeg(robot.position, puck.position, puck.goal);
     const normalizedAngle = Math.abs(angle - 180);
+    return normalizedAngle;
+  }
 
-    if (normalizedAngle < 15) {
+  function getGoalFromPuck(puck) {
+    const normalizedAngle = getNormalizedAngleToPuck(puck);
+
+    if (normalizedAngle < ANGLE_OPTIMAL_THRESHOLD) {
       return puck.position;
     }
 
@@ -151,11 +184,11 @@ function updateGoal(robot) {
       puck.goal.y,
     );
 
-    if (normalizedAngle < 75) {
+    if (normalizedAngle < ANGLE_ACCEPTABLE_THRESHOLD) {
       return closestPointInLine;
     }
 
-    return getRandGoal(robot);
+    return getGoalFromEnvOrbit(robot);
   }
 
   function selectBestNearbyPuck() {
@@ -177,10 +210,16 @@ function updateGoal(robot) {
             ? pointIsInsidePolygon(p.position, robot.BVC)
             : true;
 
+          const normalizedAngle = getNormalizedAngleToPuck(p);
+          const puckAngleAcceptable = normalizedAngle <= ANGLE_ACCEPTABLE_THRESHOLD;
+
           const condReachableInEnv = robot.pointIsReachableInEnvBounds(g);
           // TODO: disabel after global planning was implemented
           const condReachableOutOfStaticObs = true; // robot.pointIsReachableOutsideStaticObs(g);
-          return condInRobotVorCell && condReachableInEnv && condReachableOutOfStaticObs;
+          return condInRobotVorCell
+            && puckAngleAcceptable
+            && condReachableInEnv
+            && condReachableOutOfStaticObs;
         }
         return false;
       })
@@ -211,9 +250,42 @@ function updateGoal(robot) {
   }
 
   return () => {
+    // If robot was stuck and is still recovering, do not change robot goal
+    if (stuck && avoidingStuckDuration <= MIN_STUCK_MANEUVER_DURATION) {
+      avoidingStuckDuration += 1;
+      return;
+    }
+    // Else, consider maneuver over, reset counters
+    stuck = false;
+    avoidingStuckDuration = 0;
+
+    // Calc distance to last recorded position
+    const distToLastPos = lastPosition
+      ? distanceBetween2Points(robot.position, lastPosition)
+      : null;
+
+    // If robot is close enough to be considered at same position
+    if (distToLastPos != null && distToLastPos <= SAME_POSITION_DISTANCE_THRESHOLD) {
+      // Do not change recorded position, increment stuck timer by 1
+      durationAtCurPosition += 1;
+    }
+
+    // If stuck timer, reaches threshold to be considered stuck
+    if (durationAtCurPosition >= STUCK_DURATION_THRESHOLD) {
+      // Reset stuck timer, set state to stuck, start stuck maneuver timer and start maneuver
+      durationAtCurPosition = 0;
+      stuck = true;
+      avoidingStuckDuration = 0;
+      robot.goal = getGoalFromStuckManeuver();
+      console.log(`Starting Stuck Maneuver for Robot ${robot.id}`);
+      return;
+    }
+
+    // Update last position and continuer normal operations
+    lastPosition = { ...robot.position };
     const bestPuck = selectBestNearbyPuck();
     if (bestPuck === null) {
-      robot.goal = getRandGoal();
+      robot.goal = getGoalFromEnvOrbit();
     } else {
       robot.goal = getGoalFromPuck(bestPuck);
     }
