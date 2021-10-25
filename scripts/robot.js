@@ -7,10 +7,6 @@
 class Robot {
   constructor(id, position, goal, radius, envWidth, envHeight, scene, algorithm) {
     // Configs
-    this.MovementGoals = {
-      Goal: 1,
-      InBVC: 3,
-    };
     this.DeadLockRecovery = {
       None: 0,
       Simple: 1,
@@ -63,7 +59,7 @@ class Robot {
 
     // Initialize velocity according to movement goal
     this.velocity = { x: 0, y: 0 };
-    this.setMovementGoal(this.MovementGoals.InBVC);
+    this.updateVelocity();
 
     // Initialize deadlock detection mechanisms
     this.deadLockDetectionEnabled = true;
@@ -100,25 +96,6 @@ class Robot {
     this.obstacleSensingRadius = this.radius * 10;
   }
 
-  setMovementGoal(movementGoal) {
-    this.movementGoal = movementGoal;
-
-    switch (this.movementGoal) {
-      case this.MovementGoals.Goal:
-        this.tempGoal = this.goal;
-        this.updateVelocity();
-        break;
-      case this.MovementGoals.InBVC:
-        this.setTempGoalInCell(this.BVC);
-        this.updateVelocity();
-        break;
-      default:
-        this.tempGoal = this.goal;
-        this.updateVelocity();
-        break;
-    }
-  }
-
   timeStep() {
     this.prevPosition = this.position;
     this.position = this.body.position;
@@ -128,19 +105,8 @@ class Robot {
   }
 
   updateVelocity() {
-    switch (this.movementGoal) {
-      case this.MovementGoals.Goal:
-        this.tempGoal = this.goal;
-        this.setVelocityTo(this.goal);
-        break;
-      case this.MovementGoals.InBVC:
-        this.setTempGoalInCell(this.BVC);
-        this.setVelocityTo(this.tempGoal);
-        break;
-      default:
-        this.tempGoal = this.goal;
-        break;
-    }
+    this.setTempGoalInCell(this.BVC);
+    this.setVelocityTo(this.tempGoal);
   }
 
   setVelocityTo(point) {

@@ -277,7 +277,6 @@ function updateGoal(robot) {
       stuck = true;
       avoidingStuckDuration = 0;
       robot.goal = getGoalFromStuckManeuver();
-      console.log(`Starting Stuck Maneuver for Robot ${robot.id}`);
       return;
     }
 
