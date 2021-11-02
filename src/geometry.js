@@ -7,7 +7,7 @@
  ************************************************
  */
 
-function radToDeg(radians) {
+export function radToDeg(radians) {
   return radians * (180 / Math.PI);
 }
 
@@ -18,7 +18,7 @@ function radToDeg(radians) {
 * C second point
 * B center point
 */
-function angleBetweenThreePointsRad(A, B, C) {
+export function angleBetweenThreePointsRad(A, B, C) {
   const AB = Math.sqrt((B.x - A.x) ** 2 + (B.y - A.y) ** 2);
   const BC = Math.sqrt((B.x - C.x) ** 2 + (B.y - C.y) ** 2);
   const AC = Math.sqrt((C.x - A.x) ** 2 + (C.y - A.y) ** 2);
@@ -26,24 +26,24 @@ function angleBetweenThreePointsRad(A, B, C) {
   return Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
 }
 
-function angleBetweenThreePointsDeg(A, B, C) {
+export function angleBetweenThreePointsDeg(A, B, C) {
   const angleRad = angleBetweenThreePointsRad(A, B, C);
   return radToDeg(angleRad);
 }
 
 /** * Ruler Function */
-function pointOnLineSegmentPerRatio(startPoint, endPoint, ratio) {
+export function pointOnLineSegmentPerRatio(startPoint, endPoint, ratio) {
   return {
     x: (1 - ratio) * startPoint.x + ratio * endPoint.x,
     y: (1 - ratio) * startPoint.y + ratio * endPoint.y,
   };
 }
 
-function nxtCircIndx(i, length) {
+export function nxtCircIndx(i, length) {
   return (i + 1) % length;
 }
 
-function minDistanceToLine(pointsArray, vecStart, vecEnd) {
+export function minDistanceToLine(pointsArray, vecStart, vecEnd) {
   let minDist = null;
 
   for (const p of pointsArray) {
@@ -61,7 +61,7 @@ function minDistanceToLine(pointsArray, vecStart, vecEnd) {
   return minDist;
 }
 
-function allPointsAreOnSameSideOfVector(pointsArray, vecStart, vecEnd) {
+export function allPointsAreOnSameSideOfVector(pointsArray, vecStart, vecEnd) {
   let prevSide = null;
 
   for (const p of pointsArray) {
@@ -81,11 +81,11 @@ function allPointsAreOnSameSideOfVector(pointsArray, vecStart, vecEnd) {
   return true;
 }
 
-function dotProduct(vec1, vec2) {
+export function dotProduct(vec1, vec2) {
   return vec1.x * vec2.x + vec1.y * vec2.y;
 }
 
-function pointIsOnRightSideOfVector(x, y, x1, y1, x2, y2) {
+export function pointIsOnRightSideOfVector(x, y, x1, y1, x2, y2) {
   const vec1 = { x: x - x1, y: -y + y1 };
   const rot90Vec1 = { x: -1 * vec1.y, y: vec1.x };
   const vec2 = { x: x2 - x1, y: -y2 + y1 };
@@ -94,7 +94,7 @@ function pointIsOnRightSideOfVector(x, y, x1, y1, x2, y2) {
   return dot2 > 0;
 }
 
-function closestPointInPolygonToPoint(polygon, point) {
+export function closestPointInPolygonToPoint(polygon, point) {
   let closestPoint = null;
   let minDist = null;
 
@@ -121,7 +121,7 @@ function closestPointInPolygonToPoint(polygon, point) {
   return closestPoint;
 }
 
-function closestPointInLineToPoint(x, y, x1, y1, x2, y2) {
+export function closestPointInLineToPoint(x, y, x1, y1, x2, y2) {
   const A = x - x1;
   const B = y - y1;
   const C = x2 - x1;
@@ -142,7 +142,7 @@ function closestPointInLineToPoint(x, y, x1, y1, x2, y2) {
   return { x: xx, y: yy };
 }
 
-function closestPointInLineSegToPoint(x, y, x1, y1, x2, y2) {
+export function closestPointInLineSegToPoint(x, y, x1, y1, x2, y2) {
   const A = x - x1;
   const B = y - y1;
   const C = x2 - x1;
@@ -174,7 +174,7 @@ function closestPointInLineSegToPoint(x, y, x1, y1, x2, y2) {
   return { x: xx, y: yy };
 }
 
-function distanceBetween2Points(pos1, pos2) {
+export function distanceBetween2Points(pos1, pos2) {
   if (
     pos1 == null || pos2 == null
     || pos1.x == null || pos1.y == null
@@ -189,7 +189,7 @@ function distanceBetween2Points(pos1, pos2) {
   return ret;
 }
 
-function distanceBetweenPointAndLine(point, point1LineSeg, point2LineSeg) {
+export function distanceBetweenPointAndLine(point, point1LineSeg, point2LineSeg) {
   const ret = distanceBetween2Points(
     point,
     closestPointInLineToPoint(
@@ -204,7 +204,7 @@ function distanceBetweenPointAndLine(point, point1LineSeg, point2LineSeg) {
   return ret;
 }
 
-function distanceBetweenPointAndLineSeg(point, point1LineSeg, point2LineSeg) {
+export function distanceBetweenPointAndLineSeg(point, point1LineSeg, point2LineSeg) {
   const ret = distanceBetween2Points(
     point,
     closestPointInLineSegToPoint(
@@ -219,44 +219,44 @@ function distanceBetweenPointAndLineSeg(point, point1LineSeg, point2LineSeg) {
   return ret;
 }
 
-function midPointOfLineSeg(x1, y1, x2, y2) {
+export function midPointOfLineSeg(x1, y1, x2, y2) {
   return { x: (x1 + x2) / 2, y: (y1 + y2) / 2 };
 }
 
-function slopeOfLineSeg(x1, y1, x2, y2) {
+export function slopeOfLineSeg(x1, y1, x2, y2) {
   if ((x2 - x1) === 0) {
     return 99999999999;
   }
   return (y2 - y1) / (x2 - x1);
 }
 
-function slopeOfPerpendicularBisectorOfLineSeg(x1, y1, x2, y2) {
+export function slopeOfPerpendicularBisectorOfLineSeg(x1, y1, x2, y2) {
   return -1 / slopeOfLineSeg(x1, y1, x2, y2);
 }
 
-function directionOfPerpendicularBisector(x1, y1, x2, y2, scale) {
+export function directionOfPerpendicularBisector(x1, y1, x2, y2, scale) {
   const length = distanceBetween2Points({ x: x1, y: y1 }, { x: x2, y: y2 });
   return { x: (scale * (y1 - y2)) / length, y: (scale * (x2 - x1)) / length };
 }
 
-function translatePointInDirection(x1, y1, xVec, yVec) {
+export function translatePointInDirection(x1, y1, xVec, yVec) {
   return { x: x1 + xVec, y: y1 + yVec };
 }
 
-function shiftPointOfLineSegInDirOfPerpendicularBisector(x, y, x1, y1, x2, y2, scale) {
+export function shiftPointOfLineSegInDirOfPerpendicularBisector(x, y, x1, y1, x2, y2, scale) {
   const dir = directionOfPerpendicularBisector(x1, y1, x2, y2, scale);
   const p1 = translatePointInDirection(x, y, dir.x, dir.y);
   return p1;
 }
 
-function shiftLineSegInDirOfPerpendicularBisector(x1, y1, x2, y2, scale) {
+export function shiftLineSegInDirOfPerpendicularBisector(x1, y1, x2, y2, scale) {
   const dir = directionOfPerpendicularBisector(x1, y1, x2, y2, scale);
   const p1 = translatePointInDirection(x1, y1, dir.x, dir.y);
   const p2 = translatePointInDirection(x2, y2, dir.x, dir.y);
   return [p1, p2];
 }
 
-function getLineLineIntersectionPoint(
+export function getLineLineIntersectionPoint(
   line1StartX,
   line1StartY,
   line1EndX,
@@ -314,7 +314,7 @@ function getLineLineIntersectionPoint(
   return result;
 }
 
-function pointIsInsidePolygon(point, polygon) {
+export function pointIsInsidePolygon(point, polygon) {
   // ray-casting algorithm based on
   // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
 
@@ -338,7 +338,7 @@ function pointIsInsidePolygon(point, polygon) {
   }
 }
 
-function polygonArea(polygon) {
+export function polygonArea(polygon) {
   if (polygon === undefined || polygon.length < 3) {
     return 0;
   }
@@ -353,12 +353,25 @@ function polygonArea(polygon) {
   return Math.abs(area / 2);
 }
 
-function circleArea(radius) {
+export function circleArea(radius) {
   return (radius * radius * Math.PI);
 }
 
-function xyPoint(p) {
+export function xyPoint(p) {
   return { x: p[0], y: p[1] };
+}
+
+export function getLineEquationParams(p1, p2) {
+  const x1 = p1.x;
+  const y1 = p1.y;
+  const x2 = p2.x;
+  const y2 = p2.y;
+
+  const a = y1 - y2;
+  const b = x2 - x1;
+  const c = (x1 - x2) * y1 + (y2 - y1) * x1;
+
+  return [a, b, c];
 }
 
 // Static obstacles
@@ -371,7 +384,7 @@ function xyPoint(p) {
  * @param  {Vector} otherLineEndPoint - end of the line
  * @return {Vector}                   - point of the intersection
  */
-function getLineCircleIntersectionPoint(center, radius, otherLineEndPoint) {
+export function getLineCircleIntersectionPoint(center, radius, otherLineEndPoint) {
   let v = { x: otherLineEndPoint.x - center.x, y: otherLineEndPoint.y - center.y };
   const lineLength = distanceBetween2Points(v, { x: 0, y: 0 });
   if (lineLength === 0) {

@@ -7,7 +7,19 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-undef */
 // eslint-disable-next-line no-unused-vars
-class Scene {
+import * as d3 from 'd3';
+import { Engine, World, Bodies } from 'matter-js';
+import { Delaunay } from 'd3-delaunay';
+import Offset from 'polygon-offset';
+
+import Robot from './robot';
+import Puck from './puck';
+import { generateStaticObject } from './staticObjects/staticObjectFactory.js';
+import { distanceBetween2Points } from './geometry';
+import { mapSceneToArr, getPucksGoalMap } from './distanceTransform/globalPlanning';
+import Renderer from './renderer';
+
+export default class Scene {
   constructor(
     svg,
     numOfRobots,
@@ -17,6 +29,7 @@ class Scene {
     startingPositionsConfig,
     pucksGroups,
     staticObjectsDefinitions,
+    gMaps
   ) {
     this.width = parseInt(svg.attr('width'), 10);
     this.height = parseInt(svg.attr('height'), 10);
@@ -143,7 +156,7 @@ class Scene {
 
   update(activeElements) {
     this.voronoi = Delaunay
-      .from(gScene.getCurRobotsPos(), (d) => d.x, (d) => d.y)
+      .from(this.getCurRobotsPos(), (d) => d.x, (d) => d.y)
       .voronoi([0, 0, this.width, this.height]);
 
     this.updateRobotsMeasurements();
@@ -151,12 +164,12 @@ class Scene {
     this.robots.forEach((r) => r.timeStep());
     this.pucks.forEach((p) => p.timeStep());
 
-    gScene.updatePucksOutsideOfGoalMesurements();
-    // gScene.updateMinRobotRobotDistMesurements();
+    this.updatePucksOutsideOfGoalMesurements();
+    // this.updateMinRobotRobotDistMesurements();
 
     Engine.update(this.engine, this.timeDelta);
 
-    timeInstance = this.engine.timing.timestamp;
+    const timeInstance = this.engine.timing.timestamp;
 
     if (this.renderingEnabled) {
       this.renderer.update(activeElements);

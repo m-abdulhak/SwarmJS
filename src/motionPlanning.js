@@ -3,7 +3,19 @@
 /* eslint-disable no-undef */
 /* eslint no-param-reassign: ["error", { "props": false }] */
 // eslint-disable-next-line no-unused-vars
-function updateWaypoint(robot) {
+import {
+  pointOnLineSegmentPerRatio,
+  nxtCircIndx,
+  minDistanceToLine,
+  allPointsAreOnSameSideOfVector,
+  pointIsOnRightSideOfVector,
+  closestPointInPolygonToPoint,
+  distanceBetween2Points,
+  distanceBetweenPointAndLine,
+  pointIsInsidePolygon,
+} from './geometry';
+
+export default function updateWaypoint(robot) {
   // Initialize deadlock detection mechanisms
   const deadLockDetectionDuration = 5;
   let stuckAtTempGoalDuration = 0;

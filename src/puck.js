@@ -2,7 +2,10 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-undef */
 // eslint-disable-next-line no-unused-vars
-class Puck {
+import { Engine, World, Bodies } from 'matter-js';
+import { distanceBetween2Points } from './geometry';
+
+export default class Puck {
   constructor(id, position, goal, radius, envWidth, envHeight, scene, color, map) {
     this.id = id;
     this.position = position;

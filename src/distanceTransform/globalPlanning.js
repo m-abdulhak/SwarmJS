@@ -6,7 +6,7 @@ const arrTo2dArr = (arr, width) => {
   return NotImplemented;
 };
 
-const mapSceneToArr = (width, height, obstacles) => {
+export const mapSceneToArr = (width, height, obstacles) => {
   const scale = 4;
   const mapHeight = height / scale;
   const mapWidth = width / scale;
@@ -65,7 +65,7 @@ const arrTo2dArrWrapper = (mapArr, width) => ({
 
 const getElemKey = (el) => `${el[0]}-${el[1]}`;
 
-const getPucksGoalMap = (mapArr, width, height, goalPosition, scale) => {
+export const getPucksGoalMap = (mapArr, width, height, goalPosition, scale) => {
   const map = arrTo2dArrWrapper(mapArr, width);
   const dtMap = new Array(height).fill(null).map(() => Array(width).fill(NaN));
   const goalMap = new Array(height).fill(null).map(() => Array(width).fill(NaN));

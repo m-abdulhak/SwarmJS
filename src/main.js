@@ -6,7 +6,9 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-var */
-// Matter.js Physics Engine Aliases
+import * as d3 from 'd3';
+import Scene from './scene';
+import Benchmark from './benchmark';
 
 // Setup
 var timeInstance = 0;
@@ -92,12 +94,6 @@ var staticObjectsDefinitions = [
   },
 ];
 
-// Initialize Matter.js objects
-var Engine = Matter.Engine;
-var World = Matter.World;
-var Bodies = Matter.Bodies;
-var Body = Matter.Body;
-
 var uiElements = [
   'speed-slider',
   'robots-slider',
@@ -134,6 +130,7 @@ var gScene = new Scene(
   getStartingPositionsSettings(),
   pucksGroups,
   staticObjectsDefinitions,
+  gMaps,
 );
 var bench = new Benchmark(getBenchmarkSettings());
 
@@ -150,6 +147,7 @@ var resetSimulation = function () {
     getStartingPositionsSettings(),
     pucksGroups,
     staticObjectsDefinitions,
+    gMaps,
   );
   changeAlgorithm();
 };
@@ -191,7 +189,7 @@ var pauseSimulation = function () {
 };
 
 svg.on('mousemove', function () {
-  document.getElementById('mouse-pos').textContent = d3.mouse(this);
+  document.getElementById('mouse-pos').textContent = d3.pointer(this);
 });
 
 var visualizeElementsChanged = function () {

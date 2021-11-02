@@ -3,12 +3,22 @@
 /* eslint-disable no-undef */
 /* eslint no-param-reassign: ["error", { "props": false }] */
 // eslint-disable-next-line no-unused-vars
-function updateGoal(robot) {
+import {
+  angleBetweenThreePointsDeg,
+  closestPointInLineToPoint,
+  closestPointInLineSegToPoint,
+  distanceBetween2Points,
+  translatePointInDirection,
+  shiftPointOfLineSegInDirOfPerpendicularBisector,
+  pointIsInsidePolygon,
+} from './geometry';
+
+export default function updateGoal(robot) {
   let lastPosition;
   let durationAtCurPosition = 0;
   let stuck = false;
   let avoidingStuckDuration = 0;
-  MIN_STUCK_MANEUVER_DURATION = 30;
+  const MIN_STUCK_MANEUVER_DURATION = 30;
   const SAME_POSITION_DISTANCE_THRESHOLD = robot.radius / 50;
   const STUCK_DURATION_THRESHOLD = 30;
 

@@ -9,15 +9,4 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'main.js',
   },
-  module: {
-    rules: [
-      {
-        test: require.resolve('matter-js'),
-        loader: 'expose-loader',
-        options: {
-          exposes: ['Matter'],
-        },
-      },
-    ],
-  },
 };

@@ -6,7 +6,11 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
-class Renderer {
+import * as d3 from 'd3';
+import { Body } from 'matter-js';
+import { nxtCircIndx } from './geometry';
+
+export default class Renderer {
   constructor(svg, scene) {
     this.svg = svg;
     this.scene = scene;
@@ -119,17 +123,17 @@ class Renderer {
       .attr('stroke', 'black')
       .attr('stroke-width', 1)
       .call(d3.drag()
-        .on('start', (d) => {
+        .on('start', (event, d) => {
           this.robotsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'green');
           this.pauseStateOnDragStart = paused;
           paused = true;
           console.log(`Moving Robot ${d.id}`);
         })
-        .on('drag', (d) => {
-          Matter.Body.set(d.body, 'position', { x: d3.event.x, y: d3.event.y });
+        .on('drag', (event, d) => {
+          Body.set(d.body, 'position', { x: event.x, y: event.y });
           this.update(activeElements);
         })
-        .on('end', (d) => {
+        .on('end', (event, d) => {
           this.robotsCircles.filter((p) => p.id === d.id).attr('stroke', 'black');
           paused = this.pauseStateOnDragStart == null ? false : this.pauseStateOnDragStart;
         }));
@@ -160,18 +164,18 @@ class Renderer {
       .attr('stroke', 'white')
       .attr('stroke-dasharray', '0.5,0.5')
       .call(d3.drag()
-        .on('start', (d) => {
+        .on('start', (event, d) => {
           this.goalsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
           this.pauseStateOnDragStart = paused;
           paused = true;
           console.log(`Moving Goal For Robot ${d.id}`);
         })
-        .on('drag', (d) => {
-          d.goal.x = d3.event.x;
-          d.goal.y = d3.event.y;
+        .on('drag', (event, d) => {
+          d.goal.x = event.x;
+          d.goal.y = event.y;
           this.update(activeElements);
         })
-        .on('end', (d) => {
+        .on('end', (event, d) => {
           this.goalsCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray');
           paused = this.pauseStateOnDragStart == null ? false : this.pauseStateOnDragStart;
         }));
@@ -188,17 +192,17 @@ class Renderer {
       .attr('r', (d) => d.radius)
       .attr('fill', (d) => d.color)
       .call(d3.drag()
-        .on('start', (d) => {
+        .on('start', (event, d) => {
           this.pucksCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
           this.pauseStateOnDragStart = paused;
           paused = true;
           console.log(`Moving Puck ${d.id}`);
         })
-        .on('drag', (d) => {
-          Matter.Body.set(d.body, 'position', { x: d3.event.x, y: d3.event.y });
+        .on('drag', (event, d) => {
+          Body.set(d.body, 'position', { x: event.x, y: event.y });
           this.update(activeElements);
         })
-        .on('end', (d) => {
+        .on('end', (event, d) => {
           this.pucksCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray');
           paused = this.pauseStateOnDragStart == null ? false : this.pauseStateOnDragStart;
         }));

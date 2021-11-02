@@ -2,9 +2,22 @@
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-undef */
+import { Body, World, Bodies } from 'matter-js';
+import splitPolygon from 'split-polygon';
+
+import updateWaypoint from './motionPlanning';
+import updateGoal from './goalSelect';
+import { generateStaticObject } from './staticObjects/staticObjectFactory';
+import {
+  distanceBetween2Points,
+  closestPointInPolygonToPoint,
+  shiftPointOfLineSegInDirOfPerpendicularBisector,
+  pointIsInsidePolygon,
+  getLineEquationParams,
+} from './geometry';
 
 // eslint-disable-next-line no-unused-vars
-class Robot {
+export default class Robot {
   constructor(id, position, goal, radius, envWidth, envHeight, scene, algorithm) {
     // Configs
     this.DeadLockRecovery = {
@@ -181,7 +194,9 @@ class Robot {
     );
 
     const splittingLineParams = getLineEquationParams(closestPoint, secondLinePoint);
-    const splitPolygonParts = splitPolygon(this.VC, splittingLineParams).map(
+    const splitPolygonRes = splitPolygon(this.VC, splittingLineParams);
+    const splitPolygonParts = [splitPolygonRes.positive, splitPolygonRes.negative];
+    splitPolygonParts.map(
       (poly) => this.closePolygon(poly),
     );
 

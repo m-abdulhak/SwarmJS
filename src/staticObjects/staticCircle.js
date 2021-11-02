@@ -1,7 +1,10 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-undef */
 // eslint-disable-next-line no-unused-vars
-class StaticCircle {
+import { World, Bodies } from 'matter-js';
+import { distanceBetween2Points, getLineCircleIntersectionPoint } from '../geometry';
+
+export default class StaticCircle {
   constructor(def, scene, shouldAddToWorld) {
     this.def = def;
     this.scene = scene;

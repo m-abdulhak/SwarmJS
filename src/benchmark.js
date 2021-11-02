@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-undef */
+import * as d3 from 'd3';
 
 const initGraph = (id, maxTimeSteps, xAxixTitle, yAxisTitle, yScale) => {
   const elem = d3.select(id);
@@ -89,7 +90,7 @@ const updatePlot = (graph, plot, data) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-class Benchmark {
+export default class Benchmark {
   constructor(benchSettings) {
     // Benchmarking
     this.plotColors = {
