@@ -1,11 +1,26 @@
-/* eslint-disable no-use-before-define */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable no-unused-vars */
+import Offset from 'polygon-offset';
+
 /*
  ************************************************
  *************** Helper Functions ***************
  ************************************************
  */
+
+export function calculateBVCfromVC(cell, r) {
+  const offset = new Offset();
+  let padding = [];
+  try {
+    [padding] = offset.data(cell).padding(r.radius * 1);
+  } catch (err) {
+    // On collisions, if voronoi cell is too small => BVC is undefined
+    // Should not occur in collision-free configurations
+    // eslint-disable-next-line no-console
+    console.log(err);
+    padding = [[r.position.x, r.position.y]];
+  }
+
+  return padding;
+}
 
 export function radToDeg(radians) {
   return radians * (180 / Math.PI);
@@ -35,50 +50,12 @@ export function angleBetweenThreePointsDeg(A, B, C) {
 export function pointOnLineSegmentPerRatio(startPoint, endPoint, ratio) {
   return {
     x: (1 - ratio) * startPoint.x + ratio * endPoint.x,
-    y: (1 - ratio) * startPoint.y + ratio * endPoint.y,
+    y: (1 - ratio) * startPoint.y + ratio * endPoint.y
   };
 }
 
 export function nxtCircIndx(i, length) {
   return (i + 1) % length;
-}
-
-export function minDistanceToLine(pointsArray, vecStart, vecEnd) {
-  let minDist = null;
-
-  for (const p of pointsArray) {
-    const curDist = distanceBetweenPointAndLine(p,
-      vecStart,
-      vecEnd);
-
-    if (minDist == null) {
-      minDist = curDist;
-    } else if (curDist < minDist) {
-      minDist = curDist;
-    }
-  }
-
-  return minDist;
-}
-
-export function allPointsAreOnSameSideOfVector(pointsArray, vecStart, vecEnd) {
-  let prevSide = null;
-
-  for (const p of pointsArray) {
-    const curSide = pointIsOnRightSideOfVector(p.x, p.y,
-      vecStart.x, vecStart.y,
-      vecEnd.x, vecEnd.y);
-
-    if (prevSide == null) {
-      prevSide = pointIsOnRightSideOfVector(p.x, p.y,
-        vecStart.x, vecStart.y,
-        vecEnd.x, vecEnd.y);
-    } else if (curSide !== prevSide) {
-      return false;
-    }
-  }
-
-  return true;
 }
 
 export function dotProduct(vec1, vec2) {
@@ -94,31 +71,23 @@ export function pointIsOnRightSideOfVector(x, y, x1, y1, x2, y2) {
   return dot2 > 0;
 }
 
-export function closestPointInPolygonToPoint(polygon, point) {
-  let closestPoint = null;
-  let minDist = null;
+export function allPointsAreOnSameSideOfVector(pointsArray, vecStart, vecEnd) {
+  let prevSide = null;
 
-  for (let index = 0; index < polygon.length; index += 1) {
-    const v1 = polygon[index];
-    const v2 = polygon[nxtCircIndx(index, polygon.length)];
-    const closestPointInLineSeg = closestPointInLineSegToPoint(
-      point.x,
-      point.y,
-      v1[0],
-      v1[1],
-      v2[0],
-      v2[1],
-    );
+  for (let i = 0; i < pointsArray.length; i += 1) {
+    const p = pointsArray[i];
+    const curSide = pointIsOnRightSideOfVector(p.x, p.y,
+      vecStart.x, vecStart.y,
+      vecEnd.x, vecEnd.y);
 
-    const distGoalToLineSeg = distanceBetween2Points(point, closestPointInLineSeg);
-
-    if (closestPoint == null || distGoalToLineSeg < minDist) {
-      closestPoint = { x: closestPointInLineSeg.x, y: closestPointInLineSeg.y };
-      minDist = distGoalToLineSeg;
+    if (prevSide == null) {
+      prevSide = curSide;
+    } else if (curSide !== prevSide) {
+      return false;
     }
   }
 
-  return closestPoint;
+  return true;
 }
 
 export function closestPointInLineToPoint(x, y, x1, y1, x2, y2) {
@@ -184,9 +153,36 @@ export function distanceBetween2Points(pos1, pos2) {
   }
 
   const ret = Math.sqrt(
-    (pos1.x - pos2.x) * (pos1.x - pos2.x) + (pos1.y - pos2.y) * (pos1.y - pos2.y),
+    (pos1.x - pos2.x) * (pos1.x - pos2.x) + (pos1.y - pos2.y) * (pos1.y - pos2.y)
   );
   return ret;
+}
+
+export function closestPointInPolygonToPoint(polygon, point) {
+  let closestPoint = null;
+  let minDist = null;
+
+  for (let index = 0; index < polygon.length; index += 1) {
+    const v1 = polygon[index];
+    const v2 = polygon[nxtCircIndx(index, polygon.length)];
+    const closestPointInLineSeg = closestPointInLineSegToPoint(
+      point.x,
+      point.y,
+      v1[0],
+      v1[1],
+      v2[0],
+      v2[1]
+    );
+
+    const distGoalToLineSeg = distanceBetween2Points(point, closestPointInLineSeg);
+
+    if (closestPoint == null || distGoalToLineSeg < minDist) {
+      closestPoint = { x: closestPointInLineSeg.x, y: closestPointInLineSeg.y };
+      minDist = distGoalToLineSeg;
+    }
+  }
+
+  return closestPoint;
 }
 
 export function distanceBetweenPointAndLine(point, point1LineSeg, point2LineSeg) {
@@ -198,8 +194,8 @@ export function distanceBetweenPointAndLine(point, point1LineSeg, point2LineSeg)
       point1LineSeg.x,
       point1LineSeg.y,
       point2LineSeg.x,
-      point2LineSeg.y,
-    ),
+      point2LineSeg.y
+    )
   );
   return ret;
 }
@@ -213,10 +209,28 @@ export function distanceBetweenPointAndLineSeg(point, point1LineSeg, point2LineS
       point1LineSeg.x,
       point1LineSeg.y,
       point2LineSeg.x,
-      point2LineSeg.y,
-    ),
+      point2LineSeg.y
+    )
   );
   return ret;
+}
+
+export function minDistanceToLine(pointsArray, vecStart, vecEnd) {
+  let minDist = null;
+
+  pointsArray.forEach((p) => {
+    const curDist = distanceBetweenPointAndLine(p,
+      vecStart,
+      vecEnd);
+
+    if (minDist == null) {
+      minDist = curDist;
+    } else if (curDist < minDist) {
+      minDist = curDist;
+    }
+  });
+
+  return minDist;
 }
 
 export function midPointOfLineSeg(x1, y1, x2, y2) {
@@ -264,7 +278,7 @@ export function getLineLineIntersectionPoint(
   line2StartX,
   line2StartY,
   line2EndX,
-  line2EndY,
+  line2EndY
 ) {
   // if the lines intersect,
   // the result contains the x and y of the intersection (treating the lines as infinite)
@@ -275,7 +289,7 @@ export function getLineLineIntersectionPoint(
     x: null,
     y: null,
     onLine1: false,
-    onLine2: false,
+    onLine2: false
   };
 
   const denominator = ((line2EndY - line2StartY) * (line1EndX - line1StartX))

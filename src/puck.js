@@ -1,8 +1,4 @@
-/* eslint-disable no-console */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable no-undef */
-// eslint-disable-next-line no-unused-vars
-import { Engine, World, Bodies } from 'matter-js';
+import { World, Bodies } from 'matter-js';
 import { distanceBetween2Points } from './geometry';
 
 export default class Puck {
@@ -62,11 +58,12 @@ export default class Puck {
         : [1, 1];
       this.goal = {
         x: this.position.x + dir[0] * this.radius * 10,
-        y: this.position.y + dir[1] * this.radius * 10,
+        y: this.position.y + dir[1] * this.radius * 10
       };
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   isBlocked() {
     return false;
 
@@ -118,7 +115,7 @@ export default class Puck {
     const { radius } = this;
     this.goal = {
       x: Math.min(Math.max(radius, this.goal.x), this.envWidth - radius),
-      y: Math.min(Math.max(radius, this.goal.y), this.envHeight - radius),
+      y: Math.min(Math.max(radius, this.goal.y), this.envHeight - radius)
     };
   }
 
@@ -126,7 +123,7 @@ export default class Puck {
     return {
       type: 'circle',
       center: this.position,
-      radius: this.radius,
+      radius: this.radius
     };
   }
 }

@@ -1,8 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-undef */
-/* eslint no-param-reassign: ["error", { "props": false }] */
-// eslint-disable-next-line no-unused-vars
 import {
   pointOnLineSegmentPerRatio,
   nxtCircIndx,
@@ -12,7 +7,7 @@ import {
   closestPointInPolygonToPoint,
   distanceBetween2Points,
   distanceBetweenPointAndLine,
-  pointIsInsidePolygon,
+  pointIsInsidePolygon
 } from './geometry';
 
 export default function updateWaypoint(robot) {
@@ -52,7 +47,7 @@ export default function updateWaypoint(robot) {
         const dist = distanceBetweenPointAndLine(
           { x: vertex[0], y: vertex[1] },
           linesSegP1,
-          lineSegP2,
+          lineSegP2
         );
         if (maxDist == null || dist > maxDist) {
           bestVertex = vertex;
@@ -83,7 +78,7 @@ export default function updateWaypoint(robot) {
         linesSegP1.x,
         linesSegP1.y,
         lineSegP2.x,
-        lineSegP2.y,
+        lineSegP2.y
       );
       if (dir === maneuverDirection) {
         vertecies.push(vertex);
@@ -99,14 +94,14 @@ export default function updateWaypoint(robot) {
     const outermostPoint = getFurthestVertexFromLineSeg(vertecies, robot.position, robot.goal);
     const distanceToOutermostPoint = robot.getDistanceTo(outermostPoint);
     if (distanceToOutermostPoint < detourPointMaxDistance) {
-      robot.tempGoal = outermostPoint;
+      robot.setTempGoal(outermostPoint);
     } else {
       const distWithdefaultRatio = distanceToOutermostPoint * detourPointToOutermostPointRatio;
       const defaultRatioLongerThanMax = distWithdefaultRatio > detourPointMaxDistance;
       const detourRatio = defaultRatioLongerThanMax
         ? detourPointMaxDistance / distanceToOutermostPoint
         : detourPointToOutermostPointRatio;
-      robot.tempGoal = pointOnLineSegmentPerRatio(robot.position, outermostPoint, detourRatio);
+      robot.setTempGoal(pointOnLineSegmentPerRatio(robot.position, outermostPoint, detourRatio));
     }
   }
 
@@ -133,7 +128,7 @@ export default function updateWaypoint(robot) {
   function neighborsAvoided() {
     const robotsMeasurements = getNeighborsMeasurementsWithin(
       lastDeadlockPosition,
-      lastDeadlockAreaRadius,
+      lastDeadlockAreaRadius
     );
     const { robots } = robotsMeasurements;
     const robotPositions = robots.map((r) => ({ x: r.position.x, y: r.position.y }));
@@ -158,7 +153,7 @@ export default function updateWaypoint(robot) {
     const tempGoalNotReached = !robot.reachedTempGoal();
     const currentVCellContainsTempGoal = pointIsInsidePolygon(
       robot.tempGoal,
-      robot.BVC,
+      robot.BVC
     );
     const maneuverNotSucceededYet = !(deadLockManeuverInProgress && neighborsAvoided());
 
@@ -190,7 +185,7 @@ export default function updateWaypoint(robot) {
     lastDeadlockPosition = { x: robot.tempGoal.x, y: robot.tempGoal.y };
     lastDeadlockNeighborsCount = getNeighborsMeasurementsWithin(
       robot.tempGoal,
-      robot.radius * 5,
+      robot.radius * 5
     ).robots.length;
     remainingDeadlockManeuvers = lastDeadlockNeighborsCount === 1
       ? maxConsecutiveDeadlockManeuvers / 2 : maxConsecutiveDeadlockManeuvers;
@@ -204,7 +199,7 @@ export default function updateWaypoint(robot) {
 
     const neighborsMeasurements = getNeighborsMeasurementsWithin(
       tempGoal,
-      neighborGoaldistanceThreshold,
+      neighborGoaldistanceThreshold
     );
     const robotsCloseToTempGoal = neighborsMeasurements.robots;
     const { maxDistance } = neighborsMeasurements;
@@ -225,7 +220,7 @@ export default function updateWaypoint(robot) {
         const condPointsOnSameSide = allPointsAreOnSameSideOfVector(
           [robot.goal, robot.tempGoal],
           r.position,
-          rNext.position,
+          rNext.position
         );
 
         if (!condPointsOnSameSide) {

@@ -1,45 +1,38 @@
 /* eslint-disable no-restricted-globals */
-/* eslint-disable no-use-before-define */
-/* eslint-disable func-names */
-/* eslint-disable vars-on-top */
-/* eslint-disable prefer-destructuring */
 /* eslint-disable no-undef */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-var */
 import * as d3 from 'd3';
-import Scene from './scene';
 import Benchmark from './benchmark';
+import Scene from './scene';
 
 // Setup
-var timeInstance = 0;
-var activeElements = {
-  All: 1, Robots: 1, Goals: 1, TempGoals: 1, VC: 1, BVC: 1, Collisions: 1,
+let timeInstance = 0;
+let activeElements = {
+  All: 1, Robots: 1, Goals: 1, TempGoals: 1, VC: 1, BVC: 1, Collisions: 1
 };
-var paused = false;
 
 // Global Map Memory
-var gMaps = [];
+const gMaps = [];
 
 // Robots Setup
-var numberOfRobots = 20;
-var radiusOfRobots = 8;
+let numberOfRobots = 20;
+let radiusOfRobots = 7;
 
 // Pucks Setup
-var pucksGroups = [
+const pucksGroups = [
   {
     id: 0,
     count: 20,
     radius: 10,
     goal: { x: 150, y: 250 },
-    color: 'red',
+    color: 'red'
   },
   {
     id: 1,
     count: 20,
     radius: 10,
     goal: { x: 650, y: 375 },
-    color: 'blue',
-  },
+    color: 'blue'
+  }
   // {
   //   id: 2,
   //   count: 20,
@@ -50,30 +43,30 @@ var pucksGroups = [
 ];
 
 // Static Objects
-var staticObjectsDefinitions = [
+const staticObjectsDefinitions = [
   {
     type: 'rectangle',
     center: { x: 400, y: 100 },
     width: 50,
-    height: 225,
+    height: 225
   },
   {
     type: 'rectangle',
     center: { x: 550, y: 225 },
     width: 350,
-    height: 50,
+    height: 50
   },
   {
     type: 'rectangle',
     center: { x: 750, y: 100 },
     width: 350,
-    height: 50,
+    height: 50
   },
   {
     type: 'circle',
     center: { x: 100, y: 150 },
     radius: 50,
-    skipOrbit: true,
+    skipOrbit: true
   },
   // {
   //   type: 'circle',
@@ -84,44 +77,45 @@ var staticObjectsDefinitions = [
     type: 'rectangle',
     center: { x: 350, y: 425 },
     width: 50,
-    height: 150,
+    height: 150
   },
   {
     type: 'rectangle',
     center: { x: 250, y: 375 },
     width: 250,
-    height: 50,
-  },
+    height: 50
+  }
 ];
 
-var uiElements = [
+const uiElements = [
   'speed-slider',
   'robots-slider',
   'reset-button',
   'algo-select',
-  'starting-positions-select',
+  'starting-positions-select'
 ];
 
-var getStartingPositionsSettings = function () {
+const getStartingPositionsSettings = () => {
   const startPositions = parseInt(document.getElementById('starting-positions-select').value, 10);
 
   switch (startPositions) {
     case 0:
-      return Scene.StartingPositions.Random;
+      return 'Random';
     default:
-      return Scene.StartingPositions.Random;
+      return 'Random';
   }
 };
 
-var getBenchmarkSettings = function () {
-  return 0;
-  // return parseInt(document.getElementById('starting-positions-select').value, 10);
-};
+const getBenchmarkSettings = () => 0;
+// {
+//   return 0;
+//   // return parseInt(document.getElementById('starting-positions-select').value, 10);
+// };
 
 // Initializations
-var svg = d3.select('svg');
+const svg = d3.select('svg');
 let algorithm = parseInt(document.getElementById('algo-select').value, 10);
-var gScene = new Scene(
+let gScene = new Scene(
   svg,
   numberOfRobots,
   radiusOfRobots,
@@ -130,11 +124,15 @@ var gScene = new Scene(
   getStartingPositionsSettings(),
   pucksGroups,
   staticObjectsDefinitions,
-  gMaps,
+  gMaps
 );
-var bench = new Benchmark(getBenchmarkSettings());
+let bench = new Benchmark(getBenchmarkSettings());
 
-var resetSimulation = function () {
+export const changeAlgorithm = () => {
+  // const algo = parseInt(document.getElementById('algo-select').value, 10);
+};
+
+export const resetSimulation = () => {
   timeInstance = 0;
   svg.selectAll('*').remove();
   algorithm = parseInt(document.getElementById('algo-select').value, 10);
@@ -147,12 +145,12 @@ var resetSimulation = function () {
     getStartingPositionsSettings(),
     pucksGroups,
     staticObjectsDefinitions,
-    gMaps,
+    gMaps
   );
   changeAlgorithm();
 };
 
-var changeStartingPositions = function () {
+export const changeStartingPositions = () => {
   const startingPositions = parseInt(document.getElementById('starting-positions-select').value, 10);
 
   switch (startingPositions) {
@@ -168,12 +166,7 @@ var changeStartingPositions = function () {
   bench = new Benchmark(getBenchmarkSettings());
 };
 
-var changeAlgorithm = function () {
-  // const algo = parseInt(document.getElementById('algo-select').value, 10);
-
-};
-
-var toggleBenchmarking = function () {
+export const toggleBenchmarking = () => {
   uiElements.forEach((e) => {
     const docEl = document.getElementById(e);
     docEl.disabled = !docEl.disabled;
@@ -184,15 +177,17 @@ var toggleBenchmarking = function () {
   bench.toggleBenchmarking();
 };
 
-var pauseSimulation = function () {
-  paused = !paused;
+export const pauseSimulation = () => {
+  gScene.togglePause();
 };
 
-svg.on('mousemove', function () {
+svg.on('mousemove', () => {
   document.getElementById('mouse-pos').textContent = d3.pointer(this);
 });
 
-var visualizeElementsChanged = function () {
+const elementActive = (id) => document.getElementById(id).classList.contains('active');
+
+export const visualizeElementsChanged = () => {
   document.getElementById(event.srcElement.id).classList.toggle('active');
   activeElements = {
     All: elementActive('redndering-button'),
@@ -200,17 +195,13 @@ var visualizeElementsChanged = function () {
     Goals: elementActive('goal-button'),
     TempGoals: elementActive('tempGoal-button'),
     VC: elementActive('vc-button'),
-    BVC: elementActive('bvc-button'),
+    BVC: elementActive('bvc-button')
     // Collisions:elementActive("collisions-button")
   };
   gScene.renderingEnabled = activeElements.All;
 };
 
-var elementActive = function (id) {
-  return document.getElementById(id).classList.contains('active');
-};
-
-var syncSettings = function () {
+const syncSettings = () => {
   numberOfRobots = document.getElementById('robots-slider').value;
   gScene.setSpeed(document.getElementById('speed-slider').value);
   // document.getElementById("collision-count").textContent = gScene.uniqueCollisions.length
@@ -219,13 +210,14 @@ var syncSettings = function () {
   document.getElementById('distance').textContent = Math.floor(gScene.distance);
 };
 
-var renderScene = function () {
+const renderScene = () => {
   if (bench.benchmarking && timeInstance > bench.benchMaxTimesteps) {
     bench.startBenchmarkInstance();
   }
 
-  if (!paused) {
+  if (!gScene.paused) {
     gScene.update(activeElements);
+    timeInstance = gScene.timeInstance;
   }
 
   bench.updateBenchSet(timeInstance);

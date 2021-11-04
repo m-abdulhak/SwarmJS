@@ -1,7 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable no-undef */
-// eslint-disable-next-line no-unused-vars
 import { World, Bodies } from 'matter-js';
 
 import { distanceBetween2Points } from '../geometry';
@@ -20,13 +16,13 @@ export default class StaticRectangle {
       minX: this.center.x - this.width / 2,
       maxX: this.center.x + this.width / 2,
       minY: this.center.y - this.height / 2,
-      maxY: this.center.y + this.height / 2,
+      maxY: this.center.y + this.height / 2
     };
     this.points = [
       { x: this.minMax.minX, y: this.minMax.minY },
       { x: this.minMax.minX, y: this.minMax.maxY },
       { x: this.minMax.maxX, y: this.minMax.maxY },
-      { x: this.minMax.maxX, y: this.minMax.minY },
+      { x: this.minMax.maxX, y: this.minMax.minY }
     ];
 
     this.sides = [];
@@ -40,7 +36,7 @@ export default class StaticRectangle {
       this.center.y,
       this.width,
       this.height,
-      { isStatic: true },
+      { isStatic: true }
     );
 
     // this.body.collisionFilter = {
@@ -58,7 +54,7 @@ export default class StaticRectangle {
   addToWorld() {
     World.add(
       this.world,
-      this.body,
+      this.body
     );
   }
 
@@ -74,14 +70,14 @@ export default class StaticRectangle {
     if (insideOnX) {
       return {
         x: point.x,
-        y: point.y >= this.minMax.maxY ? this.minMax.maxY : this.minMax.minY,
+        y: point.y >= this.minMax.maxY ? this.minMax.maxY : this.minMax.minY
       };
     }
 
     if (insideOnY) {
       return {
         x: point.x >= this.minMax.maxX ? this.minMax.maxX : this.minMax.minX,
-        y: point.y,
+        y: point.y
       };
     }
 
@@ -125,12 +121,12 @@ export default class StaticRectangle {
     // return 100000;
     const minDistOnX = Math.min(
       Math.abs(point.x - this.minMax.minX),
-      Math.abs(point.x - this.minMax.maxX),
+      Math.abs(point.x - this.minMax.maxX)
     );
 
     const minDistOnY = Math.min(
       Math.abs(point.y - this.minMax.minY),
-      Math.abs(point.y - this.minMax.maxY),
+      Math.abs(point.y - this.minMax.maxY)
     );
 
     const insideOnX = point.x >= this.minMax.minX && point.x <= this.minMax.maxX;

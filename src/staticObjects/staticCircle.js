@@ -1,6 +1,3 @@
-/* eslint-disable class-methods-use-this */
-/* eslint-disable no-undef */
-// eslint-disable-next-line no-unused-vars
 import { World, Bodies } from 'matter-js';
 import { distanceBetween2Points, getLineCircleIntersectionPoint } from '../geometry';
 
@@ -21,7 +18,7 @@ export default class StaticCircle {
       { x: this.center.x + (2 * this.radius) / 3, y: this.center.y - (2 * this.radius) / 3 },
       { x: this.center.x + this.radius, y: this.center.y },
       { x: this.center.x + (2 * this.radius) / 3, y: this.center.y + (2 * this.radius) / 3 },
-      { x: this.center.x, y: this.center.y + this.radius },
+      { x: this.center.x, y: this.center.y + this.radius }
     ];
 
     this.sides = [];
@@ -46,7 +43,7 @@ export default class StaticCircle {
   addToWorld() {
     World.add(
       this.world,
-      this.body,
+      this.body
     );
   }
 

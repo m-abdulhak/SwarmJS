@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
-function distanceFromBooleanImage(booleanImage, width, height, method) {
+export default function distanceFromBooleanImage(booleanImage, width, height, method) {
   // First phase
   const infinity = width + height;
   const b = booleanImage;
@@ -51,13 +50,13 @@ function distanceFromBooleanImage(booleanImage, width, height, method) {
   const methodsF = {
     EDT: EDT_f,
     MDT: MDT_f,
-    CDT: CDT_f,
+    CDT: CDT_f
   };
 
   const methodsSep = {
     EDT: EDT_Sep,
     MDT: MDT_Sep,
-    CDT: CDT_Sep,
+    CDT: CDT_Sep
   };
 
   // Second phase

@@ -1,5 +1,3 @@
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable no-undef */
 import * as d3 from 'd3';
 
 const initGraph = (id, maxTimeSteps, xAxixTitle, yAxisTitle, yScale) => {
@@ -13,7 +11,7 @@ const initGraph = (id, maxTimeSteps, xAxixTitle, yAxisTitle, yScale) => {
     top: 30,
     right: 30,
     bottom: 80,
-    left: 60,
+    left: 60
   };
   graph.width = 1400 - graph.margin.left - graph.margin.right;
   graph.height = 600 - graph.margin.top - graph.margin.bottom;
@@ -91,17 +89,17 @@ const updatePlot = (graph, plot, data) => {
 
 // eslint-disable-next-line no-unused-vars
 export default class Benchmark {
-  constructor(benchSettings) {
+  constructor(benchSettings, scene) {
     // Benchmarking
     this.plotColors = {
       1: 'midnightblue',
-      2: 'green',
+      2: 'green'
     };
     this.backgroundPlotsColors = {
       1: 'cornflowerblue',
       2: 'darkseagreen',
       3: 'cornflowerblue',
-      4: 'darkseagreen',
+      4: 'darkseagreen'
     };
     this.defaultSettings = [
       // Random:
@@ -110,8 +108,8 @@ export default class Benchmark {
         benchMaxTimesteps: 25000,
         benchTimeScale: 60,
         benchRobotCount: 25,
-        robotRadius: 8,
-      },
+        robotRadius: 8
+      }
     ];
 
     this.setSettings(benchSettings);
@@ -130,14 +128,15 @@ export default class Benchmark {
 
     // Create Graphs
     this.totalDistanceGraph = initGraph(
-      '#total-distance-graph', this.benchMaxTimesteps, 'Time', 'Total Pucks To Goals Distance', [0, 120],
+      '#total-distance-graph', this.benchMaxTimesteps, 'Time', 'Total Pucks To Goals Distance', [0, 120]
     );
     this.pucksCountGraph = initGraph(
-      '#pucks-count-graph', this.benchMaxTimesteps, 'Time', 'Number of Pucks Outside Goal Areas', [0, 40],
+      '#pucks-count-graph', this.benchMaxTimesteps, 'Time', 'Number of Pucks Outside Goal Areas', [0, 40]
     );
 
     // Add object containing mean plots that will need to be repeatedly updated
     this.plots = {};
+    this.scene = scene;
   }
 
   toggleAutoDownloadImage() {
@@ -156,13 +155,13 @@ export default class Benchmark {
       simple: {
         sets: [],
         totalDistanceMeans: [],
-        puckCountMeans: [],
+        puckCountMeans: []
       },
       advanced: {
         sets: [],
         totalDistanceMeans: [],
-        puckCountMeans: [],
-      },
+        puckCountMeans: []
+      }
     };
 
     this.curTotalDistanceSet = [];
@@ -207,11 +206,11 @@ export default class Benchmark {
 
       this.fillUnchangedBenchSet(newIndx - 1);
 
-      this.curTotalDistanceSet[newIndx] = gScene.distance;
-      this.curPucksCountSet[newIndx] = gScene.pucksOutsideGoalCount;
+      this.curTotalDistanceSet[newIndx] = this.scene.distance;
+      this.curPucksCountSet[newIndx] = this.scene.pucksOutsideGoalCount;
 
       // if (this.curPucksCountSet[Math.floor((time + 3) / 10)] === undefined) {
-      //   gScene.minDistance = null;
+      //   this.scene.minDistance = null;
       // }
     }
   }
@@ -276,7 +275,7 @@ export default class Benchmark {
         this.benchAlgo,
         data.totalDistanceMeans,
         this.curTotalDistanceSet,
-        'totalDistance',
+        'totalDistance'
       );
 
       this.updateGraphs(
@@ -284,7 +283,7 @@ export default class Benchmark {
         this.benchAlgo,
         data.puckCountMeans,
         this.curPucksCountSet,
-        'PuckCounts',
+        'PuckCounts'
       );
 
       data.sets.push(this.curTotalDistanceSet);
@@ -306,11 +305,11 @@ export default class Benchmark {
 
     if (this.plots[meansPlotName] == null) {
       this.plots[meansPlotName] = createPlot(
-        graph, this.plotColors[algo], meansSet,
+        graph, this.plotColors[algo], meansSet
       );
     } else {
       updatePlot(
-        graph, this.plots[meansPlotName], meansSet,
+        graph, this.plots[meansPlotName], meansSet
       );
     }
   }
@@ -322,7 +321,7 @@ export default class Benchmark {
 
   downloadImage(graphId, reps = null) {
     const repsSec = reps == null ? '' : `__Reps-${reps}`;
-    const fileN = `Benchmark_${this.settings.type}${repsSec}__Steps-${this.settings.benchMaxTimesteps}__Robots-${this.settings.benchRobotCount}__Radius-${this.settings.robotRadius}__Env-${gScene.width}-${gScene.height}`;
+    const fileN = `Benchmark_${this.settings.type}${repsSec}__Steps-${this.settings.benchMaxTimesteps}__Robots-${this.settings.benchRobotCount}__Radius-${this.settings.robotRadius}__Env-${this.scene.width}-${this.scene.height}`;
     saveSvgAsPng(document.getElementById(graphId).children[0], `${fileN}.png`, { scale: 5 });
   }
 }

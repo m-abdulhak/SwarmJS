@@ -1,13 +1,10 @@
-/* eslint-disable class-methods-use-this */
-/* eslint-disable no-undef */
-// eslint-disable-next-line no-unused-vars
 import StaticCircle from './staticCircle';
 import StaticRectangle from './staticRectangle';
 // eslint-disable-next-line import/prefer-default-export
 export function generateStaticObject(definition, scene, shouldAddToWorld = true) {
   const modifiedDef = {
     ...definition,
-    skipOrbit: definition.skipOrbit === true,
+    skipOrbit: definition.skipOrbit === true
   };
 
   if (definition.type === 'circle') {

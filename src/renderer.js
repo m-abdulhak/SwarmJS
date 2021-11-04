@@ -1,15 +1,10 @@
-/* eslint-disable no-console */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable no-sequences */
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-return-assign */
-/* eslint-disable no-undef */
-/* eslint-disable no-unused-vars */
 import * as d3 from 'd3';
 import { Body } from 'matter-js';
 import { nxtCircIndx } from './geometry';
 
+function renderLineSeg(x1, y1, x2, y2) {
+  return `M${x1},${y1}L${x2},${y2}Z`;
+}
 export default class Renderer {
   constructor(svg, scene) {
     this.svg = svg;
@@ -82,7 +77,7 @@ export default class Renderer {
       .attr('stroke', (d, i) => d3.schemeCategory10[i % 10])
       .attr('stroke-width', 1)
       .attr('stroke-dasharray', '1,10')
-      .attr('d', (d) => this.renderLineSeg(d.position.x, d.position.y, d.tempGoal.x, d.tempGoal.y));
+      .attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.tempGoal.x, d.tempGoal.y));
 
     // Line segments between each robot's temp goal and goal
     this.tempGoalToGoalLineSegs = svg.append('g')
@@ -94,7 +89,7 @@ export default class Renderer {
       .attr('stroke', (d, i) => d3.schemeCategory10[i % 10])
       .attr('stroke-width', 1)
       .attr('stroke-dasharray', '1,10')
-      .attr('d', (d) => this.renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y));
+      .attr('d', (d) => renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y));
 
     // Puck Goals
     this.puckGoalsCircles = svg.append('g')
@@ -125,8 +120,8 @@ export default class Renderer {
       .call(d3.drag()
         .on('start', (event, d) => {
           this.robotsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'green');
-          this.pauseStateOnDragStart = paused;
-          paused = true;
+          this.pauseStateOnDragStart = this.scene.paused;
+          this.scene.pause();
           console.log(`Moving Robot ${d.id}`);
         })
         .on('drag', (event, d) => {
@@ -135,7 +130,8 @@ export default class Renderer {
         })
         .on('end', (event, d) => {
           this.robotsCircles.filter((p) => p.id === d.id).attr('stroke', 'black');
-          paused = this.pauseStateOnDragStart == null ? false : this.pauseStateOnDragStart;
+          this.scene.paused = this.pauseStateOnDragStart == null
+            ? false : this.pauseStateOnDragStart;
         }));
 
     // Line segments between robots and corresponding goal
@@ -148,7 +144,7 @@ export default class Renderer {
       .attr('stroke', (d, i) => d3.schemeCategory10[i % 10])
       .attr('stroke-width', 1)
       .attr('stroke-dasharray', '10,10')
-      .attr('d', (d) => this.renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y));
+      .attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y));
 
     // Goals
     this.goalsCircles = svg.append('g')
@@ -166,8 +162,8 @@ export default class Renderer {
       .call(d3.drag()
         .on('start', (event, d) => {
           this.goalsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
-          this.pauseStateOnDragStart = paused;
-          paused = true;
+          this.pauseStateOnDragStart = this.scene.paused;
+          this.scene.unPause();
           console.log(`Moving Goal For Robot ${d.id}`);
         })
         .on('drag', (event, d) => {
@@ -177,7 +173,8 @@ export default class Renderer {
         })
         .on('end', (event, d) => {
           this.goalsCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray');
-          paused = this.pauseStateOnDragStart == null ? false : this.pauseStateOnDragStart;
+          this.scene.paused = this.pauseStateOnDragStart == null
+            ? false : this.pauseStateOnDragStart;
         }));
 
     // Puck
@@ -194,8 +191,8 @@ export default class Renderer {
       .call(d3.drag()
         .on('start', (event, d) => {
           this.pucksCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
-          this.pauseStateOnDragStart = paused;
-          paused = true;
+          this.pauseStateOnDragStart = this.scene.paused;
+          this.scene.pause();
           console.log(`Moving Puck ${d.id}`);
         })
         .on('drag', (event, d) => {
@@ -204,7 +201,8 @@ export default class Renderer {
         })
         .on('end', (event, d) => {
           this.pucksCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray');
-          paused = this.pauseStateOnDragStart == null ? false : this.pauseStateOnDragStart;
+          this.scene.paused = this.pauseStateOnDragStart == null
+            ? false : this.pauseStateOnDragStart;
         }));
   }
 
@@ -231,16 +229,16 @@ export default class Renderer {
             .append('path')
             .attr('class', 'bvc-seg')
             .attr('fill', 'none')
-            .attr('stroke', (d, i) => d3.schemeCategory10[rIndex % 10])
+            .attr('stroke', () => d3.schemeCategory10[rIndex % 10])
             .attr('stroke-width', 1)
             .attr('stroke-opacity', activeElements.BVC ? '100%' : '0%')
             .attr('stroke-dasharray', '10,10')
-            .attr('d', (d, i) => this.renderLineSeg(
+            .attr('d', (d, i) => renderLineSeg(
               r.BVC[i][0],
               r.BVC[i][1],
               r.BVC[nxtCircIndx(i, r.BVC.length)][0],
-              r.BVC[nxtCircIndx(i, r.BVC.length)][1],
-            )),
+              r.BVC[nxtCircIndx(i, r.BVC.length)][1]
+            ))
         );
       } else {
         // console.log("null");
@@ -257,10 +255,10 @@ export default class Renderer {
       .attr('stroke-opacity', activeElements.TempGoals ? '40%' : '0%')
       .attr('fill-opacity', activeElements.TempGoals ? '40%' : '0%');
 
-    this.robotToTempGoalLineSegs.attr('d', (d) => this.renderLineSeg(d.position.x, d.position.y, d.tempGoal.x, d.tempGoal.y))
+    this.robotToTempGoalLineSegs.attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.tempGoal.x, d.tempGoal.y))
       .attr('stroke-opacity', activeElements.TempGoals ? '100%' : '0%');
 
-    this.tempGoalToGoalLineSegs.attr('d', (d) => this.renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y))
+    this.tempGoalToGoalLineSegs.attr('d', (d) => renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y))
       .attr('stroke-opacity', activeElements.TempGoals ? '100%' : '0%');
 
     this.robotsCircles.attr('cx', (d) => d.position.x).attr('cy', (d) => d.position.y)
@@ -271,15 +269,11 @@ export default class Renderer {
       .attr('stroke-opacity', activeElements.Robots ? '100%' : '0%')
       .attr('fill-opacity', activeElements.Robots ? '100%' : '0%');
 
-    this.robotToGoalLineSegs.attr('d', (d) => this.renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y))
+    this.robotToGoalLineSegs.attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y))
       .attr('stroke-opacity', activeElements.Goals ? '100%' : '0%');
 
     this.goalsCircles.attr('cx', (d) => d.goal.x).attr('cy', (d) => d.goal.y)
       .attr('stroke-opacity', activeElements.Goals ? '100%' : '0%')
       .attr('fill-opacity', activeElements.Goals ? '100%' : '0%');
-  }
-
-  renderLineSeg(x1, y1, x2, y2) {
-    return `M${x1},${y1}L${x2},${y2}Z`;
   }
 }

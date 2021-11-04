@@ -1,8 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-undef */
-/* eslint no-param-reassign: ["error", { "props": false }] */
-// eslint-disable-next-line no-unused-vars
 import {
   angleBetweenThreePointsDeg,
   closestPointInLineToPoint,
@@ -10,7 +5,7 @@ import {
   distanceBetween2Points,
   translatePointInDirection,
   shiftPointOfLineSegInDirOfPerpendicularBisector,
-  pointIsInsidePolygon,
+  pointIsInsidePolygon
 } from './geometry';
 
 export default function updateGoal(robot) {
@@ -18,6 +13,8 @@ export default function updateGoal(robot) {
   let durationAtCurPosition = 0;
   let stuck = false;
   let avoidingStuckDuration = 0;
+  let curGoalTimeSteps = 0;
+
   const MIN_STUCK_MANEUVER_DURATION = 30;
   const SAME_POSITION_DISTANCE_THRESHOLD = robot.radius / 50;
   const STUCK_DURATION_THRESHOLD = 30;
@@ -25,10 +22,12 @@ export default function updateGoal(robot) {
   const ANGLE_OPTIMAL_THRESHOLD = 15;
   const ANGLE_ACCEPTABLE_THRESHOLD = 75;
 
+  const MIN_GOAL_TIME_STEPS = 100;
+
   function getRandPoint() {
     return {
       x: (Math.random() * 0.8 + 0.1) * robot.scene.width,
-      y: (Math.random() * 0.8 + 0.1) * robot.scene.height,
+      y: (Math.random() * 0.8 + 0.1) * robot.scene.height
     };
   }
 
@@ -37,14 +36,14 @@ export default function updateGoal(robot) {
 
     const translationVec = {
       x: ((closestPoint.x - robot.position.x) * robot.radius) / (len * 10),
-      y: ((closestPoint.y - robot.position.y) * robot.radius) / (len * 10),
+      y: ((closestPoint.y - robot.position.y) * robot.radius) / (len * 10)
     };
 
     let midPoint = translatePointInDirection(
       robot.position.x,
       robot.position.y,
       translationVec.x,
-      translationVec.y,
+      translationVec.y
     );
 
     // midPoint = robot.position;
@@ -59,7 +58,7 @@ export default function updateGoal(robot) {
       robot.position.y,
       closestPoint.x,
       closestPoint.y,
-      delta,
+      delta
     );
 
     if (!robot.pointIsReachableInEnvBounds(newGoal)) {
@@ -70,7 +69,7 @@ export default function updateGoal(robot) {
         robot.position.x,
         robot.position.y,
         translationVec.x,
-        translationVec.y,
+        translationVec.y
       );
 
       newGoal = midPoint;
@@ -82,25 +81,24 @@ export default function updateGoal(robot) {
         robot.position.y,
         closestPoint.x,
         closestPoint.y,
-        delta,
+        delta
       );
-      // robot.curGoalTimeSteps = 0;
-      robot.curGoalTimeSteps = robot.minCurGoalTimeSteps;
+      curGoalTimeSteps = MIN_GOAL_TIME_STEPS;
     } else {
-      robot.curGoalTimeSteps = robot.minCurGoalTimeSteps;
+      curGoalTimeSteps = MIN_GOAL_TIME_STEPS;
     }
 
     return newGoal;
   }
 
   function getGoalFromEnvOrbit() {
-    if (robot.curGoalTimeSteps < robot.minCurGoalTimeSteps && !robot.reachedGoal()) {
-      robot.curGoalTimeSteps += 1;
+    if (curGoalTimeSteps < MIN_GOAL_TIME_STEPS && !robot.reachedGoal()) {
+      curGoalTimeSteps += 1;
       return robot.goal;
     }
 
     const environmentBounds = robot.scene.environmentBounds.map(
-      (point) => ({ x: point[0], y: point[1] }),
+      (point) => ({ x: point[0], y: point[1] })
     );
 
     const pointsCount = environmentBounds.length;
@@ -125,8 +123,8 @@ export default function updateGoal(robot) {
         side[0].x,
         side[0].y,
         side[1].x,
-        side[1].y,
-      ),
+        side[1].y
+      )
     );
 
     let closestPoint = closestPointsToSides.reduce((acc, cur) => {
@@ -159,15 +157,15 @@ export default function updateGoal(robot) {
     const envOrbitGoal = getGoalFromEnvOrbit();
     const vecToEnvOrbitGoal = {
       x: envOrbitGoal.x - robot.position.x,
-      y: envOrbitGoal.y - robot.position.y,
+      y: envOrbitGoal.y - robot.position.y
     };
     const rotatedEnvOribtGoal = {
       x: -1 * vecToEnvOrbitGoal.y,
-      y: vecToEnvOrbitGoal.x,
+      y: vecToEnvOrbitGoal.x
     };
     const newGoal = {
       x: robot.position.x + rotatedEnvOribtGoal.x,
-      y: robot.position.y + rotatedEnvOribtGoal.y,
+      y: robot.position.y + rotatedEnvOribtGoal.y
     };
     return newGoal;
   }
@@ -191,7 +189,7 @@ export default function updateGoal(robot) {
       puck.position.x,
       puck.position.y,
       puck.goal.x,
-      puck.goal.y,
+      puck.goal.y
     );
 
     if (normalizedAngle < ANGLE_ACCEPTABLE_THRESHOLD) {
@@ -202,8 +200,8 @@ export default function updateGoal(robot) {
   }
 
   function selectBestNearbyPuck() {
-    if (robot.curGoalTimeSteps < robot.minCurGoalTimeSteps && !robot.reachedGoal()) {
-      robot.curGoalTimeSteps += 1;
+    if (curGoalTimeSteps < MIN_GOAL_TIME_STEPS && !robot.reachedGoal()) {
+      curGoalTimeSteps += 1;
       return robot.bestPuck;
     }
 
@@ -247,14 +245,14 @@ export default function updateGoal(robot) {
     let bestPuck = null;
 
     if (angleRatsExist) {
-      bestPuck = angleRatings[0][0];
+      [[bestPuck]] = angleRatings;
     } else if (distRatsExist && Math.random() < 0.3) {
-      bestPuck = distanceRatings[0][0];
+      [[bestPuck]] = distanceRatings;
     }
-    robot.bestPuck = bestPuck;
+    robot.setBestPuck(bestPuck);
 
     if (bestPuck !== null) {
-      robot.curGoalTimeSteps = 0;
+      curGoalTimeSteps = 0;
     }
     return bestPuck;
   }
@@ -286,7 +284,7 @@ export default function updateGoal(robot) {
       durationAtCurPosition = 0;
       stuck = true;
       avoidingStuckDuration = 0;
-      robot.goal = getGoalFromStuckManeuver();
+      robot.setGoal(getGoalFromStuckManeuver());
       return;
     }
 
@@ -294,9 +292,9 @@ export default function updateGoal(robot) {
     lastPosition = { ...robot.position };
     const bestPuck = selectBestNearbyPuck();
     if (bestPuck === null) {
-      robot.goal = getGoalFromEnvOrbit();
+      robot.setGoal(getGoalFromEnvOrbit());
     } else {
-      robot.goal = getGoalFromPuck(bestPuck);
+      robot.setGoal(getGoalFromPuck(bestPuck));
     }
   };
 }

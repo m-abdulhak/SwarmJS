@@ -13,7 +13,7 @@ import {
   closestPointInPolygonToPoint,
   shiftPointOfLineSegInDirOfPerpendicularBisector,
   pointIsInsidePolygon,
-  getLineEquationParams,
+  getLineEquationParams
 } from './geometry';
 
 // eslint-disable-next-line no-unused-vars
@@ -23,7 +23,7 @@ export default class Robot {
     this.DeadLockRecovery = {
       None: 0,
       Simple: 1,
-      Advanced: 2,
+      Advanced: 2
     };
 
     // Change Options Based on algorithm
@@ -31,13 +31,13 @@ export default class Robot {
       // Baseline Algorithm Features
       1: {
         limitPuckSelectionToBVC: true,
-        environmentOrbit: false,
+        environmentOrbit: false
       },
       // Proposed Algorithm Features
       2: {
         limitPuckSelectionToBVC: true,
-        environmentOrbit: true,
-      },
+        environmentOrbit: true
+      }
     };
     this.algorithmOptions = this.defaultOptions[algorithm];
 
@@ -77,11 +77,21 @@ export default class Robot {
     // Pucks
     this.nearbyPucks = [];
     this.bestPuck = null;
-    this.curGoalTimeSteps = 0;
-    this.minCurGoalTimeSteps = 100;
 
     // Obstacles
     this.obstacleSensingRadius = this.radius * 10;
+  }
+
+  setGoal(goal) {
+    this.goal = goal;
+  }
+
+  setTempGoal(tempGoal) {
+    this.tempGoal = tempGoal;
+  }
+
+  setBestPuck(puck) {
+    this.bestPuck = puck;
   }
 
   timeStep() {
@@ -119,7 +129,7 @@ export default class Robot {
   // Static Obstacles
   getNearbyObstacles() {
     const staticObstacles = [...this.scene.staticObjects.filter(
-      (obj) => obj.getDistanceToBorder(this.position) < this.obstacleSensingRadius,
+      (obj) => obj.getDistanceToBorder(this.position) < this.obstacleSensingRadius
     )];
 
     // Add pucks that reached goal as obstacles
@@ -141,7 +151,7 @@ export default class Robot {
   getAllClosestPointsToNearbyObstacles() {
     const closeObstacles = this.getNearbyObstacles();
     return closeObstacles.map(
-      (staticObs) => staticObs.getIntersectionPoint(this.position),
+      (staticObs) => staticObs.getIntersectionPoint(this.position)
     );
   }
 
@@ -190,14 +200,14 @@ export default class Robot {
       closestPoint.y,
       this.position.x,
       this.position.y,
-      1,
+      1
     );
 
     const splittingLineParams = getLineEquationParams(closestPoint, secondLinePoint);
     const splitPolygonRes = splitPolygon(this.VC, splittingLineParams);
     const splitPolygonParts = [splitPolygonRes.positive, splitPolygonRes.negative];
     splitPolygonParts.map(
-      (poly) => this.closePolygon(poly),
+      (poly) => this.closePolygon(poly)
     );
 
     if (pointIsInsidePolygon(this.position, splitPolygonParts[0])) {
@@ -212,12 +222,12 @@ export default class Robot {
 
     const closestPointInEnvBoundsToGoalPoint = closestPointInPolygonToPoint(
       this.scene.environmentBounds,
-      goalPoint,
+      goalPoint
     );
 
     const pointDistToEnvBounds = distanceBetween2Points(
       goalPoint,
-      closestPointInEnvBoundsToGoalPoint,
+      closestPointInEnvBoundsToGoalPoint
     );
 
     if (pointDistToEnvBounds <= this.radius * 1.1) {
@@ -268,7 +278,7 @@ export default class Robot {
 
     return {
       x: Math.min(Math.max(radius, position.x), this.envWidth - radius),
-      y: Math.min(Math.max(radius, position.y), this.envHeight - radius),
+      y: Math.min(Math.max(radius, position.y), this.envHeight - radius)
     };
   }
 
@@ -276,7 +286,7 @@ export default class Robot {
     const { radius } = this;
     const newGoal = {
       x: Math.min(Math.max(radius, this.goal.x), this.envWidth - radius),
-      y: Math.min(Math.max(radius, this.goal.y), this.envHeight - radius),
+      y: Math.min(Math.max(radius, this.goal.y), this.envHeight - radius)
     };
 
     this.scene.staticObjects.forEach((staticObj) => {

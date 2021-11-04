@@ -1,21 +1,12 @@
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-console */
-/* eslint-disable no-throw-literal */
-/* eslint-disable no-loop-func */
-/* eslint-disable class-methods-use-this */
 /* eslint-disable no-param-reassign */
-/* eslint-disable no-undef */
-// eslint-disable-next-line no-unused-vars
 import * as d3 from 'd3';
 import { Engine, World, Bodies } from 'matter-js';
 import { Delaunay } from 'd3-delaunay';
-import Offset from 'polygon-offset';
 
 import Robot from './robot';
 import Puck from './puck';
-import { generateStaticObject } from './staticObjects/staticObjectFactory.js';
-import { distanceBetween2Points } from './geometry';
+import { generateStaticObject } from './staticObjects/staticObjectFactory';
+import { distanceBetween2Points, calculateBVCfromVC } from './geometry';
 import { mapSceneToArr, getPucksGoalMap } from './distanceTransform/globalPlanning';
 import Renderer from './renderer';
 
@@ -34,7 +25,7 @@ export default class Scene {
     this.width = parseInt(svg.attr('width'), 10);
     this.height = parseInt(svg.attr('height'), 10);
     this.environmentBounds = [
-      [0, 0], [this.width, 0], [this.width, this.height], [0, this.height], [0, 0],
+      [0, 0], [this.width, 0], [this.width, this.height], [0, this.height], [0, 0]
     ];
     this.numOfRobots = numOfRobots;
     this.robotRadius = robotRadius;
@@ -44,24 +35,26 @@ export default class Scene {
     // Create Matter.js Physics Engine
     this.engine = Engine.create();
     this.world = this.engine.world;
-    this.world.gravity.y = 0;
-    this.world.gravity.x = 0;
+    this.engine.gravity.y = 0;
+    this.engine.gravity.x = 0;
+    this.timeInstance = 0;
 
     // Add Environment Boundries To World
     this.addEnvBoundryObjects(this.width, this.height);
 
     // Add Static Obstacles To World
     this.staticObjects = staticObjectsDefinitions.map(
-      (def) => generateStaticObject(def, this, true),
+      (def) => generateStaticObject(def, this, true)
     );
 
     // Starting and Goal Positions
-    this.robotsStartingPositions = this[startingPositionsConfig](
+    // TODO: change function depending on startingPositionsConfig
+    this.robotsStartingPositions = this.getRandomCollisionFreePositions(
       this.numOfRobots,
       this.robotRadius,
       this.width,
       this.height,
-      this.numOfPucks,
+      this.numOfPucks
     );
 
     // Rendering option
@@ -73,11 +66,11 @@ export default class Scene {
       this.robotRadius,
       this.width,
       this.height,
-      algorithm,
+      algorithm
     );
 
     // Generate Binary Scene Map
-    if (gMaps.mapArray){
+    if (gMaps.mapArray) {
       this.mapArray = gMaps.mapArray;
     } else {
       this.mapArray = mapSceneToArr(this.width, this.height, this.staticObjects);
@@ -96,11 +89,11 @@ export default class Scene {
           Math.floor(this.height * this.puckMapScale),
           {
             x: Math.floor(group.goal.x * this.puckMapScale),
-            y: Math.floor(group.goal.y * this.puckMapScale),
+            y: Math.floor(group.goal.y * this.puckMapScale)
           },
-          this.puckMapScale,
+          this.puckMapScale
         )
-        ),
+        )
       );
 
       gMaps.puckMaps = this.puckMaps;
@@ -113,7 +106,7 @@ export default class Scene {
       this.pucksGroups,
       this.width,
       this.height,
-      this.puckMaps,
+      this.puckMaps
     );
     this.maxNearbyPuckDistance = this.robotRadius * 20;
 
@@ -135,19 +128,33 @@ export default class Scene {
     this.distance = null;
     // Pucks Outside Goal Count;
     this.pucksOutsideGoalCount = null;
-    
+
     // Change Options Based on algorithm
     this.defaultOptions = {
       // Baseline Algorithm Features
       1: {
-        testEnabled: false,
+        testEnabled: false
       },
       // Proposed Algorithm Features
       2: {
-        testEnabled: true,
-      },
+        testEnabled: true
+      }
     };
     this.algorithmOptions = this.defaultOptions[algorithm];
+
+    this.paused = false;
+  }
+
+  pause() {
+    this.paused = true;
+  }
+
+  unpause() {
+    this.paused = false;
+  }
+
+  togglePause() {
+    this.paused = !this.paused;
   }
 
   setSpeed(scale) {
@@ -169,7 +176,7 @@ export default class Scene {
 
     Engine.update(this.engine, this.timeDelta);
 
-    const timeInstance = this.engine.timing.timestamp;
+    this.timeInstance = this.engine.timing.timestamp;
 
     if (this.renderingEnabled) {
       this.renderer.update(activeElements);
@@ -185,7 +192,7 @@ export default class Scene {
     this.robots.forEach((r, i) => {
       // 1. Find Pucks within a certain distance to the robot
       r.nearbyPucks = this.pucks.filter(
-        (p) => r.getDistanceTo(p.position) < this.maxNearbyPuckDistance,
+        (p) => r.getDistanceTo(p.position) < this.maxNearbyPuckDistance
       );
 
       // 2. Update the robot's neighbors
@@ -203,25 +210,8 @@ export default class Scene {
       }
 
       // 4. Update BVC
-      r.BVC = this.calculateBVCfromVC(r.VC, r);
+      r.BVC = calculateBVCfromVC(r.VC, r);
     });
-  }
-
-  calculateBVCfromVC(cell, r) {
-    const offset = new Offset();
-    let padding = [];
-
-    try {
-      padding = offset.data(cell).padding(r.radius * 1)[0];
-    } catch (err) {
-      // On collisions, if voronoi cell is too small => BVC is undefined
-      // Should not occur in collision-free configurations
-      // eslint-disable-next-line no-console
-      console.log(err);
-      padding = [[r.position.x, r.position.y]];
-    }
-
-    return padding;
   }
 
   updateMinRobotRobotDistMesurements() {
@@ -242,7 +232,9 @@ export default class Scene {
 
   updatePucksOutsideOfGoalMesurements() {
     // Calculate the number of pucks outside of their goal area
-    let pucksOutsideGoalCount = this.pucks.map((p) => p.reachedGoal()).reduce((acc, cur) => acc + (cur ? 0 : 1), 0);
+    const pucksOutsideGoalCount = this.pucks
+      .map((p) => p.reachedGoal())
+      .reduce((acc, cur) => acc + (cur ? 0 : 1), 0);
     this.pucksOutsideGoalCount = pucksOutsideGoalCount;
   }
 
@@ -293,8 +285,8 @@ export default class Scene {
             envHeight,
             this,
             puckGroup.color,
-            maps[puckGroup.id],
-          )),
+            maps[puckGroup.id]
+          ))
       );
 
       id += puckGroup.count;
@@ -314,7 +306,7 @@ export default class Scene {
     const totalPositionsCount = parseInt(numOfRobots, 10) + parseInt(numOfPucks, 10);
 
     if (xCount * yCount < totalPositionsCount * 4) {
-      throw 'Invalid inputs, number and size of robots and pucks are too high for this environment size!';
+      throw new Error('Invalid inputs, number and size of robots and pucks are too high for this environment size!');
     }
 
     const positions = [];
@@ -322,16 +314,18 @@ export default class Scene {
     while (positions.length < totalPositionsCount * 3 && i < totalPositionsCount * 100) {
       const newX = Math.max(
         radius * 2,
-        Math.min(envWidth - radius * 2, Math.floor(Math.random() * xCount) * resolution),
+        Math.min(envWidth - radius * 2, Math.floor(Math.random() * xCount) * resolution)
       );
       const newY = Math.max(
         radius * 2,
-        Math.min(envHeight - radius * 2, Math.floor(Math.random() * yCount) * resolution),
+        Math.min(envHeight - radius * 2, Math.floor(Math.random() * yCount) * resolution)
       );
       const newPos = { x: newX, y: newY };
-      const doesNotCollideWithRobots = positions.findIndex((x) => distanceBetween2Points(x, newPos) < radius * 2.2) === -1;
+      const doesNotCollideWithRobots = positions
+        .findIndex((x) => distanceBetween2Points(x, newPos) < radius * 2.2) === -1;
       const doesNotCollideWithObstacles = this.staticObjects
-        .reduce((acc, cur) => !cur.containsPoint(newPos) && cur.getDistanceToBorder(newPos) > radius && acc, true);
+        .reduce((acc, cur) => !cur.containsPoint(newPos)
+          && cur.getDistanceToBorder(newPos) > radius && acc, true);
 
       if (doesNotCollideWithRobots && doesNotCollideWithObstacles) {
         positions.push(newPos);
@@ -340,7 +334,7 @@ export default class Scene {
     }
 
     if (positions.length < totalPositionsCount * 2) {
-      throw 'Invalid inputs, number and size of robots are too high for this environment size!';
+      throw new Error('Invalid inputs, number and size of robots are too high for this environment size!');
     }
 
     return positions;
@@ -349,10 +343,10 @@ export default class Scene {
   getNeighborsOf(robotIndex) {
     const neighbors = [];
     try {
-      for (const neighborIndex of this.voronoi.delaunay.neighbors(robotIndex)) {
-        neighbors.push(this.getRobotByIndex(neighborIndex));
-      }
+      const indexes = Array.from(this.voronoi.delaunay.neighbors(robotIndex));
+      indexes.forEach((i) => neighbors.push(this.getRobotByIndex(i)));
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log(`Error Exracting Neighbors: ${error}`);
     }
 
@@ -371,34 +365,29 @@ export default class Scene {
         -10,
         envWidth,
         20,
-        { isStatic: true },
+        { isStatic: true }
       ),
       Bodies.rectangle(
         envWidth / 2,
         envHeight + 10,
         envWidth,
         20,
-        { isStatic: true },
+        { isStatic: true }
       ),
       Bodies.rectangle(
         -10,
         envHeight / 2,
         20,
         envHeight,
-        { isStatic: true },
+        { isStatic: true }
       ),
       Bodies.rectangle(
         envWidth + 10,
         envHeight / 2,
         20,
         envHeight,
-        { isStatic: true },
-      ),
+        { isStatic: true }
+      )
     ]);
   }
-
-  // Initial Configurations
-  static StartingPositions = {
-    Random: 'getRandomCollisionFreePositions',
-  };
 }
