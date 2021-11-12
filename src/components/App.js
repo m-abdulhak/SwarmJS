@@ -1,99 +1,50 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import Options from './Options';
 import Benchmark from './Benchmark';
 
 import {
-  getSimulation,
+  initSimulationIfNeeded,
   getAvailableAlgorithms,
   resetSimulation,
   togglePauseSimulation,
-  setSpeed,
+  setSimulationSpeed,
   changeAlgorithm
 } from '../swarmjs-core/main';
-import Renderer from '../swarmjs-core/renderer';
+import {
+  renderScene,
+  resetRenderer,
+  setElementEnabled,
+  getRenderingElements
+} from '../swarmjs-core/renderer';
 
-const App = () => {
-  // const [time, setTime] = React.useState(0);
+const App = ({ config }) => {
+  const [time, setTime] = React.useState(0);
+  const [speed, setSpeed] = React.useState(1);
+  const [paused, setPaused] = React.useState(false);
 
-  const config = {
-    env: {
-      width: 800,
-      height: 500
-    },
-    robots: {
-      count: 20,
-      radius: 7
-    },
-    pucks: {
-      groups: [
-        {
-          id: 0,
-          count: 20,
-          radius: 10,
-          goal: { x: 150, y: 250 },
-          color: 'red'
-        },
-        {
-          id: 1,
-          count: 20,
-          radius: 10,
-          goal: { x: 650, y: 375 },
-          color: 'blue'
-        }
-      ]
-    },
-    objects: [
-      {
-        type: 'rectangle',
-        center: { x: 400, y: 100 },
-        width: 50,
-        height: 225
-      },
-      {
-        type: 'rectangle',
-        center: { x: 550, y: 225 },
-        width: 350,
-        height: 50
-      },
-      {
-        type: 'rectangle',
-        center: { x: 750, y: 100 },
-        width: 350,
-        height: 50
-      },
-      {
-        type: 'circle',
-        center: { x: 100, y: 150 },
-        radius: 50,
-        skipOrbit: true
-      },
-      {
-        type: 'rectangle',
-        center: { x: 350, y: 425 },
-        width: 50,
-        height: 150
-      },
-      {
-        type: 'rectangle',
-        center: { x: 250, y: 375 },
-        width: 250,
-        height: 50
-      }
-    ]
-  };
   const svgRef = React.useRef(null);
-  const renderer = new Renderer();
-
   const onUpdate = (newTime, scene) => {
-    // setTime(newTime);
-    renderer.update(svgRef.current, scene);
+    setTime(newTime);
+    renderScene(svgRef.current, scene);
+  };
+  initSimulationIfNeeded(config, onUpdate);
+
+  const onTogglePause = () => {
+    togglePauseSimulation();
+    setPaused(!paused);
   };
 
-  getSimulation(config, onUpdate);
+  const onSpeedChange = (newSpeed) => {
+    setSpeed(newSpeed);
+    setSimulationSpeed(newSpeed);
+  };
 
   const reset = () => {
-    renderer.initialized = false;
+    resetRenderer();
     resetSimulation(config);
+    setSimulationSpeed(speed);
   };
 
   return (
@@ -101,18 +52,23 @@ const App = () => {
     <svg ref={svgRef} width={config.env.width} height={config.env.height} style={{ border: '#bfbebe solid 3px' }}></svg>
     <br/>
     <Options
-      togglePause={togglePauseSimulation}
-      setSpeed={setSpeed}
+      togglePause={onTogglePause}
+      setSpeed={onSpeedChange}
       reset={reset}
-      renderingElements = {renderer.renderingElements}
-      setElementEnabled={renderer.setElementEnabled}
+      renderingElements = {getRenderingElements()}
+      setElementEnabled={setElementEnabled}
       availableAlgorithms={getAvailableAlgorithms()}
       changeAlgorithm={changeAlgorithm}
-      time={0}
+      time={time}
     />
     <Benchmark />
   </div>
   );
+};
+
+// props validation
+App.propTypes = {
+  config: PropTypes.object.isRequired
 };
 
 export default App;

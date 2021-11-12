@@ -41,7 +41,7 @@ export const createSimulation = (config, updateCallback) => {
   renderScene();
 };
 
-export const getSimulation = (config, updateCallback) => {
+export const initSimulationIfNeeded = (config, updateCallback) => {
   if (scene) {
     return;
   }
@@ -63,7 +63,7 @@ export const togglePauseSimulation = () => {
   scene.togglePause();
 };
 
-export const setSpeed = (speed) => {
+export const setSimulationSpeed = (speed) => {
   scene.setSpeed(speed);
 };
 
