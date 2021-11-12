@@ -27,19 +27,22 @@ export default class Robot {
     };
 
     // Change Options Based on algorithm
-    this.defaultOptions = {
-      // Baseline Algorithm Features
-      1: {
-        limitPuckSelectionToBVC: true,
-        environmentOrbit: false
-      },
-      // Proposed Algorithm Features
-      2: {
+    this.availableAlgorithms = [
+      {
+        name: 'Proposed Algorithm',
         limitPuckSelectionToBVC: true,
         environmentOrbit: true
+      },
+      {
+        name: 'Baseline Algorithm',
+        limitPuckSelectionToBVC: true,
+        environmentOrbit: false
       }
-    };
-    this.algorithmOptions = this.defaultOptions[algorithm];
+    ];
+
+    this.algorithmOptions = algorithm
+      ? this.availableAlgorithms.find((a) => a.name === algorithm)
+      : this.availableAlgorithms[0];
 
     this.id = id;
     this.position = position;
@@ -80,6 +83,12 @@ export default class Robot {
 
     // Obstacles
     this.obstacleSensingRadius = this.radius * 10;
+
+    this.changeAlgorithm = (newAlgorithm) => {
+      this.algorithmOptions = this.availableAlgorithms.find((a) => a.name === newAlgorithm);
+    };
+
+    this.changeAlgorithm.bind(this);
   }
 
   setGoal(goal) {

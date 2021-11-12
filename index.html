@@ -3,119 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deadlock Prediction and Recovery for Distributed Collision Avoidance with Buffered Voronoi Cells</title>
-  <link rel="stylesheet" href="stylesheets/styles.css">
+  <title>SwarmJS</title>
 </head>
 <style>
 </style>
 <body>
+  <!--- React root -->
+  <div id="root"></div>
   <!-- <canvas id="mapCanvas" width="800" height="500"></canvas> -->
-  <svg width="800" height="500" style="border: #bfbebe solid 3px;"></svg>
-  <br>
-  <div class="options">
-    <div class="ui-section hidden">
-      <label class="key">Mouse Position:</label>
-      <label class="input-text" id="mouse-pos"></label>
-    </div>
-    <div class="ui-section">
-      <label class="key">Time: </label>
-      <label class="input-text" id="time"></label>
-    </div>
-    <div class="ui-section">
-      <label class="key">Puck-Goal Distances: </label>
-      <label class="input-text" id="distance"></label>
-    </div>
-    <div class="ui-section">
-      <label class="key">Speed:</label>
-      <input type="range" min=".1" max="50.0" value="15" step=".1" class="slider input" id="speed-slider">
-    </div>
-    <div class="ui-section">
-      <label class="key">Robots:</label>
-      <input type="range" min="1" max="30" value="20" step="1" class="slider input" id="robots-slider">
-    </div>
-    <div class="ui-section">
-      <label class="key">Pause and Reset:</label>
-      <input type="button" value="Pause" class="input-button input half-btn" id="pause-button" onclick="pauseSimulation()">
-      <input type="button" value="Reset" class="input-button input half-btn" id="reset-button" onclick="resetSimulation()">
-    </div>
-    <div class="ui-section">
-      <label class="key">Show:</label>
-      <input type="button" value="All" class="input-button input small-btn active" id="redndering-button" onclick="visualizeElementsChanged()">
-      <input type="button" value="Robot" class="input-button input small-btn active" id="robot-button" onclick="visualizeElementsChanged()">
-      <input type="button" value="Goal" class="input-button input small-btn active" id="goal-button" onclick="visualizeElementsChanged()">
-      <input type="button" value="Waypoint" class="input-button input small-btn active" id="tempGoal-button" onclick="visualizeElementsChanged()">
-      <input type="button" value="Voronoi Cell" class="input-button input small-btn active" id="vc-button" onclick="visualizeElementsChanged()">
-      <input type="button" value="Buffered VC" class="input-button input small-btn active" id="bvc-button" onclick="visualizeElementsChanged()">
-    </div>
-    <div class="ui-section">
-      <label class="key">Algorithm:</label>
-      <select class="input-select input" id="algo-select" name="deadlock" onchange="changeAlgorithm()">
-        <option value="1">Baseline Sorting Algorithm</option>
-        <option value="2" selected>Proposed Sorting Algorithm</option>
-      </select>
-    </div>
-    <div class="ui-section">
-      <label class="key">Positions:</label>
-      <select class="input-select input" id="starting-positions-select" name="starting-positions" onchange="changeStartingPositions()">
-        <option value="0" selected>Random</option>
-      </select>
-    </div>
-    <div class="ui-section">
-      <label class="key">Start Benchmarking:</label>
-      <input  type="button" value="Benchmark" class="input-button input small-btn" id="benchmark-button" onclick="toggleBenchmarking()" style="width: 50%;">
-    </div>
-    <div class="ui-section">
-      <label class="key">Save Benchmark Image:</label>
-      <input  type="button" value="Save" class="input-button input small-btn" onclick="bench.downloadImages()" style="width: 50%;">
-      <input  type="button" value="Auto Save" class="hidden input-button input small-btn" onclick="bench.toggleAutoDownloadImage()" style="width: 50%;">
-    </div>
-  </div> 
-  
-  <div id="graph-container" style="position: absolute; left: 10px;">
-    <div style="margin:auto; width:1400px; padding: 10px; border: solid 1px black;">
-      <div style="width: fit-content; margin: auto;">
-        <p style="font-weight: 900;">Total Puck-Goal Distances</p>
-      </div>
-      <div id="total-distance-graph" class="aGraph" style="display: block;" width="1400" height="600"></div>
-      <div style="width: fit-content; margin: auto;">
-        <p style="display: inline-block; margin-right: 20px;">Proposed Sorting Algorithm:</p>
-        <p style="display: inline-block; width: fit-content; color: green; margin: 0px; margin-right: 5px; position: relative; top: -12px; font-size: xx-large; font-weight: 900;">____</p>
-        <p style="display: inline-block; margin-right: 20px;">Means</p>
-        <p style="display: inline-block; width: fit-content; color: darkseagreen; margin-right: 5px; position: relative;top: -9px;">_______</p>
-        <p style="display: inline-block; margin-right: 20px;">Individual</p>
-      </div>
-      <div style="width: fit-content; margin: auto;">
-        <p style="display: inline-block; margin-right: 20px;">Baseline Algorithm:</p>
-        <p style="display: inline-block; width: fit-content; color: midnightblue; margin: 0px; margin-right: 5px; position: relative; top: -12px; font-size: xx-large; font-weight: 900;">____</p>
-        <p style="display: inline-block; margin-right: 20px;">Means</p>
-        <p style="display: inline-block; width: fit-content; color: cornflowerblue; margin-right: 5px; position: relative;top: -9px;">______</p>
-        <p style="display: inline-block; margin-right: 20px;">Individual</p>
-      </div>
-    </div>
-    <br>
-    <div style="margin:auto; width:1400px; padding: 10px; border: solid 1px black;">
-      <div style="width: fit-content; margin: auto;">
-        <p style="font-weight: 900;">Pucks Outside Goal Areas</p>
-      </div>
-      <div id="pucks-count-graph" class="aGraph" style="display: block;" width="1400" height="600"></div>
-      <div style="width: fit-content; margin: auto;">
-        <p style="display: inline-block; margin-right: 20px;">Proposed Sorting Algorithm:</p>
-        <p style="display: inline-block; width: fit-content; color: green; margin: 0px; margin-right: 5px; position: relative; top: -12px; font-size: xx-large; font-weight: 900;">____</p>
-        <p style="display: inline-block; margin-right: 20px;">Means</p>
-        <p style="display: inline-block; width: fit-content; color: darkseagreen; margin-right: 5px; position: relative;top: -9px;">_______</p>
-        <p style="display: inline-block; margin-right: 20px;">Individual</p>
-      </div>
-      <div style="width: fit-content; margin: auto;">
-        <p style="display: inline-block; margin-right: 20px;">Baseline Algorithm:</p>
-        <p style="display: inline-block; width: fit-content; color: midnightblue; margin: 0px; margin-right: 5px; position: relative; top: -12px; font-size: xx-large; font-weight: 900;">____</p>
-        <p style="display: inline-block; margin-right: 20px;">Means</p>
-        <p style="display: inline-block; width: fit-content; color: cornflowerblue; margin-right: 5px; position: relative;top: -9px;">______</p>
-        <p style="display: inline-block; margin-right: 20px;">Individual</p>
-      </div>
-    </div>
-  </div>
-  
-  <script src="dist/main.js"></script>
-  <script src="libraries/svg-to-image.js"></script>
 </body>
 </html>

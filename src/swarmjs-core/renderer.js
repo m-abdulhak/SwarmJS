@@ -1,14 +1,40 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-console */
 import * as d3 from 'd3';
+
 import { Body } from 'matter-js';
 import { nxtCircIndx } from './geometry';
 
-function renderLineSeg(x1, y1, x2, y2) {
-  return `M${x1},${y1}L${x2},${y2}Z`;
-}
+const renderLineSeg = (x1, y1, x2, y2) => `M${x1},${y1}L${x2},${y2}Z`;
+
+const removeElements = (svg, selectionQuery) => {
+  let selection = svg.selectAll(selectionQuery).node();
+  while (selection) {
+    selection.parentNode.remove();
+    selection = svg.selectAll(selectionQuery).node();
+  }
+};
+
 export default class Renderer {
-  constructor(svg, scene) {
-    this.svg = svg;
-    this.scene = scene;
+  constructor() {
+    this.initialized = false;
+    this.renderingElements = [
+      'All', 'Robots', 'Pucks', 'Goals', 'TempGoals', 'VC', 'BVC'
+    ];
+    this.activeElements = [...this.renderingElements];
+
+    this.setElementEnabled = (element, state) => {
+      const otherActiveElements = this.activeElements.filter((e) => e !== element);
+      this.activeElements = state ? [...otherActiveElements, element] : [...otherActiveElements];
+    };
+
+    this.setElementEnabled.bind(this);
+  }
+
+  initialize(svg, scene) {
+    if (svg) {
+      svg.selectAll('*').remove();
+    }
     this.pauseStateOnDragStart = null;
 
     // Buffered voronoi cells line segments (as calculated by robots)
@@ -17,7 +43,7 @@ export default class Renderer {
     // Static Circles
     this.staticCircles = svg.append('g')
       .selectAll('circle')
-      .data(this.scene.staticObjects.filter((obj) => obj.def.type === 'circle'))
+      .data(scene.staticObjects.filter((obj) => obj.def.type === 'circle'))
       .enter()
       .append('circle')
       .attr('cx', (d) => d.center.x)
@@ -28,7 +54,7 @@ export default class Renderer {
     // Static Rectangles
     this.staticRectangles = svg.append('g')
       .selectAll('rect')
-      .data(this.scene.staticObjects.filter((obj) => obj.def.type === 'rectangle'))
+      .data(scene.staticObjects.filter((obj) => obj.def.type === 'rectangle'))
       .enter()
       .append('rect')
       .attr('x', (d) => d.center.x - d.width / 2)
@@ -38,18 +64,15 @@ export default class Renderer {
       .attr('fill', '#000000');
 
     // Voronoi cells edges (Voronoi Diagram)
+    const voronoiMesh = scene.voronoi.render();
+    this.VcMeshBG = svg.append('path')
+      .attr('stroke', '#777')
+      .attr('stroke-width', 2)
+      .attr('d', voronoiMesh);
     this.VcMesh = svg.append('path')
-      .attr('fill', 'none')
       .attr('stroke', '#000')
       .attr('stroke-width', 1)
-      .attr('d', this.scene.voronoi.render());
-
-    // Buffered Voronoi cells edges (from Voronoi Diagram)
-    this.BvcMesh = svg.append('path')
-      .attr('fill', 'none')
-      .attr('stroke', '#cccccc70')
-      .attr('stroke-width', this.scene.radius * 2)
-      .attr('d', this.scene.voronoi.render());
+      .attr('d', voronoiMesh);
 
     // Temp Goals
     this.tempGoalsCircles = svg.append('g')
@@ -57,7 +80,7 @@ export default class Renderer {
       .attr('stroke-width', 1)
       .attr('stroke-dasharray', '1,1')
       .selectAll('circle')
-      .data(this.scene.robots)
+      .data(scene.robots)
       .enter()
       .append('circle')
       .attr('cx', (d) => d.tempGoal.x)
@@ -70,7 +93,7 @@ export default class Renderer {
     // Line segments between robots and corresponding temp goal
     this.robotToTempGoalLineSegs = svg.append('g')
       .selectAll('path')
-      .data(this.scene.robots)
+      .data(scene.robots)
       .enter()
       .append('path')
       .attr('fill', 'none')
@@ -82,7 +105,7 @@ export default class Renderer {
     // Line segments between each robot's temp goal and goal
     this.tempGoalToGoalLineSegs = svg.append('g')
       .selectAll('path')
-      .data(this.scene.robots)
+      .data(scene.robots)
       .enter()
       .append('path')
       .attr('fill', 'none')
@@ -94,7 +117,7 @@ export default class Renderer {
     // Puck Goals
     this.puckGoalsCircles = svg.append('g')
       .selectAll('circle')
-      .data(this.scene.pucksGroups)
+      .data(scene.pucksGroups)
       .enter()
       .append('circle')
       .attr('cx', (d) => d.goal.x)
@@ -107,7 +130,7 @@ export default class Renderer {
     // Robots
     this.robotsCircles = svg.append('g')
       .selectAll('circle')
-      .data(this.scene.robots)
+      .data(scene.robots)
       .enter()
       .append('circle')
       .attr('cx', (d) => d.position.x)
@@ -120,24 +143,24 @@ export default class Renderer {
       .call(d3.drag()
         .on('start', (event, d) => {
           this.robotsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'green');
-          this.pauseStateOnDragStart = this.scene.paused;
-          this.scene.pause();
+          this.pauseStateOnDragStart = scene.paused;
+          scene.pause();
           console.log(`Moving Robot ${d.id}`);
         })
         .on('drag', (event, d) => {
           Body.set(d.body, 'position', { x: event.x, y: event.y });
-          this.update(activeElements);
+          // this.update(this.activeElements);
         })
         .on('end', (event, d) => {
           this.robotsCircles.filter((p) => p.id === d.id).attr('stroke', 'black');
-          this.scene.paused = this.pauseStateOnDragStart == null
+          scene.paused = this.pauseStateOnDragStart == null
             ? false : this.pauseStateOnDragStart;
         }));
 
     // Line segments between robots and corresponding goal
     this.robotToGoalLineSegs = svg.append('g')
       .selectAll('path')
-      .data(this.scene.robots)
+      .data(scene.robots)
       .enter()
       .append('path')
       .attr('fill', 'none')
@@ -149,7 +172,7 @@ export default class Renderer {
     // Goals
     this.goalsCircles = svg.append('g')
       .selectAll('circle')
-      .data(this.scene.robots)
+      .data(scene.robots)
       .enter()
       .append('circle')
       .attr('cx', (d) => d.goal.x)
@@ -162,25 +185,25 @@ export default class Renderer {
       .call(d3.drag()
         .on('start', (event, d) => {
           this.goalsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
-          this.pauseStateOnDragStart = this.scene.paused;
-          this.scene.unPause();
+          this.pauseStateOnDragStart = scene.paused;
+          scene.unPause();
           console.log(`Moving Goal For Robot ${d.id}`);
         })
         .on('drag', (event, d) => {
           d.goal.x = event.x;
           d.goal.y = event.y;
-          this.update(activeElements);
+          // this.update(this.activeElements);
         })
         .on('end', (event, d) => {
           this.goalsCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray');
-          this.scene.paused = this.pauseStateOnDragStart == null
+          scene.paused = this.pauseStateOnDragStart == null
             ? false : this.pauseStateOnDragStart;
         }));
 
     // Puck
     this.pucksCircles = svg.append('g')
       .selectAll('circle')
-      .data(this.scene.pucks)
+      .data(scene.pucks)
       .enter()
       .append('circle')
       .attr('cx', (d) => d.position.x)
@@ -191,89 +214,136 @@ export default class Renderer {
       .call(d3.drag()
         .on('start', (event, d) => {
           this.pucksCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
-          this.pauseStateOnDragStart = this.scene.paused;
-          this.scene.pause();
+          this.pauseStateOnDragStart = scene.paused;
+          scene.pause();
           console.log(`Moving Puck ${d.id}`);
         })
         .on('drag', (event, d) => {
           Body.set(d.body, 'position', { x: event.x, y: event.y });
-          this.update(activeElements);
+          // this.update(this.activeElements);
         })
         .on('end', (event, d) => {
           this.pucksCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray');
-          this.scene.paused = this.pauseStateOnDragStart == null
+          scene.paused = this.pauseStateOnDragStart == null
             ? false : this.pauseStateOnDragStart;
         }));
+
+    this.initialized = true;
   }
 
-  removeElements(selectionQuery) {
-    let selection = this.svg.selectAll(selectionQuery).node();
-    while (selection) {
-      selection.parentNode.remove();
-      selection = this.svg.selectAll(selectionQuery).node();
+  update(svgEl, scene) {
+    if (!svgEl || !scene) {
+      return;
     }
-  }
 
-  update(activeElements) {
-    this.removeElements('.bvc-seg');
+    const svg = d3.select(svgEl);
+
+    if (!this.initialized) {
+      this.initialize(svg, scene);
+    }
+
+    removeElements(svg, '.bvc-seg');
 
     this.BVCLineSegs = [];
 
-    this.scene.robots.forEach((r, rIndex) => {
-      if (typeof (r.BVC) !== 'undefined' && r.BVC.length > 0) {
-        this.BVCLineSegs.push(
-          this.svg.append('g')
-            .selectAll('path')
-            .data(r.BVC)
-            .enter()
-            .append('path')
-            .attr('class', 'bvc-seg')
-            .attr('fill', 'none')
-            .attr('stroke', () => d3.schemeCategory10[rIndex % 10])
-            .attr('stroke-width', 1)
-            .attr('stroke-opacity', activeElements.BVC ? '100%' : '0%')
-            .attr('stroke-dasharray', '10,10')
-            .attr('d', (d, i) => renderLineSeg(
-              r.BVC[i][0],
-              r.BVC[i][1],
-              r.BVC[nxtCircIndx(i, r.BVC.length)][0],
-              r.BVC[nxtCircIndx(i, r.BVC.length)][1]
-            ))
-        );
-      } else {
-        // console.log("null");
-      }
-    });
+    if (!this.activeElements.includes('All')) {
+      return;
+    }
 
-    this.BvcMesh.attr('d', this.scene.voronoi.render())
-      .attr('stroke-opacity', activeElements.VC ? '100%' : '0%');
+    if (this.activeElements.includes('BVC')) {
+      scene.robots.forEach((r, rIndex) => {
+        if (typeof (r.BVC) !== 'undefined' && r.BVC.length > 0) {
+          this.BVCLineSegs.push(
+            svg.append('g')
+              .selectAll('path')
+              .data(r.BVC)
+              .enter()
+              .append('path')
+              .attr('class', 'bvc-seg')
+              .attr('fill', 'none')
+              .attr('stroke', () => d3.schemeCategory10[rIndex % 10])
+              .attr('stroke-width', 1)
+              .attr('stroke-dasharray', '10,10')
+              .attr('d', (d, i) => renderLineSeg(
+                r.BVC[i][0],
+                r.BVC[i][1],
+                r.BVC[nxtCircIndx(i, r.BVC.length)][0],
+                r.BVC[nxtCircIndx(i, r.BVC.length)][1]
+              ))
+          );
+        }
+      });
+    }
 
-    this.VcMesh.attr('d', this.scene.voronoi.render())
-      .attr('stroke-opacity', activeElements.VC ? '100%' : '0%');
+    if (this.activeElements.includes('VC')) {
+      const vcMesh = scene.voronoi.render();
+      this.VcMeshBG
+        .attr('d', vcMesh)
+        .attr('stroke-opacity', '100%');
+      this.VcMesh
+        .attr('d', vcMesh)
+        .attr('stroke-opacity', '100%');
+    } else {
+      this.VcMeshBG.attr('stroke-opacity', '0%');
+      this.VcMesh.attr('stroke-opacity', '0%');
+    }
 
-    this.tempGoalsCircles.attr('cx', (d) => d.tempGoal.x).attr('cy', (d) => d.tempGoal.y)
-      .attr('stroke-opacity', activeElements.TempGoals ? '40%' : '0%')
-      .attr('fill-opacity', activeElements.TempGoals ? '40%' : '0%');
+    if (this.activeElements.includes('TempGoals')) {
+      this.tempGoalsCircles
+        .attr('cx', (d) => d.tempGoal.x)
+        .attr('cy', (d) => d.tempGoal.y)
+        .attr('stroke-opacity', '40%')
+        .attr('fill-opacity', '40%');
 
-    this.robotToTempGoalLineSegs.attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.tempGoal.x, d.tempGoal.y))
-      .attr('stroke-opacity', activeElements.TempGoals ? '100%' : '0%');
+      this.robotToTempGoalLineSegs
+        .attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.tempGoal.x, d.tempGoal.y))
+        .attr('stroke-opacity', '100%');
 
-    this.tempGoalToGoalLineSegs.attr('d', (d) => renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y))
-      .attr('stroke-opacity', activeElements.TempGoals ? '100%' : '0%');
+      this.tempGoalToGoalLineSegs
+        .attr('d', (d) => renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y))
+        .attr('stroke-opacity', '100%');
+    } else {
+      this.tempGoalsCircles
+        .attr('stroke-opacity', '0%')
+        .attr('fill-opacity', '0%');
 
-    this.robotsCircles.attr('cx', (d) => d.position.x).attr('cy', (d) => d.position.y)
-      .attr('stroke-opacity', activeElements.Robots ? '100%' : '0%')
-      .attr('fill-opacity', activeElements.Robots ? '100%' : '0%');
+      this.robotToTempGoalLineSegs
+        .attr('stroke-opacity', '0%');
 
-    this.pucksCircles.attr('cx', (d) => d.position.x).attr('cy', (d) => d.position.y)
-      .attr('stroke-opacity', activeElements.Robots ? '100%' : '0%')
-      .attr('fill-opacity', activeElements.Robots ? '100%' : '0%');
+      this.tempGoalToGoalLineSegs
+        .attr('stroke-opacity', '0%');
+    }
 
-    this.robotToGoalLineSegs.attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y))
-      .attr('stroke-opacity', activeElements.Goals ? '100%' : '0%');
+    if (this.activeElements.includes('Robots')) {
+      this.robotsCircles.attr('cx', (d) => d.position.x).attr('cy', (d) => d.position.y)
+        .attr('stroke-opacity', '100%')
+        .attr('fill-opacity', '100%');
+    } else {
+      this.robotsCircles
+        .attr('stroke-opacity', '0%')
+        .attr('fill-opacity', '0%');
+    }
 
-    this.goalsCircles.attr('cx', (d) => d.goal.x).attr('cy', (d) => d.goal.y)
-      .attr('stroke-opacity', activeElements.Goals ? '100%' : '0%')
-      .attr('fill-opacity', activeElements.Goals ? '100%' : '0%');
+    if (this.activeElements.includes('Pucks')) {
+      this.pucksCircles.attr('cx', (d) => d.position.x).attr('cy', (d) => d.position.y)
+        .attr('stroke-opacity', '100%')
+        .attr('fill-opacity', '100%');
+    } else {
+      this.pucksCircles
+        .attr('stroke-opacity', '0%')
+        .attr('fill-opacity', '0%');
+    }
+
+    if (this.activeElements.includes('Goals')) {
+      this.robotToGoalLineSegs.attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y))
+        .attr('stroke-opacity', '100%');
+
+      this.goalsCircles.attr('cx', (d) => d.goal.x).attr('cy', (d) => d.goal.y)
+        .attr('stroke-opacity', '100%')
+        .attr('fill-opacity', '100%');
+    } else {
+      this.robotToGoalLineSegs.attr('stroke-opacity', '0%');
+      this.goalsCircles.attr('stroke-opacity', '0%').attr('fill-opacity', '0%');
+    }
   }
 }

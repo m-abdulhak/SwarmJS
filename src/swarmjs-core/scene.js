@@ -8,36 +8,35 @@ import Puck from './puck';
 import { generateStaticObject } from './staticObjects/staticObjectFactory';
 import { distanceBetween2Points, calculateBVCfromVC } from './geometry';
 import { mapSceneToArr, getPucksGoalMap } from './distanceTransform/globalPlanning';
-import Renderer from './renderer';
 
 export default class Scene {
   constructor(
-    svg,
-    numOfRobots,
-    robotRadius,
-    algorithm,
-    enableRendering,
-    startingPositionsConfig,
+    envConfig,
+    robotsConfig,
     pucksGroups,
     staticObjectsDefinitions,
+    algorithm,
     gMaps
   ) {
-    this.width = parseInt(svg.attr('width'), 10);
-    this.height = parseInt(svg.attr('height'), 10);
-    this.environmentBounds = [
-      [0, 0], [this.width, 0], [this.width, this.height], [0, this.height], [0, 0]
-    ];
-    this.numOfRobots = numOfRobots;
-    this.robotRadius = robotRadius;
+    this.renderables = [];
+    this.numOfRobots = robotsConfig.count;
+    this.robotRadius = robotsConfig.radius;
     this.pucksGroups = pucksGroups;
     this.numOfPucks = this.pucksGroups.reduce((total, puckGroup) => total + puckGroup.count, 0);
 
+    this.width = parseInt(envConfig.width, 10);
+    this.height = parseInt(envConfig.height, 10);
+    this.environmentBounds = [
+      [0, 0], [this.width, 0], [this.width, this.height], [0, this.height], [0, 0]
+    ];
     // Create Matter.js Physics Engine
     this.engine = Engine.create();
     this.world = this.engine.world;
     this.engine.gravity.y = 0;
     this.engine.gravity.x = 0;
     this.timeInstance = 0;
+    this.engine.positionIterations = 10;
+    this.engine.velocityIterations = 10;
 
     // Add Environment Boundries To World
     this.addEnvBoundryObjects(this.width, this.height);
@@ -56,9 +55,6 @@ export default class Scene {
       this.height,
       this.numOfPucks
     );
-
-    // Rendering option
-    this.renderingEnabled = enableRendering;
 
     // Initialize Robots
     this.robots = this.initializeRobotsRange(
@@ -115,9 +111,6 @@ export default class Scene {
       .from(this.getCurRobotsPos(), (d) => d.x, (d) => d.y)
       .voronoi([0, 0, this.width, this.height]);
 
-    // Initialize Renderer
-    this.renderer = new Renderer(svg, this);
-
     // Simulation Speed
     this.timeDelta = 16.666;
 
@@ -130,38 +123,51 @@ export default class Scene {
     this.pucksOutsideGoalCount = null;
 
     // Change Options Based on algorithm
-    this.defaultOptions = {
-      // Baseline Algorithm Features
-      1: {
-        testEnabled: false
-      },
-      // Proposed Algorithm Features
-      2: {
+    this.availableAlgorithms = [
+      {
+        name: 'Proposed Algorithm',
         testEnabled: true
+      },
+      {
+        name: 'Baseline Algorithm',
+        testEnabled: false
       }
+    ];
+    this.algorithmOptions = algorithm
+      ? this.availableAlgorithms.find((a) => a.name === algorithm)
+      : this.availableAlgorithms[0];
+
+    this.paused = false;
+
+    this.togglePause = () => {
+      this.paused = !this.paused;
     };
-    this.algorithmOptions = this.defaultOptions[algorithm];
 
-    this.paused = false;
+    this.pause = () => {
+      this.paused = true;
+    };
+
+    this.unpause = () => {
+      this.paused = false;
+    };
+
+    this.setSpeed = (scale) => {
+      this.robots.forEach((r) => { r.velocityScale = scale; });
+    };
+
+    this.changeAlgorithm = (newAlgorithm) => {
+      this.algorithmOptions = this.availableAlgorithms.find((a) => a.name === newAlgorithm);
+      this.robots.forEach((r) => { r.changeAlgorithm(newAlgorithm); });
+    };
+
+    this.togglePause.bind(this);
+    this.pause.bind(this);
+    this.unpause.bind(this);
+    this.setSpeed.bind(this);
+    this.changeAlgorithm.bind(this);
   }
 
-  pause() {
-    this.paused = true;
-  }
-
-  unpause() {
-    this.paused = false;
-  }
-
-  togglePause() {
-    this.paused = !this.paused;
-  }
-
-  setSpeed(scale) {
-    this.robots.forEach((r) => { r.velocityScale = scale; });
-  }
-
-  update(activeElements) {
+  update() {
     this.voronoi = Delaunay
       .from(this.getCurRobotsPos(), (d) => d.x, (d) => d.y)
       .voronoi([0, 0, this.width, this.height]);
@@ -178,13 +184,17 @@ export default class Scene {
 
     this.timeInstance = this.engine.timing.timestamp;
 
-    if (this.renderingEnabled) {
-      this.renderer.update(activeElements);
-    }
+    // TODO: change state of renderable elements
+    // if (this.renderingEnabled) {
+    //   // this.render(activeElements);
+    // }
 
     this.updateDistance();
 
     Engine.clear(this.engine);
+
+    this.renderables = this.robots.map((r) => r.position);
+    // console.log('Renderables :', this.renderables);
   }
 
   updateRobotsMeasurements() {

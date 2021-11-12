@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import saveSvgAsPng from 'save-svg-as-png';
 
 const initGraph = (id, maxTimeSteps, xAxixTitle, yAxisTitle, yScale) => {
   const elem = d3.select(id);
