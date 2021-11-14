@@ -1,8 +1,5 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-console */
+/* eslint-disable no-use-before-define */
 import * as d3 from 'd3';
-
-import { Body } from 'matter-js';
 import { nxtCircIndx } from './geometry';
 
 const renderLineSeg = (x1, y1, x2, y2) => `M${x1},${y1}L${x2},${y2}Z`;
@@ -16,6 +13,8 @@ const removeElements = (svg, selectionQuery) => {
 };
 
 let initialized = false;
+let lastSvgEl = null;
+let lastScene = null;
 
 const renderingElements = [
   'All', 'Robots', 'Pucks', 'Goals', 'TempGoals', 'VC', 'BVC'
@@ -32,7 +31,7 @@ export const setElementEnabled = (element, state) => {
 
 const renderedElements = {};
 
-const initialize = (svg, scene) => {
+export function initialize(svg, scene) {
   if (svg) {
     svg.selectAll('*').remove();
   }
@@ -146,16 +145,16 @@ const initialize = (svg, scene) => {
         renderedElements.robotsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'green');
         pauseStateOnDragStart = scene.paused;
         scene.pause();
-        console.log(`Moving Robot ${d.id}`);
       })
       .on('drag', (event, d) => {
-        Body.set(d.body, 'position', { x: event.x, y: event.y });
-        // update(activeElements);
+        d.setPosition({ x: event.x, y: event.y });
+        renderScene();
       })
       .on('end', (event, d) => {
         renderedElements.robotsCircles.filter((p) => p.id === d.id).attr('stroke', 'black');
-        scene.paused = pauseStateOnDragStart == null
-          ? false : pauseStateOnDragStart;
+        if (pauseStateOnDragStart != null && !pauseStateOnDragStart) {
+          scene.unpause();
+        }
       }));
 
   // Line segments between robots and corresponding goal
@@ -187,18 +186,17 @@ const initialize = (svg, scene) => {
       .on('start', (event, d) => {
         renderedElements.goalsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
         pauseStateOnDragStart = scene.paused;
-        scene.unPause();
-        console.log(`Moving Goal For Robot ${d.id}`);
+        scene.pause();
       })
       .on('drag', (event, d) => {
-        d.goal.x = event.x;
-        d.goal.y = event.y;
-        // update(activeElements);
+        d.setGoal({ x: event.x, y: event.y });
+        renderScene();
       })
       .on('end', (event, d) => {
         renderedElements.goalsCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray');
-        scene.paused = pauseStateOnDragStart == null
-          ? false : pauseStateOnDragStart;
+        if (pauseStateOnDragStart != null && !pauseStateOnDragStart) {
+          scene.unpause();
+        }
       }));
 
   // Puck
@@ -217,25 +215,35 @@ const initialize = (svg, scene) => {
         renderedElements.pucksCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
         pauseStateOnDragStart = scene.paused;
         scene.pause();
-        console.log(`Moving Puck ${d.id}`);
       })
       .on('drag', (event, d) => {
-        Body.set(d.body, 'position', { x: event.x, y: event.y });
-        // update(activeElements);
+        d.setPosition({ x: event.x, y: event.y });
+        renderScene();
       })
       .on('end', (event, d) => {
         renderedElements.pucksCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray');
-        scene.paused = pauseStateOnDragStart == null
-          ? false : pauseStateOnDragStart;
+        if (pauseStateOnDragStart != null && !pauseStateOnDragStart) {
+          scene.unpause();
+        }
       }));
 
   initialized = true;
-};
+}
 
-export const renderScene = (svgEl, scene) => {
+export function renderScene(curSvgEl, curScene) {
+  let svgEl = curSvgEl;
+  let scene = curScene;
+
   if (!svgEl || !scene) {
-    return;
+    if (!lastSvgEl || !lastScene) {
+      return;
+    }
+    svgEl = lastSvgEl;
+    scene = lastScene;
   }
+
+  lastSvgEl = svgEl;
+  lastScene = scene;
 
   const svg = d3.select(svgEl);
 
@@ -346,7 +354,7 @@ export const renderScene = (svgEl, scene) => {
     renderedElements.robotToGoalLineSegs.attr('stroke-opacity', '0%');
     renderedElements.goalsCircles.attr('stroke-opacity', '0%').attr('fill-opacity', '0%');
   }
-};
+}
 
 export const resetRenderer = () => {
   initialized = false;

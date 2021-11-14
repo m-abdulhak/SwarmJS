@@ -1,4 +1,4 @@
-import { World, Bodies } from 'matter-js';
+import { World, Bodies, Body } from 'matter-js';
 import { distanceBetween2Points } from './geometry';
 
 export default class Puck {
@@ -38,6 +38,10 @@ export default class Puck {
     // this.blockedDistance = this.radius * 1.5;
     this.goalReachedDist = this.radius * 12;
     this.deepInGoalDist = this.radius * 8;
+  }
+
+  setPosition(newPosition) {
+    Body.set(this.body, 'position', { x: newPosition.x, y: newPosition.y });
   }
 
   timeStep() {

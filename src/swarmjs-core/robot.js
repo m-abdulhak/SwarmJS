@@ -91,12 +91,16 @@ export default class Robot {
     this.changeAlgorithm.bind(this);
   }
 
-  setGoal(goal) {
-    this.goal = goal;
+  setGoal(newGoal) {
+    this.goal = { x: newGoal.x, y: newGoal.y };
+  }
+
+  setPosition(newPosition) {
+    Body.set(this.body, 'position', { x: newPosition.x, y: newPosition.y });
   }
 
   setTempGoal(tempGoal) {
-    this.tempGoal = tempGoal;
+    this.tempGoal = { x: tempGoal.x, y: tempGoal.y };
   }
 
   setBestPuck(puck) {
