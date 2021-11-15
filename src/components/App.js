@@ -23,22 +23,22 @@ const App = ({ config }) => {
   const [time, setTime] = React.useState(0);
   const [speed, setSpeed] = React.useState(1);
   const [paused, setPaused] = React.useState(false);
-
   const svgRef = React.useRef(null);
+
   const onUpdate = (newTime, scene) => {
     setTime(newTime);
     renderScene(svgRef.current, scene);
   };
   initSimulationIfNeeded(config, onUpdate);
 
-  const onTogglePause = () => {
-    togglePauseSimulation();
-    setPaused(!paused);
-  };
-
   const onSpeedChange = (newSpeed) => {
     setSpeed(newSpeed);
     setSimulationSpeed(newSpeed);
+  };
+
+  const onTogglePause = () => {
+    togglePauseSimulation();
+    setPaused(!paused);
   };
 
   const reset = () => {

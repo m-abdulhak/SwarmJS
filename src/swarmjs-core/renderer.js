@@ -169,6 +169,17 @@ export function initialize(svg, scene) {
     .attr('stroke-dasharray', '10,10')
     .attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y));
 
+  // Line segments between robots and heading
+  renderedElements.robotOrientations = svg.append('g')
+    .selectAll('path')
+    .data(scene.robots)
+    .enter()
+    .append('path')
+    .attr('fill', 'none')
+    .attr('stroke', 'black')
+    .attr('stroke-width', 3)
+    .attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.headingPoint.x, d.headingPoint.y));
+
   // Goals
   renderedElements.goalsCircles = svg.append('g')
     .selectAll('circle')
@@ -342,6 +353,9 @@ export function renderScene(curSvgEl, curScene) {
       .attr('stroke-opacity', '0%')
       .attr('fill-opacity', '0%');
   }
+
+  // Line segments between robots and heading
+  renderedElements.robotOrientations.attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.headingPoint.x, d.headingPoint.y));
 
   if (activeElements.includes('Goals')) {
     renderedElements.robotToGoalLineSegs.attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y))

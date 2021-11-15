@@ -6,24 +6,12 @@ import Offset from 'polygon-offset';
  ************************************************
  */
 
-export function calculateBVCfromVC(cell, r) {
-  const offset = new Offset();
-  let padding = [];
-  try {
-    [padding] = offset.data(cell).padding(r.radius * 1);
-  } catch (err) {
-    // On collisions, if voronoi cell is too small => BVC is undefined
-    // Should not occur in collision-free configurations
-    // eslint-disable-next-line no-console
-    console.log(err);
-    padding = [[r.position.x, r.position.y]];
-  }
-
-  return padding;
+export function radToDeg(radians) {
+  return (radians * 180) / Math.PI;
 }
 
-export function radToDeg(radians) {
-  return radians * (180 / Math.PI);
+export function normalizeAngle(angle) {
+  return angle % (2 * Math.PI);
 }
 
 /*
@@ -44,6 +32,55 @@ export function angleBetweenThreePointsRad(A, B, C) {
 export function angleBetweenThreePointsDeg(A, B, C) {
   const angleRad = angleBetweenThreePointsRad(A, B, C);
   return radToDeg(angleRad);
+}
+
+export function getPointFromLengthAndAngle(length, angle) {
+  return {
+    x: length * Math.cos(angle),
+    y: length * Math.sin(angle)
+  };
+}
+
+export function getAbsolutePointFromRelativePoint(center, point) {
+  return {
+    x: point.x + center.x,
+    y: point.y + center.y
+  };
+}
+
+export function getAbsolutePointFromLengthAndAngle(center, length, angle) {
+  return getAbsolutePointFromRelativePoint(center, getPointFromLengthAndAngle(length, angle));
+}
+
+export function closePolygon(poly) {
+  if (!poly || poly.length < 2) {
+    return poly;
+  }
+
+  const firstPoint = poly[0];
+  const lastPoint = poly[poly.length - 1];
+
+  if (firstPoint[0] !== lastPoint[0] || firstPoint[1] !== lastPoint[1]) {
+    poly.push(firstPoint);
+  }
+
+  return poly;
+}
+
+export function calculateBVCfromVC(cell, r) {
+  const offset = new Offset();
+  let padding = [];
+  try {
+    [padding] = offset.data(cell).padding(r.radius * 1);
+  } catch (err) {
+    // On collisions, if voronoi cell is too small => BVC is undefined
+    // Should not occur in collision-free configurations
+    // eslint-disable-next-line no-console
+    console.log(err);
+    padding = [[r.position.x, r.position.y]];
+  }
+
+  return padding;
 }
 
 /** * Ruler Function */

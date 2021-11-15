@@ -267,7 +267,8 @@ export default function updateWaypoint(robot) {
     return null;
   }
 
-  return (cell) => {
+  return () => {
+    const cell = robot.BVC;
     // If cell is undefined (shouldn't happen in collision-free configurations)
     // => set localgoal = goal
     if (cell == null || cell.length < 2) {

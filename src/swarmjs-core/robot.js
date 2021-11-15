@@ -1,10 +1,7 @@
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-console */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable no-undef */
 import { Body, World, Bodies } from 'matter-js';
 import splitPolygon from 'split-polygon';
 
+import calculateVelocities from './controlStrategy';
 import updateWaypoint from './motionPlanning';
 import updateGoal from './goalSelect';
 import { generateStaticObject } from './staticObjects/staticObjectFactory';
@@ -13,7 +10,10 @@ import {
   closestPointInPolygonToPoint,
   shiftPointOfLineSegInDirOfPerpendicularBisector,
   pointIsInsidePolygon,
-  getLineEquationParams
+  getLineEquationParams,
+  closePolygon,
+  getAbsolutePointFromLengthAndAngle,
+  normalizeAngle
 } from './geometry';
 
 // eslint-disable-next-line no-unused-vars
@@ -47,10 +47,15 @@ export default class Robot {
     this.id = id;
     this.position = position;
     this.prevPosition = position;
+    this.radius = radius;
+    this.orientation = 0;
+    this.headingPoint = getAbsolutePointFromLengthAndAngle(
+      this.position, this.radius * 1.2, this.orientation
+    );
+    this.velocity = { x: 0, y: 0 };
     this.velocityScale = 1;
     this.goal = goal;
-    this.tempGoal = null;
-    this.radius = radius;
+    this.tempGoal = { x: this.position.x, y: this.position.y };
     this.envWidth = envWidth;
     this.envHeight = envHeight;
     this.scene = scene;
@@ -67,12 +72,14 @@ export default class Robot {
     this.body.restitution = 0;
     World.add(this.world, this.body);
 
+    // Remove
+    Body.setAngularVelocity(this.body, 1);
+
+    // Velocities calculation strategy
+    this.updateVelocity = calculateVelocities(this);
+
     // Motion Planning
     this.updateWaypoint = updateWaypoint(this);
-
-    // Initialize velocity according to movement goal
-    this.velocity = { x: 0, y: 0 };
-    this.updateVelocity();
 
     // Goal Planning
     this.updateGoal = updateGoal(this);
@@ -91,12 +98,16 @@ export default class Robot {
     this.changeAlgorithm.bind(this);
   }
 
-  setGoal(newGoal) {
-    this.goal = { x: newGoal.x, y: newGoal.y };
-  }
-
   setPosition(newPosition) {
     Body.set(this.body, 'position', { x: newPosition.x, y: newPosition.y });
+    this.position = this.body.position;
+    this.headingPoint = getAbsolutePointFromLengthAndAngle(
+      this.position, this.radius * 1.2, this.orientation
+    );
+  }
+
+  setGoal(newGoal) {
+    this.goal = { x: newGoal.x, y: newGoal.y };
   }
 
   setTempGoal(tempGoal) {
@@ -108,35 +119,39 @@ export default class Robot {
   }
 
   timeStep() {
+    // Get new position and orientation from engine
     this.prevPosition = this.position;
     this.position = this.body.position;
-    this.updateGoal();
-    this.limitGoal();
-    this.updateVelocity();
+    this.orientation = normalizeAngle(this.body.angle);
+    this.headingPoint = getAbsolutePointFromLengthAndAngle(
+      this.position, this.radius * 1.2, this.orientation
+    );
+
+    // Update goal
+    const newGoalRaw = this.updateGoal();
+    const newGoal = this.limitGoal(newGoalRaw);
+    this.setGoal(newGoal);
+
+    // Update waypoint, according to new goal
+    const newWaypoint = this.updateWaypoint();
+    this.setTempGoal(newWaypoint);
+
+    // Update velocities, according to new waypoint
+    const velocities = this.updateVelocity();
+    this.setVelocities(velocities);
   }
 
-  updateVelocity() {
-    this.setTempGoalInCell(this.BVC);
-    this.setVelocityTo(this.tempGoal);
+  setVelocities({ linearVel, angularVel }) {
+    this.setLinearVelocity(linearVel);
+    this.setAngularVelocity(angularVel);
   }
 
-  setVelocityTo(point) {
-    // If goal point is reached (default)
-    let newXVel = 0;
-    let newYVel = 0;
-
-    // else
-    if (!this.reached(point)) {
-      newXVel = this.velocityScale * (point.x - this.position.x);
-      newYVel = this.velocityScale * (point.y - this.position.y);
-    }
-
-    this.velocity = { x: newXVel, y: newYVel };
-    Body.setVelocity(this.body, { x: newXVel / 100, y: newYVel / 100 });
+  setLinearVelocity(linearVel) {
+    Body.setVelocity(this.body, { x: linearVel.x, y: linearVel.y });
   }
 
-  setTempGoalInCell(cell) {
-    this.tempGoal = this.updateWaypoint(cell);
+  setAngularVelocity(angularVel) {
+    Body.setAngularVelocity(this.body, angularVel);
   }
 
   // Static Obstacles
@@ -183,23 +198,7 @@ export default class Robot {
     }, null);
   }
 
-  closePolygon(poly) {
-    if (!poly || poly.length < 2) {
-      return poly;
-    }
-
-    const firstPoint = poly[0];
-    const lastPoint = poly[poly.length - 1];
-
-    if (firstPoint[0] !== lastPoint[0] || firstPoint[1] !== lastPoint[1]) {
-      poly.push(firstPoint);
-    }
-
-    return poly;
-  }
-
   trimVCwithStaticObstacles() {
-    // eslint-disable-next-line arrow-body-style
     const closestPoint = this.getClosestPointToNearbyObstacles();
 
     if (closestPoint == null) {
@@ -220,13 +219,13 @@ export default class Robot {
     const splitPolygonRes = splitPolygon(this.VC, splittingLineParams);
     const splitPolygonParts = [splitPolygonRes.positive, splitPolygonRes.negative];
     splitPolygonParts.map(
-      (poly) => this.closePolygon(poly)
+      (poly) => closePolygon(poly)
     );
 
     if (pointIsInsidePolygon(this.position, splitPolygonParts[0])) {
-      this.VC = splitPolygonParts[0];
+      [this.VC] = splitPolygonParts;
     } else {
-      this.VC = splitPolygonParts[1];
+      [, this.VC] = splitPolygonParts;
     }
   }
 
@@ -295,11 +294,11 @@ export default class Robot {
     };
   }
 
-  limitGoal() {
+  limitGoal(goal) {
     const { radius } = this;
     const newGoal = {
-      x: Math.min(Math.max(radius, this.goal.x), this.envWidth - radius),
-      y: Math.min(Math.max(radius, this.goal.y), this.envHeight - radius)
+      x: Math.min(Math.max(radius, goal.x), this.envWidth - radius),
+      y: Math.min(Math.max(radius, goal.y), this.envHeight - radius)
     };
 
     this.scene.staticObjects.forEach((staticObj) => {
@@ -313,7 +312,7 @@ export default class Robot {
       }
     });
 
-    this.goal = newGoal;
+    return newGoal;
   }
 
   collidingWithRobot(r) {

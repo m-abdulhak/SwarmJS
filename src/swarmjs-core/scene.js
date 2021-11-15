@@ -168,6 +168,8 @@ export default class Scene {
   }
 
   update() {
+    Engine.update(this.engine, this.timeDelta);
+
     this.voronoi = Delaunay
       .from(this.getCurRobotsPos(), (d) => d.x, (d) => d.y)
       .voronoi([0, 0, this.width, this.height]);
@@ -180,8 +182,6 @@ export default class Scene {
     this.updatePucksOutsideOfGoalMesurements();
     // this.updateMinRobotRobotDistMesurements();
 
-    Engine.update(this.engine, this.timeDelta);
-
     this.timeInstance = this.engine.timing.timestamp;
 
     // TODO: change state of renderable elements
@@ -193,7 +193,7 @@ export default class Scene {
 
     Engine.clear(this.engine);
 
-    this.renderables = this.robots.map((r) => r.position);
+    // this.renderables = this.robots.map((r) => r.position);
     // console.log('Renderables :', this.renderables);
   }
 
@@ -353,7 +353,7 @@ export default class Scene {
   getNeighborsOf(robotIndex) {
     const neighbors = [];
     try {
-      const indexes = Array.from(this.voronoi.delaunay.neighbors(robotIndex));
+      const indexes = Array.from(this.voronoi.delaunay.neighbors(robotIndex)).filter((x) => x > -1);
       indexes.forEach((i) => neighbors.push(this.getRobotByIndex(i)));
     } catch (error) {
       // eslint-disable-next-line no-console

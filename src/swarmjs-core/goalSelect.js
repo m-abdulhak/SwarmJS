@@ -261,7 +261,7 @@ export default function updateGoal(robot) {
     // If robot was stuck and is still recovering, do not change robot goal
     if (stuck && avoidingStuckDuration <= MIN_STUCK_MANEUVER_DURATION) {
       avoidingStuckDuration += 1;
-      return;
+      return robot.goal;
     }
     // Else, consider maneuver over, reset counters
     stuck = false;
@@ -284,17 +284,15 @@ export default function updateGoal(robot) {
       durationAtCurPosition = 0;
       stuck = true;
       avoidingStuckDuration = 0;
-      robot.setGoal(getGoalFromStuckManeuver());
-      return;
+      return getGoalFromStuckManeuver();
     }
 
     // Update last position and continuer normal operations
     lastPosition = { ...robot.position };
     const bestPuck = selectBestNearbyPuck();
     if (bestPuck === null) {
-      robot.setGoal(getGoalFromEnvOrbit());
-    } else {
-      robot.setGoal(getGoalFromPuck(bestPuck));
+      return getGoalFromEnvOrbit();
     }
+    return getGoalFromPuck(bestPuck);
   };
 }
