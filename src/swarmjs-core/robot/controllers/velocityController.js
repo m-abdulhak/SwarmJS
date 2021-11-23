@@ -1,26 +1,26 @@
-import { angleBetweenThreePointsDeg, pointIsOnRightSideOfVector } from './geometry';
+import { angleBetweenThreePointsDeg, pointIsOnRightSideOfVector } from '../../geometry';
 
 const angularVelocityScale = 0.01;
 
 // Returns a function that takes a target and returns a velocity vector
 // Example: { linearVel: { x: 0, y: 0 }, angularVel: 0 }
-export default function calculateVelocities(robot) {
-  const updateVelocityOmniDirectional = (point) => {
-    // If goal point is reached (default)
-    let newXVel = 0;
-    let newYVel = 0;
+export default function updateVelocity(robot) {
+  // const updateVelocityOmniDirectional = (point) => {
+  //   // If goal point is reached (default)
+  //   let newXVel = 0;
+  //   let newYVel = 0;
 
-    // else
-    if (!robot.reached(point)) {
-      newXVel = robot.velocityScale * (point.x - robot.position.x);
-      newYVel = robot.velocityScale * (point.y - robot.position.y);
-    }
+  //   // else
+  //   if (!robot.reached(point)) {
+  //     newXVel = robot.velocityScale * (point.x - robot.position.x);
+  //     newYVel = robot.velocityScale * (point.y - robot.position.y);
+  //   }
 
-    const linearVel = { x: newXVel / 100, y: newYVel / 100 };
-    const angularVel = 0;
+  //   const linearVel = { x: newXVel / 100, y: newYVel / 100 };
+  //   const angularVel = 0;
 
-    return { linearVel, angularVel };
-  };
+  //   return { linearVel, angularVel };
+  // };
 
   const updateVelocityDiffRobot = (point) => {
     // If goal point is reached (default)

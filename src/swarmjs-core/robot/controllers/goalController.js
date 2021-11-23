@@ -6,9 +6,10 @@ import {
   translatePointInDirection,
   shiftPointOfLineSegInDirOfPerpendicularBisector,
   pointIsInsidePolygon
-} from './geometry';
+} from '../../geometry';
 
 export default function updateGoal(robot) {
+  const { radius, envWidth, envHeight } = robot;
   let lastPosition;
   let durationAtCurPosition = 0;
   let stuck = false;
@@ -16,7 +17,7 @@ export default function updateGoal(robot) {
   let curGoalTimeSteps = 0;
 
   const MIN_STUCK_MANEUVER_DURATION = 30;
-  const SAME_POSITION_DISTANCE_THRESHOLD = robot.radius / 50;
+  const SAME_POSITION_DISTANCE_THRESHOLD = radius / 50;
   const STUCK_DURATION_THRESHOLD = 30;
 
   const ANGLE_OPTIMAL_THRESHOLD = 15;
@@ -26,8 +27,8 @@ export default function updateGoal(robot) {
 
   function getRandPoint() {
     return {
-      x: (Math.random() * 0.8 + 0.1) * robot.scene.width,
-      y: (Math.random() * 0.8 + 0.1) * robot.scene.height
+      x: (Math.random() * 0.8 + 0.1) * envWidth,
+      y: (Math.random() * 0.8 + 0.1) * envHeight
     };
   }
 
@@ -35,8 +36,8 @@ export default function updateGoal(robot) {
     const len = robot.getDistanceTo(closestPoint);
 
     const translationVec = {
-      x: ((closestPoint.x - robot.position.x) * robot.radius) / (len * 10),
-      y: ((closestPoint.y - robot.position.y) * robot.radius) / (len * 10)
+      x: ((closestPoint.x - robot.position.x) * radius) / (len * 10),
+      y: ((closestPoint.y - robot.position.y) * radius) / (len * 10)
     };
 
     let midPoint = translatePointInDirection(
@@ -48,7 +49,7 @@ export default function updateGoal(robot) {
 
     // midPoint = robot.position;
 
-    const delta = robot.radius * 2;
+    const delta = radius * 2;
     let newGoal = midPoint;
 
     newGoal = shiftPointOfLineSegInDirOfPerpendicularBisector(
@@ -92,11 +93,6 @@ export default function updateGoal(robot) {
   }
 
   function getGoalFromEnvOrbit() {
-    if (curGoalTimeSteps < MIN_GOAL_TIME_STEPS && !robot.reachedGoal()) {
-      curGoalTimeSteps += 1;
-      return robot.goal;
-    }
-
     const environmentBounds = robot.scene.environmentBounds.map(
       (point) => ({ x: point[0], y: point[1] })
     );
@@ -170,14 +166,14 @@ export default function updateGoal(robot) {
     return newGoal;
   }
 
-  function getNormalizedAngleToPuck(puck) {
-    const angle = angleBetweenThreePointsDeg(robot.position, puck.position, puck.goal);
+  function getNormalizedAngleToPuck(robotPosition, puck) {
+    const angle = angleBetweenThreePointsDeg(robotPosition, puck.position, puck.goal);
     const normalizedAngle = Math.abs(angle - 180);
     return normalizedAngle;
   }
 
   function getGoalFromPuck(puck) {
-    const normalizedAngle = getNormalizedAngleToPuck(puck);
+    const normalizedAngle = getNormalizedAngleToPuck(robot.position, puck);
 
     if (normalizedAngle < ANGLE_OPTIMAL_THRESHOLD) {
       return puck.position;
@@ -196,15 +192,10 @@ export default function updateGoal(robot) {
       return closestPointInLine;
     }
 
-    return getGoalFromEnvOrbit(robot);
+    return getGoalFromEnvOrbit();
   }
 
   function selectBestNearbyPuck() {
-    if (curGoalTimeSteps < MIN_GOAL_TIME_STEPS && !robot.reachedGoal()) {
-      curGoalTimeSteps += 1;
-      return robot.bestPuck;
-    }
-
     const angleRatings = [];
     const distanceRatings = [];
 
@@ -218,7 +209,7 @@ export default function updateGoal(robot) {
             ? pointIsInsidePolygon(p.position, robot.BVC)
             : true;
 
-          const normalizedAngle = getNormalizedAngleToPuck(p);
+          const normalizedAngle = getNormalizedAngleToPuck(robot.position, p);
           const puckAngleAcceptable = normalizedAngle <= ANGLE_ACCEPTABLE_THRESHOLD;
 
           const condReachableInEnv = robot.pointIsReachableInEnvBounds(g);
@@ -251,9 +242,6 @@ export default function updateGoal(robot) {
     }
     robot.setBestPuck(bestPuck);
 
-    if (bestPuck !== null) {
-      curGoalTimeSteps = 0;
-    }
     return bestPuck;
   }
 
@@ -287,9 +275,19 @@ export default function updateGoal(robot) {
       return getGoalFromStuckManeuver();
     }
 
-    // Update last position and continuer normal operations
+    // Update last position and continue normal operations
     lastPosition = { ...robot.position };
-    const bestPuck = selectBestNearbyPuck();
+
+    let { bestPuck } = robot;
+    if (curGoalTimeSteps < MIN_GOAL_TIME_STEPS && !robot.reachedGoal()) {
+      curGoalTimeSteps += 1;
+    } else {
+      bestPuck = selectBestNearbyPuck();
+      if (bestPuck !== null) {
+        curGoalTimeSteps = 0;
+      }
+    }
+
     if (bestPuck === null) {
       return getGoalFromEnvOrbit();
     }

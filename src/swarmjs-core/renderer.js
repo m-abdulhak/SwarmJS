@@ -338,8 +338,12 @@ export function renderScene(curSvgEl, curScene) {
     renderedElements.robotsCircles.attr('cx', (d) => d.position.x).attr('cy', (d) => d.position.y)
       .attr('stroke-opacity', '100%')
       .attr('fill-opacity', '100%');
+    renderedElements.robotOrientations.attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.headingPoint.x, d.headingPoint.y));
   } else {
     renderedElements.robotsCircles
+      .attr('stroke-opacity', '0%')
+      .attr('fill-opacity', '0%');
+    renderedElements.robotOrientations
       .attr('stroke-opacity', '0%')
       .attr('fill-opacity', '0%');
   }
@@ -353,9 +357,6 @@ export function renderScene(curSvgEl, curScene) {
       .attr('stroke-opacity', '0%')
       .attr('fill-opacity', '0%');
   }
-
-  // Line segments between robots and heading
-  renderedElements.robotOrientations.attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.headingPoint.x, d.headingPoint.y));
 
   if (activeElements.includes('Goals')) {
     renderedElements.robotToGoalLineSegs.attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y))

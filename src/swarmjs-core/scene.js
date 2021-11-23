@@ -3,9 +3,9 @@ import * as d3 from 'd3';
 import { Engine, World, Bodies } from 'matter-js';
 import { Delaunay } from 'd3-delaunay';
 
-import Robot from './robot';
+import Robot from './robot/robot';
 import Puck from './puck';
-import { generateStaticObject } from './staticObjects/staticObjectFactory';
+import generateStaticObject from './staticObjects/staticObjectFactory';
 import { distanceBetween2Points, calculateBVCfromVC } from './geometry';
 import { mapSceneToArr, getPucksGoalMap } from './distanceTransform/globalPlanning';
 

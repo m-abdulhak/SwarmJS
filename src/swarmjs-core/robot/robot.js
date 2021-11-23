@@ -1,10 +1,7 @@
 import { Body, World, Bodies } from 'matter-js';
 import splitPolygon from 'split-polygon';
 
-import calculateVelocities from './controlStrategy';
-import updateWaypoint from './motionPlanning';
-import updateGoal from './goalSelect';
-import { generateStaticObject } from './staticObjects/staticObjectFactory';
+import generateStaticObject from '../staticObjects/staticObjectFactory';
 import {
   distanceBetween2Points,
   closestPointInPolygonToPoint,
@@ -14,7 +11,11 @@ import {
   closePolygon,
   getAbsolutePointFromLengthAndAngle,
   normalizeAngle
-} from './geometry';
+} from '../geometry';
+
+import updateVelocity from './controllers/velocityController';
+import updateWaypoint from './controllers/waypointController';
+import updateGoal from './controllers/goalController';
 
 // eslint-disable-next-line no-unused-vars
 export default class Robot {
@@ -76,7 +77,7 @@ export default class Robot {
     Body.setAngularVelocity(this.body, 1);
 
     // Velocities calculation strategy
-    this.updateVelocity = calculateVelocities(this);
+    this.updateVelocity = updateVelocity(this);
 
     // Motion Planning
     this.updateWaypoint = updateWaypoint(this);
@@ -128,7 +129,7 @@ export default class Robot {
     );
 
     // Update goal
-    const newGoalRaw = this.updateGoal();
+    const newGoalRaw = this.updateGoal(this.position);
     const newGoal = this.limitGoal(newGoalRaw);
     this.setGoal(newGoal);
 

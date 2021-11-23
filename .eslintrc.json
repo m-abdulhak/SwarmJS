@@ -13,6 +13,11 @@
     "rules": {
         "linebreak-style":"off",
         "strict": 0,
-        "comma-dangle": ["error", "never"]
+        "comma-dangle": ["error", "never"],
+        "prefer-destructuring": ["warn", {
+            "array": true,
+            "object": true
+          }
+        ]
     }
 }
