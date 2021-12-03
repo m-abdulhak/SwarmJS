@@ -17,9 +17,11 @@ import updateVelocity from './controllers/velocityController';
 import updateWaypoint from './controllers/waypointController';
 import updateGoal from './controllers/goalController';
 
+import SensorManager from './sensors/sensorManager';
+
 // eslint-disable-next-line no-unused-vars
 export default class Robot {
-  constructor(id, position, goal, radius, envWidth, envHeight, scene, algorithm) {
+  constructor(id, position, goal, sensors, radius, envWidth, envHeight, scene, algorithm) {
     // Configs
     this.DeadLockRecovery = {
       None: 0,
@@ -92,6 +94,11 @@ export default class Robot {
     // Obstacles
     this.obstacleSensingRadius = this.radius * 10;
 
+    // Sensors
+    this.sensors = new SensorManager(this.scene, this, sensors);
+    this.sensors.start();
+    this.sensorValues = this.sensors.readAll();
+
     this.changeAlgorithm = (newAlgorithm) => {
       this.algorithmOptions = this.availableAlgorithms.find((a) => a.name === newAlgorithm);
     };
@@ -119,7 +126,15 @@ export default class Robot {
     this.bestPuck = puck;
   }
 
+  readSensors() {
+    return this.sensors.readAll();
+  }
+
   timeStep() {
+    // Update sensors
+    this.sensors.update();
+    this.sensorValues = this.sensors.readAll();
+
     // Get new position and orientation from engine
     this.prevPosition = this.position;
     this.position = this.body.position;

@@ -3,6 +3,7 @@ import './stylesheets/styles.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import { sensors } from './swarmjs-core/robot/sensors/sensorManager';
 import App from './components/App';
 
 const config = {
@@ -12,7 +13,10 @@ const config = {
   },
   robots: {
     count: 20,
-    radius: 7
+    radius: 7,
+    sensors: [
+      sensors.position
+    ]
   },
   pucks: {
     groups: [

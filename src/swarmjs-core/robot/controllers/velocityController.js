@@ -43,15 +43,15 @@ export default function updateVelocity(robot) {
     );
 
     if (angle < 15) {
-      linearVelX = (robot.headingPoint.x - robot.position.x);
-      linearVelY = (robot.headingPoint.y - robot.position.y);
+      linearVelX = robot.velocityScale * (robot.headingPoint.x - robot.position.x);
+      linearVelY = robot.velocityScale * (robot.headingPoint.y - robot.position.y);
     } else if (directionOnRight) {
       angularVel = -1 * angularVelocityScale * angle;
     } else {
       angularVel = angularVelocityScale * angle;
     }
 
-    const linearVel = { x: linearVelX, y: linearVelY };
+    const linearVel = { x: linearVelX / 50, y: linearVelY / 50 };
 
     return { linearVel, angularVel };
   };

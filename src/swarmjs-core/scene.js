@@ -21,6 +21,7 @@ export default class Scene {
     this.renderables = [];
     this.numOfRobots = robotsConfig.count;
     this.robotRadius = robotsConfig.radius;
+    this.robotSensors = robotsConfig.sensors;
     this.pucksGroups = pucksGroups;
     this.numOfPucks = this.pucksGroups.reduce((total, puckGroup) => total + puckGroup.count, 0);
 
@@ -272,6 +273,7 @@ export default class Scene {
       .map((i) => new Robot(i,
         this.getAnInitialPos(),
         this.getAnInitialPos(),
+        this.robotSensors,
         radius,
         envWidth,
         envHeight,

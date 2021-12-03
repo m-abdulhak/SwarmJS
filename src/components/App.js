@@ -12,6 +12,7 @@ import {
   setSimulationSpeed,
   changeAlgorithm
 } from '../swarmjs-core/main';
+
 import {
   renderScene,
   resetRenderer,
