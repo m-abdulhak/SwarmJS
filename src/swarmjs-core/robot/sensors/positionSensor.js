@@ -1,21 +1,27 @@
-/* This is an example of a sensor that senses the location of the robot
-   Sensors should implement the sensor interface:
-   sample(): calculates the value of the sensor
-   read(): returns the value of the sensor
-   name: will be used to access the sensor throuh the sensor manager
-   type: determines when the sensor is sampled, possible values: onStart, onUpdate, or onRequest.
-   dependencies: optional, list of sensors that this sensor depends on.
+/*
+  This is an example of a sensor that senses the location of the robot
+  Sensors can be implemented as either a class or a function
+  Sensors should implement the following interface:
+    sample(): calculates the value of the sensor
+    read(): returns the latest sampled value of the sensor
+    name: used to access (sample and read) the sensor through the sensor manager
+    type: determines when the sensor is sampled, possible values: onStart, onUpdate, or onRequest.
+    dependencies: optional, a list specifying any other sensors needed for this sensor to work,
+                  used by sensorManager to determine the order in which the sensors are sampled
 
-    Sensors should be added to the availableSensors definitions in sensorManager
-
-    Sensors can be implemented as either a class or a function
+  The name and sensor object should be exposed by default exporting an object with properties:
+    name: the name of the sensor
+    Sensor: the sensor object (function or class)
+  and all sensors should be added to the 'availableSensorDefitions' list in sensorManager
 */
 
 import { sensorSamplingTypes, availableSensors } from './sensorManager';
 
+const name = 'position';
+
 // Class based sensor implementation
-// export default class PositionSensor {
-//   constructor(name, robot, scene) {
+// class PositionSensor {
+//   constructor(robot, scene) {
 //     this.name = name;
 //     this.type = sensorSamplingTypes.onUpdate;
 //     this.dependencies = [availableSensors.prevPosition];
@@ -35,7 +41,7 @@ import { sensorSamplingTypes, availableSensors } from './sensorManager';
 // }
 
 // Function based sensor implementation
-export default function PositionSensor(name, robot) {
+const PositionSensor = (robot) => {
   const type = sensorSamplingTypes.onUpdate;
   const dependencies = [availableSensors.prevPosition];
 
@@ -56,4 +62,9 @@ export default function PositionSensor(name, robot) {
     sample,
     read
   };
-}
+};
+
+export default {
+  name,
+  Sensor: PositionSensor
+};

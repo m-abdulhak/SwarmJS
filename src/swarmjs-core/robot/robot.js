@@ -108,6 +108,7 @@ export default class Robot {
 
   setPosition(newPosition) {
     Body.set(this.body, 'position', { x: newPosition.x, y: newPosition.y });
+    // TODO: update sensors
     this.position = this.body.position;
     this.headingPoint = getAbsolutePointFromLengthAndAngle(
       this.position, this.radius * 1.2, this.orientation

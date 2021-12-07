@@ -14,23 +14,17 @@ export const sensorSamplingTypes = {
   onRequest: 'none'
 };
 
-// sensors are stored in this object
-// key: used to refer to the sensor from other modules,
-//      e.g. in config when defining the enabled sensors, or in other sensors to define a dependency
-// name: used to access (sample and read) the sensor during runtime through the sensor manager
-// Sensor: the actual sensor object (class or function)
-// TODO:  is there a  better way to define the sensors without having both a key and a name, while
-//        keeping the dependency definitions and enebled sensors definitions as clean as possible?
-export const availableSensors = {
-  position: {
-    name: 'position',
-    Sensor: PositionSensor
-  },
-  prevPosition: {
-    name: 'prevPosition',
-    Sensor: PrevPositionSensor
-  }
-};
+const availableSensorDefitions = [
+  PositionSensor,
+  PrevPositionSensor
+];
+
+// Sensors are stored in this object allowing other modules to easily reference them
+// e.g. in config when defining the enabled sensors, or in other sensors to define a dependency
+export const availableSensors = availableSensorDefitions.reduce((acc, sensorDef) => {
+  acc[sensorDef.name] = sensorDef;
+  return acc;
+}, {});
 
 const orderSensors = (sensorList) => {
   const edges = [];
@@ -57,7 +51,7 @@ export default class SensorManager {
     this.robot = robot;
 
     this.activeSensors = orderSensors(
-      enabledSensors.map(({ name, Sensor }) => new Sensor(name, robot, scene))
+      enabledSensors.map(({ Sensor }) => new Sensor(robot, scene))
     );
     this.sensorsOnStart = this.activeSensors
       .filter((s) => s.type === sensorSamplingTypes.onStart);
