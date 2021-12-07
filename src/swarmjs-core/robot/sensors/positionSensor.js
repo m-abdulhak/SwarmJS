@@ -4,19 +4,21 @@
    read(): returns the value of the sensor
    name: will be used to access the sensor throuh the sensor manager
    type: determines when the sensor is sampled, possible values: onStart, onUpdate, or onRequest.
+   dependencies: optional, list of sensors that this sensor depends on.
 
-    Sensors should be added to the sensor manager's list of sensors to be available for use
+    Sensors should be added to the availableSensors definitions in sensorManager
 
     Sensors can be implemented as either a class or a function
 */
 
-import { sensorSamplingTypes } from './sensorManager';
+import { sensorSamplingTypes, availableSensors } from './sensorManager';
 
 // Class based sensor implementation
 // export default class PositionSensor {
-//   constructor(scene, robot) {
-//     this.name = 'position';
+//   constructor(name, robot, scene) {
+//     this.name = name;
 //     this.type = sensorSamplingTypes.onUpdate;
+//     this.dependencies = [availableSensors.prevPosition];
 
 //     // private
 //     this.body = robot.body;
@@ -33,16 +35,16 @@ import { sensorSamplingTypes } from './sensorManager';
 // }
 
 // Function based sensor implementation
-export default function PositionSensor(scene, robot) {
-  const name = 'position';
+export default function PositionSensor(name, robot) {
   const type = sensorSamplingTypes.onUpdate;
+  const dependencies = [availableSensors.prevPosition];
 
   // private
   const { body } = robot;
   let value = null;
 
   const sample = () => {
-    value = body.position;
+    value = { ...body.position };
   };
 
   const read = () => value;
@@ -50,6 +52,7 @@ export default function PositionSensor(scene, robot) {
   return {
     name,
     type,
+    dependencies,
     sample,
     read
   };

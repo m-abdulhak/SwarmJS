@@ -47,6 +47,7 @@
     "save-svg-as-png": "^1.4.17",
     "semantic-ui-react": "^2.0.4",
     "split-polygon": "^1.0.0",
-    "standard": "^16.0.3"
+    "standard": "^16.0.3",
+    "toposort": "^2.0.2"
   }
 }

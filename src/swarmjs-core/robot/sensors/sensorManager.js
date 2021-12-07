@@ -4,6 +4,9 @@
 */
 
 import PositionSensor from './positionSensor';
+import PrevPositionSensor from './prevPositionSensor';
+
+const toposort = require('toposort');
 
 export const sensorSamplingTypes = {
   onStart: 'start',
@@ -11,21 +14,55 @@ export const sensorSamplingTypes = {
   onRequest: 'none'
 };
 
-export const sensors = {
-  position: PositionSensor
+// sensors are stored in this object
+// key: used to refer to the sensor from other modules,
+//      e.g. in config when defining the enabled sensors, or in other sensors to define a dependency
+// name: used to access (sample and read) the sensor during runtime through the sensor manager
+// Sensor: the actual sensor object (class or function)
+// TODO:  is there a  better way to define the sensors without having both a key and a name, while
+//        keeping the dependency definitions and enebled sensors definitions as clean as possible?
+export const availableSensors = {
+  position: {
+    name: 'position',
+    Sensor: PositionSensor
+  },
+  prevPosition: {
+    name: 'prevPosition',
+    Sensor: PrevPositionSensor
+  }
+};
+
+const orderSensors = (sensorList) => {
+  const edges = [];
+  sensorList.forEach((sensor) => {
+    if (sensor.dependencies && sensor.dependencies.length > 0) {
+      sensor.dependencies.forEach((dependency) => {
+        edges.push([dependency.name, sensor.name]);
+      });
+    }
+  });
+  const sorted = toposort(edges);
+  return sorted.map((name) => sensorList.find((s) => s.name === name));
+};
+
+const sampleSensors = (sensorsList) => {
+  sensorsList.forEach((sensor) => {
+    sensor.sample();
+  });
 };
 
 export default class SensorManager {
   constructor(scene, robot, enabledSensors) {
     this.scene = scene;
     this.robot = robot;
-    this.activeSensors = enabledSensors.map((Sensor) => new Sensor(scene, robot));
-  }
 
-  sampleAll() {
-    this.activeSensors.forEach((sensor) => {
-      sensor.sample();
-    });
+    this.activeSensors = orderSensors(
+      enabledSensors.map(({ name, Sensor }) => new Sensor(name, robot, scene))
+    );
+    this.sensorsOnStart = this.activeSensors
+      .filter((s) => s.type === sensorSamplingTypes.onStart);
+    this.sensorsOnUpdate = this.activeSensors
+      .filter((s) => s.type === sensorSamplingTypes.onUpdate);
   }
 
   readAll() {
@@ -35,6 +72,11 @@ export default class SensorManager {
     }, {});
   }
 
+  read(name) {
+    const sensor = this.activeSensors.find((s) => s.name === name);
+    return sensor.read();
+  }
+
   sample(name) {
     const sensor = this.activeSensors.find((s) => s.name === name);
     if (sensor) {
@@ -42,24 +84,11 @@ export default class SensorManager {
     }
   }
 
-  read(name) {
-    const sensor = this.activeSensors.find((s) => s.name === name);
-    return sensor.read();
-  }
-
-  sampleOnEvent(event) {
-    this.activeSensors.forEach((sensor) => {
-      if (sensor.type === event) {
-        sensor.sample();
-      }
-    });
-  }
-
   update() {
-    this.sampleOnEvent('update');
+    sampleSensors(this.sensorsOnUpdate);
   }
 
   start() {
-    this.sampleOnEvent('start');
+    sampleSensors(this.sensorsOnStart);
   }
 }
