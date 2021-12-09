@@ -1,16 +1,16 @@
 import { sensorSamplingTypes } from './sensorManager';
 
-const name = 'prevPosition';
+const name = 'VC';
 
-const PrevPositionSensor = (robot) => {
+const VoronoiCellSensor = (robot, scene) => {
   const type = sensorSamplingTypes.onUpdate;
   const dependencies = [];
 
   // private
-  let value = { x: null, y: null };
+  let value = [];
 
   const sample = () => {
-    value = { ...robot.sense('position') };
+    value = [...scene.voronoi.cellPolygon(robot.id)];
   };
 
   const read = () => value;
@@ -26,5 +26,5 @@ const PrevPositionSensor = (robot) => {
 
 export default {
   name,
-  Sensor: PrevPositionSensor
+  Sensor: VoronoiCellSensor
 };

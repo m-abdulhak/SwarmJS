@@ -2,7 +2,6 @@ import { sensorSamplingTypes, availableSensors } from './sensorManager';
 
 const name = 'neighbors';
 
-// Function based sensor implementation
 const NeighborsSensor = (robot, scene) => {
   const type = sensorSamplingTypes.onUpdate;
   const dependencies = [availableSensors.position];

@@ -1,14 +1,9 @@
 import { Body, World, Bodies } from 'matter-js';
-import splitPolygon from 'split-polygon';
 
 import generateStaticObject from '../staticObjects/staticObjectFactory';
 import {
   distanceBetween2Points,
-  closestPointInPolygonToPoint,
-  shiftPointOfLineSegInDirOfPerpendicularBisector,
-  pointIsInsidePolygon,
-  getLineEquationParams,
-  closePolygon
+  closestPointInPolygonToPoint
 } from '../geometry';
 
 import updateVelocity from './controllers/velocityController';
@@ -56,7 +51,6 @@ export default class Robot {
     this.scene = scene;
     this.engine = this.scene.engine;
     this.world = this.scene.world;
-    this.VC = [];
 
     // Create Matter.js body and attach it to world
     this.body = Bodies.circle(position.x, position.y, this.radius);
@@ -198,40 +192,6 @@ export default class Robot {
       }
       return acc;
     }, null);
-  }
-
-  trimVCwithStaticObstacles() {
-    const closestPoint = this.getClosestPointToNearbyObstacles();
-
-    if (closestPoint == null) {
-      return;
-    }
-
-    const secondLinePoint = shiftPointOfLineSegInDirOfPerpendicularBisector(
-      closestPoint.x,
-      closestPoint.y,
-      closestPoint.x,
-      closestPoint.y,
-      this.sense('position').x,
-      this.sense('position').y,
-      1
-    );
-
-    const splittingLineParams = getLineEquationParams(closestPoint, secondLinePoint);
-
-    const splitPolygonRes = this.VC && this.VC.length > 2
-      ? splitPolygon(this.VC, splittingLineParams)
-      : { positive: this.VC, negative: [] };
-    const splitPolygonParts = [splitPolygonRes.positive, splitPolygonRes.negative];
-    splitPolygonParts.map(
-      (poly) => closePolygon(poly)
-    );
-
-    if (pointIsInsidePolygon(this.sense('position'), splitPolygonParts[0])) {
-      [this.VC] = splitPolygonParts;
-    } else {
-      [, this.VC] = splitPolygonParts;
-    }
   }
 
   pointIsReachableInEnvBounds(goalPoint) {

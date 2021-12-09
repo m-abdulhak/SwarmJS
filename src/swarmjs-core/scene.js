@@ -174,10 +174,10 @@ export default class Scene {
       .from(this.getCurRobotsPos(), (d) => d.x, (d) => d.y)
       .voronoi([0, 0, this.width, this.height]);
 
-    this.updateRobotsMeasurements();
-
     this.robots.forEach((r) => r.timeStep());
     this.pucks.forEach((p) => p.timeStep());
+
+    this.updateRobotsMeasurements();
 
     this.updatePucksOutsideOfGoalMesurements();
     // this.updateMinRobotRobotDistMesurements();
@@ -207,18 +207,16 @@ export default class Scene {
       // moved to a sensor
 
       // 3. Update the robot's cell
-      const cell = this.voronoi.cellPolygon(i);
-      r.VC = cell;
-
-      r.trimVCwithStaticObstacles();
+      // moved to a sensor
 
       // If cell is not defined => no need to update the BVC
+      const cell = r.sense('voronoiCell');
       if (cell == null || cell === undefined || cell.length < 3) {
         return;
       }
 
       // 4. Update BVC
-      r.BVC = calculateBVCfromVC(r.VC, r.sense('position'), r.radius);
+      r.BVC = calculateBVCfromVC(r.sense('voronoiCell'), r.sense('position'), r.radius);
     });
   }
 
