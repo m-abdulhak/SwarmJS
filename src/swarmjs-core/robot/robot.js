@@ -57,7 +57,6 @@ export default class Robot {
     this.engine = this.scene.engine;
     this.world = this.scene.world;
     this.VC = [];
-    this.neighbors = [];
 
     // Create Matter.js body and attach it to world
     this.body = Bodies.circle(position.x, position.y, this.radius);

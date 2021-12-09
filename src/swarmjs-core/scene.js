@@ -204,7 +204,7 @@ export default class Scene {
       // moved to a sensor
 
       // 2. Update the robot's neighbors
-      r.neighbors = this.getNeighborsOf(i);
+      // moved to a sensor
 
       // 3. Update the robot's cell
       const cell = this.voronoi.cellPolygon(i);
@@ -347,23 +347,6 @@ export default class Scene {
     }
 
     return positions;
-  }
-
-  getNeighborsOf(robotIndex) {
-    const neighbors = [];
-    try {
-      const indexes = Array.from(this.voronoi.delaunay.neighbors(robotIndex)).filter((x) => x > -1);
-      indexes.forEach((i) => neighbors.push(this.getRobotByIndex(i)));
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(`Error Exracting Neighbors: ${error}`);
-    }
-
-    return neighbors;
-  }
-
-  getRobotByIndex(index) {
-    return this.robots[index];
   }
 
   addEnvBoundryObjects(envWidth, envHeight) {

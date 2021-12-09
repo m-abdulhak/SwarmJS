@@ -114,7 +114,7 @@ export default function updateWaypoint(robot) {
     const closeRobots = [];
     let maxDist = 0;
 
-    robot.neighbors.forEach((r) => {
+    robot.sense('neighbors').forEach((r) => {
       const curDist = distanceBetween2Points(r.sense('position'), point);
       if (curDist <= distance) {
         closeRobots.push(r);

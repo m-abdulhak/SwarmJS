@@ -8,6 +8,7 @@ import PrevPositionSensor from './prevPositionSensor';
 import OrientationSensor from './orientationSensor';
 import HeadingSensor from './headingSensor';
 import NearbyPucksSensor from './nearbyPucksSensor';
+import NeighborsSensor from './neighborsSensor';
 
 const toposort = require('toposort');
 
@@ -22,7 +23,8 @@ const availableSensorDefitions = [
   PrevPositionSensor,
   OrientationSensor,
   HeadingSensor,
-  NearbyPucksSensor
+  NearbyPucksSensor,
+  NeighborsSensor
 ];
 
 // Sensors are stored in this object allowing other modules to easily reference them
