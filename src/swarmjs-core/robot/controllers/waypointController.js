@@ -153,7 +153,7 @@ export default function updateWaypoint(robot) {
     const tempGoalNotReached = !robot.reachedTempGoal();
     const currentVCellContainsTempGoal = pointIsInsidePolygon(
       robot.tempGoal,
-      robot.BVC
+      robot.sense('BVC')
     );
     const maneuverNotSucceededYet = !(deadLockManeuverInProgress && neighborsAvoided());
 
@@ -268,7 +268,7 @@ export default function updateWaypoint(robot) {
   }
 
   return () => {
-    const cell = robot.BVC;
+    const cell = robot.sense('BVC');
     // If cell is undefined (shouldn't happen in collision-free configurations)
     // => set localgoal = goal
     if (cell == null || cell.length < 2) {

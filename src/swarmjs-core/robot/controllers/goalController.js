@@ -206,7 +206,7 @@ export default function updateGoal(robot) {
 
           // Only Test this condition if enabled by robot algorithm options
           const condInRobotVorCell = robot.algorithmOptions.limitPuckSelectionToBVC
-            ? pointIsInsidePolygon(p.position, robot.BVC)
+            ? pointIsInsidePolygon(p.position, robot.sense('BVC'))
             : true;
 
           const normalizedAngle = getNormalizedAngleToPuck(robot.sense('position'), p);

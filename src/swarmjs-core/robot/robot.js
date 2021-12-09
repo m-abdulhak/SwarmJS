@@ -280,10 +280,7 @@ export default class Robot {
     return newGoal;
   }
 
-  collidingWithRobot(r) {
-    return distanceBetween2Points(this.sense('position'), r.sensotValues.position) < this.radius * 2;
-  }
-
+  // TODO: move to benchmark module
   getNeighborRobotsDistanceMeasurements(robots) {
     let minDist = -1;
 

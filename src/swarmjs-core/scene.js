@@ -6,7 +6,7 @@ import { Delaunay } from 'd3-delaunay';
 import Robot from './robot/robot';
 import Puck from './puck';
 import generateStaticObject from './staticObjects/staticObjectFactory';
-import { distanceBetween2Points, calculateBVCfromVC } from './geometry';
+import { distanceBetween2Points } from './geometry';
 import { mapSceneToArr, getPucksGoalMap } from './distanceTransform/globalPlanning';
 
 export default class Scene {
@@ -21,7 +21,6 @@ export default class Scene {
     this.renderables = [];
     this.numOfRobots = robotsConfig.count;
     this.robotRadius = robotsConfig.radius;
-    this.robotSensors = robotsConfig.sensors;
     this.pucksGroups = pucksGroups;
     this.numOfPucks = this.pucksGroups.reduce((total, puckGroup) => total + puckGroup.count, 0);
 
@@ -61,6 +60,7 @@ export default class Scene {
     this.robots = this.initializeRobotsRange(
       this.numOfRobots,
       this.robotRadius,
+      robotsConfig.sensors,
       this.width,
       this.height,
       algorithm
@@ -177,8 +177,6 @@ export default class Scene {
     this.robots.forEach((r) => r.timeStep());
     this.pucks.forEach((p) => p.timeStep());
 
-    this.updateRobotsMeasurements();
-
     this.updatePucksOutsideOfGoalMesurements();
     // this.updateMinRobotRobotDistMesurements();
 
@@ -197,29 +195,7 @@ export default class Scene {
     // console.log('Renderables :', this.renderables);
   }
 
-  updateRobotsMeasurements() {
-    // For each robot
-    this.robots.forEach((r, i) => {
-      // 1. Find Pucks within a certain distance to the robot
-      // moved to a sensor
-
-      // 2. Update the robot's neighbors
-      // moved to a sensor
-
-      // 3. Update the robot's cell
-      // moved to a sensor
-
-      // If cell is not defined => no need to update the BVC
-      const cell = r.sense('voronoiCell');
-      if (cell == null || cell === undefined || cell.length < 3) {
-        return;
-      }
-
-      // 4. Update BVC
-      r.BVC = calculateBVCfromVC(r.sense('voronoiCell'), r.sense('position'), r.radius);
-    });
-  }
-
+  // TODO: Move to benchmark module
   updateMinRobotRobotDistMesurements() {
     let minDist = null;
 
@@ -236,6 +212,7 @@ export default class Scene {
     }
   }
 
+  // TODO: Move to benchmarking class
   updatePucksOutsideOfGoalMesurements() {
     // Calculate the number of pucks outside of their goal area
     const pucksOutsideGoalCount = this.pucks
@@ -244,6 +221,7 @@ export default class Scene {
     this.pucksOutsideGoalCount = pucksOutsideGoalCount;
   }
 
+  // TODO: Move to benchmarking module
   updateDistance() {
     let dis = 0;
 
@@ -263,12 +241,12 @@ export default class Scene {
     return this.robots.map((r) => r.goal);
   }
 
-  initializeRobotsRange(numOfRobots, radius, envWidth, envHeight, algorithm) {
+  initializeRobotsRange(numOfRobots, radius, sensors, envWidth, envHeight, algorithm) {
     return d3.range(numOfRobots)
       .map((i) => new Robot(i,
         this.getAnInitialPos(),
         this.getAnInitialPos(),
-        this.robotSensors,
+        sensors,
         radius,
         envWidth,
         envHeight,
@@ -306,6 +284,7 @@ export default class Scene {
     return this.robotsStartingPositions.pop();
   }
 
+  // TODO: Move to a separate module, and pass as a dependency
   getRandomCollisionFreePositions(numOfRobots, radius, envWidth, envHeight, numOfPucks) {
     const resolution = (radius * 2.1);
     const xCount = envWidth / resolution;

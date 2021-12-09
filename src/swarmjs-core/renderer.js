@@ -273,11 +273,12 @@ export function renderScene(curSvgEl, curScene) {
 
   if (activeElements.includes('BVC')) {
     scene.robots.forEach((r, rIndex) => {
-      if (typeof (r.BVC) !== 'undefined' && r.BVC.length > 0) {
+      const bVC = r.sense('BVC');
+      if (typeof (bVC) !== 'undefined' && bVC.length > 0) {
         renderedElements.BVCLineSegs.push(
           svg.append('g')
             .selectAll('path')
-            .data(r.BVC)
+            .data(bVC)
             .enter()
             .append('path')
             .attr('class', 'bvc-seg')
@@ -286,10 +287,10 @@ export function renderScene(curSvgEl, curScene) {
             .attr('stroke-width', 1)
             .attr('stroke-dasharray', '10,10')
             .attr('d', (d, i) => renderLineSeg(
-              r.BVC[i][0],
-              r.BVC[i][1],
-              r.BVC[nxtCircIndx(i, r.BVC.length)][0],
-              r.BVC[nxtCircIndx(i, r.BVC.length)][1]
+              bVC[i][0],
+              bVC[i][1],
+              bVC[nxtCircIndx(i, bVC.length)][0],
+              bVC[nxtCircIndx(i, bVC.length)][1]
             ))
         );
       }
