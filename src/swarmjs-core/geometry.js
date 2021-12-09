@@ -67,17 +67,17 @@ export function closePolygon(poly) {
   return poly;
 }
 
-export function calculateBVCfromVC(cell, r) {
+export function calculateBVCfromVC(cell, position, radius) {
   const offset = new Offset();
   let padding = [];
   try {
-    [padding] = offset.data(cell).padding(r.radius * 1);
+    [padding] = offset.data(cell).padding(radius * 1);
   } catch (err) {
     // On collisions, if voronoi cell is too small => BVC is undefined
     // Should not occur in collision-free configurations
     // eslint-disable-next-line no-console
-    console.log(err);
-    padding = [[r.position.x, r.position.y]];
+    console.log(`Error calculating BVC:  ${err}`);
+    padding = [[position.x, position.y]];
   }
 
   return padding;

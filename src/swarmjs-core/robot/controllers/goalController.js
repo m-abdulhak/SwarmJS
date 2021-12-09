@@ -36,18 +36,18 @@ export default function updateGoal(robot) {
     const len = robot.getDistanceTo(closestPoint);
 
     const translationVec = {
-      x: ((closestPoint.x - robot.position.x) * radius) / (len * 10),
-      y: ((closestPoint.y - robot.position.y) * radius) / (len * 10)
+      x: ((closestPoint.x - robot.sense('position').x) * radius) / (len * 10),
+      y: ((closestPoint.y - robot.sense('position').y) * radius) / (len * 10)
     };
 
     let midPoint = translatePointInDirection(
-      robot.position.x,
-      robot.position.y,
+      robot.sense('position').x,
+      robot.sense('position').y,
       translationVec.x,
       translationVec.y
     );
 
-    // midPoint = robot.position;
+    // midPoint = robot.sense('position');
 
     const delta = radius * 2;
     let newGoal = midPoint;
@@ -55,8 +55,8 @@ export default function updateGoal(robot) {
     newGoal = shiftPointOfLineSegInDirOfPerpendicularBisector(
       midPoint.x,
       midPoint.y,
-      robot.position.x,
-      robot.position.y,
+      robot.sense('position').x,
+      robot.sense('position').y,
       closestPoint.x,
       closestPoint.y,
       delta
@@ -67,8 +67,8 @@ export default function updateGoal(robot) {
       translationVec.y *= -1;
 
       midPoint = translatePointInDirection(
-        robot.position.x,
-        robot.position.y,
+        robot.sense('position').x,
+        robot.sense('position').y,
         translationVec.x,
         translationVec.y
       );
@@ -78,8 +78,8 @@ export default function updateGoal(robot) {
       newGoal = shiftPointOfLineSegInDirOfPerpendicularBisector(
         midPoint.x,
         midPoint.y,
-        robot.position.x,
-        robot.position.y,
+        robot.sense('position').x,
+        robot.sense('position').y,
         closestPoint.x,
         closestPoint.y,
         delta
@@ -114,8 +114,8 @@ export default function updateGoal(robot) {
 
     const closestPointsToSides = allSides.map(
       (side) => closestPointInLineSegToPoint(
-        robot.position.x,
-        robot.position.y,
+        robot.sense('position').x,
+        robot.sense('position').y,
         side[0].x,
         side[0].y,
         side[1].x,
@@ -152,16 +152,16 @@ export default function updateGoal(robot) {
   function getGoalFromStuckManeuver() {
     const envOrbitGoal = getGoalFromEnvOrbit();
     const vecToEnvOrbitGoal = {
-      x: envOrbitGoal.x - robot.position.x,
-      y: envOrbitGoal.y - robot.position.y
+      x: envOrbitGoal.x - robot.sense('position').x,
+      y: envOrbitGoal.y - robot.sense('position').y
     };
     const rotatedEnvOribtGoal = {
       x: -1 * vecToEnvOrbitGoal.y,
       y: vecToEnvOrbitGoal.x
     };
     const newGoal = {
-      x: robot.position.x + rotatedEnvOribtGoal.x,
-      y: robot.position.y + rotatedEnvOribtGoal.y
+      x: robot.sense('position').x + rotatedEnvOribtGoal.x,
+      y: robot.sense('position').y + rotatedEnvOribtGoal.y
     };
     return newGoal;
   }
@@ -173,15 +173,15 @@ export default function updateGoal(robot) {
   }
 
   function getGoalFromPuck(puck) {
-    const normalizedAngle = getNormalizedAngleToPuck(robot.position, puck);
+    const normalizedAngle = getNormalizedAngleToPuck(robot.sense('position'), puck);
 
     if (normalizedAngle < ANGLE_OPTIMAL_THRESHOLD) {
       return puck.position;
     }
 
     const closestPointInLine = closestPointInLineToPoint(
-      robot.position.x,
-      robot.position.y,
+      robot.sense('position').x,
+      robot.sense('position').y,
       puck.position.x,
       puck.position.y,
       puck.goal.x,
@@ -209,7 +209,7 @@ export default function updateGoal(robot) {
             ? pointIsInsidePolygon(p.position, robot.BVC)
             : true;
 
-          const normalizedAngle = getNormalizedAngleToPuck(robot.position, p);
+          const normalizedAngle = getNormalizedAngleToPuck(robot.sense('position'), p);
           const puckAngleAcceptable = normalizedAngle <= ANGLE_ACCEPTABLE_THRESHOLD;
 
           const condReachableInEnv = robot.pointIsReachableInEnvBounds(g);
@@ -223,7 +223,7 @@ export default function updateGoal(robot) {
         return false;
       })
       .forEach((p) => {
-        angleRatings.push([p, angleBetweenThreePointsDeg(robot.position, p.position, p.goal)]);
+        angleRatings.push([p, angleBetweenThreePointsDeg(robot.sense('position'), p.position, p.goal)]);
         distanceRatings.push([p, robot.getDistanceTo(p.position)]);
       });
 
@@ -257,7 +257,7 @@ export default function updateGoal(robot) {
 
     // Calc distance to last recorded position
     const distToLastPos = lastPosition
-      ? distanceBetween2Points(robot.position, lastPosition)
+      ? distanceBetween2Points(robot.sense('position'), lastPosition)
       : null;
 
     // If robot is close enough to be considered at same position
@@ -276,7 +276,7 @@ export default function updateGoal(robot) {
     }
 
     // Update last position and continue normal operations
-    lastPosition = { ...robot.position };
+    lastPosition = { ...robot.sense('position') };
 
     let { bestPuck } = robot;
     if (curGoalTimeSteps < MIN_GOAL_TIME_STEPS && !robot.reachedGoal()) {

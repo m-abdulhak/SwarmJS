@@ -8,9 +8,7 @@ import {
   shiftPointOfLineSegInDirOfPerpendicularBisector,
   pointIsInsidePolygon,
   getLineEquationParams,
-  closePolygon,
-  getAbsolutePointFromLengthAndAngle,
-  normalizeAngle
+  closePolygon
 } from '../geometry';
 
 import updateVelocity from './controllers/velocityController';
@@ -48,17 +46,11 @@ export default class Robot {
       : this.availableAlgorithms[0];
 
     this.id = id;
-    this.position = position;
-    this.prevPosition = position;
     this.radius = radius;
-    this.orientation = 0;
-    this.headingPoint = getAbsolutePointFromLengthAndAngle(
-      this.position, this.radius * 1.2, this.orientation
-    );
     this.velocity = { x: 0, y: 0 };
     this.velocityScale = 1;
     this.goal = goal;
-    this.tempGoal = { x: this.position.x, y: this.position.y };
+    this.tempGoal = { x: position.x, y: position.y };
     this.envWidth = envWidth;
     this.envHeight = envHeight;
     this.scene = scene;
@@ -97,7 +89,7 @@ export default class Robot {
     // Sensors
     this.sensors = new SensorManager(this.scene, this, sensors);
     this.sensors.start();
-    this.sensorValues = this.sensors.readAll();
+    this.readSensorValues();
 
     this.changeAlgorithm = (newAlgorithm) => {
       this.algorithmOptions = this.availableAlgorithms.find((a) => a.name === newAlgorithm);
@@ -106,13 +98,18 @@ export default class Robot {
     this.changeAlgorithm.bind(this);
   }
 
+  readSensorValues() {
+    this.sensorValues = this.sensors.readAll();
+  }
+
+  sense(sensorName) {
+    return this.sensors.sense(sensorName);
+  }
+
   setPosition(newPosition) {
     Body.set(this.body, 'position', { x: newPosition.x, y: newPosition.y });
-    // TODO: update sensors
-    this.position = this.body.position;
-    this.headingPoint = getAbsolutePointFromLengthAndAngle(
-      this.position, this.radius * 1.2, this.orientation
-    );
+    this.sensors.update();
+    this.readSensorValues();
   }
 
   setGoal(newGoal) {
@@ -127,25 +124,15 @@ export default class Robot {
     this.bestPuck = puck;
   }
 
-  readSensors() {
-    return this.sensors.readAll();
-  }
-
   timeStep() {
     // Update sensors
     this.sensors.update();
-    this.sensorValues = this.sensors.readAll();
+    this.readSensorValues();
 
     // Get new position and orientation from engine
-    this.prevPosition = this.position;
-    this.position = this.body.position;
-    this.orientation = normalizeAngle(this.body.angle);
-    this.headingPoint = getAbsolutePointFromLengthAndAngle(
-      this.position, this.radius * 1.2, this.orientation
-    );
 
     // Update goal
-    const newGoalRaw = this.updateGoal(this.position);
+    const newGoalRaw = this.updateGoal(this.sense('position'));
     const newGoal = this.limitGoal(newGoalRaw);
     this.setGoal(newGoal);
 
@@ -174,7 +161,7 @@ export default class Robot {
   // Static Obstacles
   getNearbyObstacles() {
     const staticObstacles = [...this.scene.staticObjects.filter(
-      (obj) => obj.getDistanceToBorder(this.position) < this.obstacleSensingRadius
+      (obj) => obj.getDistanceToBorder(this.sense('position')) < this.obstacleSensingRadius
     )];
 
     // Add pucks that reached goal as obstacles
@@ -196,7 +183,7 @@ export default class Robot {
   getAllClosestPointsToNearbyObstacles() {
     const closeObstacles = this.getNearbyObstacles();
     return closeObstacles.map(
-      (staticObs) => staticObs.getIntersectionPoint(this.position)
+      (staticObs) => staticObs.getIntersectionPoint(this.sense('position'))
     );
   }
 
@@ -227,19 +214,22 @@ export default class Robot {
       closestPoint.y,
       closestPoint.x,
       closestPoint.y,
-      this.position.x,
-      this.position.y,
+      this.sense('position').x,
+      this.sense('position').y,
       1
     );
 
     const splittingLineParams = getLineEquationParams(closestPoint, secondLinePoint);
-    const splitPolygonRes = splitPolygon(this.VC, splittingLineParams);
+
+    const splitPolygonRes = this.VC && this.VC.length > 2
+      ? splitPolygon(this.VC, splittingLineParams)
+      : { positive: this.VC, negative: [] };
     const splitPolygonParts = [splitPolygonRes.positive, splitPolygonRes.negative];
     splitPolygonParts.map(
       (poly) => closePolygon(poly)
     );
 
-    if (pointIsInsidePolygon(this.position, splitPolygonParts[0])) {
+    if (pointIsInsidePolygon(this.sense('position'), splitPolygonParts[0])) {
       [this.VC] = splitPolygonParts;
     } else {
       [, this.VC] = splitPolygonParts;
@@ -294,7 +284,7 @@ export default class Robot {
   }
 
   getDistanceTo(point) {
-    const ret = distanceBetween2Points(this.position, point);
+    const ret = distanceBetween2Points(this.sense('position'), point);
     return ret;
   }
 
@@ -322,8 +312,8 @@ export default class Robot {
       let diffX = null;
       let diffY = null;
       while (!staticObj.pointIsReachableByRobot(newGoal, this)) {
-        diffX = diffX || newGoal.x - this.position.x;
-        diffY = diffY || newGoal.y - this.position.y;
+        diffX = diffX || newGoal.x - this.sense('position').x;
+        diffY = diffY || newGoal.y - this.sense('position').y;
         newGoal.x += diffX;
         newGoal.y += diffY;
       }
@@ -333,14 +323,14 @@ export default class Robot {
   }
 
   collidingWithRobot(r) {
-    return distanceBetween2Points(this.position, r.position) < this.radius * 2;
+    return distanceBetween2Points(this.sense('position'), r.sensotValues.position) < this.radius * 2;
   }
 
   getNeighborRobotsDistanceMeasurements(robots) {
     let minDist = -1;
 
     robots.forEach((r) => {
-      const distance = distanceBetween2Points(this.position, r.position);
+      const distance = distanceBetween2Points(this.sense('position'), r.sensotValues.position);
 
       // If first or closest neighbor, set distanceas min distance
       if (minDist === -1 || distance < minDist) {

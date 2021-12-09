@@ -56,7 +56,7 @@ export default function updateWaypoint(robot) {
       });
       return { x: bestVertex[0], y: bestVertex[1] };
     } catch (error) {
-      return robot.position;
+      return robot.sense('position');
     }
   }
 
@@ -90,8 +90,8 @@ export default function updateWaypoint(robot) {
   // returns temp goal according to advanced deadlock recovery algorithm
   function setTempGoalAccToAdvancedDeadlockRec(cell) {
     // Get vertices of cell that lie on the current maneuver direction
-    const vertecies = getVerteciesOnManeuverDir(cell, robot.position, robot.goal);
-    const outermostPoint = getFurthestVertexFromLineSeg(vertecies, robot.position, robot.goal);
+    const vertecies = getVerteciesOnManeuverDir(cell, robot.sense('position'), robot.goal);
+    const outermostPoint = getFurthestVertexFromLineSeg(vertecies, robot.sense('position'), robot.goal);
     const distanceToOutermostPoint = robot.getDistanceTo(outermostPoint);
     if (distanceToOutermostPoint < detourPointMaxDistance) {
       robot.setTempGoal(outermostPoint);
@@ -101,7 +101,7 @@ export default function updateWaypoint(robot) {
       const detourRatio = defaultRatioLongerThanMax
         ? detourPointMaxDistance / distanceToOutermostPoint
         : detourPointToOutermostPointRatio;
-      robot.setTempGoal(pointOnLineSegmentPerRatio(robot.position, outermostPoint, detourRatio));
+      robot.setTempGoal(pointOnLineSegmentPerRatio(robot.sense('position'), outermostPoint, detourRatio));
     }
   }
 
@@ -115,7 +115,7 @@ export default function updateWaypoint(robot) {
     let maxDist = 0;
 
     robot.neighbors.forEach((r) => {
-      const curDist = distanceBetween2Points(r.position, point);
+      const curDist = distanceBetween2Points(r.sense('position'), point);
       if (curDist <= distance) {
         closeRobots.push(r);
         maxDist = curDist > maxDist ? curDist : maxDist;
@@ -131,7 +131,7 @@ export default function updateWaypoint(robot) {
       lastDeadlockAreaRadius
     );
     const { robots } = robotsMeasurements;
-    const robotPositions = robots.map((r) => ({ x: r.position.x, y: r.position.y }));
+    const robotPositions = robots.map((r) => ({ x: r.sense('position').x, y: r.sense('position').y }));
 
     if (lastDeadlockNeighborsCount > 1) {
       if (robots.length < 2) {
@@ -139,8 +139,8 @@ export default function updateWaypoint(robot) {
         // return Math.random() > 0.3;
       }
 
-      if (allPointsAreOnSameSideOfVector(robotPositions, robot.position, robot.goal)
-        && minDistanceToLine(robotPositions, robot.position, robot.goal) > robot.radius * 1.5) {
+      if (allPointsAreOnSameSideOfVector(robotPositions, robot.sense('position'), robot.goal)
+        && minDistanceToLine(robotPositions, robot.sense('position'), robot.goal) > robot.radius * 1.5) {
         // console.log('Successfully Recovered From Deadlock! 2');
         return Math.random() > 0.1;
       }
@@ -174,9 +174,9 @@ export default function updateWaypoint(robot) {
     // Add a bit of randomness to the direction of the maneuver
     if (Math.random() > 0.8) return Math.random() > 0.5;
 
-    const furthestPoint = getFurthestVertexFromLineSeg(cell, robot.position, robot.goal);
+    const furthestPoint = getFurthestVertexFromLineSeg(cell, robot.sense('position'), robot.goal);
     const furthestPointDir = pointIsOnRightSideOfVector(furthestPoint.x, furthestPoint.y,
-      robot.position.x, robot.position.y,
+      robot.sense('position').x, robot.sense('position').y,
       robot.goal.x, robot.goal.y);
     return furthestPointDir;
   }
@@ -215,12 +215,12 @@ export default function updateWaypoint(robot) {
       const nextIndx = nxtCircIndx(neighborIndx, robotsCloseToTempGoal.length);
       const rNext = robotsCloseToTempGoal[nextIndx];
 
-      const distToNextNeighbor = distanceBetween2Points(r.position, rNext.position);
+      const distToNextNeighbor = distanceBetween2Points(r.sense('position'), rNext.sense('position'));
       if (distToNextNeighbor < neighborNeighbordistanceThreshold) {
         const condPointsOnSameSide = allPointsAreOnSameSideOfVector(
           [robot.goal, robot.tempGoal],
-          r.position,
-          rNext.position
+          r.sense('position'),
+          rNext.sense('position')
         );
 
         if (!condPointsOnSameSide) {

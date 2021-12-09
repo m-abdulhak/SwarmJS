@@ -12,12 +12,9 @@ const config = {
     height: 500
   },
   robots: {
-    count: 1,
+    count: 20,
     radius: 7,
-    sensors: [
-      availableSensors.position,
-      availableSensors.prevPosition
-    ]
+    sensors: Object.values(availableSensors)
   },
   pucks: {
     groups: [

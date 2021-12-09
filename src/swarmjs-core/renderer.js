@@ -100,7 +100,7 @@ export function initialize(svg, scene) {
     .attr('stroke', (d, i) => d3.schemeCategory10[i % 10])
     .attr('stroke-width', 1)
     .attr('stroke-dasharray', '1,10')
-    .attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.tempGoal.x, d.tempGoal.y));
+    .attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.tempGoal.x, d.tempGoal.y));
 
   // Line segments between each robot's temp goal and goal
   renderedElements.tempGoalToGoalLineSegs = svg.append('g')
@@ -133,8 +133,8 @@ export function initialize(svg, scene) {
     .data(scene.robots)
     .enter()
     .append('circle')
-    .attr('cx', (d) => d.position.x)
-    .attr('cy', (d) => d.position.y)
+    .attr('cx', (d) => d.sense('position').x)
+    .attr('cy', (d) => d.sense('position').y)
     .attr('id', (d) => d.id)
     .attr('r', (d) => d.radius)
     .attr('fill', '#FFC53A')
@@ -168,7 +168,7 @@ export function initialize(svg, scene) {
     .attr('stroke', (d, i) => d3.schemeCategory10[i % 10])
     .attr('stroke-width', 1)
     .attr('stroke-dasharray', '10,10')
-    .attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y));
+    .attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.goal.x, d.goal.y));
 
   // Line segments between robots and heading
   renderedElements.robotOrientations = svg.append('g')
@@ -179,7 +179,7 @@ export function initialize(svg, scene) {
     .attr('fill', 'none')
     .attr('stroke', 'black')
     .attr('stroke-width', 3)
-    .attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.headingPoint.x, d.headingPoint.y));
+    .attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.sense('heading').x, d.sense('heading').y));
 
   // Goals
   renderedElements.goalsCircles = svg.append('g')
@@ -317,7 +317,7 @@ export function renderScene(curSvgEl, curScene) {
       .attr('fill-opacity', '40%');
 
     renderedElements.robotToTempGoalLineSegs
-      .attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.tempGoal.x, d.tempGoal.y))
+      .attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.tempGoal.x, d.tempGoal.y))
       .attr('stroke-opacity', '100%');
 
     renderedElements.tempGoalToGoalLineSegs
@@ -336,10 +336,10 @@ export function renderScene(curSvgEl, curScene) {
   }
 
   if (activeElements.includes('Robots')) {
-    renderedElements.robotsCircles.attr('cx', (d) => d.position.x).attr('cy', (d) => d.position.y)
+    renderedElements.robotsCircles.attr('cx', (d) => d.sense('position').x).attr('cy', (d) => d.sense('position').y)
       .attr('stroke-opacity', '100%')
       .attr('fill-opacity', '100%');
-    renderedElements.robotOrientations.attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.headingPoint.x, d.headingPoint.y));
+    renderedElements.robotOrientations.attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.sense('heading').x, d.sense('heading').y));
   } else {
     renderedElements.robotsCircles
       .attr('stroke-opacity', '0%')
@@ -360,7 +360,7 @@ export function renderScene(curSvgEl, curScene) {
   }
 
   if (activeElements.includes('Goals')) {
-    renderedElements.robotToGoalLineSegs.attr('d', (d) => renderLineSeg(d.position.x, d.position.y, d.goal.x, d.goal.y))
+    renderedElements.robotToGoalLineSegs.attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.goal.x, d.goal.y))
       .attr('stroke-opacity', '100%');
 
     renderedElements.goalsCircles.attr('cx', (d) => d.goal.x).attr('cy', (d) => d.goal.y)

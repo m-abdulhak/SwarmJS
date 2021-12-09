@@ -5,6 +5,8 @@
 
 import PositionSensor from './positionSensor';
 import PrevPositionSensor from './prevPositionSensor';
+import OrientationSensor from './orientationSensor';
+import HeadingSensor from './headingSensor';
 
 const toposort = require('toposort');
 
@@ -16,7 +18,9 @@ export const sensorSamplingTypes = {
 
 const availableSensorDefitions = [
   PositionSensor,
-  PrevPositionSensor
+  PrevPositionSensor,
+  OrientationSensor,
+  HeadingSensor
 ];
 
 // Sensors are stored in this object allowing other modules to easily reference them
@@ -36,7 +40,11 @@ const orderSensors = (sensorList) => {
     }
   });
   const sorted = toposort(edges);
-  return sorted.map((name) => sensorList.find((s) => s.name === name));
+  const unsorted = sensorList
+    .filter((sensor) => !sorted.includes(sensor.name))
+    .map((sensor) => sensor.name);
+
+  return [...unsorted, ...sorted].map((name) => sensorList.find((s) => s.name === name));
 };
 
 const sampleSensors = (sensorsList) => {
@@ -68,6 +76,14 @@ export default class SensorManager {
 
   read(name) {
     const sensor = this.activeSensors.find((s) => s.name === name);
+    return sensor.read();
+  }
+
+  sense(name) {
+    const sensor = this.activeSensors.find((s) => s.name === name);
+    if (sensor.type === sensorSamplingTypes.onRequest) {
+      sensor.sample();
+    }
     return sensor.read();
   }
 

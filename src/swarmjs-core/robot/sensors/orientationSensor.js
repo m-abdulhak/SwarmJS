@@ -1,17 +1,17 @@
 import { sensorSamplingTypes } from './sensorManager';
+import { normalizeAngle } from '../../geometry';
 
-const name = 'prevPosition';
+const name = 'orientation';
 
-// Function based sensor implementation
-const PrevPositionSensor = (robot) => {
-  const type = sensorSamplingTypes.onUpdate;
+const OrientationSensor = (robot) => {
+  const type = sensorSamplingTypes.onRequest;
   const dependencies = [];
 
-  // private
+  const { body } = robot;
   let value = { x: null, y: null };
 
   const sample = () => {
-    value = { ...robot.sense('position') };
+    value = normalizeAngle(body.angle);
   };
 
   const read = () => value;
@@ -27,5 +27,5 @@ const PrevPositionSensor = (robot) => {
 
 export default {
   name,
-  Sensor: PrevPositionSensor
+  Sensor: OrientationSensor
 };

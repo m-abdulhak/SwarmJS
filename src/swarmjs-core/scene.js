@@ -194,7 +194,7 @@ export default class Scene {
 
     Engine.clear(this.engine);
 
-    // this.renderables = this.robots.map((r) => r.position);
+    // this.renderables = this.robots.map((r) => r.sense('position'));
     // console.log('Renderables :', this.renderables);
   }
 
@@ -221,7 +221,7 @@ export default class Scene {
       }
 
       // 4. Update BVC
-      r.BVC = calculateBVCfromVC(r.VC, r);
+      r.BVC = calculateBVCfromVC(r.VC, r.sense('position'), r.radius);
     });
   }
 
@@ -261,7 +261,7 @@ export default class Scene {
   }
 
   getCurRobotsPos() {
-    return this.robots.map((r) => r.position);
+    return this.robots.map((r) => r.sense('position'));
   }
 
   getCurGoalsPos() {

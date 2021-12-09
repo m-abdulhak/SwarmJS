@@ -19,6 +19,32 @@ import { sensorSamplingTypes, availableSensors } from './sensorManager';
 
 const name = 'position';
 
+// Function based sensor implementation
+const PositionSensor = (robot) => {
+  const type = sensorSamplingTypes.onUpdate;
+  const dependencies = [availableSensors.prevPosition];
+
+  // private
+  const { body } = robot;
+  let value = { x: null, y: null };
+
+  const sample = () => {
+    value = body.position && body.position.x && body.position.y
+      ? { ...body.position }
+      : { x: null, y: null };
+  };
+
+  const read = () => value;
+
+  return {
+    name,
+    type,
+    dependencies,
+    sample,
+    read
+  };
+};
+
 // Class based sensor implementation
 // class PositionSensor {
 //   constructor(robot, scene) {
@@ -39,30 +65,6 @@ const name = 'position';
 //     return this.value;
 //   }
 // }
-
-// Function based sensor implementation
-const PositionSensor = (robot) => {
-  const type = sensorSamplingTypes.onUpdate;
-  const dependencies = [availableSensors.prevPosition];
-
-  // private
-  const { body } = robot;
-  let value = null;
-
-  const sample = () => {
-    value = { ...body.position };
-  };
-
-  const read = () => value;
-
-  return {
-    name,
-    type,
-    dependencies,
-    sample,
-    read
-  };
-};
 
 export default {
   name,

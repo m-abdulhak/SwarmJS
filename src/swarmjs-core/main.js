@@ -72,3 +72,5 @@ export const getAvailableAlgorithms = () => scene.availableAlgorithms;
 export const changeAlgorithm = (algorithm) => {
   scene.changeAlgorithm(algorithm);
 };
+
+export default initSimulationIfNeeded;
