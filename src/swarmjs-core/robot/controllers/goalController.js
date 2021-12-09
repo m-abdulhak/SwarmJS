@@ -199,7 +199,7 @@ export default function updateGoal(robot) {
     const angleRatings = [];
     const distanceRatings = [];
 
-    robot.nearbyPucks
+    robot.sense('nearbyPucks')
       .filter((p) => {
         if (!p.reachedGoal() && !p.isBlocked()) {
           const g = getGoalFromPuck(p);

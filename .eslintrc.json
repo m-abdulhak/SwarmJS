@@ -8,13 +8,13 @@
         "plugin:react/recommended"
     ],
     "parserOptions": {
-        "ecmaVersion": 2018
+        "ecmaVersion": 2020
     },
     "rules": {
         "linebreak-style":"off",
         "strict": 0,
         "comma-dangle": ["error", "never"],
-        "prefer-destructuring": ["warn", {
+        "prefer-destructuring": ["off", {
             "array": true,
             "object": true
           }

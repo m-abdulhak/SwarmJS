@@ -80,7 +80,6 @@ export default class Robot {
     this.updateGoal = updateGoal(this);
 
     // Pucks
-    this.nearbyPucks = [];
     this.bestPuck = null;
 
     // Obstacles
@@ -165,7 +164,7 @@ export default class Robot {
     )];
 
     // Add pucks that reached goal as obstacles
-    this.nearbyPucks.forEach((puck) => {
+    this.sense('nearbyPucks').forEach((puck) => {
       if (puck.deepInGoal() && this.getDistanceTo(puck.position) > this.radius) {
         // Add chance to ignore object if it is close to the current goal puck
         // if (this.bestPuck

@@ -105,7 +105,6 @@ export default class Scene {
       this.height,
       this.puckMaps
     );
-    this.maxNearbyPuckDistance = this.robotRadius * 20;
 
     // Initialize Voronoi Diagram
     this.voronoi = Delaunay
@@ -202,9 +201,7 @@ export default class Scene {
     // For each robot
     this.robots.forEach((r, i) => {
       // 1. Find Pucks within a certain distance to the robot
-      r.nearbyPucks = this.pucks.filter(
-        (p) => r.getDistanceTo(p.position) < this.maxNearbyPuckDistance
-      );
+      // moved to a sensor
 
       // 2. Update the robot's neighbors
       r.neighbors = this.getNeighborsOf(i);
