@@ -177,7 +177,11 @@ export function distanceBetween2Points(pos1, pos2) {
   return ret;
 }
 
-export function closestPointInPolygonToPoint(polygon, point) {
+export function closestPointInPolygonToPoint(origPolygon, origPoint) {
+  // if point is array transform it to object
+  const point = Array.isArray(origPoint) ? { x: origPoint[0], y: origPoint[1] } : origPoint;
+  // if polygon points are array transform it to object
+  const polygon = origPolygon.map((p) => (Array.isArray(p) ? { x: p[0], y: p[1] } : p));
   let closestPoint = null;
   let minDist = null;
 
@@ -187,10 +191,10 @@ export function closestPointInPolygonToPoint(polygon, point) {
     const closestPointInLineSeg = closestPointInLineSegToPoint(
       point.x,
       point.y,
-      v1[0],
-      v1[1],
-      v2[0],
-      v2[1]
+      v1.x,
+      v1.y,
+      v2.x,
+      v2.y
     );
 
     const distGoalToLineSeg = distanceBetween2Points(point, closestPointInLineSeg);

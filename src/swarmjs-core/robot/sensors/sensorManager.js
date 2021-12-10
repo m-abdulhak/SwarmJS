@@ -3,6 +3,7 @@
     all sampling is done through this module.
 */
 
+import EnvironmentBoundsSensor from './envBoundsSensor';
 import PositionSensor from './positionSensor';
 import PrevPositionSensor from './prevPositionSensor';
 import OrientationSensor from './orientationSensor';
@@ -21,6 +22,7 @@ export const sensorSamplingTypes = {
 };
 
 const availableSensorDefitions = [
+  EnvironmentBoundsSensor,
   PositionSensor,
   PrevPositionSensor,
   OrientationSensor,
@@ -55,12 +57,6 @@ const orderSensors = (sensorList) => {
   return [...unsorted, ...sorted].map((name) => sensorList.find((s) => s.name === name));
 };
 
-const sampleSensors = (sensorsList) => {
-  sensorsList.forEach((sensor) => {
-    sensor.sample();
-  });
-};
-
 export default class SensorManager {
   constructor(scene, robot, enabledSensors) {
     this.scene = scene;
@@ -73,6 +69,8 @@ export default class SensorManager {
       .filter((s) => s.type === sensorSamplingTypes.onStart);
     this.sensorsOnUpdate = this.activeSensors
       .filter((s) => s.type === sensorSamplingTypes.onUpdate);
+
+    this.values = {};
   }
 
   readAll() {
@@ -87,26 +85,40 @@ export default class SensorManager {
     return sensor.read();
   }
 
-  sense(name) {
+  sense(name, params) {
     const sensor = this.activeSensors.find((s) => s.name === name);
     if (sensor.type === sensorSamplingTypes.onRequest) {
-      sensor.sample();
+      // No need to add to values, as it is a regular sensor
+      // and most likely involves special parameters
+      // if it is beneficial to add it to values, change next line to:
+      // this.sample(name, params);
+      sensor.sample(params);
     }
     return sensor.read();
   }
 
-  sample(name) {
+  sample(name, params) {
     const sensor = this.activeSensors.find((s) => s.name === name);
     if (sensor) {
-      sensor.sample();
+      sensor.sample(params);
     }
+    this.values = {
+      ...this.values,
+      [name]: sensor.read()
+    };
+  }
+
+  sampleSensors(sensorsList) {
+    sensorsList.forEach((sensor) => {
+      this.sample(sensor.name);
+    });
   }
 
   update() {
-    sampleSensors(this.sensorsOnUpdate);
+    this.sampleSensors(this.sensorsOnUpdate);
   }
 
   start() {
-    sampleSensors(this.sensorsOnStart);
+    this.sampleSensors(this.sensorsOnStart);
   }
 }

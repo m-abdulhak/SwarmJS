@@ -81,17 +81,12 @@ export default class Robot {
     // Sensors
     this.sensors = new SensorManager(this.scene, this, sensors);
     this.sensors.start();
-    this.readSensorValues();
 
     this.changeAlgorithm = (newAlgorithm) => {
       this.algorithmOptions = this.availableAlgorithms.find((a) => a.name === newAlgorithm);
     };
 
     this.changeAlgorithm.bind(this);
-  }
-
-  readSensorValues() {
-    this.sensorValues = this.sensors.readAll();
   }
 
   sense(sensorName) {
@@ -101,7 +96,6 @@ export default class Robot {
   setPosition(newPosition) {
     Body.set(this.body, 'position', { x: newPosition.x, y: newPosition.y });
     this.sensors.update();
-    this.readSensorValues();
   }
 
   setGoal(newGoal) {
@@ -119,7 +113,6 @@ export default class Robot {
   timeStep() {
     // Update sensors
     this.sensors.update();
-    this.readSensorValues();
 
     // Get new position and orientation from engine
 
@@ -198,7 +191,7 @@ export default class Robot {
     let reachable = true;
 
     const closestPointInEnvBoundsToGoalPoint = closestPointInPolygonToPoint(
-      this.scene.environmentBounds,
+      this.sense('envBounds'),
       goalPoint
     );
 

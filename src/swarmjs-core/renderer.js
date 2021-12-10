@@ -145,7 +145,7 @@ export function initialize(svg, scene) {
         renderedElements.robotsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'green');
         pauseStateOnDragStart = scene.paused;
         scene.pause();
-        console.log(d.sensorValues);
+        console.log(d.sensors.values);
       })
       .on('drag', (event, d) => {
         d.setPosition({ x: event.x, y: event.y });

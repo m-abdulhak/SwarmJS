@@ -27,7 +27,6 @@ const BufferedVoronoiCellSensor = (robot) => {
     availableSensors.voronoiCell
   ];
 
-  // private
   let value = [];
 
   const sample = () => {

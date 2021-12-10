@@ -93,16 +93,14 @@ export default function updateGoal(robot) {
   }
 
   function getGoalFromEnvOrbit() {
-    const environmentBounds = robot.scene.environmentBounds.map(
-      (point) => ({ x: point[0], y: point[1] })
-    );
+    const envBounds = robot.sense('envBounds');
 
-    const pointsCount = environmentBounds.length;
+    const pointsCount = envBounds.length;
     const envRectSides = [];
 
-    for (let index = 0; index < environmentBounds.length; index += 1) {
+    for (let index = 0; index < envBounds.length; index += 1) {
       const nextIndx = (index + 1) % pointsCount;
-      envRectSides.push([environmentBounds[index], environmentBounds[nextIndx]]);
+      envRectSides.push([envBounds[index], envBounds[nextIndx]]);
     }
 
     const allSides = [...envRectSides];

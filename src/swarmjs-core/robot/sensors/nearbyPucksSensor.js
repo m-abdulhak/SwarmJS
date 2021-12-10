@@ -6,7 +6,6 @@ const NearbyPucksSensor = (robot, scene) => {
   const type = sensorSamplingTypes.onUpdate;
   const dependencies = [availableSensors.position];
 
-  // private
   let value = [];
   const maxNearbyPuckDistance = robot.radius * 20;
 

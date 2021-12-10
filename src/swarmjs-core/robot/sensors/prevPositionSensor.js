@@ -6,7 +6,6 @@ const PrevPositionSensor = (robot) => {
   const type = sensorSamplingTypes.onUpdate;
   const dependencies = [];
 
-  // private
   let value = { x: null, y: null };
 
   const sample = () => {

@@ -51,7 +51,6 @@ const VoronoiCellSensor = (robot, scene) => {
   const type = sensorSamplingTypes.onUpdate;
   const dependencies = [];
 
-  // private
   let value = [];
 
   const sample = () => {

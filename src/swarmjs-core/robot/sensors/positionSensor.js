@@ -29,7 +29,7 @@ const PositionSensor = (robot) => {
   let value = { x: null, y: null };
 
   const sample = () => {
-    value = body.position && body.position.x && body.position.y
+    value = body?.position?.x && body?.position?.y
       ? { ...body.position }
       : { x: null, y: null };
   };
