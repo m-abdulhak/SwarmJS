@@ -45,7 +45,7 @@ export default class Robot {
     this.velocity = { x: 0, y: 0 };
     this.velocityScale = 1;
     this.goal = goal;
-    this.tempGoal = { x: position.x, y: position.y };
+    this.waypoint = { x: position.x, y: position.y };
     this.envWidth = envWidth;
     this.envHeight = envHeight;
     this.scene = scene;
@@ -108,8 +108,8 @@ export default class Robot {
     this.goal = { x: newGoal.x, y: newGoal.y };
   }
 
-  setTempGoal(tempGoal) {
-    this.tempGoal = { x: tempGoal.x, y: tempGoal.y };
+  setWaypoint(waypoint) {
+    this.waypoint = { x: waypoint.x, y: waypoint.y };
   }
 
   setBestPuck(puck) {
@@ -130,7 +130,7 @@ export default class Robot {
 
     // Update waypoint, according to new goal
     const newWaypoint = this.updateWaypoint();
-    this.setTempGoal(newWaypoint);
+    this.setWaypoint(newWaypoint);
 
     // Update velocities, according to new waypoint
     const velocities = this.updateVelocity();
@@ -231,8 +231,8 @@ export default class Robot {
     return ret;
   }
 
-  reachedTempGoal() {
-    const ret = this.reached(this.tempGoal);
+  reachedWaypoint() {
+    const ret = this.reached(this.waypoint);
     return ret;
   }
 

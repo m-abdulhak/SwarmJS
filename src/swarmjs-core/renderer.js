@@ -17,7 +17,7 @@ let lastSvgEl = null;
 let lastScene = null;
 
 const renderingElements = [
-  'All', 'Robots', 'Pucks', 'Goals', 'TempGoals', 'VC', 'BVC'
+  'All', 'Robots', 'Pucks', 'Goals', 'Waypoints', 'VC', 'BVC'
 ];
 
 let activeElements = [...renderingElements];
@@ -75,7 +75,7 @@ export function initialize(svg, scene) {
     .attr('d', voronoiMesh);
 
   // Temp Goals
-  renderedElements.tempGoalsCircles = svg.append('g')
+  renderedElements.waypointsCircles = svg.append('g')
     .attr('fill-opacity', '40%')
     .attr('stroke-width', 1)
     .attr('stroke-dasharray', '1,1')
@@ -83,15 +83,15 @@ export function initialize(svg, scene) {
     .data(scene.robots)
     .enter()
     .append('circle')
-    .attr('cx', (d) => d.tempGoal.x)
-    .attr('cy', (d) => d.tempGoal.y)
+    .attr('cx', (d) => d.waypoint.x)
+    .attr('cy', (d) => d.waypoint.y)
     .attr('id', (d) => d.id)
     .attr('r', (d) => d.radius / 1.5)
     .attr('fill', (d, i) => d3.schemeCategory10[i % 10])
     .attr('stroke', (d, i) => d3.schemeCategory10[i % 10]);
 
   // Line segments between robots and corresponding temp goal
-  renderedElements.robotToTempGoalLineSegs = svg.append('g')
+  renderedElements.robotToWaypointLineSegs = svg.append('g')
     .selectAll('path')
     .data(scene.robots)
     .enter()
@@ -100,10 +100,10 @@ export function initialize(svg, scene) {
     .attr('stroke', (d, i) => d3.schemeCategory10[i % 10])
     .attr('stroke-width', 1)
     .attr('stroke-dasharray', '1,10')
-    .attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.tempGoal.x, d.tempGoal.y));
+    .attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.waypoint.x, d.waypoint.y));
 
   // Line segments between each robot's temp goal and goal
-  renderedElements.tempGoalToGoalLineSegs = svg.append('g')
+  renderedElements.waypointToGoalLineSegs = svg.append('g')
     .selectAll('path')
     .data(scene.robots)
     .enter()
@@ -112,7 +112,7 @@ export function initialize(svg, scene) {
     .attr('stroke', (d, i) => d3.schemeCategory10[i % 10])
     .attr('stroke-width', 1)
     .attr('stroke-dasharray', '1,10')
-    .attr('d', (d) => renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y));
+    .attr('d', (d) => renderLineSeg(d.waypoint.x, d.waypoint.y, d.goal.x, d.goal.y));
 
   // Puck Goals
   renderedElements.puckGoalsCircles = svg.append('g')
@@ -310,29 +310,29 @@ export function renderScene(curSvgEl, curScene) {
     renderedElements.VcMesh.attr('stroke-opacity', '0%');
   }
 
-  if (activeElements.includes('TempGoals')) {
-    renderedElements.tempGoalsCircles
-      .attr('cx', (d) => d.tempGoal.x)
-      .attr('cy', (d) => d.tempGoal.y)
+  if (activeElements.includes('Waypoints')) {
+    renderedElements.waypointsCircles
+      .attr('cx', (d) => d.waypoint.x)
+      .attr('cy', (d) => d.waypoint.y)
       .attr('stroke-opacity', '40%')
       .attr('fill-opacity', '40%');
 
-    renderedElements.robotToTempGoalLineSegs
-      .attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.tempGoal.x, d.tempGoal.y))
+    renderedElements.robotToWaypointLineSegs
+      .attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.waypoint.x, d.waypoint.y))
       .attr('stroke-opacity', '100%');
 
-    renderedElements.tempGoalToGoalLineSegs
-      .attr('d', (d) => renderLineSeg(d.tempGoal.x, d.tempGoal.y, d.goal.x, d.goal.y))
+    renderedElements.waypointToGoalLineSegs
+      .attr('d', (d) => renderLineSeg(d.waypoint.x, d.waypoint.y, d.goal.x, d.goal.y))
       .attr('stroke-opacity', '100%');
   } else {
-    renderedElements.tempGoalsCircles
+    renderedElements.waypointsCircles
       .attr('stroke-opacity', '0%')
       .attr('fill-opacity', '0%');
 
-    renderedElements.robotToTempGoalLineSegs
+    renderedElements.robotToWaypointLineSegs
       .attr('stroke-opacity', '0%');
 
-    renderedElements.tempGoalToGoalLineSegs
+    renderedElements.waypointToGoalLineSegs
       .attr('stroke-opacity', '0%');
   }
 

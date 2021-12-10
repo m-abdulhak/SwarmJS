@@ -13,7 +13,7 @@ import {
 export default function updateWaypoint(robot) {
   // Initialize deadlock detection mechanisms
   const deadLockDetectionDuration = 5;
-  let stuckAtTempGoalDuration = 0;
+  let stuckAtWaypointDuration = 0;
 
   // Initialize deadlock recovery mechanisms
   let deadLockManeuverInProgress = false;
@@ -88,25 +88,25 @@ export default function updateWaypoint(robot) {
   }
 
   // returns temp goal according to advanced deadlock recovery algorithm
-  function setTempGoalAccToAdvancedDeadlockRec(cell) {
+  function setWaypointAccToAdvancedDeadlockRec(cell) {
     // Get vertices of cell that lie on the current maneuver direction
     const vertecies = getVerteciesOnManeuverDir(cell, robot.sense('position'), robot.goal);
     const outermostPoint = getFurthestVertexFromLineSeg(vertecies, robot.sense('position'), robot.goal);
     const distanceToOutermostPoint = robot.getDistanceTo(outermostPoint);
     if (distanceToOutermostPoint < detourPointMaxDistance) {
-      robot.setTempGoal(outermostPoint);
+      robot.setWaypoint(outermostPoint);
     } else {
       const distWithdefaultRatio = distanceToOutermostPoint * detourPointToOutermostPointRatio;
       const defaultRatioLongerThanMax = distWithdefaultRatio > detourPointMaxDistance;
       const detourRatio = defaultRatioLongerThanMax
         ? detourPointMaxDistance / distanceToOutermostPoint
         : detourPointToOutermostPointRatio;
-      robot.setTempGoal(pointOnLineSegmentPerRatio(robot.sense('position'), outermostPoint, detourRatio));
+      robot.setWaypoint(pointOnLineSegmentPerRatio(robot.sense('position'), outermostPoint, detourRatio));
     }
   }
 
   function initiateDeadlockManeuver(cell) {
-    setTempGoalAccToAdvancedDeadlockRec(cell);
+    setWaypointAccToAdvancedDeadlockRec(cell);
     deadLockManeuverInProgress = true;
   }
 
@@ -149,25 +149,25 @@ export default function updateWaypoint(robot) {
     return false;
   }
 
-  function deadLockTempGoalStillValid() {
-    const tempGoalNotReached = !robot.reachedTempGoal();
-    const currentVCellContainsTempGoal = pointIsInsidePolygon(
-      robot.tempGoal,
+  function deadLockWaypointStillValid() {
+    const waypointNotReached = !robot.reachedWaypoint();
+    const currentVCellContainsWaypoint = pointIsInsidePolygon(
+      robot.waypoint,
       robot.sense('BVC')
     );
     const maneuverNotSucceededYet = !(deadLockManeuverInProgress && neighborsAvoided());
 
-    return tempGoalNotReached && currentVCellContainsTempGoal && maneuverNotSucceededYet;
+    return waypointNotReached && currentVCellContainsWaypoint && maneuverNotSucceededYet;
   }
 
   function deadLocked() {
-    if (robot.reachedTempGoal() && !robot.reachedGoal()) {
-      stuckAtTempGoalDuration += 1;
+    if (robot.reachedWaypoint() && !robot.reachedGoal()) {
+      stuckAtWaypointDuration += 1;
     } else {
-      stuckAtTempGoalDuration = 0;
+      stuckAtWaypointDuration = 0;
     }
 
-    return stuckAtTempGoalDuration > deadLockDetectionDuration;
+    return stuckAtWaypointDuration > deadLockDetectionDuration;
   }
 
   function getManeuverDirAccToDLRecoveryAlgo(cell) {
@@ -182,9 +182,9 @@ export default function updateWaypoint(robot) {
   }
 
   function startDeadlockRecovery(cell) {
-    lastDeadlockPosition = { x: robot.tempGoal.x, y: robot.tempGoal.y };
+    lastDeadlockPosition = { x: robot.waypoint.x, y: robot.waypoint.y };
     lastDeadlockNeighborsCount = getNeighborsMeasurementsWithin(
-      robot.tempGoal,
+      robot.waypoint,
       robot.radius * 5
     ).robots.length;
     remainingDeadlockManeuvers = lastDeadlockNeighborsCount === 1
@@ -193,39 +193,39 @@ export default function updateWaypoint(robot) {
     initiateDeadlockManeuver(cell);
   }
 
-  function deadLockExpected(tempGoal) {
+  function deadLockExpected(waypoint) {
     const neighborGoaldistanceThreshold = robot.radius * 3;
     const neighborNeighbordistanceThreshold = robot.radius * 4;
 
     const neighborsMeasurements = getNeighborsMeasurementsWithin(
-      tempGoal,
+      waypoint,
       neighborGoaldistanceThreshold
     );
-    const robotsCloseToTempGoal = neighborsMeasurements.robots;
+    const robotsCloseToWaypoint = neighborsMeasurements.robots;
     const { maxDistance } = neighborsMeasurements;
 
     // TODO: Handle case for 1 robot in the way on the edge of environment leading to Deadlock,
     // currently it will be ignored
-    if (robotsCloseToTempGoal.length < 2) {
+    if (robotsCloseToWaypoint.length < 2) {
       return false;
     }
 
-    for (let neighborIndx = 0; neighborIndx < robotsCloseToTempGoal.length; neighborIndx += 1) {
-      const r = robotsCloseToTempGoal[neighborIndx];
-      const nextIndx = nxtCircIndx(neighborIndx, robotsCloseToTempGoal.length);
-      const rNext = robotsCloseToTempGoal[nextIndx];
+    for (let neighborIndx = 0; neighborIndx < robotsCloseToWaypoint.length; neighborIndx += 1) {
+      const r = robotsCloseToWaypoint[neighborIndx];
+      const nextIndx = nxtCircIndx(neighborIndx, robotsCloseToWaypoint.length);
+      const rNext = robotsCloseToWaypoint[nextIndx];
 
       const distToNextNeighbor = distanceBetween2Points(r.sense('position'), rNext.sense('position'));
       if (distToNextNeighbor < neighborNeighbordistanceThreshold) {
         const condPointsOnSameSide = allPointsAreOnSameSideOfVector(
-          [robot.goal, robot.tempGoal],
+          [robot.goal, robot.waypoint],
           r.sense('position'),
           rNext.sense('position')
         );
 
         if (!condPointsOnSameSide) {
           lastDeadlockAreaRadius = maxDistance;
-          // console.log("Deadlock Expected With: " + robotsCloseToTempGoal.length +
+          // console.log("Deadlock Expected With: " + robotsCloseToWaypoint.length +
           //   " Robots, with max Distance: " + maxDistance);
           return true;
         }
@@ -240,27 +240,27 @@ export default function updateWaypoint(robot) {
 
     // If currently recovering from deadlock
     if (recoveringFromDeadLock()) {
-      // if current maneuver's tempGoal is still valid (the current tempGoal has not been reached)
+      // if current maneuver's waypoint is still valid (the current waypoint has not been reached)
       // => do not change it, return true
-      if (deadLockTempGoalStillValid(cell)) {
-        return robot.tempGoal;
+      if (deadLockWaypointStillValid(cell)) {
+        return robot.waypoint;
       }
-      // if not, then current maneuver's tempGoal has been reached => end current maneuver
+      // if not, then current maneuver's waypoint has been reached => end current maneuver
       remainingDeadlockManeuvers -= 1;
       deadLockManeuverInProgress = false;
 
       // if another maneuver is needed => initiate it, localGoal is set there so return true
       if (shouldPerformAnotherManeuver()) {
         initiateDeadlockManeuver(cell);
-        return robot.tempGoal;
+        return robot.waypoint;
       }
       remainingDeadlockManeuvers = 0;
-    } else if (deadLocked() || deadLockExpected(robot.tempGoal)) {
+    } else if (deadLocked() || deadLockExpected(robot.waypoint)) {
       // if not recovering from deadlock, test wether currently deadlocked
 
       // if deadlocked => start deadlock recovery, localGoal is set there so return true
       startDeadlockRecovery(cell);
-      return robot.tempGoal;
+      return robot.waypoint;
     }
 
     // If all condition fails => localGoal should not be set according to deadlock recovery policies
@@ -282,9 +282,9 @@ export default function updateWaypoint(robot) {
 
     // If deadlocked or deadlock is expected or currently recovering from deadlock
     // set local goal according to deadlock recovery policies
-    // TODO: fix, seLocationGoalByDeadlockRecovery() should not set tempGoal but return it
+    // TODO: fix, seLocationGoalByDeadlockRecovery() should not set waypoint but return it
     if (setLocalGoalByDeadlockRecovery(cell) != null) {
-      return robot.tempGoal;
+      return robot.waypoint;
     }
 
     // Default behavior: set local goal as the point in cell that is closest to the goal

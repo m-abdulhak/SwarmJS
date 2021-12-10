@@ -57,8 +57,8 @@ export default function updateVelocity(robot) {
   };
 
   return () => {
-    // const { linearVel, angularVel } = updateVelocityOmniDirectional(robot.tempGoal);
-    const { linearVel, angularVel } = updateVelocityDiffRobot(robot.tempGoal);
+    // const { linearVel, angularVel } = updateVelocityOmniDirectional(robot.waypoint);
+    const { linearVel, angularVel } = updateVelocityDiffRobot(robot.waypoint);
 
     return {
       linearVel,
