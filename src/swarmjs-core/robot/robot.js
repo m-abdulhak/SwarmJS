@@ -143,28 +143,6 @@ export default class Robot {
     Body.setAngularVelocity(this.body, angularVel);
   }
 
-  getAllClosestPointsToNearbyObstacles() {
-    const closeObstacles = this.sense('nearbyObstacles');
-    return closeObstacles.map(
-      (staticObs) => staticObs.getIntersectionPoint(this.sense('position'))
-    );
-  }
-
-  getClosestPointToNearbyObstacles() {
-    const points = this.getAllClosestPointsToNearbyObstacles();
-
-    if (points.length === 0) {
-      return null;
-    }
-
-    return points.reduce((acc, point) => {
-      if (acc === null || this.getDistanceTo(point) < this.getDistanceTo(acc)) {
-        return point;
-      }
-      return acc;
-    }, null);
-  }
-
   pointIsReachableInEnvBounds(goalPoint) {
     let reachable = true;
 
