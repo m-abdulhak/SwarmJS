@@ -14,7 +14,7 @@ import SensorManager from './sensors/sensorManager';
 
 // eslint-disable-next-line no-unused-vars
 export default class Robot {
-  constructor(id, position, goal, sensors, radius, envWidth, envHeight, scene, algorithm) {
+  constructor(id, position, goal, enabledSensors, radius, envWidth, envHeight, scene, algorithm) {
     // Configs
     this.DeadLockRecovery = {
       None: 0,
@@ -78,9 +78,9 @@ export default class Robot {
     // Obstacles
     this.obstacleSensingRadius = this.radius * 10;
 
-    // Sensors
-    this.sensors = new SensorManager(this.scene, this, sensors);
-    this.sensors.start();
+    // Sensor Manager
+    this.sensorManager = new SensorManager(this.scene, this, enabledSensors);
+    this.sensorManager.start();
 
     this.changeAlgorithm = (newAlgorithm) => {
       this.algorithmOptions = this.availableAlgorithms.find((a) => a.name === newAlgorithm);
@@ -89,13 +89,17 @@ export default class Robot {
     this.changeAlgorithm.bind(this);
   }
 
-  sense(sensorName) {
-    return this.sensors.sense(sensorName);
+  sense(sensorName, params) {
+    return this.sensorManager.sense(sensorName, params);
+  }
+
+  get sensors() {
+    return this.sensorManager.values;
   }
 
   setPosition(newPosition) {
     Body.set(this.body, 'position', { x: newPosition.x, y: newPosition.y });
-    this.sensors.update();
+    this.sensorManager.update();
   }
 
   setGoal(newGoal) {
@@ -112,7 +116,7 @@ export default class Robot {
 
   timeStep() {
     // Update sensors
-    this.sensors.update();
+    this.sensorManager.update();
 
     // Get new position and orientation from engine
 
@@ -280,7 +284,7 @@ export default class Robot {
     robots.forEach((r) => {
       const distance = distanceBetween2Points(this.sense('position'), r.sensotValues.position);
 
-      // If first or closest neighbor, set distanceas min distance
+      // If first or closest neighbor, set distances min distance
       if (minDist === -1 || distance < minDist) {
         minDist = distance;
       }

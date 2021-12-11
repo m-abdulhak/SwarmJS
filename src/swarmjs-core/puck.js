@@ -67,31 +67,6 @@ export default class Puck {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  isBlocked() {
-    return false;
-
-    // let blocked = false;
-
-    // const closestPointToEnvBounds = closestPointInPolygonToPoint(
-    //   this.scene.environmentBounds,
-    //   this.position,
-    // );
-    // const distToEnvBounds = this.getDistanceTo(closestPointToEnvBounds);
-    // if (distToEnvBounds < this.blockedDistance * 2) {
-    //   blocked = true;
-    // }
-
-    // for (let index = 0; !blocked && index < this.scene.staticObjects.length; index += 1) {
-    //   const staticObj = this.scene.staticObjects[index];
-    //   if (staticObj.getDistanceToBorder(this.position) < this.blockedDistance) {
-    //     blocked = true;
-    //   }
-    // }
-
-    // return blocked;
-  }
-
   reachedGoal() {
     return this.reachedDist(this.groupGoal, this.goalReachedDist);
   }

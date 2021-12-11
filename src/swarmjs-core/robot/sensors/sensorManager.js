@@ -90,7 +90,7 @@ export default class SensorManager {
     if (sensor.type === sensorSamplingTypes.onRequest) {
       // No need to add to values, as it is a regular sensor
       // and most likely involves special parameters
-      // if it is beneficial to add it to values, change next line to:
+      // If it is beneficial to add it to values, change next line to:
       // this.sample(name, params);
       sensor.sample(params);
     }

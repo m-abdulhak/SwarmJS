@@ -199,7 +199,7 @@ export default function updateGoal(robot) {
 
     robot.sense('nearbyPucks')
       .filter((p) => {
-        if (!p.reachedGoal() && !p.isBlocked()) {
+        if (!p.reachedGoal()) {
           const g = getGoalFromPuck(p);
 
           // Only Test this condition if enabled by robot algorithm options
@@ -211,7 +211,7 @@ export default function updateGoal(robot) {
           const puckAngleAcceptable = normalizedAngle <= ANGLE_ACCEPTABLE_THRESHOLD;
 
           const condReachableInEnv = robot.pointIsReachableInEnvBounds(g);
-          // TODO: disabel after global planning was implemented
+          // TODO: disable after global planning was implemented
           const condReachableOutOfStaticObs = true; // robot.pointIsReachableOutsideStaticObs(g);
           return condInRobotVorCell
             && puckAngleAcceptable
@@ -221,7 +221,9 @@ export default function updateGoal(robot) {
         return false;
       })
       .forEach((p) => {
-        angleRatings.push([p, angleBetweenThreePointsDeg(robot.sense('position'), p.position, p.goal)]);
+        angleRatings.push(
+          [p, angleBetweenThreePointsDeg(robot.sense('position'), p.position, p.goal)]
+        );
         distanceRatings.push([p, robot.getDistanceTo(p.position)]);
       });
 
