@@ -9,6 +9,7 @@ import PrevPositionSensor from './prevPositionSensor';
 import OrientationSensor from './orientationSensor';
 import HeadingSensor from './headingSensor';
 import NearbyPucksSensor from './nearbyPucksSensor';
+import NearbyObstaclesSensor from './nearbyObstaclesSensor';
 import NeighborsSensor from './neighborsSensor';
 import VoronoiCellSensor from './voronoiCellSensor';
 import BufferedVoronoiCellSensor from './bufferedVoronoiCellSensor';
@@ -28,6 +29,7 @@ const availableSensorDefitions = [
   OrientationSensor,
   HeadingSensor,
   NearbyPucksSensor,
+  NearbyObstaclesSensor,
   NeighborsSensor,
   VoronoiCellSensor,
   BufferedVoronoiCellSensor

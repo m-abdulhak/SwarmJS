@@ -102,7 +102,9 @@ export default class Puck {
     return {
       type: 'circle',
       center: this.position,
-      radius: this.radius
+      radius: this.radius,
+      skipOrbit: true,
+      fromPuck: true
     };
   }
 }

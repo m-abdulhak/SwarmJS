@@ -1,6 +1,5 @@
 import { Body, World, Bodies } from 'matter-js';
 
-import generateStaticObject from '../staticObjects/staticObjectFactory';
 import {
   distanceBetween2Points,
   closestPointInPolygonToPoint
@@ -75,9 +74,6 @@ export default class Robot {
     // Pucks
     this.bestPuck = null;
 
-    // Obstacles
-    this.obstacleSensingRadius = this.radius * 10;
-
     // Sensor Manager
     this.sensorManager = new SensorManager(this.scene, this, enabledSensors);
     this.sensorManager.start();
@@ -147,30 +143,8 @@ export default class Robot {
     Body.setAngularVelocity(this.body, angularVel);
   }
 
-  // Static Obstacles
-  getNearbyObstacles() {
-    const staticObstacles = [...this.scene.staticObjects.filter(
-      (obj) => obj.getDistanceToBorder(this.sense('position')) < this.obstacleSensingRadius
-    )];
-
-    // Add pucks that reached goal as obstacles
-    this.sense('nearbyPucks').forEach((puck) => {
-      if (puck.deepInGoal() && this.getDistanceTo(puck.position) > this.radius) {
-        // Add chance to ignore object if it is close to the current goal puck
-        // if (this.bestPuck
-        //     && this.bestPuck.position
-        //     && puck.getDistanceTo(this.bestPuck.position) > this.radius * 1) {
-        const staticObstacleDefinition = puck.generateStaticObjectDefinition();
-        staticObstacles.push(generateStaticObject(staticObstacleDefinition, this.scene, false));
-        // }
-      }
-    });
-
-    return staticObstacles;
-  }
-
   getAllClosestPointsToNearbyObstacles() {
-    const closeObstacles = this.getNearbyObstacles();
+    const closeObstacles = this.sense('nearbyObstacles');
     return closeObstacles.map(
       (staticObs) => staticObs.getIntersectionPoint(this.sense('position'))
     );
