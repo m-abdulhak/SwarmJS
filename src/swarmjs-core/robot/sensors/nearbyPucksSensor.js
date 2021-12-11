@@ -1,30 +1,23 @@
+import Sensor from './sensor';
 import { sensorSamplingTypes, availableSensors } from './sensorManager';
 
 const name = 'nearbyPucks';
 
-const NearbyPucksSensor = (robot, scene) => {
-  const type = sensorSamplingTypes.onUpdate;
-  const dependencies = [availableSensors.position];
+class NearbyPucksSensor extends Sensor {
+  constructor(robot, scene) {
+    super(robot, scene, name, sensorSamplingTypes.onUpdate);
+    this.dependencies = [availableSensors.position];
+    this.value = [];
 
-  let value = [];
-  const maxNearbyPuckDistance = robot.radius * 20;
+    this.MAX_NEARBY_DISTANCE = robot.radius * 20;
+  }
 
-  const sample = () => {
-    value = scene?.pucks?.filter(
-      (p) => robot.getDistanceTo(p.position) < maxNearbyPuckDistance
+  sample() {
+    this.value = this.scene?.pucks?.filter(
+      (p) => this.robot.getDistanceTo(p.position) < this.MAX_NEARBY_DISTANCE
     );
-  };
-
-  const read = () => value;
-
-  return {
-    name,
-    type,
-    dependencies,
-    sample,
-    read
-  };
-};
+  }
+}
 
 export default {
   name,

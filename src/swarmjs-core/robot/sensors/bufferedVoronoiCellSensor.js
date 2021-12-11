@@ -1,5 +1,6 @@
 import Offset from 'polygon-offset';
 
+import Sensor from './sensor';
 import { sensorSamplingTypes, availableSensors } from './sensorManager';
 
 const name = 'BVC';
@@ -20,40 +21,31 @@ const calculateBVCfromVC = (cell, position, radius) => {
   return padding;
 };
 
-const BufferedVoronoiCellSensor = (robot) => {
-  const type = sensorSamplingTypes.onUpdate;
-  const dependencies = [
-    availableSensors.position,
-    availableSensors.voronoiCell
-  ];
+class BufferedVoronoiCellSensor extends Sensor {
+  constructor(robot, scene) {
+    super(robot, scene, name, sensorSamplingTypes.onUpdate);
+    this.dependencies = [
+      availableSensors.position,
+      availableSensors.voronoiCell
+    ];
+    this.value = [];
+  }
 
-  let value = [];
-
-  const sample = () => {
-    const cell = robot.sense('voronoiCell');
-    const pos = robot.sense('position');
+  sample() {
+    const cell = this.robot.sense('voronoiCell');
+    const pos = this.robot.sense('position');
 
     if (cell == null || cell.length < 3) {
       return;
     }
 
-    value = calculateBVCfromVC(
+    this.value = calculateBVCfromVC(
       cell,
       pos,
-      robot.radius
+      this.robot.radius
     );
-  };
-
-  const read = () => value;
-
-  return {
-    name,
-    type,
-    dependencies,
-    sample,
-    read
-  };
-};
+  }
+}
 
 export default {
   name,

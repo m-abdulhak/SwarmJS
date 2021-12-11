@@ -15,56 +15,49 @@
   and all sensors should be added to the 'availableSensorDefitions' list in sensorManager
 */
 
+import Sensor from './sensor';
 import { sensorSamplingTypes, availableSensors } from './sensorManager';
 
 const name = 'position';
 
-// Function based sensor implementation
-const PositionSensor = (robot) => {
-  const type = sensorSamplingTypes.onUpdate;
-  const dependencies = [availableSensors.prevPosition];
-
-  // private
-  const { body } = robot;
-  let value = { x: null, y: null };
-
-  const sample = () => {
-    value = body?.position?.x && body?.position?.y
-      ? { ...body.position }
-      : { x: null, y: null };
-  };
-
-  const read = () => value;
-
-  return {
-    name,
-    type,
-    dependencies,
-    sample,
-    read
-  };
-};
-
 // Class based sensor implementation
-// class PositionSensor {
-//   constructor(robot, scene) {
-//     this.name = name;
-//     this.type = sensorSamplingTypes.onUpdate;
-//     this.dependencies = [availableSensors.prevPosition];
+class PositionSensor extends Sensor {
+  constructor(robot, scene) {
+    super(robot, scene, name, sensorSamplingTypes.onUpdate);
+    this.dependencies = [availableSensors.prevPosition];
+    this.value = { x: null, y: null };
+  }
 
-//     // private
-//     this.body = robot.body;
-//     this.value = null;
-//   }
+  sample() {
+    this.value = this.robot.body?.position ? { ...this.robot.body.position } : { x: null, y: null };
+  }
+}
 
-//   sample() {
-//     this.value = this.body.position;
-//   }
+// Function based sensor implementation
+// const PositionSensor = (robot) => {
+//   const type = sensorSamplingTypes.onUpdate;
+//   const dependencies = [availableSensors.prevPosition];
 
-//   read() {
-//     return this.value;
-//   }
-// }
+//   // private
+//   const { body } = robot;
+//   let value = { x: null, y: null };
+
+//   const sample = () => {
+//     value = body?.position?.x && body?.position?.y
+//       ? { ...body.position }
+//       : { x: null, y: null };
+//   };
+
+//   const read = () => value;
+
+//   return {
+//     name,
+//     type,
+//     dependencies,
+//     sample,
+//     read
+//   };
+// };
 
 export default {
   name,

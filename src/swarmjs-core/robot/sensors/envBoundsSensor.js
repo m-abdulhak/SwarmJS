@@ -1,33 +1,24 @@
+import Sensor from './sensor';
 import { sensorSamplingTypes } from './sensorManager';
 
 const name = 'envBounds';
 
-const EnvironmentBoundsSensor = (robot, scene) => {
-  const type = sensorSamplingTypes.onStart;
-  const dependencies = [];
+class EnvironmentBoundsSensor extends Sensor {
+  constructor(robot, scene) {
+    super(robot, scene, name, sensorSamplingTypes.onStart);
+    this.value = [];
+  }
 
-  let value = [];
-
-  const sample = () => {
-    value = [
+  sample() {
+    this.value = [
       { x: 0, y: 0 },
-      { x: scene.width, y: 0 },
-      { x: scene.width, y: scene.height },
-      { x: 0, y: scene.height },
+      { x: this.scene.width, y: 0 },
+      { x: this.scene.width, y: this.scene.height },
+      { x: 0, y: this.scene.height },
       { x: 0, y: 0 }
     ];
-  };
-
-  const read = () => value;
-
-  return {
-    name,
-    type,
-    dependencies,
-    sample,
-    read
-  };
-};
+  }
+}
 
 export default {
   name,

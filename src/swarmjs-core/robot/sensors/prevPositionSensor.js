@@ -1,27 +1,18 @@
+import Sensor from './sensor';
 import { sensorSamplingTypes } from './sensorManager';
 
 const name = 'prevPosition';
 
-const PrevPositionSensor = (robot) => {
-  const type = sensorSamplingTypes.onUpdate;
-  const dependencies = [];
+class PrevPositionSensor extends Sensor {
+  constructor(robot, scene) {
+    super(robot, scene, name, sensorSamplingTypes.onUpdate);
+    this.value = { x: null, y: null };
+  }
 
-  let value = { x: null, y: null };
-
-  const sample = () => {
-    value = { ...robot.sense('position') };
-  };
-
-  const read = () => value;
-
-  return {
-    name,
-    type,
-    dependencies,
-    sample,
-    read
-  };
-};
+  sample() {
+    this.value = { ...this.robot.sense('position') };
+  }
+}
 
 export default {
   name,

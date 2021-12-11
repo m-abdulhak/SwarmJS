@@ -1,29 +1,19 @@
+import Sensor from './sensor';
 import { sensorSamplingTypes } from './sensorManager';
 import { normalizeAngle } from '../../geometry';
 
 const name = 'orientation';
 
-const OrientationSensor = (robot) => {
-  const type = sensorSamplingTypes.onRequest;
-  const dependencies = [];
+class OrientationSensor extends Sensor {
+  constructor(robot, scene) {
+    super(robot, scene, name, sensorSamplingTypes.onUpdate);
+    this.value = null;
+  }
 
-  const { body } = robot;
-  let value = { x: null, y: null };
-
-  const sample = () => {
-    value = normalizeAngle(body.angle);
-  };
-
-  const read = () => value;
-
-  return {
-    name,
-    type,
-    dependencies,
-    sample,
-    read
-  };
-};
+  sample() {
+    this.value = normalizeAngle(this.robot.body.angle);
+  }
+}
 
 export default {
   name,

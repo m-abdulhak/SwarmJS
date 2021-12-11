@@ -1,33 +1,25 @@
+import Sensor from './sensor';
 import { sensorSamplingTypes, availableSensors } from './sensorManager';
 import { getAbsolutePointFromLengthAndAngle } from '../../geometry';
 
 const name = 'heading';
 
-const HeadingSensor = (robot) => {
-  const type = sensorSamplingTypes.onUpdate;
-  const dependencies = [
-    availableSensors.position,
-    availableSensors.orientation
-  ];
+class HeadingSensor extends Sensor {
+  constructor(robot, scene) {
+    super(robot, scene, name, sensorSamplingTypes.onUpdate);
+    this.dependencies = [
+      availableSensors.position,
+      availableSensors.orientation
+    ];
+    this.value = { x: null, y: null };
+  }
 
-  let value = { x: null, y: null };
-
-  const sample = () => {
-    value = getAbsolutePointFromLengthAndAngle(
-      robot.sense('position'), robot.radius * 1.2, robot.sense('orientation')
+  sample() {
+    this.value = getAbsolutePointFromLengthAndAngle(
+      this.robot.sense('position'), this.robot.radius * 1.2, this.robot.sense('orientation')
     );
-  };
-
-  const read = () => value;
-
-  return {
-    name,
-    type,
-    dependencies,
-    sample,
-    read
-  };
-};
+  }
+}
 
 export default {
   name,

@@ -6,6 +6,7 @@
 
 import splitPolygon from 'split-polygon';
 
+import Sensor from './sensor';
 import { sensorSamplingTypes } from './sensorManager';
 import {
   shiftPointOfLineSegInDirOfPerpendicularBisector,
@@ -47,30 +48,20 @@ const trimVCwithStaticObstacles = (pos, VC, closestPoint) => {
   return splitPolygonParts[1];
 };
 
-const VoronoiCellSensor = (robot, scene) => {
-  const type = sensorSamplingTypes.onUpdate;
-  const dependencies = [];
+class VoronoiCellSensor extends Sensor {
+  constructor(robot, scene) {
+    super(robot, scene, name, sensorSamplingTypes.onUpdate);
+    this.value = [];
+  }
 
-  let value = [];
-
-  const sample = () => {
-    const originalVC = scene.voronoi.cellPolygon(robot.id);
-    const pos = robot.sense('position');
+  sample() {
+    const originalVC = this.scene.voronoi.cellPolygon(this.robot.id);
+    const pos = this.robot.sense('position');
     // TODO: move getClosestPointToNearbyObstacles to a sensor and use through a dependency
-    const closestPoint = robot.getClosestPointToNearbyObstacles();
-    value = trimVCwithStaticObstacles(pos, originalVC, closestPoint);
-  };
-
-  const read = () => value;
-
-  return {
-    name,
-    type,
-    dependencies,
-    sample,
-    read
-  };
-};
+    const closestPoint = this.robot.getClosestPointToNearbyObstacles();
+    this.value = trimVCwithStaticObstacles(pos, originalVC, closestPoint);
+  }
+}
 
 export default {
   name,

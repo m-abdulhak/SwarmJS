@@ -16,9 +16,9 @@ import BufferedVoronoiCellSensor from './bufferedVoronoiCellSensor';
 const toposort = require('toposort');
 
 export const sensorSamplingTypes = {
-  onStart: 'start',
-  onUpdate: 'update',
-  onRequest: 'none'
+  onStart: 'onStart',
+  onUpdate: 'onUpdate',
+  onRequest: 'onRequest'
 };
 
 const availableSensorDefitions = [

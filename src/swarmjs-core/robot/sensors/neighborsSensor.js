@@ -1,41 +1,33 @@
+import Sensor from './sensor';
 import { sensorSamplingTypes, availableSensors } from './sensorManager';
 
 const name = 'neighbors';
 
-const NeighborsSensor = (robot, scene) => {
-  const type = sensorSamplingTypes.onUpdate;
-  const dependencies = [availableSensors.position];
+const getNeighbors = (scene, robotId) => {
+  const neighbors = [];
+  try {
+    Array.from(scene.voronoi.delaunay.neighbors(robotId))
+      .filter((x) => x > -1)
+      .forEach((i) => neighbors.push(scene.robots[i]));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(`Error Exracting Neighbors for robot ${robotId}: ${error}`);
+  }
 
-  let value = [];
-  const getNeighbors = () => {
-    const neighbors = [];
-    try {
-      const indexes = Array.from(scene.voronoi.delaunay.neighbors(robot.id))
-        .filter((x) => x > -1);
-
-      indexes.forEach((i) => neighbors.push(scene.robots[i]));
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(`Error Exracting Neighbors: ${error}`);
-    }
-
-    return neighbors;
-  };
-
-  const sample = () => {
-    value = getNeighbors();
-  };
-
-  const read = () => value;
-
-  return {
-    name,
-    type,
-    dependencies,
-    sample,
-    read
-  };
+  return neighbors;
 };
+
+class NeighborsSensor extends Sensor {
+  constructor(robot, scene) {
+    super(robot, scene, name, sensorSamplingTypes.onUpdate);
+    this.dependencies = [availableSensors.position];
+    this.value = [];
+  }
+
+  sample() {
+    this.value = getNeighbors(this.scene, this.robot.id);
+  }
+}
 
 export default {
   name,
