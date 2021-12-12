@@ -13,7 +13,7 @@ import {
   getLineEquationParams,
   pointIsInsidePolygon,
   closePolygon
-} from '../../geometry';
+} from '../../utils/geometry';
 
 const name = 'voronoiCell';
 

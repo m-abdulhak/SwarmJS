@@ -6,7 +6,7 @@ import {
   translatePointInDirection,
   shiftPointOfLineSegInDirOfPerpendicularBisector,
   pointIsInsidePolygon
-} from '../../geometry';
+} from '../../utils/geometry';
 
 export default function updateGoal(robot) {
   const { radius, envWidth, envHeight } = robot;

@@ -1,5 +1,5 @@
 import { World, Bodies } from 'matter-js';
-import { distanceBetween2Points, getLineCircleIntersectionPoint } from '../geometry';
+import { distanceBetween2Points, getLineCircleIntersectionPoint } from '../utils/geometry';
 
 export default class StaticCircle {
   constructor(def, scene, shouldAddToWorld) {

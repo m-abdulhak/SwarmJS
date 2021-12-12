@@ -3,7 +3,7 @@ import { Body, World, Bodies } from 'matter-js';
 import {
   distanceBetween2Points,
   closestPointInPolygonToPoint
-} from '../geometry';
+} from '../utils/geometry';
 
 import updateVelocity from './controllers/velocityController';
 import updateWaypoint from './controllers/waypointController';
@@ -52,7 +52,14 @@ export default class Robot {
     this.world = this.scene.world;
 
     // Create Matter.js body and attach it to world
-    this.body = Bodies.circle(position.x, position.y, this.radius);
+    // TOOD: implement compound body
+    const part1 = Bodies.circle(position.x, position.y, this.radius);
+    // const part2 = Bodies.circle(position.x + 20, position.y, this.radius);
+    // const compoundBody = Body.create({
+    //   parts: [part1, part2]
+    // });
+    // this.body = compoundBody;
+    this.body = part1;
     this.body.friction = 0;
     this.body.frictionAir = 0;
     this.body.frictionStatic = 0;
@@ -113,8 +120,6 @@ export default class Robot {
   timeStep() {
     // Update sensors
     this.sensorManager.update();
-
-    // Get new position and orientation from engine
 
     // Update goal
     const newGoalRaw = this.updateGoal(this.sense('position'));

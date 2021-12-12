@@ -1,6 +1,6 @@
 import { World, Bodies } from 'matter-js';
 
-import { distanceBetween2Points } from '../geometry';
+import { distanceBetween2Points } from '../utils/geometry';
 
 export default class StaticRectangle {
   constructor(def, scene, shouldAddToWorld) {

@@ -8,7 +8,7 @@ import {
   distanceBetween2Points,
   distanceBetweenPointAndLine,
   pointIsInsidePolygon
-} from '../../geometry';
+} from '../../utils/geometry';
 
 export default function updateWaypoint(robot) {
   // Initialize deadlock detection mechanisms

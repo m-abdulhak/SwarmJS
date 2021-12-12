@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { availableSensors } from './swarmjs-core/robot/sensors/sensorManager';
+import getRandomCollisionFreePositionsGenerator from './swarmjs-core/utils/randomPositionsGenerator';
 import App from './components/App';
 
 const config = {
@@ -71,7 +72,8 @@ const config = {
       width: 250,
       height: 50
     }
-  ]
+  ],
+  positionsGenerator: getRandomCollisionFreePositionsGenerator
 };
 
 ReactDOM.render(

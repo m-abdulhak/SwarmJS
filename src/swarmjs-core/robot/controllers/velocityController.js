@@ -1,4 +1,4 @@
-import { angleBetweenThreePointsDeg, pointIsOnRightSideOfVector } from '../../geometry';
+import { angleBetweenThreePointsDeg, pointIsOnRightSideOfVector } from '../../utils/geometry';
 
 const angularVelocityScale = 0.01;
 

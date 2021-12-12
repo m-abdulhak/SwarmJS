@@ -1,6 +1,6 @@
 import Sensor from './sensor';
 import { sensorSamplingTypes } from './sensorManager';
-import { normalizeAngle } from '../../geometry';
+import { normalizeAngle } from '../../utils/geometry';
 
 const name = 'orientation';
 

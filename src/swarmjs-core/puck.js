@@ -1,5 +1,5 @@
 import { World, Bodies, Body } from 'matter-js';
-import { distanceBetween2Points } from './geometry';
+import { distanceBetween2Points } from './utils/geometry';
 
 export default class Puck {
   constructor(id, position, goal, radius, envWidth, envHeight, scene, color, map) {

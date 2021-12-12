@@ -6,7 +6,6 @@ import { Delaunay } from 'd3-delaunay';
 import Robot from './robot/robot';
 import Puck from './puck';
 import generateStaticObject from './staticObjects/staticObjectFactory';
-import { distanceBetween2Points } from './geometry';
 import { mapSceneToArr, getPucksGoalMap } from './distanceTransform/globalPlanning';
 
 export default class Scene {
@@ -16,9 +15,9 @@ export default class Scene {
     pucksGroups,
     staticObjectsDefinitions,
     algorithm,
+    positionsGenerator,
     gMaps
   ) {
-    this.renderables = [];
     this.numOfRobots = robotsConfig.count;
     this.robotRadius = robotsConfig.radius;
     this.pucksGroups = pucksGroups;
@@ -45,13 +44,12 @@ export default class Scene {
     );
 
     // Starting and Goal Positions
-    // TODO: change function depending on startingPositionsConfig
-    this.robotsStartingPositions = this.getRandomCollisionFreePositions(
-      this.numOfRobots,
+    this.getPos = positionsGenerator(
+      this.numOfRobots + this.numOfPucks,
       this.robotRadius,
       this.width,
       this.height,
-      this.numOfPucks
+      this.staticObjects
     );
 
     // Initialize Robots
@@ -180,17 +178,9 @@ export default class Scene {
 
     this.timeInstance = this.engine.timing.timestamp;
 
-    // TODO: change state of renderable elements
-    // if (this.renderingEnabled) {
-    //   // this.render(activeElements);
-    // }
-
     this.updateDistance();
 
     Engine.clear(this.engine);
-
-    // this.renderables = this.robots.map((r) => r.sense('position'));
-    // console.log('Renderables :', this.renderables);
   }
 
   // TODO: Move to benchmark module
@@ -210,7 +200,7 @@ export default class Scene {
     }
   }
 
-  // TODO: Move to benchmarking class
+  // TODO: Move to benchmarking module
   updatePucksOutsideOfGoalMesurements() {
     // Calculate the number of pucks outside of their goal area
     const pucksOutsideGoalCount = this.pucks
@@ -242,8 +232,8 @@ export default class Scene {
   initializeRobotsRange(numOfRobots, radius, sensors, envWidth, envHeight, algorithm) {
     return d3.range(numOfRobots)
       .map((i) => new Robot(i,
-        this.getAnInitialPos(),
-        this.getAnInitialPos(),
+        this.getPos(),
+        this.getPos(),
         sensors,
         radius,
         envWidth,
@@ -261,7 +251,7 @@ export default class Scene {
         ...d3.range(puckGroup.count)
           .map((i) => new Puck(
             i + id,
-            this.getAnInitialPos(),
+            this.getPos(),
             puckGroup.goal,
             puckGroup.radius,
             envWidth,
@@ -276,52 +266,6 @@ export default class Scene {
     });
 
     return pucks;
-  }
-
-  getAnInitialPos() {
-    return this.robotsStartingPositions.pop();
-  }
-
-  // TODO: Move to a separate module, and pass as a dependency
-  getRandomCollisionFreePositions(numOfRobots, radius, envWidth, envHeight, numOfPucks) {
-    const resolution = (radius * 2.1);
-    const xCount = envWidth / resolution;
-    const yCount = envHeight / resolution;
-    const totalPositionsCount = parseInt(numOfRobots, 10) + parseInt(numOfPucks, 10);
-
-    if (xCount * yCount < totalPositionsCount * 4) {
-      throw new Error('Invalid inputs, number and size of robots and pucks are too high for this environment size!');
-    }
-
-    const positions = [];
-    let i = 0;
-    while (positions.length < totalPositionsCount * 3 && i < totalPositionsCount * 100) {
-      const newX = Math.max(
-        radius * 2,
-        Math.min(envWidth - radius * 2, Math.floor(Math.random() * xCount) * resolution)
-      );
-      const newY = Math.max(
-        radius * 2,
-        Math.min(envHeight - radius * 2, Math.floor(Math.random() * yCount) * resolution)
-      );
-      const newPos = { x: newX, y: newY };
-      const doesNotCollideWithRobots = positions
-        .findIndex((x) => distanceBetween2Points(x, newPos) < radius * 2.2) === -1;
-      const doesNotCollideWithObstacles = this.staticObjects
-        .reduce((acc, cur) => !cur.containsPoint(newPos)
-          && cur.getDistanceToBorder(newPos) > radius && acc, true);
-
-      if (doesNotCollideWithRobots && doesNotCollideWithObstacles) {
-        positions.push(newPos);
-      }
-      i += 1;
-    }
-
-    if (positions.length < totalPositionsCount * 2) {
-      throw new Error('Invalid inputs, number and size of robots are too high for this environment size!');
-    }
-
-    return positions;
   }
 
   addEnvBoundryObjects(envWidth, envHeight) {

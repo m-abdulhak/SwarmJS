@@ -16,6 +16,7 @@ export const createSimulation = (config, updateCallback) => {
     config.pucks.groups,
     config.objects,
     config.algorithm,
+    config.positionsGenerator,
     gMaps
   );
 

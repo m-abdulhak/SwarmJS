@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 import * as d3 from 'd3';
-import { nxtCircIndx } from './geometry';
+import { nxtCircIndx } from './utils/geometry';
 
 const renderLineSeg = (x1, y1, x2, y2) => `M${x1},${y1}L${x2},${y2}Z`;
 
@@ -243,15 +243,11 @@ export function initialize(svg, scene) {
 }
 
 export function renderScene(curSvgEl, curScene) {
-  let svgEl = curSvgEl;
-  let scene = curScene;
+  const svgEl = curSvgEl || lastSvgEl;
+  const scene = curScene || lastScene;
 
   if (!svgEl || !scene) {
-    if (!lastSvgEl || !lastScene) {
-      return;
-    }
-    svgEl = lastSvgEl;
-    scene = lastScene;
+    return;
   }
 
   lastSvgEl = svgEl;
