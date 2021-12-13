@@ -1,9 +1,6 @@
 import { Body, World, Bodies } from 'matter-js';
 
-import {
-  distanceBetween2Points,
-  closestPointInPolygonToPoint
-} from '../utils/geometry';
+import { distanceBetween2Points } from '../utils/geometry';
 
 import updateVelocity from './controllers/velocityController';
 import updateWaypoint from './controllers/waypointController';
@@ -11,7 +8,6 @@ import updateGoal from './controllers/goalController';
 
 import SensorManager from './sensors/sensorManager';
 
-// eslint-disable-next-line no-unused-vars
 export default class Robot {
   constructor(id, position, goal, enabledSensors, radius, envWidth, envHeight, scene, algorithm) {
     // Configs
@@ -65,9 +61,11 @@ export default class Robot {
     this.body.frictionStatic = 0;
     this.body.restitution = 0;
     World.add(this.world, this.body);
-
-    // Remove
     Body.setAngularVelocity(this.body, 1);
+
+    // Sensor Manager
+    this.sensorManager = new SensorManager(this.scene, this, enabledSensors);
+    this.sensorManager.start();
 
     // Velocities calculation strategy
     this.updateVelocity = updateVelocity(this);
@@ -80,10 +78,6 @@ export default class Robot {
 
     // Pucks
     this.bestPuck = null;
-
-    // Sensor Manager
-    this.sensorManager = new SensorManager(this.scene, this, enabledSensors);
-    this.sensorManager.start();
 
     this.changeAlgorithm = (newAlgorithm) => {
       this.algorithmOptions = this.availableAlgorithms.find((a) => a.name === newAlgorithm);
@@ -146,38 +140,6 @@ export default class Robot {
 
   setAngularVelocity(angularVel) {
     Body.setAngularVelocity(this.body, angularVel);
-  }
-
-  pointIsReachableInEnvBounds(goalPoint) {
-    let reachable = true;
-
-    const closestPointInEnvBoundsToGoalPoint = closestPointInPolygonToPoint(
-      this.sense('envBounds'),
-      goalPoint
-    );
-
-    const pointDistToEnvBounds = distanceBetween2Points(
-      goalPoint,
-      closestPointInEnvBoundsToGoalPoint
-    );
-
-    if (pointDistToEnvBounds <= this.radius * 1.1) {
-      reachable = Math.random() < 0.1;
-    }
-
-    return reachable;
-  }
-
-  pointIsReachableOutsideStaticObs(goalPoint) {
-    let reachable = true;
-
-    this.scene.staticObjects.forEach((staticObj) => {
-      if (reachable && !staticObj.pointIsReachableByRobot(goalPoint, this)) {
-        reachable = false;
-      }
-    });
-
-    return reachable;
   }
 
   reachedGoal() {

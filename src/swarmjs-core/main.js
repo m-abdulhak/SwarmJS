@@ -56,6 +56,7 @@ export const resetSimulation = (config) => {
     config.pucks.groups,
     config.objects,
     config.algorithm,
+    config.positionsGenerator,
     gMaps
   );
 };

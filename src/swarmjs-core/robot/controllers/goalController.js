@@ -5,11 +5,33 @@ import {
   distanceBetween2Points,
   translatePointInDirection,
   shiftPointOfLineSegInDirOfPerpendicularBisector,
-  pointIsInsidePolygon
+  pointIsInsidePolygon,
+  closestPointInPolygonToPoint
 } from '../../utils/geometry';
+
+const pointIsReachableInEnvBounds = (env, goalPoint, radius) => {
+  let reachable = true;
+
+  const closestPointInEnvBoundsToGoalPoint = closestPointInPolygonToPoint(
+    env,
+    goalPoint
+  );
+
+  const pointDistToEnvBounds = distanceBetween2Points(
+    goalPoint,
+    closestPointInEnvBoundsToGoalPoint
+  );
+
+  if (pointDistToEnvBounds <= radius * 1.1) {
+    reachable = Math.random() < 0.1;
+  }
+
+  return reachable;
+};
 
 export default function updateGoal(robot) {
   const { radius, envWidth, envHeight } = robot;
+  const envBounds = robot.sense('envBounds');
   let lastPosition;
   let durationAtCurPosition = 0;
   let stuck = false;
@@ -62,7 +84,7 @@ export default function updateGoal(robot) {
       delta
     );
 
-    if (!robot.pointIsReachableInEnvBounds(newGoal)) {
+    if (!pointIsReachableInEnvBounds(envBounds, newGoal, radius)) {
       translationVec.x *= -1;
       translationVec.y *= -1;
 
@@ -93,8 +115,6 @@ export default function updateGoal(robot) {
   }
 
   function getGoalFromEnvOrbit() {
-    const envBounds = robot.sense('envBounds');
-
     const pointsCount = envBounds.length;
     const envRectSides = [];
 
@@ -105,7 +125,7 @@ export default function updateGoal(robot) {
 
     const allSides = [...envRectSides];
 
-    robot.scene.staticObjects
+    robot.sense('nearbyObstacles')
       .filter((obj) => !obj.def.skipOrbit)
       .map((ob) => ob.sides)
       .forEach((sides) => allSides.push(...sides));
@@ -210,13 +230,8 @@ export default function updateGoal(robot) {
           const normalizedAngle = getNormalizedAngleToPuck(robot.sense('position'), p);
           const puckAngleAcceptable = normalizedAngle <= ANGLE_ACCEPTABLE_THRESHOLD;
 
-          const condReachableInEnv = robot.pointIsReachableInEnvBounds(g);
-          // TODO: disable after global planning was implemented
-          const condReachableOutOfStaticObs = true; // robot.pointIsReachableOutsideStaticObs(g);
-          return condInRobotVorCell
-            && puckAngleAcceptable
-            && condReachableInEnv
-            && condReachableOutOfStaticObs;
+          const condReachableInEnv = pointIsReachableInEnvBounds(envBounds, g, radius);
+          return condInRobotVorCell && puckAngleAcceptable && condReachableInEnv;
         }
         return false;
       })

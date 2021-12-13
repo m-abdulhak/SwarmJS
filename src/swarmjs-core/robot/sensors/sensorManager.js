@@ -3,24 +3,23 @@
     all sampling is done through this module.
 */
 
-import EnvironmentBoundsSensor from './envBoundsSensor';
-import PositionSensor from './positionSensor';
-import PrevPositionSensor from './prevPositionSensor';
-import OrientationSensor from './orientationSensor';
-import HeadingSensor from './headingSensor';
-import NearbyPucksSensor from './nearbyPucksSensor';
-import NearbyObstaclesSensor from './nearbyObstaclesSensor';
-import ClosestObstaclePointSensor from './closestObstaclePointSensor';
-import NeighborsSensor from './neighborsSensor';
-import VoronoiCellSensor from './voronoiCellSensor';
-import BufferedVoronoiCellSensor from './bufferedVoronoiCellSensor';
+import EnvironmentBoundsSensor from './env/envBoundsSensor';
+import PositionSensor from './pose/positionSensor';
+import PrevPositionSensor from './pose/prevPositionSensor';
+import OrientationSensor from './pose/orientationSensor';
+import HeadingSensor from './pose/headingSensor';
+import NearbyPucksSensor from './nearby/nearbyPucksSensor';
+import NearbyObstaclesSensor from './nearby/nearbyObstaclesSensor';
+import ClosestObstaclePointSensor from './voronoi/closestObstaclePointSensor';
+import NeighborsSensor from './nearby/neighborsSensor';
+import ObstaclesAwareVoronoiCellSensor from './voronoi/obstaclesAwareVoronoiCellSensor';
+import BufferedVoronoiCellSensor from './voronoi/bufferedVoronoiCellSensor';
 
 const toposort = require('toposort');
 
 export const sensorSamplingTypes = {
   onStart: 'onStart',
-  onUpdate: 'onUpdate',
-  onRequest: 'onRequest'
+  onUpdate: 'onUpdate'
 };
 
 const availableSensorDefitions = [
@@ -33,7 +32,7 @@ const availableSensorDefitions = [
   NearbyObstaclesSensor,
   ClosestObstaclePointSensor,
   NeighborsSensor,
-  VoronoiCellSensor,
+  ObstaclesAwareVoronoiCellSensor,
   BufferedVoronoiCellSensor
 ];
 
@@ -89,15 +88,8 @@ export default class SensorManager {
     return sensor.read();
   }
 
-  sense(name, params) {
+  sense(name) {
     const sensor = this.activeSensors.find((s) => s.name === name);
-    if (sensor.type === sensorSamplingTypes.onRequest) {
-      // No need to add to values, as it is a regular sensor
-      // and most likely involves special parameters
-      // If it is beneficial to add it to values, change next line to:
-      // this.sample(name, params);
-      sensor.sample(params);
-    }
     return sensor.read();
   }
 

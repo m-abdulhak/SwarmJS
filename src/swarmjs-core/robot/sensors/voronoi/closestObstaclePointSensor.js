@@ -1,5 +1,5 @@
-import Sensor from './sensor';
-import { sensorSamplingTypes, availableSensors } from './sensorManager';
+import Sensor from '../sensor';
+import { sensorSamplingTypes, availableSensors } from '../sensorManager';
 
 const name = 'closestObstaclePoint';
 

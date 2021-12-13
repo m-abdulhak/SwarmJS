@@ -1,6 +1,6 @@
-import Sensor from './sensor';
-import { sensorSamplingTypes, availableSensors } from './sensorManager';
-import generateStaticObject from '../../staticObjects/staticObjectFactory';
+import Sensor from '../sensor';
+import { sensorSamplingTypes, availableSensors } from '../sensorManager';
+import generateStaticObject from '../../../staticObjects/staticObjectFactory';
 
 const name = 'nearbyObstacles';
 

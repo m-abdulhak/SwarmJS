@@ -1,5 +1,5 @@
-import Sensor from './sensor';
-import { sensorSamplingTypes } from './sensorManager';
+import Sensor from '../sensor';
+import { sensorSamplingTypes } from '../sensorManager';
 
 const name = 'envBounds';
 

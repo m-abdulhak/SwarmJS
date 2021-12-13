@@ -9,7 +9,7 @@ export default class Sensor {
   }
 
   sample() {
-    // Should be overridin by each sensor
+    // Should be overridden by each sensor
     this.value = null;
   }
 

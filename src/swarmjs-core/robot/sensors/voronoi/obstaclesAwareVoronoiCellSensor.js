@@ -6,16 +6,16 @@
 
 import splitPolygon from 'split-polygon';
 
-import Sensor from './sensor';
-import { availableSensors, sensorSamplingTypes } from './sensorManager';
+import Sensor from '../sensor';
+import { availableSensors, sensorSamplingTypes } from '../sensorManager';
 import {
   shiftPointOfLineSegInDirOfPerpendicularBisector,
   getLineEquationParams,
   pointIsInsidePolygon,
   closePolygon
-} from '../../utils/geometry';
+} from '../../../utils/geometry';
 
-const name = 'voronoiCell';
+const name = 'obstaclesAwareVoronoiCell';
 
 const trimVCwithStaticObstacles = (pos, VC, closestPoint) => {
   if (closestPoint == null) {
@@ -48,7 +48,7 @@ const trimVCwithStaticObstacles = (pos, VC, closestPoint) => {
   return splitPolygonParts[1];
 };
 
-class VoronoiCellSensor extends Sensor {
+class ObstaclesAwareVoronoiCellSensor extends Sensor {
   constructor(robot, scene) {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
     this.dependencies = [
@@ -68,5 +68,5 @@ class VoronoiCellSensor extends Sensor {
 
 export default {
   name,
-  Sensor: VoronoiCellSensor
+  Sensor: ObstaclesAwareVoronoiCellSensor
 };

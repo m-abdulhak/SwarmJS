@@ -1,6 +1,6 @@
-import Sensor from './sensor';
-import { sensorSamplingTypes, availableSensors } from './sensorManager';
-import { getAbsolutePointFromLengthAndAngle } from '../../utils/geometry';
+import Sensor from '../sensor';
+import { sensorSamplingTypes, availableSensors } from '../sensorManager';
+import { getAbsolutePointFromLengthAndAngle } from '../../../utils/geometry';
 
 const name = 'heading';
 

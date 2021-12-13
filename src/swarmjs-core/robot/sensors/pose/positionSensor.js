@@ -5,7 +5,7 @@
     sample(): calculates the value of the sensor
     read(): returns the latest sampled value of the sensor
     name: used to access (sample and read) the sensor through the sensor manager
-    type: determines when the sensor is sampled, possible values: onStart, onUpdate, or onRequest.
+    type: determines when the sensor is sampled, possible values: onStart, onUpdate.
     dependencies: optional, a list specifying any other sensors needed for this sensor to work,
                   used by sensorManager to determine the order in which the sensors are sampled
 
@@ -15,8 +15,8 @@
   and all sensors should be added to the 'availableSensorDefitions' list in sensorManager
 */
 
-import Sensor from './sensor';
-import { sensorSamplingTypes, availableSensors } from './sensorManager';
+import Sensor from '../sensor';
+import { sensorSamplingTypes, availableSensors } from '../sensorManager';
 
 const name = 'position';
 

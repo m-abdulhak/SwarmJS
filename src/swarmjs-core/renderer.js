@@ -179,7 +179,11 @@ export function initialize(svg, scene) {
     .attr('fill', 'none')
     .attr('stroke', 'black')
     .attr('stroke-width', 3)
-    .attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.sense('heading').x, d.sense('heading').y));
+    .attr('d', (d) => {
+      const pos = d.sense('position');
+      const heading = d.sense('heading');
+      return renderLineSeg(pos.x, pos.y, heading.x, heading.y);
+    });
 
   // Goals
   renderedElements.goalsCircles = svg.append('g')
@@ -336,7 +340,12 @@ export function renderScene(curSvgEl, curScene) {
     renderedElements.robotsCircles.attr('cx', (d) => d.sense('position').x).attr('cy', (d) => d.sense('position').y)
       .attr('stroke-opacity', '100%')
       .attr('fill-opacity', '100%');
-    renderedElements.robotOrientations.attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.sense('heading').x, d.sense('heading').y));
+    renderedElements.robotOrientations
+      .attr('d', (d) => {
+        const pos = d.sense('position');
+        const heading = d.sense('heading');
+        return renderLineSeg(pos.x, pos.y, heading.x, heading.y);
+      });
   } else {
     renderedElements.robotsCircles
       .attr('stroke-opacity', '0%')
