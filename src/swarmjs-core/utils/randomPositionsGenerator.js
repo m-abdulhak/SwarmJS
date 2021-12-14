@@ -6,7 +6,7 @@ import { distanceBetween2Points } from './geometry';
 const positions = [];
 
 const getPos = () => {
-  if (positions.length <= 0) {
+  if (positions.length === 0) {
     throw new Error('No positions available!');
   }
   return positions.pop();
@@ -48,7 +48,7 @@ export default function getRandomCollisionFreePositionsGenerator(
   }
 
   if (positions.length < positionsCount * 2) {
-    throw new Error('Invalid inputs, number and size of robots are too high for this environment size!');
+    throw new Error('Invalid inputs, number and size of robots are too high for this environment!');
   }
 
   return getPos;

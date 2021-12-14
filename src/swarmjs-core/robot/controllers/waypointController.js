@@ -91,7 +91,9 @@ export default function updateWaypoint(robot) {
   function setWaypointAccToAdvancedDeadlockRec(cell) {
     // Get vertices of cell that lie on the current maneuver direction
     const vertecies = getVerteciesOnManeuverDir(cell, robot.sensors.position, robot.goal);
-    const outermostPoint = getFurthestVertexFromLineSeg(vertecies, robot.sensors.position, robot.goal);
+    const outermostPoint = getFurthestVertexFromLineSeg(
+      vertecies, robot.sensors.position, robot.goal
+    );
     const distanceToOutermostPoint = robot.getDistanceTo(outermostPoint);
     if (distanceToOutermostPoint < detourPointMaxDistance) {
       robot.setWaypoint(outermostPoint);
@@ -101,7 +103,9 @@ export default function updateWaypoint(robot) {
       const detourRatio = defaultRatioLongerThanMax
         ? detourPointMaxDistance / distanceToOutermostPoint
         : detourPointToOutermostPointRatio;
-      robot.setWaypoint(pointOnLineSegmentPerRatio(robot.sensors.position, outermostPoint, detourRatio));
+      robot.setWaypoint(
+        pointOnLineSegmentPerRatio(robot.sensors.position, outermostPoint, detourRatio)
+      );
     }
   }
 
@@ -131,7 +135,8 @@ export default function updateWaypoint(robot) {
       lastDeadlockAreaRadius
     );
     const { robots } = robotsMeasurements;
-    const robotPositions = robots.map((r) => ({ x: r.sensors.position.x, y: r.sensors.position.y }));
+    const robotPositions = robots
+      .map((r) => ({ x: r.sensors.position.x, y: r.sensors.position.y }));
 
     if (lastDeadlockNeighborsCount > 1) {
       if (robots.length < 2) {
@@ -140,7 +145,8 @@ export default function updateWaypoint(robot) {
       }
 
       if (allPointsAreOnSameSideOfVector(robotPositions, robot.sensors.position, robot.goal)
-        && minDistanceToLine(robotPositions, robot.sensors.position, robot.goal) > robot.radius * 1.5) {
+        && minDistanceToLine(robotPositions, robot.sensors.position, robot.goal)
+            > robot.radius * 1.5) {
         // console.log('Successfully Recovered From Deadlock! 2');
         return Math.random() > 0.1;
       }
@@ -150,7 +156,7 @@ export default function updateWaypoint(robot) {
   }
 
   function deadLockWaypointStillValid() {
-    const waypointNotReached = !robot.reachedWaypoint();
+    const waypointNotReached = !robot.sensors.reachedWaypoint;
     const currentVCellContainsWaypoint = pointIsInsidePolygon(
       robot.waypoint,
       robot.sensors.BVC
@@ -161,7 +167,7 @@ export default function updateWaypoint(robot) {
   }
 
   function deadLocked() {
-    if (robot.reachedWaypoint() && !robot.reachedGoal()) {
+    if (robot.sensors.reachedWaypoint && !robot.sensors.reachedGoal) {
       stuckAtWaypointDuration += 1;
     } else {
       stuckAtWaypointDuration = 0;

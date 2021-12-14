@@ -16,25 +16,6 @@ export default class Robot {
       Simple: 1,
       Advanced: 2
     };
-
-    // Change Options Based on algorithm
-    this.availableAlgorithms = [
-      {
-        name: 'Proposed Algorithm',
-        limitPuckSelectionToBVC: true,
-        environmentOrbit: true
-      },
-      {
-        name: 'Baseline Algorithm',
-        limitPuckSelectionToBVC: true,
-        environmentOrbit: false
-      }
-    ];
-
-    this.algorithmOptions = algorithm
-      ? this.availableAlgorithms.find((a) => a.name === algorithm)
-      : this.availableAlgorithms[0];
-
     this.id = id;
     this.radius = radius;
     this.velocity = { x: 0, y: 0 };
@@ -74,10 +55,7 @@ export default class Robot {
     this.updateWaypoint = updateWaypoint(this);
 
     // Goal Planning
-    this.updateGoal = updateGoal(this);
-
-    // Pucks
-    this.bestPuck = null;
+    this.updateGoal = updateGoal(radius, envWidth, envHeight, this.sensors.envBounds, algorithm);
 
     this.changeAlgorithm = (newAlgorithm) => {
       this.algorithmOptions = this.availableAlgorithms.find((a) => a.name === newAlgorithm);
@@ -107,16 +85,12 @@ export default class Robot {
     this.waypoint = { x: waypoint.x, y: waypoint.y };
   }
 
-  setBestPuck(puck) {
-    this.bestPuck = puck;
-  }
-
   timeStep() {
     // Update sensors
     this.sensorManager.update();
 
     // Update goal
-    const newGoalRaw = this.updateGoal(this.sensors.position);
+    const newGoalRaw = this.updateGoal(this.goal, this.sensors);
     const newGoal = this.limitGoal(newGoalRaw);
     this.setGoal(newGoal);
 
@@ -140,16 +114,6 @@ export default class Robot {
 
   setAngularVelocity(angularVel) {
     Body.setAngularVelocity(this.body, angularVel);
-  }
-
-  reachedGoal() {
-    const ret = this.reached(this.goal);
-    return ret;
-  }
-
-  reachedWaypoint() {
-    const ret = this.reached(this.waypoint);
-    return ret;
   }
 
   reached(point) {

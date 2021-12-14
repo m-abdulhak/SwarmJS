@@ -14,6 +14,8 @@ import ClosestObstaclePointSensor from './voronoi/closestObstaclePointSensor';
 import NeighborsSensor from './nearby/neighborsSensor';
 import ObstaclesAwareVoronoiCellSensor from './voronoi/obstaclesAwareVoronoiCellSensor';
 import BufferedVoronoiCellSensor from './voronoi/bufferedVoronoiCellSensor';
+import ReachedGoalSensor from './state/reachedGoalSensor';
+import ReachedWaypointSensor from './state/reachedWaypointSensor';
 
 const toposort = require('toposort');
 
@@ -33,7 +35,9 @@ const availableSensorDefitions = [
   ClosestObstaclePointSensor,
   NeighborsSensor,
   ObstaclesAwareVoronoiCellSensor,
-  BufferedVoronoiCellSensor
+  BufferedVoronoiCellSensor,
+  ReachedGoalSensor,
+  ReachedWaypointSensor
 ];
 
 // Sensors are stored in this object allowing other modules to easily reference them
