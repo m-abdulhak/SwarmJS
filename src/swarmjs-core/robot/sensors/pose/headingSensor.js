@@ -16,7 +16,7 @@ class HeadingSensor extends Sensor {
 
   sample() {
     this.value = getAbsolutePointFromLengthAndAngle(
-      this.robot.sense('position'), this.robot.radius * 1.2, this.robot.sense('orientation')
+      this.robot.sensors.position, this.robot.radius * 1.2, this.robot.sensors.orientation
     );
   }
 }

@@ -14,8 +14,8 @@ class ClosestObstaclePointSensor extends Sensor {
   }
 
   sample() {
-    const pos = this.robot.sense('position');
-    const points = this.robot.sense('nearbyObstacles')
+    const pos = this.robot.sensors.position;
+    const points = this.robot.sensors.nearbyObstacles
       .map((staticObs) => staticObs.getIntersectionPoint(pos));
 
     if (points.length === 0) {

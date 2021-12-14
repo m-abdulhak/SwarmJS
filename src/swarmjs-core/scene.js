@@ -222,7 +222,7 @@ export default class Scene {
   }
 
   getCurRobotsPos() {
-    return this.robots.map((r) => r.sense('position'));
+    return this.robots.map((r) => r.sensors.position);
   }
 
   getCurGoalsPos() {

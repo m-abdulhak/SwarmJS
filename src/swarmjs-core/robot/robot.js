@@ -116,7 +116,7 @@ export default class Robot {
     this.sensorManager.update();
 
     // Update goal
-    const newGoalRaw = this.updateGoal(this.sense('position'));
+    const newGoalRaw = this.updateGoal(this.sensors.position);
     const newGoal = this.limitGoal(newGoalRaw);
     this.setGoal(newGoal);
 
@@ -158,7 +158,7 @@ export default class Robot {
   }
 
   getDistanceTo(point) {
-    const ret = distanceBetween2Points(this.sense('position'), point);
+    const ret = distanceBetween2Points(this.sensors.position, point);
     return ret;
   }
 
@@ -186,8 +186,8 @@ export default class Robot {
       let diffX = null;
       let diffY = null;
       while (!staticObj.pointIsReachableByRobot(newGoal, this)) {
-        diffX = diffX || newGoal.x - this.sense('position').x;
-        diffY = diffY || newGoal.y - this.sense('position').y;
+        diffX = diffX || newGoal.x - this.sensors.position.x;
+        diffY = diffY || newGoal.y - this.sensors.position.y;
         newGoal.x += diffX;
         newGoal.y += diffY;
       }
@@ -201,7 +201,7 @@ export default class Robot {
     let minDist = -1;
 
     robots.forEach((r) => {
-      const distance = distanceBetween2Points(this.sense('position'), r.sensotValues.position);
+      const distance = distanceBetween2Points(this.sensors.position, r.sensotValues.position);
 
       // If first or closest neighbor, set distances min distance
       if (minDist === -1 || distance < minDist) {

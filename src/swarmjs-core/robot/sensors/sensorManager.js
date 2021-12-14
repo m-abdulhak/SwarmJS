@@ -73,7 +73,10 @@ export default class SensorManager {
     this.sensorsOnUpdate = this.activeSensors
       .filter((s) => s.type === sensorSamplingTypes.onUpdate);
 
-    this.values = {};
+    this.values = this.activeSensors.reduce((acc, sensor) => {
+      acc[sensor.name] = sensor.read();
+      return acc;
+    }, {});
   }
 
   readAll() {

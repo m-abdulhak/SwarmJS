@@ -56,7 +56,7 @@ export default function updateWaypoint(robot) {
       });
       return { x: bestVertex[0], y: bestVertex[1] };
     } catch (error) {
-      return robot.sense('position');
+      return robot.sensors.position;
     }
   }
 
@@ -90,8 +90,8 @@ export default function updateWaypoint(robot) {
   // returns temp goal according to advanced deadlock recovery algorithm
   function setWaypointAccToAdvancedDeadlockRec(cell) {
     // Get vertices of cell that lie on the current maneuver direction
-    const vertecies = getVerteciesOnManeuverDir(cell, robot.sense('position'), robot.goal);
-    const outermostPoint = getFurthestVertexFromLineSeg(vertecies, robot.sense('position'), robot.goal);
+    const vertecies = getVerteciesOnManeuverDir(cell, robot.sensors.position, robot.goal);
+    const outermostPoint = getFurthestVertexFromLineSeg(vertecies, robot.sensors.position, robot.goal);
     const distanceToOutermostPoint = robot.getDistanceTo(outermostPoint);
     if (distanceToOutermostPoint < detourPointMaxDistance) {
       robot.setWaypoint(outermostPoint);
@@ -101,7 +101,7 @@ export default function updateWaypoint(robot) {
       const detourRatio = defaultRatioLongerThanMax
         ? detourPointMaxDistance / distanceToOutermostPoint
         : detourPointToOutermostPointRatio;
-      robot.setWaypoint(pointOnLineSegmentPerRatio(robot.sense('position'), outermostPoint, detourRatio));
+      robot.setWaypoint(pointOnLineSegmentPerRatio(robot.sensors.position, outermostPoint, detourRatio));
     }
   }
 
@@ -114,8 +114,8 @@ export default function updateWaypoint(robot) {
     const closeRobots = [];
     let maxDist = 0;
 
-    robot.sense('neighbors').forEach((r) => {
-      const curDist = distanceBetween2Points(r.sense('position'), point);
+    robot.sensors.neighbors.forEach((r) => {
+      const curDist = distanceBetween2Points(r.sensors.position, point);
       if (curDist <= distance) {
         closeRobots.push(r);
         maxDist = curDist > maxDist ? curDist : maxDist;
@@ -131,7 +131,7 @@ export default function updateWaypoint(robot) {
       lastDeadlockAreaRadius
     );
     const { robots } = robotsMeasurements;
-    const robotPositions = robots.map((r) => ({ x: r.sense('position').x, y: r.sense('position').y }));
+    const robotPositions = robots.map((r) => ({ x: r.sensors.position.x, y: r.sensors.position.y }));
 
     if (lastDeadlockNeighborsCount > 1) {
       if (robots.length < 2) {
@@ -139,8 +139,8 @@ export default function updateWaypoint(robot) {
         // return Math.random() > 0.3;
       }
 
-      if (allPointsAreOnSameSideOfVector(robotPositions, robot.sense('position'), robot.goal)
-        && minDistanceToLine(robotPositions, robot.sense('position'), robot.goal) > robot.radius * 1.5) {
+      if (allPointsAreOnSameSideOfVector(robotPositions, robot.sensors.position, robot.goal)
+        && minDistanceToLine(robotPositions, robot.sensors.position, robot.goal) > robot.radius * 1.5) {
         // console.log('Successfully Recovered From Deadlock! 2');
         return Math.random() > 0.1;
       }
@@ -153,7 +153,7 @@ export default function updateWaypoint(robot) {
     const waypointNotReached = !robot.reachedWaypoint();
     const currentVCellContainsWaypoint = pointIsInsidePolygon(
       robot.waypoint,
-      robot.sense('BVC')
+      robot.sensors.BVC
     );
     const maneuverNotSucceededYet = !(deadLockManeuverInProgress && neighborsAvoided());
 
@@ -174,9 +174,9 @@ export default function updateWaypoint(robot) {
     // Add a bit of randomness to the direction of the maneuver
     if (Math.random() > 0.8) return Math.random() > 0.5;
 
-    const furthestPoint = getFurthestVertexFromLineSeg(cell, robot.sense('position'), robot.goal);
+    const furthestPoint = getFurthestVertexFromLineSeg(cell, robot.sensors.position, robot.goal);
     const furthestPointDir = pointIsOnRightSideOfVector(furthestPoint.x, furthestPoint.y,
-      robot.sense('position').x, robot.sense('position').y,
+      robot.sensors.position.x, robot.sensors.position.y,
       robot.goal.x, robot.goal.y);
     return furthestPointDir;
   }
@@ -215,12 +215,12 @@ export default function updateWaypoint(robot) {
       const nextIndx = nxtCircIndx(neighborIndx, robotsCloseToWaypoint.length);
       const rNext = robotsCloseToWaypoint[nextIndx];
 
-      const distToNextNeighbor = distanceBetween2Points(r.sense('position'), rNext.sense('position'));
+      const distToNextNeighbor = distanceBetween2Points(r.sensors.position, rNext.sensors.position);
       if (distToNextNeighbor < neighborNeighbordistanceThreshold) {
         const condPointsOnSameSide = allPointsAreOnSameSideOfVector(
           [robot.goal, robot.waypoint],
-          r.sense('position'),
-          rNext.sense('position')
+          r.sensors.position,
+          rNext.sensors.position
         );
 
         if (!condPointsOnSameSide) {
@@ -268,7 +268,7 @@ export default function updateWaypoint(robot) {
   }
 
   return () => {
-    const cell = robot.sense('BVC');
+    const cell = robot.sensors.BVC;
     // If cell is undefined (shouldn't happen in collision-free configurations)
     // => set localgoal = goal
     if (cell == null || cell.length < 2) {

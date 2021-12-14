@@ -100,7 +100,7 @@ export function initialize(svg, scene) {
     .attr('stroke', (d, i) => d3.schemeCategory10[i % 10])
     .attr('stroke-width', 1)
     .attr('stroke-dasharray', '1,10')
-    .attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.waypoint.x, d.waypoint.y));
+    .attr('d', (d) => renderLineSeg(d.sensors.position.x, d.sensors.position.y, d.waypoint.x, d.waypoint.y));
 
   // Line segments between each robot's temp goal and goal
   renderedElements.waypointToGoalLineSegs = svg.append('g')
@@ -133,8 +133,8 @@ export function initialize(svg, scene) {
     .data(scene.robots)
     .enter()
     .append('circle')
-    .attr('cx', (d) => d.sense('position').x)
-    .attr('cy', (d) => d.sense('position').y)
+    .attr('cx', (d) => d.sensors.position.x)
+    .attr('cy', (d) => d.sensors.position.y)
     .attr('id', (d) => d.id)
     .attr('r', (d) => d.radius)
     .attr('fill', '#FFC53A')
@@ -168,7 +168,7 @@ export function initialize(svg, scene) {
     .attr('stroke', (d, i) => d3.schemeCategory10[i % 10])
     .attr('stroke-width', 1)
     .attr('stroke-dasharray', '10,10')
-    .attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.goal.x, d.goal.y));
+    .attr('d', (d) => renderLineSeg(d.sensors.position.x, d.sensors.position.y, d.goal.x, d.goal.y));
 
   // Line segments between robots and heading
   renderedElements.robotOrientations = svg.append('g')
@@ -180,8 +180,8 @@ export function initialize(svg, scene) {
     .attr('stroke', 'black')
     .attr('stroke-width', 3)
     .attr('d', (d) => {
-      const pos = d.sense('position');
-      const heading = d.sense('heading');
+      const pos = d.sensors.position;
+      const heading = d.sensors.heading;
       return renderLineSeg(pos.x, pos.y, heading.x, heading.y);
     });
 
@@ -273,7 +273,7 @@ export function renderScene(curSvgEl, curScene) {
 
   if (activeElements.includes('BVC')) {
     scene.robots.forEach((r, rIndex) => {
-      const bVC = r.sense('BVC');
+      const bVC = r.sensors.BVC;
       if (typeof (bVC) !== 'undefined' && bVC.length > 0) {
         renderedElements.BVCLineSegs.push(
           svg.append('g')
@@ -318,7 +318,7 @@ export function renderScene(curSvgEl, curScene) {
       .attr('fill-opacity', '40%');
 
     renderedElements.robotToWaypointLineSegs
-      .attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.waypoint.x, d.waypoint.y))
+      .attr('d', (d) => renderLineSeg(d.sensors.position.x, d.sensors.position.y, d.waypoint.x, d.waypoint.y))
       .attr('stroke-opacity', '100%');
 
     renderedElements.waypointToGoalLineSegs
@@ -337,13 +337,13 @@ export function renderScene(curSvgEl, curScene) {
   }
 
   if (activeElements.includes('Robots')) {
-    renderedElements.robotsCircles.attr('cx', (d) => d.sense('position').x).attr('cy', (d) => d.sense('position').y)
+    renderedElements.robotsCircles.attr('cx', (d) => d.sensors.position.x).attr('cy', (d) => d.sensors.position.y)
       .attr('stroke-opacity', '100%')
       .attr('fill-opacity', '100%');
     renderedElements.robotOrientations
       .attr('d', (d) => {
-        const pos = d.sense('position');
-        const heading = d.sense('heading');
+        const pos = d.sensors.position;
+        const heading = d.sensors.heading;
         return renderLineSeg(pos.x, pos.y, heading.x, heading.y);
       });
   } else {
@@ -366,7 +366,7 @@ export function renderScene(curSvgEl, curScene) {
   }
 
   if (activeElements.includes('Goals')) {
-    renderedElements.robotToGoalLineSegs.attr('d', (d) => renderLineSeg(d.sense('position').x, d.sense('position').y, d.goal.x, d.goal.y))
+    renderedElements.robotToGoalLineSegs.attr('d', (d) => renderLineSeg(d.sensors.position.x, d.sensors.position.y, d.goal.x, d.goal.y))
       .attr('stroke-opacity', '100%');
 
     renderedElements.goalsCircles.attr('cx', (d) => d.goal.x).attr('cy', (d) => d.goal.y)

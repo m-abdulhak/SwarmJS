@@ -32,8 +32,8 @@ class BufferedVoronoiCellSensor extends Sensor {
   }
 
   sample() {
-    const cell = this.robot.sense('obstaclesAwareVoronoiCell');
-    const pos = this.robot.sense('position');
+    const cell = this.robot.sensors.obstaclesAwareVoronoiCell;
+    const pos = this.robot.sensors.position;
 
     if (cell == null || cell.length < 3) {
       return;

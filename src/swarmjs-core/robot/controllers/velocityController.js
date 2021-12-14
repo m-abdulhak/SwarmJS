@@ -12,8 +12,8 @@ export default function updateVelocity(robot) {
 
   //   // else
   //   if (!robot.reached(point)) {
-  //     newXVel = robot.velocityScale * (point.x - robot.sense('position').x);
-  //     newYVel = robot.velocityScale * (point.y - robot.sense('position').y);
+  //     newXVel = robot.velocityScale * (point.x - robot.sensors.position.x);
+  //     newYVel = robot.velocityScale * (point.y - robot.sensors.position.y);
   //   }
 
   //   const linearVel = { x: newXVel / 100, y: newYVel / 100 };
@@ -32,19 +32,19 @@ export default function updateVelocity(robot) {
       return { linearVel: { x: 0, y: 0 }, angularVel };
     }
 
-    const angle = angleBetweenThreePointsDeg(robot.sense('heading'), robot.sense('position'), point);
+    const angle = angleBetweenThreePointsDeg(robot.sensors.heading, robot.sensors.position, point);
     const directionOnRight = pointIsOnRightSideOfVector(
-      robot.sense('heading').x,
-      robot.sense('heading').y,
-      robot.sense('position').x,
-      robot.sense('position').y,
+      robot.sensors.heading.x,
+      robot.sensors.heading.y,
+      robot.sensors.position.x,
+      robot.sensors.position.y,
       point.x,
       point.y
     );
 
     if (angle < 15) {
-      linearVelX = robot.velocityScale * (robot.sense('heading').x - robot.sense('position').x);
-      linearVelY = robot.velocityScale * (robot.sense('heading').y - robot.sense('position').y);
+      linearVelX = robot.velocityScale * (robot.sensors.heading.x - robot.sensors.position.x);
+      linearVelY = robot.velocityScale * (robot.sensors.heading.y - robot.sensors.position.y);
     } else if (directionOnRight) {
       angularVel = -1 * angularVelocityScale * angle;
     } else {

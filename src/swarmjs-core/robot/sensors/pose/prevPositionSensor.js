@@ -10,7 +10,7 @@ class PrevPositionSensor extends Sensor {
   }
 
   sample() {
-    this.value = { ...this.robot.sense('position') };
+    this.value = { ...this.robot.sensors.position };
   }
 }
 
