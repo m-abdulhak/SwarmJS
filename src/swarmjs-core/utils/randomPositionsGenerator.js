@@ -1,7 +1,7 @@
 // Module to generate random initial positions for robots and pucks
 // TODO: replace with a js generator
 
-import { distanceBetween2Points } from './geometry';
+import { getDistance } from './geometry';
 
 const positions = [];
 
@@ -36,7 +36,7 @@ export default function getRandomCollisionFreePositionsGenerator(
     );
     const newPos = { x: newX, y: newY };
     const doesNotCollideWithRobots = positions
-      .findIndex((x) => distanceBetween2Points(x, newPos) < radius * 2.2) === -1;
+      .findIndex((x) => getDistance(x, newPos) < radius * 2.2) === -1;
     const doesNotCollideWithObstacles = staticObjects
       .reduce((acc, cur) => !cur.containsPoint(newPos)
         && cur.getDistanceToBorder(newPos) > radius && acc, true);

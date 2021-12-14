@@ -1,6 +1,6 @@
 import { World, Bodies } from 'matter-js';
 
-import { distanceBetween2Points } from '../utils/geometry';
+import { getDistance } from '../utils/geometry';
 
 export default class StaticRectangle {
   constructor(def, scene, shouldAddToWorld) {
@@ -50,7 +50,7 @@ export default class StaticRectangle {
     }
   }
 
-  // Static Obstaccle Interface
+  // Static Obstacle Interface
   addToWorld() {
     World.add(
       this.world,
@@ -58,7 +58,7 @@ export default class StaticRectangle {
     );
   }
 
-  // Static Obstacles Interface
+  // Static Obstacle Interface
   getIntersectionPoint(point) {
     const insideOnX = point.x >= this.minMax.minX && point.x <= this.minMax.maxX;
     const insideOnY = point.y >= this.minMax.minY && point.y <= this.minMax.maxY;
@@ -87,14 +87,14 @@ export default class StaticRectangle {
           return p;
         }
 
-        const minDist = distanceBetween2Points(acc, point);
-        const curDist = distanceBetween2Points(p, point);
+        const minDist = getDistance(acc, point);
+        const curDist = getDistance(p, point);
 
         return curDist < minDist ? p : acc;
       });
   }
 
-  // Static Obstaccle Interface
+  // Static Obstacle Interface
   pointIsReachableByRobot(point, robot) {
     // console.log('pointIsReachableByRobot');
     // return true;
@@ -105,7 +105,7 @@ export default class StaticRectangle {
     return !unreachable;
   }
 
-  // Static Obstaccle Interface
+  // Static Obstacle Interface
   containsPoint(point) {
     // console.log('containsPoint');
     // return false;
@@ -115,7 +115,7 @@ export default class StaticRectangle {
     && point.y <= this.minMax.maxY;
   }
 
-  // Static Obstaccle Interface
+  // Static Obstacle Interface
   getDistanceToBorder(point) {
     // console.log('getDistanceToBorder');
     // return 100000;

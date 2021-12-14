@@ -162,7 +162,7 @@ export function closestPointInLineSegToPoint(x, y, x1, y1, x2, y2) {
   return { x: xx, y: yy };
 }
 
-export function distanceBetween2Points(pos1, pos2) {
+export function getDistance(pos1, pos2) {
   if (
     pos1 == null || pos2 == null
     || pos1.x == null || pos1.y == null
@@ -197,7 +197,7 @@ export function closestPointInPolygonToPoint(origPolygon, origPoint) {
       v2.y
     );
 
-    const distGoalToLineSeg = distanceBetween2Points(point, closestPointInLineSeg);
+    const distGoalToLineSeg = getDistance(point, closestPointInLineSeg);
 
     if (closestPoint == null || distGoalToLineSeg < minDist) {
       closestPoint = { x: closestPointInLineSeg.x, y: closestPointInLineSeg.y };
@@ -209,7 +209,7 @@ export function closestPointInPolygonToPoint(origPolygon, origPoint) {
 }
 
 export function distanceBetweenPointAndLine(point, point1LineSeg, point2LineSeg) {
-  const ret = distanceBetween2Points(
+  const ret = getDistance(
     point,
     closestPointInLineToPoint(
       point.x,
@@ -224,7 +224,7 @@ export function distanceBetweenPointAndLine(point, point1LineSeg, point2LineSeg)
 }
 
 export function distanceBetweenPointAndLineSeg(point, point1LineSeg, point2LineSeg) {
-  const ret = distanceBetween2Points(
+  const ret = getDistance(
     point,
     closestPointInLineSegToPoint(
       point.x,
@@ -272,7 +272,7 @@ export function slopeOfPerpendicularBisectorOfLineSeg(x1, y1, x2, y2) {
 }
 
 export function directionOfPerpendicularBisector(x1, y1, x2, y2, scale) {
-  const length = distanceBetween2Points({ x: x1, y: y1 }, { x: x2, y: y2 });
+  const length = getDistance({ x: x1, y: y1 }, { x: x2, y: y2 });
   return { x: (scale * (y1 - y2)) / length, y: (scale * (x2 - x1)) / length };
 }
 
@@ -423,7 +423,7 @@ export function getLineEquationParams(p1, p2) {
  */
 export function getLineCircleIntersectionPoint(center, radius, otherLineEndPoint) {
   let v = { x: otherLineEndPoint.x - center.x, y: otherLineEndPoint.y - center.y };
-  const lineLength = distanceBetween2Points(v, { x: 0, y: 0 });
+  const lineLength = getDistance(v, { x: 0, y: 0 });
   if (lineLength === 0) {
     throw new Error('Cannot get intersection point between line and circle, end point is same as center!');
   }

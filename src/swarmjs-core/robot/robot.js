@@ -1,6 +1,6 @@
 import { Body, World, Bodies } from 'matter-js';
 
-import { distanceBetween2Points } from '../utils/geometry';
+import { getDistance } from '../utils/geometry';
 
 import updateVelocity from './controllers/velocityController';
 import updateWaypoint from './controllers/waypointController';
@@ -122,7 +122,7 @@ export default class Robot {
   }
 
   getDistanceTo(point) {
-    const ret = distanceBetween2Points(this.sensors.position, point);
+    const ret = getDistance(this.sensors.position, point);
     return ret;
   }
 
@@ -165,7 +165,7 @@ export default class Robot {
     let minDist = -1;
 
     robots.forEach((r) => {
-      const distance = distanceBetween2Points(this.sensors.position, r.sensotValues.position);
+      const distance = getDistance(this.sensors.position, r.sensotValues.position);
 
       // If first or closest neighbor, set distances min distance
       if (minDist === -1 || distance < minDist) {

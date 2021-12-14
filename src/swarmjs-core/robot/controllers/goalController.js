@@ -2,7 +2,7 @@ import {
   angleBetweenThreePointsDeg,
   closestPointInLineToPoint,
   closestPointInLineSegToPoint,
-  distanceBetween2Points,
+  getDistance,
   translatePointInDirection,
   shiftPointOfLineSegInDirOfPerpendicularBisector,
   pointIsInsidePolygon,
@@ -34,10 +34,7 @@ const pointIsReachableInEnvBounds = (env, goalPoint, radius) => {
     goalPoint
   );
 
-  const pointDistToEnvBounds = distanceBetween2Points(
-    goalPoint,
-    closestPointInEnvBoundsToGoalPoint
-  );
+  const pointDistToEnvBounds = getDistance(goalPoint, closestPointInEnvBoundsToGoalPoint);
 
   if (pointDistToEnvBounds <= radius * 1.1) {
     reachable = Math.random() < 0.1;
@@ -75,7 +72,7 @@ export default function updateGoal(radius, envWidth, envHeight, envBounds, algor
   }
 
   function getGoalFromClosestPointToEnvBounds(sensors, closestPoint) {
-    const len = distanceBetween2Points(sensors.position, closestPoint);
+    const len = getDistance(sensors.position, closestPoint);
 
     const translationVec = {
       x: ((closestPoint.x - sensors.position.x) * radius) / (len * 10),
@@ -162,11 +159,10 @@ export default function updateGoal(radius, envWidth, envHeight, envBounds, algor
     );
 
     let closestPoint = closestPointsToSides.reduce((acc, cur) => {
-      const condNotReached = distanceBetween2Points(sensors.position, cur) > 50 || true;
+      const condNotReached = getDistance(sensors.position, cur) > 50 || true;
       const condFirstCorner = acc == null;
       const condCloserThanAcc = condFirstCorner
-        || distanceBetween2Points(sensors.position, cur)
-            < distanceBetween2Points(sensors.position, acc);
+        || getDistance(sensors.position, cur) < getDistance(sensors.position, acc);
       if (condNotReached && (condFirstCorner || condCloserThanAcc)) {
         return cur;
       }
@@ -175,7 +171,7 @@ export default function updateGoal(radius, envWidth, envHeight, envBounds, algor
 
     for (let index = 0; index < closestPointsToSides.length; index += 1) {
       const p = closestPointsToSides[index];
-      if (distanceBetween2Points(sensors.position, p) < 5) {
+      if (getDistance(sensors.position, p) < 5) {
         closestPoint = closestPointsToSides[(index + 1) % (closestPointsToSides.length)];
       }
     }
@@ -259,7 +255,7 @@ export default function updateGoal(radius, envWidth, envHeight, envBounds, algor
         angleRatings.push(
           [p, angleBetweenThreePointsDeg(sensors.position, p.position, p.goal)]
         );
-        distanceRatings.push([p, distanceBetween2Points(sensors.position, p.position)]);
+        distanceRatings.push([p, getDistance(sensors.position, p.position)]);
       });
 
     angleRatings.sort((a, b) => b[1] - a[1]);
@@ -292,7 +288,7 @@ export default function updateGoal(radius, envWidth, envHeight, envBounds, algor
 
     // Calc distance to last recorded position
     const distToLastPos = lastPosition
-      ? distanceBetween2Points(sensors.position, lastPosition)
+      ? getDistance(sensors.position, lastPosition)
       : null;
 
     // If robot is close enough to be considered at same position

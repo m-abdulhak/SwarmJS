@@ -5,7 +5,7 @@ import {
   allPointsAreOnSameSideOfVector,
   pointIsOnRightSideOfVector,
   closestPointInPolygonToPoint,
-  distanceBetween2Points,
+  getDistance,
   distanceBetweenPointAndLine,
   pointIsInsidePolygon
 } from '../../utils/geometry';
@@ -119,7 +119,7 @@ export default function updateWaypoint(robot) {
     let maxDist = 0;
 
     robot.sensors.neighbors.forEach((r) => {
-      const curDist = distanceBetween2Points(r.sensors.position, point);
+      const curDist = getDistance(r.sensors.position, point);
       if (curDist <= distance) {
         closeRobots.push(r);
         maxDist = curDist > maxDist ? curDist : maxDist;
@@ -221,7 +221,7 @@ export default function updateWaypoint(robot) {
       const nextIndx = nxtCircIndx(neighborIndx, robotsCloseToWaypoint.length);
       const rNext = robotsCloseToWaypoint[nextIndx];
 
-      const distToNextNeighbor = distanceBetween2Points(r.sensors.position, rNext.sensors.position);
+      const distToNextNeighbor = getDistance(r.sensors.position, rNext.sensors.position);
       if (distToNextNeighbor < neighborNeighbordistanceThreshold) {
         const condPointsOnSameSide = allPointsAreOnSameSideOfVector(
           [robot.goal, robot.waypoint],

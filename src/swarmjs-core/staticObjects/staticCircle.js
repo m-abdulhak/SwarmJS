@@ -1,5 +1,5 @@
 import { World, Bodies } from 'matter-js';
-import { distanceBetween2Points, getLineCircleIntersectionPoint } from '../utils/geometry';
+import { getDistance, getLineCircleIntersectionPoint } from '../utils/geometry';
 
 export default class StaticCircle {
   constructor(def, scene, shouldAddToWorld) {
@@ -39,7 +39,7 @@ export default class StaticCircle {
     }
   }
 
-  // Static Obstaccle Interface
+  // Static Obstacle Interface
   addToWorld() {
     World.add(
       this.world,
@@ -52,22 +52,22 @@ export default class StaticCircle {
     return getLineCircleIntersectionPoint(this.center, this.radius, point);
   }
 
-  // Static Obstaccle Interface
+  // Static Obstacle Interface
   pointIsReachableByRobot(point, robot) {
     return this.getDistanceToBorder(point) > robot.radius;
   }
 
-  // Static Obstaccle Interface
+  // Static Obstacle Interface
   containsPoint(point) {
-    return distanceBetween2Points(this.center, point) <= this.radius;
+    return getDistance(this.center, point) <= this.radius;
   }
 
-  // Static Obstaccle Interface
+  // Static Obstacle Interface
   getDistanceToBorder(point) {
     return this.getDistanceToCenter(point) - this.radius;
   }
 
   getDistanceToCenter(point) {
-    return distanceBetween2Points(this.center, point);
+    return getDistance(this.center, point);
   }
 }
