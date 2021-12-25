@@ -29,6 +29,10 @@ class PositionSensor extends Sensor {
   }
 
   sample() {
+    if (!this.robot.body || !this.robot.body.position || this.robot.body.position.x == null) {
+      // eslint-disable-next-line no-console
+      console.log(`Robot ${this.robot.id} position not detected!`, this.robot);
+    }
     this.value = this.robot.body?.position ? { ...this.robot.body.position } : { x: null, y: null };
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-use-before-define */
 import * as d3 from 'd3';
 import { nxtCircIndx } from './utils/geometry';
@@ -145,7 +146,7 @@ export function initialize(svg, scene) {
         renderedElements.robotsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'green');
         pauseStateOnDragStart = scene.paused;
         scene.pause();
-        console.log(d.sensors);
+        console.log(`${d.id}: `, d.sensors);
       })
       .on('drag', (event, d) => {
         d.setPosition({ x: event.x, y: event.y });
@@ -231,6 +232,7 @@ export function initialize(svg, scene) {
         renderedElements.pucksCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
         pauseStateOnDragStart = scene.paused;
         scene.pause();
+        console.log(d);
       })
       .on('drag', (event, d) => {
         d.setPosition({ x: event.x, y: event.y });

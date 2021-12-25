@@ -33,7 +33,8 @@ class NearbyObstaclesSensor extends Sensor {
     );
 
     // Nearby obstacles from pucks that reached their goals
-    const nearbyPucksInsideGoals = this.robot.sensors.nearbyPucks.filter((puck) => puck.deepInGoal());
+    const nearbyPucksInsideGoals = this.robot.sensors.nearbyPucks
+      .filter((puck) => puck.deepInGoal());
     const pucksObstacles = nearbyPucksInsideGoals.map((puck) => {
       const staticObstacleDefinition = puck.generateStaticObjectDefinition();
       return generateStaticObject(staticObstacleDefinition, this.scene, false);

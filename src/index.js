@@ -4,7 +4,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { availableSensors } from './swarmjs-core/robot/sensors/sensorManager';
-import getRandomCollisionFreePositionsGenerator from './swarmjs-core/utils/randomPositionsGenerator';
+import { availableActuators } from './swarmjs-core/robot/actuators/actuatorsManager';
+import getRandCollFreePosGenerator from './swarmjs-core/utils/randomPositionsGenerator';
 import App from './components/App';
 
 const config = {
@@ -13,9 +14,10 @@ const config = {
     height: 500
   },
   robots: {
-    count: 20,
+    count: 1,
     radius: 7,
-    sensors: Object.values(availableSensors)
+    sensors: Object.values(availableSensors),
+    actuators: Object.values(availableActuators)
   },
   pucks: {
     groups: [
@@ -73,7 +75,7 @@ const config = {
       height: 50
     }
   ],
-  positionsGenerator: getRandomCollisionFreePositionsGenerator
+  positionsGenerator: getRandCollFreePosGenerator
 };
 
 ReactDOM.render(

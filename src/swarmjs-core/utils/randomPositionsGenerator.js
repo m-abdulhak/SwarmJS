@@ -12,7 +12,7 @@ const getPos = () => {
   return positions.pop();
 };
 
-export default function getRandomCollisionFreePositionsGenerator(
+export default function getRandCollFreePosGenerator(
   numOfPos, radius, envWidth, envHeight, staticObjects
 ) {
   const resolution = (radius * 2.1);

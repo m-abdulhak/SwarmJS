@@ -14,7 +14,7 @@ class NearbyPucksSensor extends Sensor {
 
   sample() {
     this.value = this.scene?.pucks?.filter(
-      (p) => this.robot.getDistanceTo(p.position) < this.MAX_NEARBY_DISTANCE
+      (p) => !p.held && this.robot.getDistanceTo(p.position) < this.MAX_NEARBY_DISTANCE
     );
   }
 }

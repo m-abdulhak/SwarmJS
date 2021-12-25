@@ -42,7 +42,7 @@ export default function updateVelocity(robot) {
       point.y
     );
 
-    if (angle < 15) {
+    if (angle < 5) {
       linearVelX = robot.velocityScale * (robot.sensors.heading.x - robot.sensors.position.x);
       linearVelY = robot.velocityScale * (robot.sensors.heading.y - robot.sensors.position.y);
     } else if (directionOnRight) {

@@ -7,9 +7,21 @@ import updateWaypoint from './controllers/waypointController';
 import updateGoal from './controllers/goalController';
 
 import SensorManager from './sensors/sensorManager';
+import ActuatorManager from './actuators/actuatorsManager';
 
 export default class Robot {
-  constructor(id, position, goal, enabledSensors, radius, envWidth, envHeight, scene, algorithm) {
+  constructor(
+    id,
+    position,
+    goal,
+    enabledSensors,
+    enabledActuators,
+    radius,
+    envWidth,
+    envHeight,
+    scene,
+    algorithm
+  ) {
     // Configs
     this.DeadLockRecovery = {
       None: 0,
@@ -47,6 +59,10 @@ export default class Robot {
     // Sensor Manager
     this.sensorManager = new SensorManager(this.scene, this, enabledSensors);
     this.sensorManager.start();
+
+    // Actuator Manager
+    this.actuatorManager = new ActuatorManager(this.scene, this, enabledActuators);
+    this.actuators = this.actuatorManager.actuators;
 
     // Velocities calculation strategy
     this.updateVelocity = updateVelocity(this);
@@ -90,7 +106,7 @@ export default class Robot {
     this.sensorManager.update();
 
     // Update goal
-    const newGoalRaw = this.updateGoal(this.goal, this.sensors);
+    const newGoalRaw = this.updateGoal(this.goal, this.sensors, this.actuators);
     const newGoal = this.limitGoal(newGoalRaw);
     this.setGoal(newGoal);
 
@@ -140,6 +156,13 @@ export default class Robot {
   }
 
   limitGoal(goal) {
+    if (
+      !this.sensors.position
+      || !Number.isNaN(this.sensors.position.x)
+      || !Number.isNaN(this.sensors.position.y)
+    ) {
+      return goal;
+    }
     const { radius } = this;
     const newGoal = {
       x: Math.min(Math.max(radius, goal.x), this.envWidth - radius),
@@ -149,7 +172,11 @@ export default class Robot {
     this.scene.staticObjects.forEach((staticObj) => {
       let diffX = null;
       let diffY = null;
-      while (!staticObj.pointIsReachableByRobot(newGoal, this)) {
+      while (
+        !Number.isNaN(this.sensors.position.x)
+        && !Number.isNaN(this.sensors.position.y)
+        && !staticObj.pointIsReachableByRobot(newGoal, this)
+      ) {
         diffX = diffX || newGoal.x - this.sensors.position.x;
         diffY = diffY || newGoal.y - this.sensors.position.y;
         newGoal.x += diffX;
