@@ -4,7 +4,6 @@ import { getDistance } from './utils/geometry';
 export default class Puck {
   constructor(id, position, goal, radius, envWidth, envHeight, scene, color, map) {
     this.id = id;
-    this.position = position;
     this.prevPosition = position;
     this.velocityScale = 1;
     this.groupGoal = { ...goal };
@@ -40,13 +39,20 @@ export default class Puck {
     this.deepInGoalDist = this.radius * 8;
   }
 
-  setPosition(newPosition) {
-    Body.set(this.body, 'position', { x: newPosition.x, y: newPosition.y });
+  get position() {
+    return {
+      x: this.body.position.x,
+      y: this.body.position.y
+    };
+  }
+
+  set position(val) {
+    Body.set(this.body, 'position', { x: val?.x || null, y: val?.y || null });
   }
 
   timeStep() {
     this.prevPosition = this.position;
-    this.position = this.body.position;
+    this.position = this.body?.position;
     this.updateGoal();
     this.limitGoal();
   }

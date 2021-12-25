@@ -73,23 +73,22 @@ export default class Robot {
     // Goal Planning
     this.updateGoal = updateGoal(radius, envWidth, envHeight, this.sensors.envBounds, algorithm);
 
+    this.sense = (sensorName, params) => this.sensorManager.sense(sensorName, params);
+
     this.changeAlgorithm = (newAlgorithm) => {
       this.algorithmOptions = this.availableAlgorithms.find((a) => a.name === newAlgorithm);
     };
 
+    this.sense.bind(this);
     this.changeAlgorithm.bind(this);
-  }
-
-  sense(sensorName, params) {
-    return this.sensorManager.sense(sensorName, params);
   }
 
   get sensors() {
     return this.sensorManager.values;
   }
 
-  setPosition(newPosition) {
-    Body.set(this.body, 'position', { x: newPosition.x, y: newPosition.y });
+  set position(val) {
+    Body.set(this.body, 'position', { x: val.x, y: val.y });
     this.sensorManager.update();
   }
 
@@ -203,3 +202,41 @@ export default class Robot {
     return { minDistance: minDist };
   }
 }
+
+export const RobotRenderables = [
+  {
+    shape: 'circle',
+    staticAttrs: {
+      r: 'radius',
+      id: 'id'
+    },
+    dynamicAttrs: {
+      cx: 'sensors.position.x',
+      cy: 'sensors.position.y'
+    },
+    styles: {
+      fill: '#FFC53A',
+      stroke: 'black',
+      'stroke-width': 1,
+      'stroke-opacity': '%50',
+      'fill-opacity': '%50'
+    },
+    drag: {
+      prop: 'position',
+      pause: true,
+      onStart: {
+        styles: {
+          stroke: 'green'
+        },
+        log: [
+          'sensors'
+        ]
+      },
+      onEnd: {
+        styles: {
+          stroke: 'black'
+        }
+      }
+    }
+  }
+];

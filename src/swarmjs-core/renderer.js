@@ -1,6 +1,10 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-console */
 /* eslint-disable no-use-before-define */
 import * as d3 from 'd3';
+import { get, has } from 'lodash';
+
+import { RobotRenderables } from './robot/robot';
 import { nxtCircIndx } from './utils/geometry';
 
 const renderLineSeg = (x1, y1, x2, y2) => `M${x1},${y1}L${x2},${y2}Z`;
@@ -20,6 +24,11 @@ let lastScene = null;
 const renderingElements = [
   'All', 'Robots', 'Pucks', 'Goals', 'Waypoints', 'VC', 'BVC'
 ];
+
+const rendrables = {
+  Robots: RobotRenderables
+};
+const renders = [];
 
 let activeElements = [...renderingElements];
 
@@ -129,35 +138,80 @@ export function initialize(svg, scene) {
     .attr('fill-opacity', '10%');
 
   // Robots
-  renderedElements.robotsCircles = svg.append('g')
-    .selectAll('circle')
-    .data(scene.robots)
-    .enter()
-    .append('circle')
-    .attr('cx', (d) => d.sensors.position.x)
-    .attr('cy', (d) => d.sensors.position.y)
-    .attr('id', (d) => d.id)
-    .attr('r', (d) => d.radius)
-    .attr('fill', '#FFC53A')
-    .attr('stroke', 'black')
-    .attr('stroke-width', 1)
-    .call(d3.drag()
-      .on('start', (event, d) => {
-        renderedElements.robotsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'green');
-        pauseStateOnDragStart = scene.paused;
-        scene.pause();
-        console.log(`${d.id}: `, d.sensors);
-      })
+  console.log(rendrables.Robots);
+  rendrables.Robots.forEach((def) => {
+    const rends = svg.append('g')
+      .selectAll(def.shape)
+      .data(scene.robots)
+      .enter()
+      .append(def.shape);
+
+    Object.keys(def.styles).forEach((attrKey) => {
+      const attrValue = def.styles[attrKey];
+      rends.attr(attrKey, attrValue);
+    });
+
+    Object.keys(def.staticAttrs).forEach((attrKey) => {
+      const attrValue = def.staticAttrs[attrKey];
+      rends.attr(attrKey, (d) => get(d, attrValue));
+    });
+
+    Object.keys(def.dynamicAttrs).forEach((attrKey) => {
+      const attrValue = def.dynamicAttrs[attrKey];
+      rends.attr(attrKey, (d) => get(d, attrValue));
+    });
+
+    rends.call(d3.drag()
+      .on(
+        'start',
+        (event, d) => {
+          if (def.drag?.pause) {
+            pauseStateOnDragStart = scene.paused;
+            scene.pause();
+          }
+          if (def.drag?.onStart?.log) {
+            console.log(`${d.id}: `, ...def.drag.onStart.log.map((prop) => get(d, prop)));
+          }
+          if (has(def, 'drag.onStart.styles')) {
+            const styles = def.drag.onStart.styles;
+            Object.keys(styles).forEach((attrKey) => {
+              const attrValue = styles[attrKey];
+              rends.filter((p) => p.id === d.id).raise().attr(attrKey, attrValue);
+            });
+          }
+        }
+      )
       .on('drag', (event, d) => {
-        d.setPosition({ x: event.x, y: event.y });
+        if (def.drag?.onDrag?.log) {
+          console.log(`${d.id}: `, ...def.drag.onDrag.log.map((prop) => get(d, prop)));
+        }
+        d[def.drag.prop] = { x: event.x, y: event.y };
         renderScene();
       })
       .on('end', (event, d) => {
-        renderedElements.robotsCircles.filter((p) => p.id === d.id).attr('stroke', 'black');
-        if (pauseStateOnDragStart != null && !pauseStateOnDragStart) {
-          scene.unpause();
+        if (def.drag?.pause) {
+          if (pauseStateOnDragStart != null && !pauseStateOnDragStart) {
+            scene.unpause();
+          }
+        }
+        if (def.drag?.onEnd?.log) {
+          console.log(`${d.id}: `, ...def.drag.onEnd.log.map((prop) => get(d, prop)));
+        }
+        if (has(def, 'drag.onEnd.styles')) {
+          const styles = def.drag.onEnd.styles;
+          Object.keys(styles).forEach((attrKey) => {
+            const attrValue = styles[attrKey];
+            rends.filter((p) => p.id === d.id).raise().attr(attrKey, attrValue);
+          });
         }
       }));
+
+    renders.push({
+      def,
+      type: 'Robots',
+      values: rends
+    });
+  });
 
   // Line segments between robots and corresponding goal
   renderedElements.robotToGoalLineSegs = svg.append('g')
@@ -226,7 +280,9 @@ export function initialize(svg, scene) {
     .attr('cy', (d) => d.position.y)
     .attr('id', (d) => d.id)
     .attr('r', (d) => d.radius)
-    .attr('fill', (d) => d.color)
+    .attr('fill', (d) => d.color);
+
+  renderedElements.pucksCircles
     .call(d3.drag()
       .on('start', (event, d) => {
         renderedElements.pucksCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
@@ -235,7 +291,7 @@ export function initialize(svg, scene) {
         console.log(d);
       })
       .on('drag', (event, d) => {
-        d.setPosition({ x: event.x, y: event.y });
+        d.position = { x: event.x, y: event.y };
         renderScene();
       })
       .on('end', (event, d) => {
@@ -338,10 +394,17 @@ export function renderScene(curSvgEl, curScene) {
       .attr('stroke-opacity', '0%');
   }
 
+  // Robots
   if (activeElements.includes('Robots')) {
-    renderedElements.robotsCircles.attr('cx', (d) => d.sensors.position.x).attr('cy', (d) => d.sensors.position.y)
-      .attr('stroke-opacity', '100%')
-      .attr('fill-opacity', '100%');
+    renders.forEach((render) => {
+      Object.keys(render.def.dynamicAttrs).forEach((attrKey) => {
+        const attrValue = render.def.dynamicAttrs[attrKey];
+        render.values
+          .attr(attrKey, (d) => get(d, attrValue))
+          .attr('stroke-opacity', render.def.styles['stroke-opacity'] || '100%')
+          .attr('fill-opacity', render.def.styles['stroke-opacity'] || '100%');
+      });
+    });
     renderedElements.robotOrientations
       .attr('d', (d) => {
         const pos = d.sensors.position;
@@ -349,9 +412,11 @@ export function renderScene(curSvgEl, curScene) {
         return renderLineSeg(pos.x, pos.y, heading.x, heading.y);
       });
   } else {
-    renderedElements.robotsCircles
-      .attr('stroke-opacity', '0%')
-      .attr('fill-opacity', '0%');
+    renders.forEach((render) => {
+      render.values
+        .attr('stroke-opacity', '0%')
+        .attr('fill-opacity', '0%');
+    });
     renderedElements.robotOrientations
       .attr('stroke-opacity', '0%')
       .attr('fill-opacity', '0%');
