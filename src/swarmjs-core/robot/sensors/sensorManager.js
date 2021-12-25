@@ -8,6 +8,7 @@ import PositionSensor from './pose/positionSensor';
 import PrevPositionSensor from './pose/prevPositionSensor';
 import OrientationSensor from './pose/orientationSensor';
 import HeadingSensor from './pose/headingSensor';
+import DirectionsSensor from './pose/directionsSensor';
 import NearbyPucksSensor from './nearby/nearbyPucksSensor';
 import NearbyObstaclesSensor from './nearby/nearbyObstaclesSensor';
 import ClosestObstaclePointSensor from './voronoi/closestObstaclePointSensor';
@@ -32,6 +33,7 @@ const availableSensorDefitions = [
   PrevPositionSensor,
   OrientationSensor,
   HeadingSensor,
+  DirectionsSensor,
   NearbyPucksSensor,
   NearbyObstaclesSensor,
   ClosestObstaclePointSensor,
