@@ -184,6 +184,10 @@ export default class Scene {
     Engine.clear(this.engine);
   }
 
+  get voronoiMesh() {
+    return this.voronoi.render();
+  }
+
   // TODO: Move to benchmark module
   updateMinRobotRobotDistMesurements() {
     let minDist = null;

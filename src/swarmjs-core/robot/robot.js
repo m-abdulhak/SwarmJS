@@ -202,7 +202,7 @@ export default class Robot {
 export const RobotRenderables = [
   {
     type: 'body',
-    dataPoints: { prop: 'robots' }, // property of scene
+    dataPoints: { sceneProp: 'robots' }, // property of scene
     shape: 'circle',
     staticAttrs: {
       r: { prop: 'radius' },
@@ -239,7 +239,7 @@ export const RobotRenderables = [
   },
   {
     type: 'waypoint',
-    dataPoints: { prop: 'robots' }, // property of scene
+    dataPoints: { sceneProp: 'robots' }, // property of scene
     shape: 'circle',
     staticAttrs: {
       r: {
@@ -263,7 +263,7 @@ export const RobotRenderables = [
   },
   {
     type: 'goal',
-    dataPoints: { prop: 'robots' }, // property of scene
+    dataPoints: { sceneProp: 'robots' }, // property of scene
     shape: 'circle',
     staticAttrs: {
       r: {
@@ -306,7 +306,7 @@ export const RobotRenderables = [
     type: 'waypoint',
     name: 'robotToWaypointLineSegs',
     desc: 'Line segments between robots and waypoints',
-    dataPoints: { prop: 'robots' }, // property of scene
+    dataPoints: { sceneProp: 'robots' }, // property of scene
     shape: 'path',
     staticAttrs: {
       id: { prop: 'id' }
@@ -330,7 +330,7 @@ export const RobotRenderables = [
     type: 'waypoint',
     name: 'waypointToGoalLineSegs',
     desc: 'Line segments between waypoints and goals',
-    dataPoints: { prop: 'robots' }, // property of scene
+    dataPoints: { sceneProp: 'robots' }, // property of scene
     shape: 'path',
     staticAttrs: {
       id: { prop: 'id' }
@@ -354,7 +354,7 @@ export const RobotRenderables = [
     type: 'goal',
     name: 'robotToGoalLineSegs',
     desc: 'Line segments between robots and goals',
-    dataPoints: { prop: 'robots' }, // property of scene
+    dataPoints: { sceneProp: 'robots' }, // property of scene
     shape: 'path',
     staticAttrs: {
       id: { prop: 'id' }
@@ -378,7 +378,7 @@ export const RobotRenderables = [
     type: 'body',
     name: 'robotOrientations',
     desc: 'Line segments between robots and headings',
-    dataPoints: { prop: 'robots' }, // property of scene
+    dataPoints: { sceneProp: 'robots' }, // property of scene
     shape: 'path',
     staticAttrs: {
       id: { prop: 'id' }
@@ -395,6 +395,34 @@ export const RobotRenderables = [
       'stroke-width': 3,
       'stroke-opacity': 1,
       'fill-opacity': 1
+    }
+  },
+  {
+    type: 'VC',
+    name: 'VcMeshBG',
+    desc: 'Vodonoi Diagram Background',
+    shape: 'path',
+    dynamicAttrs: {
+      d: { sceneProp: 'voronoiMesh' }
+    },
+    styles: {
+      stroke: '#777',
+      'stroke-width': 2,
+      'stroke-opacity': 1
+    }
+  },
+  {
+    type: 'VC',
+    name: 'VcMesh',
+    desc: 'Vodonoi Diagram',
+    shape: 'path',
+    dynamicAttrs: {
+      d: { sceneProp: 'voronoiMesh' }
+    },
+    styles: {
+      stroke: '#000',
+      'stroke-width': 1,
+      'stroke-opacity': 1
     }
   }
 ];

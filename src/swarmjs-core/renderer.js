@@ -18,7 +18,7 @@ const removeElements = (svg, selectionQuery) => {
   }
 };
 
-const parseAttr = (obj, attr) => {
+const parseAttr = (obj, attr, scene) => {
   // If attr is a string or number, return it
   if (typeof attr === 'number' || typeof attr === 'string') {
     return attr;
@@ -37,6 +37,23 @@ const parseAttr = (obj, attr) => {
     if (typeof attr.modifier === 'string') {
       parsedVal = obj[attr.modifier](parsedVal, attr.params);
     }
+
+    return parsedVal;
+  }
+
+  // If attr is an object with a sceneProp key
+  if (has(attr, 'sceneProp')) {
+    let parsedVal = get(scene, attr.sceneProp);
+
+    // If a modifier callback is defined and is a function, call it
+    if (has(attr, 'modifier') && typeof attr.modifier === 'function') {
+      parsedVal = attr.modifier(parsedVal, attr.params);
+    }
+
+    // If a modifier is a string, assume it is a function name and call it
+    // if (typeof attr.modifier === 'string') {
+    //   parsedVal = obj[attr.modifier](parsedVal, attr.params);
+    // }
 
     return parsedVal;
   }
@@ -63,6 +80,8 @@ let pauseStateOnDragStart = null;
 
 let activeElements = [...renderingElements];
 
+const renderedElements = {};
+
 export const getRenderingElements = () => [...renderingElements];
 
 export const setElementEnabled = (element, state) => {
@@ -70,7 +89,7 @@ export const setElementEnabled = (element, state) => {
   activeElements = state ? [...otherActiveElements, element] : [...otherActiveElements];
 };
 
-function setDynamicAttrs(def, values) {
+function setDynamicAttrs(def, values, scene) {
   if (def.shape === 'circle') {
     Object.keys(def.dynamicAttrs).forEach((attrKey) => {
       const attrVal = def.dynamicAttrs[attrKey];
@@ -99,39 +118,52 @@ function setDynamicAttrs(def, values) {
         points[1].y
       );
     });
+  } else if (
+    def.shape === 'path'
+    && has(def, 'dynamicAttrs.d')
+  ) {
+    values.attr('d', (d) => parseAttr(d, def.dynamicAttrs.d, scene));
   }
 }
 
-function addRenderables(svg, scene, definitions) {
+function addRenderables(svg, scene, definitions, obj) {
   definitions.forEach((def) => {
-    const rends = svg
-      .append('g')
-      .selectAll(def.shape)
-      .data(parseAttr(scene, def.dataPoints))
-      .enter()
-      .append(def.shape);
+    const rends = has(def, 'dataPoints')
+      ? svg
+        .append('g')
+        .selectAll(def.shape)
+        .data(parseAttr(obj, def.dataPoints, scene))
+        .enter()
+        .append(def.shape)
+      : svg
+        .append(def.shape);
 
-    Object.keys(def.styles).forEach((attrKey) => {
-      const attrValue = def.styles[attrKey];
-      rends.attr(attrKey, (d, i) => {
-        if (attrValue === 'RandomColor') {
-          return d3.schemeCategory10[i % 10];
-        }
-        return attrValue;
+    if (has(def, 'styles') && typeof def.styles === 'object') {
+      Object.keys(def.styles).forEach((attrKey) => {
+        const attrValue = def.styles[attrKey];
+        rends.attr(attrKey, (d, i) => {
+          if (attrValue === 'RandomColor') {
+            return d3.schemeCategory10[i % 10];
+          }
+          return attrValue;
+        });
       });
-    });
+    }
 
-    Object.keys(def.staticAttrs).forEach((attrKey) => {
-      const attrValue = def.staticAttrs[attrKey];
-      rends.attr(attrKey, (d) => parseAttr(d, attrValue));
-    });
-    if (!def.staticAttrs.id) {
+    if (has(def, 'staticAttrs') && typeof def.staticAttrs === 'object') {
+      Object.keys(def.staticAttrs).forEach((attrKey) => {
+        const attrValue = def.staticAttrs[attrKey];
+        rends.attr(attrKey, (d) => parseAttr(d, attrValue));
+      });
+    }
+
+    if (!def.staticAttrs?.id) {
       rends.attr('id', (d, i) => i);
     }
 
-    setDynamicAttrs(def, rends);
+    setDynamicAttrs(def, rends, scene);
 
-    if (def.drag) {
+    if (def.drag && typeof def.drag === 'object') {
       rends.call(d3.drag()
         .on('start', (event, d) => {
           if (def.drag?.pause) {
@@ -183,8 +215,6 @@ function addRenderables(svg, scene, definitions) {
   });
 }
 
-const renderedElements = {};
-
 export function initialize(svg, scene) {
   if (svg) {
     svg.selectAll('*').remove();
@@ -216,28 +246,15 @@ export function initialize(svg, scene) {
     .attr('height', (d) => d.height)
     .attr('fill', '#000000');
 
-  // Voronoi cells edges (Voronoi Diagram)
-  const voronoiMesh = scene.voronoi.render();
-  renderedElements.VcMeshBG = svg.append('path')
-    .attr('stroke', '#777')
-    .attr('stroke-width', 2)
-    .attr('d', voronoiMesh);
-  renderedElements.VcMesh = svg.append('path')
-    .attr('stroke', '#000')
-    .attr('stroke-width', 1)
-    .attr('d', voronoiMesh);
-
-  // TODO:
-
   // Puck
   addRenderables(svg, scene, rendrables.Pucks);
 
   // Robots
-  // console.log(rendrables.Robots);
   addRenderables(svg, scene, rendrables.Robots);
 
   initialized = true;
 }
+
 export function renderScene(curSvgEl, curScene) {
   const svgEl = curSvgEl || lastSvgEl;
   const scene = curScene || lastScene;
@@ -289,23 +306,10 @@ export function renderScene(curSvgEl, curScene) {
     });
   }
 
-  if (activeElements.includes('VC')) {
-    const vcMesh = scene.voronoi.render();
-    renderedElements.VcMeshBG
-      .attr('d', vcMesh)
-      .attr('stroke-opacity', '100%');
-    renderedElements.VcMesh
-      .attr('d', vcMesh)
-      .attr('stroke-opacity', '100%');
-  } else {
-    renderedElements.VcMeshBG.attr('stroke-opacity', '0%');
-    renderedElements.VcMesh.attr('stroke-opacity', '0%');
-  }
-
   // Robots
   if (activeElements.includes('Robots')) {
     renders.forEach((render) => {
-      setDynamicAttrs(render.def, render.values);
+      setDynamicAttrs(render.def, render.values, scene);
 
       render.values
         .attr('stroke-opacity', render.def.styles['stroke-opacity'] || '100%')
