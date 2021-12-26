@@ -2,9 +2,10 @@
 /* eslint-disable no-console */
 /* eslint-disable no-use-before-define */
 import * as d3 from 'd3';
-import { get, has } from 'lodash';
+import { get, has, isArray } from 'lodash';
 
 import { RobotRenderables } from './robot/robot';
+import { PuckRenderables } from './puck';
 import { nxtCircIndx } from './utils/geometry';
 
 const renderLineSeg = (x1, y1, x2, y2) => `M${x1},${y1}L${x2},${y2}Z`;
@@ -17,6 +18,34 @@ const removeElements = (svg, selectionQuery) => {
   }
 };
 
+const parseAttr = (obj, attr) => {
+  // If attr is a string or number, return it
+  if (typeof attr === 'number' || typeof attr === 'string') {
+    return attr;
+  }
+
+  // If attr is an object with a prop key
+  if (has(attr, 'prop')) {
+    let parsedVal = get(obj, attr.prop);
+
+    // If a modifier callback is defined and is a function, call it
+    if (has(attr, 'modifier') && typeof attr.modifier === 'function') {
+      parsedVal = attr.modifier(parsedVal, attr.params);
+    }
+
+    // If a modifier is a string, assume it is a function name and call it
+    if (typeof attr.modifier === 'string') {
+      parsedVal = obj[attr.modifier](parsedVal, attr.params);
+    }
+
+    return parsedVal;
+  }
+
+  // Otherwise return null
+  console.log('Invalid attr: ', attr, ' for object: ', obj);
+  return null;
+};
+
 let initialized = false;
 let lastSvgEl = null;
 let lastScene = null;
@@ -26,9 +55,11 @@ const renderingElements = [
 ];
 
 const rendrables = {
+  Pucks: PuckRenderables,
   Robots: RobotRenderables
 };
 const renders = [];
+let pauseStateOnDragStart = null;
 
 let activeElements = [...renderingElements];
 
@@ -39,13 +70,125 @@ export const setElementEnabled = (element, state) => {
   activeElements = state ? [...otherActiveElements, element] : [...otherActiveElements];
 };
 
+function setDynamicAttrs(def, values) {
+  if (def.shape === 'circle') {
+    Object.keys(def.dynamicAttrs).forEach((attrKey) => {
+      const attrVal = def.dynamicAttrs[attrKey];
+      values.attr(attrKey, (d) => parseAttr(d, attrVal));
+    });
+  } else if (
+    def.shape === 'path'
+    && def.dynamicAttrs.points
+    && isArray(def.dynamicAttrs.points)
+    && def.dynamicAttrs.points.length === 2
+  ) {
+    const getPoints = (d) => def.dynamicAttrs.points
+      .map((attr) => {
+        const parsedPoint = parseAttr(d, attr);
+        return {
+          ...parsedPoint
+        };
+      });
+
+    values.attr('d', (d) => {
+      const points = getPoints(d);
+      return renderLineSeg(
+        points[0].x,
+        points[0].y,
+        points[1].x,
+        points[1].y
+      );
+    });
+  }
+}
+
+function addRenderables(svg, scene, definitions) {
+  definitions.forEach((def) => {
+    const rends = svg
+      .append('g')
+      .selectAll(def.shape)
+      .data(parseAttr(scene, def.dataPoints))
+      .enter()
+      .append(def.shape);
+
+    Object.keys(def.styles).forEach((attrKey) => {
+      const attrValue = def.styles[attrKey];
+      rends.attr(attrKey, (d, i) => {
+        if (attrValue === 'RandomColor') {
+          return d3.schemeCategory10[i % 10];
+        }
+        return attrValue;
+      });
+    });
+
+    Object.keys(def.staticAttrs).forEach((attrKey) => {
+      const attrValue = def.staticAttrs[attrKey];
+      rends.attr(attrKey, (d) => parseAttr(d, attrValue));
+    });
+    if (!def.staticAttrs.id) {
+      rends.attr('id', (d, i) => i);
+    }
+
+    setDynamicAttrs(def, rends);
+
+    if (def.drag) {
+      rends.call(d3.drag()
+        .on('start', (event, d) => {
+          if (def.drag?.pause) {
+            pauseStateOnDragStart = scene.paused;
+            scene.pause();
+          }
+          if (def.drag?.onStart?.log) {
+            console.log(`${d.id}: `, ...def.drag.onStart.log.map((prop) => parseAttr(d, prop)));
+          }
+          if (has(def, 'drag.onStart.styles')) {
+            const styles = def.drag.onStart.styles;
+            Object.keys(styles).forEach((attrKey) => {
+              const attrValue = styles[attrKey];
+              rends.filter((p) => p.id === d.id).raise().attr(attrKey, attrValue);
+            });
+          }
+        })
+        .on('drag', (event, d) => {
+          if (def.drag?.onDrag?.log) {
+            console.log(`${d.id}: `, ...def.drag.onDrag.log.map((prop) => parseAttr(d, prop)));
+          }
+          d[def.drag.prop] = { x: event.x, y: event.y };
+          renderScene();
+        })
+        .on('end', (event, d) => {
+          if (def.drag?.pause) {
+            if (pauseStateOnDragStart != null && !pauseStateOnDragStart) {
+              scene.unpause();
+            }
+          }
+          if (def.drag?.onEnd?.log) {
+            console.log(`${d.id}: `, ...def.drag.onEnd.log.map((prop) => parseAttr(d, prop)));
+          }
+          if (has(def, 'drag.onEnd.styles')) {
+            const styles = def.drag.onEnd.styles;
+            Object.keys(styles).forEach((attrKey) => {
+              const attrValue = styles[attrKey];
+              rends.filter((p) => p.id === d.id).raise().attr(attrKey, attrValue);
+            });
+          }
+        }));
+    }
+
+    renders.push({
+      def,
+      type: 'Robots',
+      values: rends
+    });
+  });
+}
+
 const renderedElements = {};
 
 export function initialize(svg, scene) {
   if (svg) {
     svg.selectAll('*').remove();
   }
-  let pauseStateOnDragStart = null;
 
   // Buffered voronoi cells line segments (as calculated by robots)
   renderedElements.BVCLineSegs = [];
@@ -84,226 +227,17 @@ export function initialize(svg, scene) {
     .attr('stroke-width', 1)
     .attr('d', voronoiMesh);
 
-  // Temp Goals
-  renderedElements.waypointsCircles = svg.append('g')
-    .attr('fill-opacity', '40%')
-    .attr('stroke-width', 1)
-    .attr('stroke-dasharray', '1,1')
-    .selectAll('circle')
-    .data(scene.robots)
-    .enter()
-    .append('circle')
-    .attr('cx', (d) => d.waypoint.x)
-    .attr('cy', (d) => d.waypoint.y)
-    .attr('id', (d) => d.id)
-    .attr('r', (d) => d.radius / 1.5)
-    .attr('fill', (d, i) => d3.schemeCategory10[i % 10])
-    .attr('stroke', (d, i) => d3.schemeCategory10[i % 10]);
-
-  // Line segments between robots and corresponding temp goal
-  renderedElements.robotToWaypointLineSegs = svg.append('g')
-    .selectAll('path')
-    .data(scene.robots)
-    .enter()
-    .append('path')
-    .attr('fill', 'none')
-    .attr('stroke', (d, i) => d3.schemeCategory10[i % 10])
-    .attr('stroke-width', 1)
-    .attr('stroke-dasharray', '1,10')
-    .attr('d', (d) => renderLineSeg(d.sensors.position.x, d.sensors.position.y, d.waypoint.x, d.waypoint.y));
-
-  // Line segments between each robot's temp goal and goal
-  renderedElements.waypointToGoalLineSegs = svg.append('g')
-    .selectAll('path')
-    .data(scene.robots)
-    .enter()
-    .append('path')
-    .attr('fill', 'none')
-    .attr('stroke', (d, i) => d3.schemeCategory10[i % 10])
-    .attr('stroke-width', 1)
-    .attr('stroke-dasharray', '1,10')
-    .attr('d', (d) => renderLineSeg(d.waypoint.x, d.waypoint.y, d.goal.x, d.goal.y));
-
-  // Puck Goals
-  renderedElements.puckGoalsCircles = svg.append('g')
-    .selectAll('circle')
-    .data(scene.pucksGroups)
-    .enter()
-    .append('circle')
-    .attr('cx', (d) => d.goal.x)
-    .attr('cy', (d) => d.goal.y)
-    .attr('id', (d, i) => i)
-    .attr('r', (d) => d.radius * 12)
-    .attr('fill', (d) => d.color)
-    .attr('fill-opacity', '10%');
-
-  // Robots
-  console.log(rendrables.Robots);
-  rendrables.Robots.forEach((def) => {
-    const rends = svg.append('g')
-      .selectAll(def.shape)
-      .data(scene.robots)
-      .enter()
-      .append(def.shape);
-
-    Object.keys(def.styles).forEach((attrKey) => {
-      const attrValue = def.styles[attrKey];
-      rends.attr(attrKey, attrValue);
-    });
-
-    Object.keys(def.staticAttrs).forEach((attrKey) => {
-      const attrValue = def.staticAttrs[attrKey];
-      rends.attr(attrKey, (d) => get(d, attrValue));
-    });
-
-    Object.keys(def.dynamicAttrs).forEach((attrKey) => {
-      const attrValue = def.dynamicAttrs[attrKey];
-      rends.attr(attrKey, (d) => get(d, attrValue));
-    });
-
-    rends.call(d3.drag()
-      .on(
-        'start',
-        (event, d) => {
-          if (def.drag?.pause) {
-            pauseStateOnDragStart = scene.paused;
-            scene.pause();
-          }
-          if (def.drag?.onStart?.log) {
-            console.log(`${d.id}: `, ...def.drag.onStart.log.map((prop) => get(d, prop)));
-          }
-          if (has(def, 'drag.onStart.styles')) {
-            const styles = def.drag.onStart.styles;
-            Object.keys(styles).forEach((attrKey) => {
-              const attrValue = styles[attrKey];
-              rends.filter((p) => p.id === d.id).raise().attr(attrKey, attrValue);
-            });
-          }
-        }
-      )
-      .on('drag', (event, d) => {
-        if (def.drag?.onDrag?.log) {
-          console.log(`${d.id}: `, ...def.drag.onDrag.log.map((prop) => get(d, prop)));
-        }
-        d[def.drag.prop] = { x: event.x, y: event.y };
-        renderScene();
-      })
-      .on('end', (event, d) => {
-        if (def.drag?.pause) {
-          if (pauseStateOnDragStart != null && !pauseStateOnDragStart) {
-            scene.unpause();
-          }
-        }
-        if (def.drag?.onEnd?.log) {
-          console.log(`${d.id}: `, ...def.drag.onEnd.log.map((prop) => get(d, prop)));
-        }
-        if (has(def, 'drag.onEnd.styles')) {
-          const styles = def.drag.onEnd.styles;
-          Object.keys(styles).forEach((attrKey) => {
-            const attrValue = styles[attrKey];
-            rends.filter((p) => p.id === d.id).raise().attr(attrKey, attrValue);
-          });
-        }
-      }));
-
-    renders.push({
-      def,
-      type: 'Robots',
-      values: rends
-    });
-  });
-
-  // Line segments between robots and corresponding goal
-  renderedElements.robotToGoalLineSegs = svg.append('g')
-    .selectAll('path')
-    .data(scene.robots)
-    .enter()
-    .append('path')
-    .attr('fill', 'none')
-    .attr('stroke', (d, i) => d3.schemeCategory10[i % 10])
-    .attr('stroke-width', 1)
-    .attr('stroke-dasharray', '10,10')
-    .attr('d', (d) => renderLineSeg(d.sensors.position.x, d.sensors.position.y, d.goal.x, d.goal.y));
-
-  // Line segments between robots and heading
-  renderedElements.robotOrientations = svg.append('g')
-    .selectAll('path')
-    .data(scene.robots)
-    .enter()
-    .append('path')
-    .attr('fill', 'none')
-    .attr('stroke', 'black')
-    .attr('stroke-width', 3)
-    .attr('d', (d) => {
-      const pos = d.sensors.position;
-      const heading = d.sensors.heading;
-      return renderLineSeg(pos.x, pos.y, heading.x, heading.y);
-    });
-
-  // Goals
-  renderedElements.goalsCircles = svg.append('g')
-    .selectAll('circle')
-    .data(scene.robots)
-    .enter()
-    .append('circle')
-    .attr('cx', (d) => d.goal.x)
-    .attr('cy', (d) => d.goal.y)
-    .attr('id', (d) => d.id)
-    .attr('r', (d) => d.radius / 4)
-    .attr('fill', (d, i) => d3.schemeCategory10[i % 10])
-    .attr('stroke', 'white')
-    .attr('stroke-dasharray', '0.5,0.5')
-    .call(d3.drag()
-      .on('start', (event, d) => {
-        renderedElements.goalsCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
-        pauseStateOnDragStart = scene.paused;
-        scene.pause();
-      })
-      .on('drag', (event, d) => {
-        d.setGoal({ x: event.x, y: event.y });
-        renderScene();
-      })
-      .on('end', (event, d) => {
-        renderedElements.goalsCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray');
-        if (pauseStateOnDragStart != null && !pauseStateOnDragStart) {
-          scene.unpause();
-        }
-      }));
+  // TODO:
 
   // Puck
-  renderedElements.pucksCircles = svg.append('g')
-    .selectAll('circle')
-    .data(scene.pucks)
-    .enter()
-    .append('circle')
-    .attr('cx', (d) => d.position.x)
-    .attr('cy', (d) => d.position.y)
-    .attr('id', (d) => d.id)
-    .attr('r', (d) => d.radius)
-    .attr('fill', (d) => d.color);
+  addRenderables(svg, scene, rendrables.Pucks);
 
-  renderedElements.pucksCircles
-    .call(d3.drag()
-      .on('start', (event, d) => {
-        renderedElements.pucksCircles.filter((p) => p.id === d.id).raise().attr('stroke', 'black');
-        pauseStateOnDragStart = scene.paused;
-        scene.pause();
-        console.log(d);
-      })
-      .on('drag', (event, d) => {
-        d.position = { x: event.x, y: event.y };
-        renderScene();
-      })
-      .on('end', (event, d) => {
-        renderedElements.pucksCircles.filter((p) => p.id === d.id).attr('stroke', 'lightgray');
-        if (pauseStateOnDragStart != null && !pauseStateOnDragStart) {
-          scene.unpause();
-        }
-      }));
+  // Robots
+  // console.log(rendrables.Robots);
+  addRenderables(svg, scene, rendrables.Robots);
 
   initialized = true;
 }
-
 export function renderScene(curSvgEl, curScene) {
   const svgEl = curSvgEl || lastSvgEl;
   const scene = curScene || lastScene;
@@ -368,80 +302,21 @@ export function renderScene(curSvgEl, curScene) {
     renderedElements.VcMesh.attr('stroke-opacity', '0%');
   }
 
-  if (activeElements.includes('Waypoints')) {
-    renderedElements.waypointsCircles
-      .attr('cx', (d) => d.waypoint.x)
-      .attr('cy', (d) => d.waypoint.y)
-      .attr('stroke-opacity', '40%')
-      .attr('fill-opacity', '40%');
-
-    renderedElements.robotToWaypointLineSegs
-      .attr('d', (d) => renderLineSeg(d.sensors.position.x, d.sensors.position.y, d.waypoint.x, d.waypoint.y))
-      .attr('stroke-opacity', '100%');
-
-    renderedElements.waypointToGoalLineSegs
-      .attr('d', (d) => renderLineSeg(d.waypoint.x, d.waypoint.y, d.goal.x, d.goal.y))
-      .attr('stroke-opacity', '100%');
-  } else {
-    renderedElements.waypointsCircles
-      .attr('stroke-opacity', '0%')
-      .attr('fill-opacity', '0%');
-
-    renderedElements.robotToWaypointLineSegs
-      .attr('stroke-opacity', '0%');
-
-    renderedElements.waypointToGoalLineSegs
-      .attr('stroke-opacity', '0%');
-  }
-
   // Robots
   if (activeElements.includes('Robots')) {
     renders.forEach((render) => {
-      Object.keys(render.def.dynamicAttrs).forEach((attrKey) => {
-        const attrValue = render.def.dynamicAttrs[attrKey];
-        render.values
-          .attr(attrKey, (d) => get(d, attrValue))
-          .attr('stroke-opacity', render.def.styles['stroke-opacity'] || '100%')
-          .attr('fill-opacity', render.def.styles['stroke-opacity'] || '100%');
-      });
+      setDynamicAttrs(render.def, render.values);
+
+      render.values
+        .attr('stroke-opacity', render.def.styles['stroke-opacity'] || '100%')
+        .attr('fill-opacity', render.def.styles['fill-opacity'] || '100%');
     });
-    renderedElements.robotOrientations
-      .attr('d', (d) => {
-        const pos = d.sensors.position;
-        const heading = d.sensors.heading;
-        return renderLineSeg(pos.x, pos.y, heading.x, heading.y);
-      });
   } else {
     renders.forEach((render) => {
       render.values
         .attr('stroke-opacity', '0%')
         .attr('fill-opacity', '0%');
     });
-    renderedElements.robotOrientations
-      .attr('stroke-opacity', '0%')
-      .attr('fill-opacity', '0%');
-  }
-
-  if (activeElements.includes('Pucks')) {
-    renderedElements.pucksCircles.attr('cx', (d) => d.position.x).attr('cy', (d) => d.position.y)
-      .attr('stroke-opacity', '100%')
-      .attr('fill-opacity', '100%');
-  } else {
-    renderedElements.pucksCircles
-      .attr('stroke-opacity', '0%')
-      .attr('fill-opacity', '0%');
-  }
-
-  if (activeElements.includes('Goals')) {
-    renderedElements.robotToGoalLineSegs.attr('d', (d) => renderLineSeg(d.sensors.position.x, d.sensors.position.y, d.goal.x, d.goal.y))
-      .attr('stroke-opacity', '100%');
-
-    renderedElements.goalsCircles.attr('cx', (d) => d.goal.x).attr('cy', (d) => d.goal.y)
-      .attr('stroke-opacity', '100%')
-      .attr('fill-opacity', '100%');
-  } else {
-    renderedElements.robotToGoalLineSegs.attr('stroke-opacity', '0%');
-    renderedElements.goalsCircles.attr('stroke-opacity', '0%').attr('fill-opacity', '0%');
   }
 }
 

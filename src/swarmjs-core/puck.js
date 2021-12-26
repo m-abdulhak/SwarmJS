@@ -114,3 +114,63 @@ export default class Puck {
     };
   }
 }
+
+export const PuckRenderables = [
+  {
+    type: 'goal',
+    dataPoints: { prop: 'pucksGroups' }, // property of scene
+    shape: 'circle',
+    staticAttrs: {
+      r: {
+        prop: 'radius',
+        modifier: (val) => val * 12
+      },
+      fill: { prop: 'color' },
+      cx: { prop: 'goal.x' },
+      cy: { prop: 'goal.y' }
+    },
+    dynamicAttrs: {
+    },
+    styles: {
+      'fill-opacity': 0.1,
+      'stroke-opacity': 0.1
+    }
+  },
+  {
+    type: 'body',
+    dataPoints: { prop: 'pucks' }, // property of scene
+    shape: 'circle',
+    staticAttrs: {
+      r: { prop: 'radius' },
+      id: { prop: 'id' },
+      fill: { prop: 'color' }
+    },
+    dynamicAttrs: {
+      cx: { prop: 'position.x' },
+      cy: { prop: 'position.y' }
+    },
+    styles: {
+      stroke: 'black',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
+    },
+    drag: {
+      prop: 'position',
+      pause: true,
+      onStart: {
+        styles: {
+          stroke: 'lightgray'
+        },
+        log: [
+          'sensors'
+        ]
+      },
+      onEnd: {
+        styles: {
+          stroke: 'black'
+        }
+      }
+    }
+  }
+];

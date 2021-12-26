@@ -92,10 +92,6 @@ export default class Robot {
     this.sensorManager.update();
   }
 
-  setGoal(newGoal) {
-    this.goal = { x: newGoal.x, y: newGoal.y };
-  }
-
   setWaypoint(waypoint) {
     this.waypoint = { x: waypoint.x, y: waypoint.y };
   }
@@ -107,10 +103,10 @@ export default class Robot {
     // Update goal
     const newGoalRaw = this.updateGoal(this.goal, this.sensors, this.actuators);
     const newGoal = this.limitGoal(newGoalRaw);
-    this.setGoal(newGoal);
+    this.goal = newGoal;
 
     // Update waypoint, according to new goal
-    const newWaypoint = this.updateWaypoint();
+    const newWaypoint = this.updateWaypoint(this.goal, this.sensors, this.actuators);
     this.setWaypoint(newWaypoint);
 
     // Update velocities, according to new waypoint
@@ -205,21 +201,23 @@ export default class Robot {
 
 export const RobotRenderables = [
   {
+    type: 'body',
+    dataPoints: { prop: 'robots' }, // property of scene
     shape: 'circle',
     staticAttrs: {
-      r: 'radius',
-      id: 'id'
+      r: { prop: 'radius' },
+      id: { prop: 'id' }
     },
     dynamicAttrs: {
-      cx: 'sensors.position.x',
-      cy: 'sensors.position.y'
+      cx: { prop: 'sensors.position.x' },
+      cy: { prop: 'sensors.position.y' }
     },
     styles: {
       fill: '#FFC53A',
       stroke: 'black',
       'stroke-width': 1,
-      'stroke-opacity': '%50',
-      'fill-opacity': '%50'
+      'stroke-opacity': 1,
+      'fill-opacity': 1
     },
     drag: {
       prop: 'position',
@@ -237,6 +235,166 @@ export const RobotRenderables = [
           stroke: 'black'
         }
       }
+    }
+  },
+  {
+    type: 'waypoint',
+    dataPoints: { prop: 'robots' }, // property of scene
+    shape: 'circle',
+    staticAttrs: {
+      r: {
+        prop: 'radius',
+        modifier: (val) => val / 1.5
+      },
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      cx: { prop: 'waypoint.x' },
+      cy: { prop: 'waypoint.y' }
+    },
+    styles: {
+      fill: 'RandomColor',
+      stroke: 'RandomColor',
+      'stroke-dasharray': '1,1',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 0.4
+    }
+  },
+  {
+    type: 'goal',
+    dataPoints: { prop: 'robots' }, // property of scene
+    shape: 'circle',
+    staticAttrs: {
+      r: {
+        prop: 'radius',
+        modifier: (val) => val / 2
+      },
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      cx: { prop: 'goal.x' },
+      cy: { prop: 'goal.y' }
+    },
+    styles: {
+      fill: 'RandomColor',
+      stroke: 'white',
+      'stroke-dasharray': '0.5,0.5',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
+    },
+    drag: {
+      prop: 'goal',
+      pause: true,
+      onStart: {
+        styles: {
+          stroke: 'black'
+        },
+        log: [
+          'sensors'
+        ]
+      },
+      onEnd: {
+        styles: {
+          stroke: 'lightgray'
+        }
+      }
+    }
+  },
+  {
+    type: 'waypoint',
+    name: 'robotToWaypointLineSegs',
+    desc: 'Line segments between robots and waypoints',
+    dataPoints: { prop: 'robots' }, // property of scene
+    shape: 'path',
+    staticAttrs: {
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      points: [
+        { prop: 'sensors.position' },
+        { prop: 'waypoint' }
+      ]
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'RandomColor',
+      'stroke-dasharray': '1,10',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
+    }
+  },
+  {
+    type: 'waypoint',
+    name: 'waypointToGoalLineSegs',
+    desc: 'Line segments between waypoints and goals',
+    dataPoints: { prop: 'robots' }, // property of scene
+    shape: 'path',
+    staticAttrs: {
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      points: [
+        { prop: 'waypoint' },
+        { prop: 'goal' }
+      ]
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'RandomColor',
+      'stroke-dasharray': '1,10',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
+    }
+  },
+  {
+    type: 'goal',
+    name: 'robotToGoalLineSegs',
+    desc: 'Line segments between robots and goals',
+    dataPoints: { prop: 'robots' }, // property of scene
+    shape: 'path',
+    staticAttrs: {
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      points: [
+        { prop: 'sensors.position' },
+        { prop: 'goal' }
+      ]
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'RandomColor',
+      'stroke-dasharray': '10,10',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
+    }
+  },
+  {
+    type: 'body',
+    name: 'robotOrientations',
+    desc: 'Line segments between robots and headings',
+    dataPoints: { prop: 'robots' }, // property of scene
+    shape: 'path',
+    staticAttrs: {
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      points: [
+        { prop: 'sensors.position' },
+        { prop: 'sensors.heading' }
+      ]
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'stroke-width': 3,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
     }
   }
 ];
