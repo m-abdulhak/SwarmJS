@@ -6,7 +6,6 @@ import { get, has, isArray } from 'lodash';
 
 import { RobotRenderables } from './robot/robot';
 import { PuckRenderables } from './puck';
-import { nxtCircIndx } from './utils/geometry';
 
 const renderLineSeg = (x1, y1, x2, y2) => `M${x1},${y1}L${x2},${y2}Z`;
 
@@ -24,8 +23,17 @@ const parseAttr = (obj, attr, scene) => {
     return attr;
   }
 
+  // If attr is an object with a special key, handle it
+  if (attr.special) {
+    if (attr.special === 'schemaColor') {
+      const objIndx = attr.param ? parseAttr(obj, attr.param, scene) : obj.i;
+      return d3.schemeCategory10[objIndx % 10];
+    }
+    return null;
+  }
+
   // If attr is an object with a prop key
-  if (has(attr, 'prop')) {
+  if (attr.prop) {
     let parsedVal = get(obj, attr.prop);
 
     // If a modifier callback is defined and is a function, call it
@@ -42,7 +50,7 @@ const parseAttr = (obj, attr, scene) => {
   }
 
   // If attr is an object with a sceneProp key
-  if (has(attr, 'sceneProp')) {
+  if (attr.sceneProp) {
     let parsedVal = get(scene, attr.sceneProp);
 
     // If a modifier callback is defined and is a function, call it
@@ -76,6 +84,7 @@ const rendrables = {
   Robots: RobotRenderables
 };
 const renders = [];
+const repeatableRenders = [];
 let pauseStateOnDragStart = null;
 
 let activeElements = [...renderingElements];
@@ -89,11 +98,11 @@ export const setElementEnabled = (element, state) => {
   activeElements = state ? [...otherActiveElements, element] : [...otherActiveElements];
 };
 
-function setDynamicAttrs(def, values, scene) {
+function setDynamicAttrs(def, rends, scene) {
   if (def.shape === 'circle') {
     Object.keys(def.dynamicAttrs).forEach((attrKey) => {
       const attrVal = def.dynamicAttrs[attrKey];
-      values.attr(attrKey, (d) => parseAttr(d, attrVal));
+      rends.attr(attrKey, (d) => parseAttr(d, attrVal));
     });
   } else if (
     def.shape === 'path'
@@ -109,7 +118,7 @@ function setDynamicAttrs(def, values, scene) {
         };
       });
 
-    values.attr('d', (d) => {
+    rends.attr('d', (d) => {
       const points = getPoints(d);
       return renderLineSeg(
         points[0].x,
@@ -122,33 +131,77 @@ function setDynamicAttrs(def, values, scene) {
     def.shape === 'path'
     && has(def, 'dynamicAttrs.d')
   ) {
-    values.attr('d', (d) => parseAttr(d, def.dynamicAttrs.d, scene));
+    rends.attr('d', (d) => parseAttr(d, def.dynamicAttrs.d, scene));
   }
 }
 
-function addRenderables(svg, scene, definitions, obj) {
+function setStyles(def, rends, scene) {
+  if (has(def, 'styles') && typeof def.styles === 'object') {
+    Object.keys(def.styles).forEach((attrKey) => {
+      const attrValue = def.styles[attrKey];
+      rends.attr(attrKey, (d, i) => parseAttr({ ...d, i }, attrValue, scene));
+    });
+  }
+}
+
+function reRenderRepeatable(svg, scene, def) {
+  const rends = [];
+
+  const objectsList = parseAttr(null, def.repeatList, scene);
+  if (!objectsList || !Array.isArray(objectsList) || !objectsList.length) {
+    return rends;
+  }
+
+  removeElements(svg, `.${def.name}`);
+
+  objectsList.forEach((r) => {
+    const dataPoints = parseAttr(r, def.dataPoints, scene);
+    if (!dataPoints || !Array.isArray(dataPoints) || !dataPoints.length) {
+      return;
+    }
+
+    const newRends = svg.append('g')
+      .selectAll(def.shape)
+      .data(dataPoints)
+      .enter()
+      .append(def.shape)
+      .attr('class', def.name);
+
+    setDynamicAttrs(def, newRends, scene);
+
+    setStyles(def, newRends, scene);
+
+    setDynamicAttrs(def, newRends, scene);
+
+    rends.push(newRends);
+  });
+
+  return rends;
+}
+
+function addRenderables(svg, scene, definitions) {
   definitions.forEach((def) => {
+    if (def.repeatable) {
+      const rends = reRenderRepeatable(svg, scene, def);
+      repeatableRenders.push({
+        def,
+        type: def.type,
+        values: rends
+      });
+      return;
+    }
+
     const rends = has(def, 'dataPoints')
       ? svg
         .append('g')
         .selectAll(def.shape)
-        .data(parseAttr(obj, def.dataPoints, scene))
+        .data(parseAttr(null, def.dataPoints, scene))
         .enter()
         .append(def.shape)
       : svg
         .append(def.shape);
 
-    if (has(def, 'styles') && typeof def.styles === 'object') {
-      Object.keys(def.styles).forEach((attrKey) => {
-        const attrValue = def.styles[attrKey];
-        rends.attr(attrKey, (d, i) => {
-          if (attrValue === 'RandomColor') {
-            return d3.schemeCategory10[i % 10];
-          }
-          return attrValue;
-        });
-      });
-    }
+    setStyles(def, rends, scene);
 
     if (has(def, 'staticAttrs') && typeof def.staticAttrs === 'object') {
       Object.keys(def.staticAttrs).forEach((attrKey) => {
@@ -209,7 +262,7 @@ function addRenderables(svg, scene, definitions, obj) {
 
     renders.push({
       def,
-      type: 'Robots',
+      type: def.type,
       values: rends
     });
   });
@@ -219,9 +272,6 @@ export function initialize(svg, scene) {
   if (svg) {
     svg.selectAll('*').remove();
   }
-
-  // Buffered voronoi cells line segments (as calculated by robots)
-  renderedElements.BVCLineSegs = [];
 
   // Static Circles
   renderedElements.staticCircles = svg.append('g')
@@ -274,37 +324,13 @@ export function renderScene(curSvgEl, curScene) {
 
   removeElements(svg, '.bvc-seg');
 
-  renderedElements.BVCLineSegs = [];
-
   if (!activeElements.includes('All')) {
     return;
   }
 
-  if (activeElements.includes('BVC')) {
-    scene.robots.forEach((r, rIndex) => {
-      const bVC = r.sensors.BVC;
-      if (typeof (bVC) !== 'undefined' && bVC.length > 0) {
-        renderedElements.BVCLineSegs.push(
-          svg.append('g')
-            .selectAll('path')
-            .data(bVC)
-            .enter()
-            .append('path')
-            .attr('class', 'bvc-seg')
-            .attr('fill', 'none')
-            .attr('stroke', () => d3.schemeCategory10[rIndex % 10])
-            .attr('stroke-width', 1)
-            .attr('stroke-dasharray', '10,10')
-            .attr('d', (d, i) => renderLineSeg(
-              bVC[i][0],
-              bVC[i][1],
-              bVC[nxtCircIndx(i, bVC.length)][0],
-              bVC[nxtCircIndx(i, bVC.length)][1]
-            ))
-        );
-      }
-    });
-  }
+  repeatableRenders.forEach((render) => {
+    reRenderRepeatable(svg, scene, render.def);
+  });
 
   // Robots
   if (activeElements.includes('Robots')) {

@@ -14,7 +14,7 @@ const config = {
     height: 500
   },
   robots: {
-    count: 10,
+    count: 20,
     radius: 7,
     sensors: Object.values(availableSensors),
     actuators: Object.values(availableActuators)

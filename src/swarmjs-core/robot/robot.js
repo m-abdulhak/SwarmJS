@@ -1,6 +1,6 @@
 import { Body, World, Bodies } from 'matter-js';
 
-import { getDistance } from '../utils/geometry';
+import { nxtCircIndx, getDistance } from '../utils/geometry';
 
 import updateVelocity from './controllers/velocityController';
 import updateWaypoint from './controllers/waypointController';
@@ -197,6 +197,18 @@ export default class Robot {
 
     return { minDistance: minDist };
   }
+
+  get bvcLineSegments() {
+    const bvc = this.sensors.BVC;
+    return !bvc || bvc.length < 1 ? [] : bvc.map((point, i) => {
+      const nextPoint = bvc[nxtCircIndx(i, bvc.length)];
+      return {
+        p1: { x: point[0], y: point[1] },
+        p2: { x: nextPoint[0], y: nextPoint[1] },
+        robotIndx: this.id
+      };
+    });
+  }
 }
 
 export const RobotRenderables = [
@@ -253,8 +265,8 @@ export const RobotRenderables = [
       cy: { prop: 'waypoint.y' }
     },
     styles: {
-      fill: 'RandomColor',
-      stroke: 'RandomColor',
+      fill: { special: 'schemaColor' },
+      stroke: { special: 'schemaColor' },
       'stroke-dasharray': '1,1',
       'stroke-width': 1,
       'stroke-opacity': 1,
@@ -277,7 +289,7 @@ export const RobotRenderables = [
       cy: { prop: 'goal.y' }
     },
     styles: {
-      fill: 'RandomColor',
+      fill: { special: 'schemaColor' },
       stroke: 'white',
       'stroke-dasharray': '0.5,0.5',
       'stroke-width': 1,
@@ -319,7 +331,7 @@ export const RobotRenderables = [
     },
     styles: {
       fill: 'none',
-      stroke: 'RandomColor',
+      stroke: { special: 'schemaColor' },
       'stroke-dasharray': '1,10',
       'stroke-width': 1,
       'stroke-opacity': 1,
@@ -343,7 +355,7 @@ export const RobotRenderables = [
     },
     styles: {
       fill: 'none',
-      stroke: 'RandomColor',
+      stroke: { special: 'schemaColor' },
       'stroke-dasharray': '1,10',
       'stroke-width': 1,
       'stroke-opacity': 1,
@@ -367,7 +379,7 @@ export const RobotRenderables = [
     },
     styles: {
       fill: 'none',
-      stroke: 'RandomColor',
+      stroke: { special: 'schemaColor' },
       'stroke-dasharray': '10,10',
       'stroke-width': 1,
       'stroke-opacity': 1,
@@ -421,6 +433,28 @@ export const RobotRenderables = [
     },
     styles: {
       stroke: '#000',
+      'stroke-width': 1,
+      'stroke-opacity': 1
+    }
+  },
+  {
+    type: 'BVC',
+    name: 'BVCMesh',
+    desc: 'Buffered Vodonoi Diagram',
+    shape: 'path',
+    repeatable: true,
+    repeatList: { sceneProp: 'robots' },
+    dataPoints: { prop: 'bvcLineSegments' },
+    dynamicAttrs: {
+      points: [
+        { prop: 'p1' },
+        { prop: 'p2' }
+      ]
+    },
+    styles: {
+      fill: 'none',
+      stroke: { special: 'schemaColor', param: { prop: 'robotIndx' } },
+      'stroke-dasharray': '10,10',
       'stroke-width': 1,
       'stroke-opacity': 1
     }
