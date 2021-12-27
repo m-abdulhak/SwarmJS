@@ -6,8 +6,22 @@ import { get, has, isArray } from 'lodash';
 
 import { RobotRenderables } from './robot/robot';
 import { PuckRenderables } from './puck';
+import { xyPoint } from './utils/geometry';
 
-const renderLineSeg = (x1, y1, x2, y2) => `M${x1},${y1}L${x2},${y2}Z`;
+const renderLineSeg = (p1, p2) => `M${p1.x},${p1.y}L${p2.x},${p2.y}`;
+
+const renderPath = (points) => {
+  const d = points.map((p, i) => {
+    const point = xyPoint(p);
+    if (i === 0) {
+      return `M${point.x},${point.y}`;
+    }
+    return `L${point.x},${point.y}`;
+  });
+  return d.join('');
+};
+
+const renderClosedPath = (points) => renderPath(points).concat('Z');
 
 const removeElements = (svg, selectionQuery) => {
   let selection = svg.selectAll(selectionQuery).node();
@@ -79,12 +93,12 @@ const renderingElements = [
   'All', 'Robots', 'Pucks', 'Goals', 'Waypoints', 'VC', 'BVC'
 ];
 
-const rendrables = {
-  Pucks: PuckRenderables,
-  Robots: RobotRenderables
-};
+const rendrables = [
+  PuckRenderables,
+  RobotRenderables
+];
+
 const renders = [];
-const repeatableRenders = [];
 let pauseStateOnDragStart = null;
 
 let activeElements = [...renderingElements];
@@ -104,28 +118,28 @@ function setDynamicAttrs(def, rends, scene) {
       const attrVal = def.dynamicAttrs[attrKey];
       rends.attr(attrKey, (d) => parseAttr(d, attrVal));
     });
-  } else if (
-    def.shape === 'path'
-    && def.dynamicAttrs.points
-    && isArray(def.dynamicAttrs.points)
-    && def.dynamicAttrs.points.length === 2
-  ) {
-    const getPoints = (d) => def.dynamicAttrs.points
-      .map((attr) => {
-        const parsedPoint = parseAttr(d, attr);
-        return {
-          ...parsedPoint
-        };
-      });
+  } else if (def.shape === 'path' && def.dynamicAttrs?.points) {
+    const getPoints = (d) => {
+      if (isArray(def.dynamicAttrs.points)) {
+        return def.dynamicAttrs.points
+          .map((attr) => {
+            const parsedPoint = parseAttr(d, attr);
+            return {
+              ...parsedPoint
+            };
+          });
+      }
+      if (def.dynamicAttrs.points.prop) {
+        const pointList = parseAttr(d, def.dynamicAttrs.points);
+        return pointList && isArray(pointList) ? pointList : [];
+      }
+      return [];
+    };
 
     rends.attr('d', (d) => {
       const points = getPoints(d);
-      return renderLineSeg(
-        points[0].x,
-        points[0].y,
-        points[1].x,
-        points[1].y
-      );
+      const renderedPath = def.shapeParams === 'closed' ? renderClosedPath(points) : renderPath(points);
+      return renderedPath;
     });
   } else if (
     def.shape === 'path'
@@ -144,53 +158,8 @@ function setStyles(def, rends, scene) {
   }
 }
 
-function reRenderRepeatable(svg, scene, def) {
-  const rends = [];
-
-  const objectsList = parseAttr(null, def.repeatList, scene);
-  if (!objectsList || !Array.isArray(objectsList) || !objectsList.length) {
-    return rends;
-  }
-
-  removeElements(svg, `.${def.name}`);
-
-  objectsList.forEach((r) => {
-    const dataPoints = parseAttr(r, def.dataPoints, scene);
-    if (!dataPoints || !Array.isArray(dataPoints) || !dataPoints.length) {
-      return;
-    }
-
-    const newRends = svg.append('g')
-      .selectAll(def.shape)
-      .data(dataPoints)
-      .enter()
-      .append(def.shape)
-      .attr('class', def.name);
-
-    setDynamicAttrs(def, newRends, scene);
-
-    setStyles(def, newRends, scene);
-
-    setDynamicAttrs(def, newRends, scene);
-
-    rends.push(newRends);
-  });
-
-  return rends;
-}
-
 function addRenderables(svg, scene, definitions) {
   definitions.forEach((def) => {
-    if (def.repeatable) {
-      const rends = reRenderRepeatable(svg, scene, def);
-      repeatableRenders.push({
-        def,
-        type: def.type,
-        values: rends
-      });
-      return;
-    }
-
     const rends = has(def, 'dataPoints')
       ? svg
         .append('g')
@@ -296,11 +265,9 @@ export function initialize(svg, scene) {
     .attr('height', (d) => d.height)
     .attr('fill', '#000000');
 
-  // Puck
-  addRenderables(svg, scene, rendrables.Pucks);
-
-  // Robots
-  addRenderables(svg, scene, rendrables.Robots);
+  rendrables.forEach((renderable) => {
+    addRenderables(svg, scene, renderable);
+  });
 
   initialized = true;
 }
@@ -327,10 +294,6 @@ export function renderScene(curSvgEl, curScene) {
   if (!activeElements.includes('All')) {
     return;
   }
-
-  repeatableRenders.forEach((render) => {
-    reRenderRepeatable(svg, scene, render.def);
-  });
 
   // Robots
   if (activeElements.includes('Robots')) {

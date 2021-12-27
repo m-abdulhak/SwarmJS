@@ -395,7 +395,13 @@ export function circleArea(radius) {
 }
 
 export function xyPoint(p) {
-  return { x: p[0], y: p[1] };
+  if (p && Array.isArray(p) && p.length === 2) {
+    return { x: p[0], y: p[1] };
+  }
+  if (p && p.x !== undefined && p.y !== undefined) {
+    return p;
+  }
+  return null;
 }
 
 export function getLineEquationParams(p1, p2) {
