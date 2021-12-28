@@ -1,6 +1,6 @@
 import { Body, World, Bodies } from 'matter-js';
 
-import { nxtCircIndx, getDistance } from '../utils/geometry';
+import { getDistance } from '../utils/geometry';
 
 import updateVelocity from './controllers/velocityController';
 import updateWaypoint from './controllers/waypointController';
@@ -201,8 +201,8 @@ export default class Robot {
 
 export const RobotRenderables = [
   {
-    type: 'body',
-    dataPoints: { sceneProp: 'robots' }, // property of scene
+    type: 'Body',
+    dataPoints: { sceneProp: 'robots' },
     shape: 'circle',
     staticAttrs: {
       r: { prop: 'radius' },
@@ -227,7 +227,7 @@ export const RobotRenderables = [
           stroke: 'green'
         },
         log: [
-          'sensors'
+          { prop: 'sensors' }
         ]
       },
       onEnd: {
@@ -238,8 +238,8 @@ export const RobotRenderables = [
     }
   },
   {
-    type: 'waypoint',
-    dataPoints: { sceneProp: 'robots' }, // property of scene
+    type: 'Waypoint',
+    dataPoints: { sceneProp: 'robots' },
     shape: 'circle',
     staticAttrs: {
       r: {
@@ -262,8 +262,8 @@ export const RobotRenderables = [
     }
   },
   {
-    type: 'goal',
-    dataPoints: { sceneProp: 'robots' }, // property of scene
+    type: 'Goal',
+    dataPoints: { sceneProp: 'robots' },
     shape: 'circle',
     staticAttrs: {
       r: {
@@ -292,7 +292,7 @@ export const RobotRenderables = [
           stroke: 'black'
         },
         log: [
-          'sensors'
+          { prop: 'sensors' }
         ]
       },
       onEnd: {
@@ -303,10 +303,10 @@ export const RobotRenderables = [
     }
   },
   {
-    type: 'waypoint',
+    type: 'Waypoint',
     name: 'robotToWaypointLineSegs',
     desc: 'Line segments between robots and waypoints',
-    dataPoints: { sceneProp: 'robots' }, // property of scene
+    dataPoints: { sceneProp: 'robots' },
     shape: 'path',
     staticAttrs: {
       id: { prop: 'id' }
@@ -327,10 +327,10 @@ export const RobotRenderables = [
     }
   },
   {
-    type: 'waypoint',
+    type: 'Waypoint',
     name: 'waypointToGoalLineSegs',
     desc: 'Line segments between waypoints and goals',
-    dataPoints: { sceneProp: 'robots' }, // property of scene
+    dataPoints: { sceneProp: 'robots' },
     shape: 'path',
     staticAttrs: {
       id: { prop: 'id' }
@@ -351,10 +351,10 @@ export const RobotRenderables = [
     }
   },
   {
-    type: 'goal',
+    type: 'Goal',
     name: 'robotToGoalLineSegs',
     desc: 'Line segments between robots and goals',
-    dataPoints: { sceneProp: 'robots' }, // property of scene
+    dataPoints: { sceneProp: 'robots' },
     shape: 'path',
     staticAttrs: {
       id: { prop: 'id' }
@@ -375,10 +375,10 @@ export const RobotRenderables = [
     }
   },
   {
-    type: 'body',
+    type: 'Body',
     name: 'robotOrientations',
     desc: 'Line segments between robots and headings',
-    dataPoints: { sceneProp: 'robots' }, // property of scene
+    dataPoints: { sceneProp: 'robots' },
     shape: 'path',
     staticAttrs: {
       id: { prop: 'id' }
@@ -430,7 +430,7 @@ export const RobotRenderables = [
     name: 'BVCMesh',
     desc: 'Buffered Vodonoi Diagram',
     shape: 'path',
-    dataPoints: { sceneProp: 'robots' }, // property of scene
+    dataPoints: { sceneProp: 'robots' },
     dynamicAttrs: {
       points: { prop: 'sensors.BVC' }
     },

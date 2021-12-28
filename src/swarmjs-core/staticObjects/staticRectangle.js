@@ -12,6 +12,8 @@ export default class StaticRectangle {
     this.center = this.def.center;
     this.width = this.def.width;
     this.height = this.def.height;
+    this.left = this.center.x - this.width / 2;
+    this.top = this.center.y - this.height / 2;
     this.minMax = {
       minX: this.center.x - this.width / 2,
       maxX: this.center.x + this.width / 2,

@@ -18,7 +18,7 @@ import {
   resetRenderer,
   setElementEnabled,
   getRenderingElements
-} from '../swarmjs-core/renderer';
+} from '../swarmjs-core/rendering/renderer';
 
 const App = ({ config }) => {
   const [time, setTime] = React.useState(0);

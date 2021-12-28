@@ -117,8 +117,8 @@ export default class Puck {
 
 export const PuckRenderables = [
   {
-    type: 'goal',
-    dataPoints: { sceneProp: 'pucksGroups' }, // property of scene
+    type: 'Goal',
+    dataPoints: { sceneProp: 'pucksGroups' },
     shape: 'circle',
     staticAttrs: {
       r: {
@@ -137,8 +137,8 @@ export const PuckRenderables = [
     }
   },
   {
-    type: 'body',
-    dataPoints: { sceneProp: 'pucks' }, // property of scene
+    type: 'Body',
+    dataPoints: { sceneProp: 'pucks' },
     shape: 'circle',
     staticAttrs: {
       r: { prop: 'radius' },
@@ -163,7 +163,11 @@ export const PuckRenderables = [
           stroke: 'lightgray'
         },
         log: [
-          'sensors'
+          { prop: 'color' },
+          { prop: 'groupGoal' },
+          { prop: 'goal' },
+          { prop: 'position' },
+          { prop: 'velocity' }
         ]
       },
       onEnd: {
