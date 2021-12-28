@@ -78,7 +78,12 @@ const config = {
   positionsGenerator: getRandCollFreePosGenerator
 };
 
+const compoundBodyRobotSim = config;
+compoundBodyRobotSim.robots.radius = 10;
+compoundBodyRobotSim.pucks.groups[0].radius = 7;
+compoundBodyRobotSim.pucks.groups[1].radius = 7;
+
 ReactDOM.render(
-  <App config={config}/>,
+  <App config={compoundBodyRobotSim}/>,
   document.getElementById('root')
 );

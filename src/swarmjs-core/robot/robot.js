@@ -41,14 +41,23 @@ export default class Robot {
     this.world = this.scene.world;
 
     // Create Matter.js body and attach it to world
-    // TOOD: implement compound body
-    const part1 = Bodies.circle(position.x, position.y, this.radius);
-    // const part2 = Bodies.circle(position.x + 20, position.y, this.radius);
-    // const compoundBody = Body.create({
-    //   parts: [part1, part2]
-    // });
-    // this.body = compoundBody;
-    this.body = part1;
+    const compoundBody = Body.create({
+      parts: [
+        Bodies.circle(position.x, position.y, this.radius)
+        // If you want to add more parts to the robot body, add them here.
+        // Make sure to also change renderabes to render all parts of the robot.
+        // Example of compound body:
+        ,
+        Bodies.polygon(
+          position.x + this.radius / 10 + this.radius / 2,
+          position.y - (2 * this.radius) / 5,
+          3,
+          this.radius * 1.2,
+          { angle: (1.6 * Math.PI) / 2 }
+        )
+      ]
+    });
+    this.body = compoundBody;
     this.body.friction = 0;
     this.body.frictionAir = 0;
     this.body.frictionStatic = 0;
@@ -199,7 +208,8 @@ export default class Robot {
   }
 }
 
-export const RobotRenderables = [
+// Example of compound body
+const compoundBodyRenderables = [
   {
     type: 'Body',
     dataPoints: { sceneProp: 'robots' },
@@ -209,12 +219,11 @@ export const RobotRenderables = [
       id: { prop: 'id' }
     },
     dynamicAttrs: {
-      cx: { prop: 'sensors.position.x' },
-      cy: { prop: 'sensors.position.y' }
+      cx: { prop: 'body.parts[1].position.x' },
+      cy: { prop: 'body.parts[1].position.y' }
     },
     styles: {
       fill: '#FFC53A',
-      stroke: 'black',
       'stroke-width': 1,
       'stroke-opacity': 1,
       'fill-opacity': 1
@@ -238,29 +247,144 @@ export const RobotRenderables = [
     }
   },
   {
-    type: 'Waypoint',
+    type: 'Body',
+    dataPoints: { sceneProp: 'robots' },
+    shape: 'polygon',
+    staticAttrs: {
+    },
+    dynamicAttrs: {
+      points: {
+        prop: 'body.parts[2].vertices',
+        modifier: (vertices) => vertices.map((p) => `${p.x},${p.y}`).join(' ')
+      }
+    },
+    styles: {
+      fill: '#FFC53A',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
+    },
+    drag: {
+      prop: 'position',
+      pause: true,
+      onStart: {
+        styles: {
+          stroke: 'green'
+        },
+        log: [
+          { prop: 'sensors' }
+        ]
+      },
+      onEnd: {
+        styles: {
+          stroke: 'black'
+        }
+      }
+    }
+  }
+];
+
+const bodyRenderables = [
+  // {
+  //   type: 'Body',
+  //   name: 'robotOrientations',
+  //   desc: 'Line segments between robots and headings',
+  //   dataPoints: { sceneProp: 'robots' },
+  //   shape: 'path',
+  //   staticAttrs: {
+  //     id: { prop: 'id' }
+  //   },
+  //   dynamicAttrs: {
+  //     points: [
+  //       { prop: 'sensors.position' },
+  //       { prop: 'sensors.heading' }
+  //     ]
+  //   },
+  //   styles: {
+  //     fill: 'none',
+  //     stroke: 'black',
+  //     'stroke-width': 3,
+  //     'stroke-opacity': 1,
+  //     'fill-opacity': 1
+  //   }
+  // },
+  {
+    type: 'Body',
     dataPoints: { sceneProp: 'robots' },
     shape: 'circle',
     staticAttrs: {
-      r: {
-        prop: 'radius',
-        modifier: (val) => val / 1.5
-      },
+      r: { prop: 'radius' },
       id: { prop: 'id' }
     },
     dynamicAttrs: {
-      cx: { prop: 'waypoint.x' },
-      cy: { prop: 'waypoint.y' }
+      cx: { prop: 'body.parts[1].position.x' },
+      cy: { prop: 'body.parts[1].position.y' }
     },
     styles: {
-      fill: { special: 'schemaColor' },
-      stroke: { special: 'schemaColor' },
-      'stroke-dasharray': '1,1',
+      fill: '#FFC53A',
+      // stroke: 'black',
       'stroke-width': 1,
       'stroke-opacity': 1,
-      'fill-opacity': 0.4
+      'fill-opacity': 1
+    },
+    drag: {
+      prop: 'position',
+      pause: true,
+      onStart: {
+        styles: {
+          stroke: 'green'
+        },
+        log: [
+          { prop: 'sensors' }
+        ]
+      },
+      onEnd: {
+        styles: {
+          stroke: 'black'
+        }
+      }
     }
   },
+  {
+    type: 'Body',
+    dataPoints: { sceneProp: 'robots' },
+    shape: 'polygon',
+    staticAttrs: {
+    },
+    dynamicAttrs: {
+      points: {
+        prop: 'body.parts[2].vertices',
+        modifier: (vertices) => vertices.map((p) => `${p.x},${p.y}`).join(' ')
+      }
+    },
+    styles: {
+      fill: '#FFC53A',
+      // stroke: 'black',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
+    },
+    drag: {
+      prop: 'position',
+      pause: true,
+      onStart: {
+        styles: {
+          stroke: 'green'
+        },
+        log: [
+          { prop: 'sensors' }
+        ]
+      },
+      onEnd: {
+        styles: {
+          stroke: 'black'
+        }
+      }
+    }
+  }
+];
+
+const goalRenderables = [
   {
     type: 'Goal',
     dataPoints: { sceneProp: 'robots' },
@@ -300,6 +424,57 @@ export const RobotRenderables = [
           stroke: 'lightgray'
         }
       }
+    }
+  },
+  {
+    type: 'Goal',
+    name: 'robotToGoalLineSegs',
+    desc: 'Line segments between robots and goals',
+    dataPoints: { sceneProp: 'robots' },
+    shape: 'path',
+    staticAttrs: {
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      points: [
+        { prop: 'sensors.position' },
+        { prop: 'goal' }
+      ]
+    },
+    styles: {
+      fill: 'none',
+      stroke: { special: 'schemaColor' },
+      'stroke-dasharray': '10,10',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
+    }
+  }
+];
+
+const waypointRenderables = [
+  {
+    type: 'Waypoint',
+    dataPoints: { sceneProp: 'robots' },
+    shape: 'circle',
+    staticAttrs: {
+      r: {
+        prop: 'radius',
+        modifier: (val) => val / 1.5
+      },
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      cx: { prop: 'waypoint.x' },
+      cy: { prop: 'waypoint.y' }
+    },
+    styles: {
+      fill: { special: 'schemaColor' },
+      stroke: { special: 'schemaColor' },
+      'stroke-dasharray': '1,1',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 0.4
     }
   },
   {
@@ -349,54 +524,10 @@ export const RobotRenderables = [
       'stroke-opacity': 1,
       'fill-opacity': 1
     }
-  },
-  {
-    type: 'Goal',
-    name: 'robotToGoalLineSegs',
-    desc: 'Line segments between robots and goals',
-    dataPoints: { sceneProp: 'robots' },
-    shape: 'path',
-    staticAttrs: {
-      id: { prop: 'id' }
-    },
-    dynamicAttrs: {
-      points: [
-        { prop: 'sensors.position' },
-        { prop: 'goal' }
-      ]
-    },
-    styles: {
-      fill: 'none',
-      stroke: { special: 'schemaColor' },
-      'stroke-dasharray': '10,10',
-      'stroke-width': 1,
-      'stroke-opacity': 1,
-      'fill-opacity': 1
-    }
-  },
-  {
-    type: 'Body',
-    name: 'robotOrientations',
-    desc: 'Line segments between robots and headings',
-    dataPoints: { sceneProp: 'robots' },
-    shape: 'path',
-    staticAttrs: {
-      id: { prop: 'id' }
-    },
-    dynamicAttrs: {
-      points: [
-        { prop: 'sensors.position' },
-        { prop: 'sensors.heading' }
-      ]
-    },
-    styles: {
-      fill: 'none',
-      stroke: 'black',
-      'stroke-width': 3,
-      'stroke-opacity': 1,
-      'fill-opacity': 1
-    }
-  },
+  }
+];
+
+const vornoiRenderables = [
   {
     type: 'VC',
     name: 'VcMeshBG',
@@ -442,4 +573,11 @@ export const RobotRenderables = [
       'stroke-opacity': 1
     }
   }
+];
+
+export const RobotRenderables = [
+  ...compoundBodyRenderables,
+  ...goalRenderables,
+  ...waypointRenderables,
+  ...vornoiRenderables
 ];
