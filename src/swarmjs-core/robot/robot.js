@@ -47,14 +47,14 @@ export default class Robot {
         // If you want to add more parts to the robot body, add them here.
         // Make sure to also change renderabes to render all parts of the robot.
         // Example of compound body:
-        ,
-        Bodies.polygon(
-          position.x + this.radius / 10 + this.radius / 2,
-          position.y - (2 * this.radius) / 5,
-          3,
-          this.radius * 1.2,
-          { angle: (1.6 * Math.PI) / 2 }
-        )
+        // ,
+        // Bodies.polygon(
+        //   position.x + this.radius / 10 + this.radius / 2,
+        //   position.y - (2 * this.radius) / 5,
+        //   3,
+        //   this.radius * 1.2,
+        //   { angle: (1.6 * Math.PI) / 2 }
+        // )
       ]
     });
     this.body = compoundBody;
@@ -208,106 +208,92 @@ export default class Robot {
   }
 }
 
-// Example of compound body
-const compoundBodyRenderables = [
-  {
-    type: 'Body',
-    dataPoints: { sceneProp: 'robots' },
-    shape: 'circle',
-    staticAttrs: {
-      r: { prop: 'radius' },
-      id: { prop: 'id' }
-    },
-    dynamicAttrs: {
-      cx: { prop: 'body.parts[1].position.x' },
-      cy: { prop: 'body.parts[1].position.y' }
-    },
-    styles: {
-      fill: '#FFC53A',
-      'stroke-width': 1,
-      'stroke-opacity': 1,
-      'fill-opacity': 1
-    },
-    drag: {
-      prop: 'position',
-      pause: true,
-      onStart: {
-        styles: {
-          stroke: 'green'
-        },
-        log: [
-          { prop: 'sensors' }
-        ]
-      },
-      onEnd: {
-        styles: {
-          stroke: 'black'
-        }
-      }
-    }
-  },
-  {
-    type: 'Body',
-    dataPoints: { sceneProp: 'robots' },
-    shape: 'polygon',
-    staticAttrs: {
-    },
-    dynamicAttrs: {
-      points: {
-        prop: 'body.parts[2].vertices',
-        modifier: (vertices) => vertices.map((p) => `${p.x},${p.y}`).join(' ')
-      }
-    },
-    styles: {
-      fill: '#FFC53A',
-      'stroke-width': 1,
-      'stroke-opacity': 1,
-      'fill-opacity': 1
-    },
-    drag: {
-      prop: 'position',
-      pause: true,
-      onStart: {
-        styles: {
-          stroke: 'green'
-        },
-        log: [
-          { prop: 'sensors' }
-        ]
-      },
-      onEnd: {
-        styles: {
-          stroke: 'black'
-        }
-      }
-    }
-  }
-];
+// Define and export renderables
+// ===============================
+// This is where we define renderables in a simple config format
+// We should also import and register the renderables into renderering module (renderer.js)
+// This maybe more suitable to be in a separate file,
+// but for now I'm keeping each module's renderables in the same file
+// Some of the syntax might not be very clean, such as requiring knowing where stuff are defined
+// and stored within the Scene and defining them with a sceneProp, but I think it's fine for now
+
+// Example of rendering a compound body
+// const compoundBodyRenderables = [
+//   {
+//     type: 'Body',
+//     dataPoints: { sceneProp: 'robots' },
+//     shape: 'circle',
+//     staticAttrs: {
+//       r: { prop: 'radius' },
+//       id: { prop: 'id' }
+//     },
+//     dynamicAttrs: {
+//       cx: { prop: 'body.parts[1].position.x' },
+//       cy: { prop: 'body.parts[1].position.y' }
+//     },
+//     styles: {
+//       fill: '#FFC53A',
+//       'stroke-width': 1,
+//       'stroke-opacity': 1,
+//       'fill-opacity': 1
+//     },
+//     drag: {
+//       prop: 'position',
+//       pause: true,
+//       onStart: {
+//         styles: {
+//           stroke: 'green'
+//         },
+//         log: [
+//           { prop: 'sensors' }
+//         ]
+//       },
+//       onEnd: {
+//         styles: {
+//           stroke: 'black'
+//         }
+//       }
+//     }
+//   },
+//   {
+//     type: 'Body',
+//     dataPoints: { sceneProp: 'robots' },
+//     shape: 'polygon',
+//     staticAttrs: {
+//     },
+//     dynamicAttrs: {
+//       points: {
+//         prop: 'body.parts[2].vertices',
+//         modifier: (vertices) => vertices.map((p) => `${p.x},${p.y}`).join(' ')
+//       }
+//     },
+//     styles: {
+//       fill: '#FFC53A',
+//       'stroke-width': 1,
+//       'stroke-opacity': 1,
+//       'fill-opacity': 1
+//     },
+//     drag: {
+//       prop: 'position',
+//       pause: true,
+//       onStart: {
+//         styles: {
+//           stroke: 'green'
+//         },
+//         log: [
+//           { prop: 'sensors' }
+//         ]
+//       },
+//       onEnd: {
+//         styles: {
+//           stroke: 'black'
+//         }
+//       }
+//     }
+//   }
+// ];
 
 const bodyRenderables = [
-  // {
-  //   type: 'Body',
-  //   name: 'robotOrientations',
-  //   desc: 'Line segments between robots and headings',
-  //   dataPoints: { sceneProp: 'robots' },
-  //   shape: 'path',
-  //   staticAttrs: {
-  //     id: { prop: 'id' }
-  //   },
-  //   dynamicAttrs: {
-  //     points: [
-  //       { prop: 'sensors.position' },
-  //       { prop: 'sensors.heading' }
-  //     ]
-  //   },
-  //   styles: {
-  //     fill: 'none',
-  //     stroke: 'black',
-  //     'stroke-width': 3,
-  //     'stroke-opacity': 1,
-  //     'fill-opacity': 1
-  //   }
-  // },
   {
     type: 'Body',
     dataPoints: { sceneProp: 'robots' },
@@ -317,12 +303,12 @@ const bodyRenderables = [
       id: { prop: 'id' }
     },
     dynamicAttrs: {
-      cx: { prop: 'body.parts[1].position.x' },
-      cy: { prop: 'body.parts[1].position.y' }
+      cx: { prop: 'sensors.position.x' },
+      cy: { prop: 'sensors.position.y' }
     },
     styles: {
       fill: '#FFC53A',
-      // stroke: 'black',
+      stroke: 'black',
       'stroke-width': 1,
       'stroke-opacity': 1,
       'fill-opacity': 1
@@ -347,89 +333,8 @@ const bodyRenderables = [
   },
   {
     type: 'Body',
-    dataPoints: { sceneProp: 'robots' },
-    shape: 'polygon',
-    staticAttrs: {
-    },
-    dynamicAttrs: {
-      points: {
-        prop: 'body.parts[2].vertices',
-        modifier: (vertices) => vertices.map((p) => `${p.x},${p.y}`).join(' ')
-      }
-    },
-    styles: {
-      fill: '#FFC53A',
-      // stroke: 'black',
-      'stroke-width': 1,
-      'stroke-opacity': 1,
-      'fill-opacity': 1
-    },
-    drag: {
-      prop: 'position',
-      pause: true,
-      onStart: {
-        styles: {
-          stroke: 'green'
-        },
-        log: [
-          { prop: 'sensors' }
-        ]
-      },
-      onEnd: {
-        styles: {
-          stroke: 'black'
-        }
-      }
-    }
-  }
-];
-
-const goalRenderables = [
-  {
-    type: 'Goal',
-    dataPoints: { sceneProp: 'robots' },
-    shape: 'circle',
-    staticAttrs: {
-      r: {
-        prop: 'radius',
-        modifier: (val) => val / 2
-      },
-      id: { prop: 'id' }
-    },
-    dynamicAttrs: {
-      cx: { prop: 'goal.x' },
-      cy: { prop: 'goal.y' }
-    },
-    styles: {
-      fill: { special: 'schemaColor' },
-      stroke: 'white',
-      'stroke-dasharray': '0.5,0.5',
-      'stroke-width': 1,
-      'stroke-opacity': 1,
-      'fill-opacity': 1
-    },
-    drag: {
-      prop: 'goal',
-      pause: true,
-      onStart: {
-        styles: {
-          stroke: 'black'
-        },
-        log: [
-          { prop: 'sensors' }
-        ]
-      },
-      onEnd: {
-        styles: {
-          stroke: 'lightgray'
-        }
-      }
-    }
-  },
-  {
-    type: 'Goal',
-    name: 'robotToGoalLineSegs',
-    desc: 'Line segments between robots and goals',
+    name: 'robotOrientations',
+    desc: 'Line segments between robots and headings',
     dataPoints: { sceneProp: 'robots' },
     shape: 'path',
     staticAttrs: {
@@ -438,14 +343,13 @@ const goalRenderables = [
     dynamicAttrs: {
       points: [
         { prop: 'sensors.position' },
-        { prop: 'goal' }
+        { prop: 'sensors.heading' }
       ]
     },
     styles: {
       fill: 'none',
-      stroke: { special: 'schemaColor' },
-      'stroke-dasharray': '10,10',
-      'stroke-width': 1,
+      stroke: 'black',
+      'stroke-width': 3,
       'stroke-opacity': 1,
       'fill-opacity': 1
     }
@@ -527,6 +431,74 @@ const waypointRenderables = [
   }
 ];
 
+const goalRenderables = [
+  {
+    type: 'Goal',
+    dataPoints: { sceneProp: 'robots' },
+    shape: 'circle',
+    staticAttrs: {
+      r: {
+        prop: 'radius',
+        modifier: (val) => val / 2
+      },
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      cx: { prop: 'goal.x' },
+      cy: { prop: 'goal.y' }
+    },
+    styles: {
+      fill: { special: 'schemaColor' },
+      stroke: 'white',
+      'stroke-dasharray': '0.5,0.5',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
+    },
+    drag: {
+      prop: 'goal',
+      pause: true,
+      onStart: {
+        styles: {
+          stroke: 'black'
+        },
+        log: [
+          { prop: 'sensors' }
+        ]
+      },
+      onEnd: {
+        styles: {
+          stroke: 'lightgray'
+        }
+      }
+    }
+  },
+  {
+    type: 'Goal',
+    name: 'robotToGoalLineSegs',
+    desc: 'Line segments between robots and goals',
+    dataPoints: { sceneProp: 'robots' },
+    shape: 'path',
+    staticAttrs: {
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      points: [
+        { prop: 'sensors.position' },
+        { prop: 'goal' }
+      ]
+    },
+    styles: {
+      fill: 'none',
+      stroke: { special: 'schemaColor' },
+      'stroke-dasharray': '10,10',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
+    }
+  }
+];
+
 const vornoiRenderables = [
   {
     type: 'VC',
@@ -576,8 +548,8 @@ const vornoiRenderables = [
 ];
 
 export const RobotRenderables = [
-  ...compoundBodyRenderables,
-  ...goalRenderables,
+  ...bodyRenderables,
   ...waypointRenderables,
+  ...goalRenderables,
   ...vornoiRenderables
 ];
