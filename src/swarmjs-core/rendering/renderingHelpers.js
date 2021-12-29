@@ -205,6 +205,10 @@ export function addRenderables(svg, scene, definitions, module) {
       : svg
         .append(def.shape);
 
+    // Add classes to svg elements if defined, useful for debugging
+    rends.classed(def.svgClass, true);
+
+    // Add an id to each svg, usefull for color scheme selection
     if (!def.staticAttrs?.id) {
       rends.attr('id', (d, i) => i);
     }

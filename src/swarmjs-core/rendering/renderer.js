@@ -21,8 +21,8 @@ let lastScene = null;
 // Elements defined first are shown in the back
 const renderables = [
   { module: 'Scene', rendList: SceneRenderables },
-  { module: 'Puck', rendList: PuckRenderables },
-  { module: 'Robot', rendList: RobotRenderables }
+  { module: 'Robot', rendList: RobotRenderables },
+  { module: 'Puck', rendList: PuckRenderables }
 ];
 
 const uniqueRenderingElements = ['All', ...new Set(renderables

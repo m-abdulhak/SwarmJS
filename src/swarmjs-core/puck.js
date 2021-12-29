@@ -118,6 +118,7 @@ export default class Puck {
 export const PuckRenderables = [
   {
     type: 'Goal',
+    svgClass: 'puck-goal',
     dataPoints: { sceneProp: 'pucksGroups' },
     shape: 'circle',
     staticAttrs: {
@@ -138,6 +139,7 @@ export const PuckRenderables = [
   },
   {
     type: 'Body',
+    svgClass: 'puck-body',
     dataPoints: { sceneProp: 'pucks' },
     shape: 'circle',
     staticAttrs: {

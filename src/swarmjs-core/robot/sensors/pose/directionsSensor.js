@@ -8,13 +8,13 @@ import { getAbsolutePointFromLengthAndAngle } from '../../../utils/geometry';
 const name = 'directions';
 const directionsDefinitions = {
   forward: 0,
-  right: Math.PI / 2,
-  left: -Math.PI / 2,
   forwardRight: Math.PI / 4,
-  forwardLeft: -Math.PI / 4,
+  right: Math.PI / 2,
   backwardRight: (3 * Math.PI) / 4,
+  backward: Math.PI,
   backwardLeft: -(3 * Math.PI) / 4,
-  backward: Math.PI
+  left: -Math.PI / 2,
+  forwardLeft: -Math.PI / 4
 };
 
 class DirectionsSensor extends Sensor {

@@ -312,6 +312,7 @@ export default class Scene {
 export const SceneRenderables = [
   {
     type: 'Obstacles',
+    svgClass: 'obstacle',
     dataPoints: {
       sceneProp: 'staticObjects',
       modifier: (list) => list.filter((o) => o.def.type === 'rectangle')
@@ -329,6 +330,7 @@ export const SceneRenderables = [
   },
   {
     type: 'Obstacles',
+    svgClass: 'obstacle',
     dataPoints: {
       sceneProp: 'staticObjects',
       modifier: (list) => list.filter((o) => o.def.type === 'circle')
