@@ -1,6 +1,12 @@
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-globals */
 import Scene from './scene';
+import {
+  updateBench,
+  startBench,
+  stopBench,
+  getBenchData
+} from './benchmark';
 
 // Global Map Memory
 const gMaps = [];
@@ -8,8 +14,6 @@ const gMaps = [];
 let scene;
 
 export const createSimulation = (config, updateCallback) => {
-  console.log('Main config: ', config);
-
   scene = new Scene(
     config.env,
     config.robots,
@@ -21,31 +25,26 @@ export const createSimulation = (config, updateCallback) => {
   );
 
   const renderScene = () => {
-    // if (bench.benchmarking && timeInstance > bench.benchMaxTimesteps) {
-    //   bench.startBenchmarkInstance();
-    // }
-
     if (!scene.paused) {
       scene.update();
+      updateBench(scene, scene.timeInstance);
       if (updateCallback && typeof updateCallback === 'function') {
-        updateCallback(scene.timeInstance, scene);
+        const benchData = getBenchData();
+        updateCallback(scene.timeInstance, scene, benchData);
       }
     }
-
-    // bench.updateBenchSet(timeInstance);
-    // console.log("TimeInstance: ",timeInstance.toFixed(2), " Distance: ",
-    // Math.floor(scene.distance));
-
     requestAnimationFrame(renderScene);
   };
-
   renderScene();
 };
 
-export const initSimulationIfNeeded = (config, updateCallback) => {
+export const simulationIsInitialized = () => scene !== undefined;
+
+export const initSim = (config, updateCallback) => {
   if (scene) {
     return;
   }
+  console.log('Creating Sim With Config: ', config);
   createSimulation(config, updateCallback);
 };
 
@@ -61,18 +60,19 @@ export const resetSimulation = (config) => {
   );
 };
 
-export const togglePauseSimulation = () => {
-  scene.togglePause();
+export const startBenchmark = (benchConfig, resetSimCB) => {
+  const resetSimFunc = resetSimCB && typeof resetSimCB === 'function' ? resetSimCB : resetSimulation;
+  startBench(benchConfig, resetSimFunc);
 };
 
-export const setSimulationSpeed = (speed) => {
-  scene.setSpeed(speed);
-};
+export const stopBenchmark = () => stopBench();
 
-export const getAvailableAlgorithms = () => scene.availableAlgorithms;
+export const getBenchmarkData = () => getBenchData();
 
-export const changeAlgorithm = (algorithm) => {
-  scene.changeAlgorithm(algorithm);
-};
+export const togglePauseSimulation = () => scene.togglePause();
 
-export default initSimulationIfNeeded;
+export const setSimulationSpeed = (speed) => scene.setSpeed(speed);
+
+export const getAvailableAlgorithms = () => (scene ? scene.availableAlgorithms : []);
+
+export const changeAlgorithm = (algorithm) => scene.changeAlgorithm(algorithm);

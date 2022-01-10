@@ -6,9 +6,11 @@ const name = 'neighbors';
 const getNeighbors = (scene, robotId) => {
   const neighbors = [];
   try {
-    Array.from(scene.voronoi.delaunay.neighbors(robotId))
-      .filter((x) => x > -1)
-      .forEach((i) => neighbors.push(scene.robots[i]));
+    if (scene.voronoi?.delaunay) {
+      Array.from(scene.voronoi?.delaunay.neighbors(robotId))
+        .filter((x) => x > -1)
+        .forEach((i) => neighbors.push(scene.robots[i]));
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(`Error Exracting Neighbors for robot ${robotId}: ${error}`);

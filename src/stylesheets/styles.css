@@ -89,3 +89,26 @@ body{
     position: inherit;
     }
 }
+
+.graph_plot {
+    fill: none;
+    stroke-width: 5px;
+    opacity: 1;
+}
+
+.svg_stroke_scheme_0 {
+    stroke: green;
+}
+
+.svg_stroke_scheme_1 {
+    stroke: blue;
+}
+
+.svg_plot_background {
+    opacity: 0.5;
+    stroke-width: 1px;
+}
+
+.svg_plot_reference {
+    stroke-dasharray: 10, 2;
+}

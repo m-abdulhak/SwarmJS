@@ -162,6 +162,8 @@ export default class Scene {
     this.unpause.bind(this);
     this.setSpeed.bind(this);
     this.changeAlgorithm.bind(this);
+
+    this.setSpeed(envConfig.speed);
   }
 
   update() {

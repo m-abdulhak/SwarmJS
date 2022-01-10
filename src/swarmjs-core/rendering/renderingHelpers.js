@@ -195,6 +195,7 @@ export function setDynamicAttrs(def, rends, scene) {
 
 export function addRenderables(svg, scene, definitions, module) {
   return definitions.map((def) => {
+    // console.log('Adding renderable to : ', svg);
     const rends = def.dataPoints
       ? svg
         .append('g')
@@ -202,8 +203,7 @@ export function addRenderables(svg, scene, definitions, module) {
         .data(parseAttr(null, def.dataPoints, scene))
         .enter()
         .append(def.shape)
-      : svg
-        .append(def.shape);
+      : svg.append(def.shape);
 
     // Add classes to svg elements if defined, useful for debugging
     rends.classed(def.svgClass, true);

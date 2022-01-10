@@ -70,6 +70,7 @@ export default class Robot {
     // Sensor Manager
     this.sensorManager = new SensorManager(this.scene, this, enabledSensors);
     this.sensorManager.start();
+    this.sensorManager.update();
 
     // Actuator Manager
     this.actuatorManager = new ActuatorManager(this.scene, this, enabledActuators);
@@ -146,19 +147,6 @@ export default class Robot {
   getDistanceTo(point) {
     const ret = getDistance(this.sensors.position, point);
     return ret;
-  }
-
-  limitPos(position) {
-    const { radius } = this;
-    this.velocity.x = position.x <= radius || position.x >= this.envWidth - radius
-      ? this.velocity.x * -1 : this.velocity.x;
-    this.velocity.y = position.y <= radius || position.y >= this.envHeight - radius
-      ? this.velocity.y * -1 : this.velocity.y;
-
-    return {
-      x: Math.min(Math.max(radius, position.x), this.envWidth - radius),
-      y: Math.min(Math.max(radius, position.y), this.envHeight - radius)
-    };
   }
 
   limitGoal(goal) {

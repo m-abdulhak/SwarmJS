@@ -17,8 +17,8 @@ let lastScene = null;
 // So if both robots and pucks have 'body' type renderables, they can still be treated as separate
 // types and be disabled/enabled independently from the UI while also having a readable name
 // There could be a cleaner way to do this, but it works for now
-// Ordering is also important, as it determines which elements are shown in front of others
-// Elements defined first are shown in the back
+// Ordering is also important, as it determines which elements are shown on top
+// Elements defined last are shown on top
 const renderables = [
   { module: 'Scene', rendList: SceneRenderables },
   { module: 'Robot', rendList: RobotRenderables },
@@ -47,6 +47,7 @@ export function initialize(svg, scene) {
   if (svg) {
     svg.selectAll('*').remove();
   }
+  renderedElems.length = 0;
 
   renderables.forEach((renderable) => {
     renderedElems.push(...addRenderables(svg, scene, renderable.rendList, renderable.module));

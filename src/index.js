@@ -11,7 +11,8 @@ import App from './components/App';
 const config = {
   env: {
     width: 800,
-    height: 500
+    height: 500,
+    speed: 15
   },
   robots: {
     count: 20,
@@ -78,13 +79,60 @@ const config = {
   positionsGenerator: getRandCollFreePosGenerator
 };
 
-// Configs for compound body example
+// // Configs for compound body example
 // const compoundBodyRobotSim = config;
 // compoundBodyRobotSim.robots.radius = 10;
 // compoundBodyRobotSim.pucks.groups[0].radius = 7;
 // compoundBodyRobotSim.pucks.groups[1].radius = 7;
 
+const benchmarkSettings = {
+  configs: [
+    {
+      name: '5 Robots',
+      simConfig: {
+        ...config,
+        env: {
+          ...config.env,
+          speed: 50
+        },
+        robots: {
+          ...config.robots,
+          count: 5
+        }
+      }
+    },
+    {
+      name: '20 Robots',
+      simConfig: {
+        ...config,
+        env: {
+          ...config.env,
+          speed: 50
+        }
+      }
+    }
+  ],
+  trackers: [
+    {
+      name: 'Distance',
+      title: 'Total Pucks To Goal Distance',
+      getValue: (scene) => scene.distance,
+      // How to aggregat values measured within a single time instance:
+      // 'first', 'last', 'average', 'sum', 'min', 'max'
+      aggregate: (values) => values.reduce((acc, val) => acc + val, 0) / values.length
+    },
+    {
+      name: 'Pucks',
+      title: 'Number of Pucks Outside of Goal Area',
+      getValue: (scene) => scene.pucksOutsideGoalCount,
+      aggregate: (values) => values.reduce((acc, val) => acc + val, 0) / values.length
+    }
+  ],
+  maxTimeStep: 5000,
+  timeStep: 100
+};
+
 ReactDOM.render(
-  <App config={config}/>,
+  <App config={config} benchSettings={benchmarkSettings}/>,
   document.getElementById('root')
 );

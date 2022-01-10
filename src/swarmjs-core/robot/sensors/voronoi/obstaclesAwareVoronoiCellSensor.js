@@ -59,10 +59,18 @@ class ObstaclesAwareVoronoiCellSensor extends Sensor {
   }
 
   sample() {
-    const originalVC = this.scene.voronoi.cellPolygon(this.robot.id);
-    const pos = this.robot.sensors.position;
-    const closestPoint = this.robot.sensors.closestObstaclePoint;
-    this.value = trimVCwithStaticObstacles(pos, originalVC, closestPoint);
+    const originalVC = this.scene?.voronoi?.cellPolygon(this.robot.id);
+
+    if (originalVC == null) {
+      this.value = [];
+      return;
+    }
+
+    const pos = this.robot.sensors?.position;
+    const closestPoint = this.robot?.sensors?.closestObstaclePoint;
+    this.value = pos && closestPoint
+      ? trimVCwithStaticObstacles(pos, originalVC, closestPoint)
+      : originalVC;
   }
 }
 

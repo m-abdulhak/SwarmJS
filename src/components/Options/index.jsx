@@ -1,7 +1,9 @@
 import React from 'react';
 import propTypes from 'prop-types';
+import Slider from '../Inputs/Slider';
 
 const Options = ({
+  speed,
   togglePause,
   setSpeed,
   reset,
@@ -13,20 +15,12 @@ const Options = ({
 }) => (
   <div className="options">
     <div className="ui-section">
-      <label className="key">Mouse Position:</label>
-      <label className="input-text" id="mouse-pos"></label>
-    </div>
-    <div className="ui-section">
       <label className="key">Time: </label>
       <label className="input-text" id="time">{parseInt(time, 10)}</label>
     </div>
     <div className="ui-section">
-      <label className="key">Puck-Goal Distances: </label>
-      <label className="input-text" id="distance"></label>
-    </div>
-    <div className="ui-section">
       <label className="key">Speed:</label>
-      <input type="range" min=".1" max="50.0" defaultValue="15" step=".1" className="slider input" id="speed-slider" onChange={(event) => setSpeed(event.target.value)} />
+      <Slider min={0.1} max={50} step={0.1} val={speed} onChange={setSpeed} />
     </div>
     <div className="ui-section">
       <label className="key">Robots:</label>
@@ -54,20 +48,12 @@ const Options = ({
         ))}
       </select>
     </div>
-    <div className="ui-section">
-      <label className="key">Start Benchmarking:</label>
-      <input type="button" value="Benchmark" className="input-button input small-btn" id="benchmark-button" style={{ width: '50%' }}/>
-    </div>
-    <div className="ui-section">
-      <label className="key">Save Benchmark Image:</label>
-      <input type="button" value="Save" className="input-button input small-btn" style={{ width: '50%' }}/>
-      <input type="button" value="Auto Save" className="hidden input-button input small-btn" style={{ width: '50%' }}/>
-    </div>
   </div>
 );
 
 // props validation
 Options.propTypes = {
+  speed: propTypes.number.isRequired,
   togglePause: propTypes.func.isRequired,
   setSpeed: propTypes.func.isRequired,
   reset: propTypes.func.isRequired,
