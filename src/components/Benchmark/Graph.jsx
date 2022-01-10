@@ -10,13 +10,19 @@ const outsideDomain = (domain, value) => value < domain[0] || value > domain[1];
 const getDataSetsCount = (data) => Object.values(data)
   .reduce((count, dataSets) => count + dataSets.length, 0);
 
-const shouldUpdatePlots = (plottedLines, data) => {
+const shouldUpdatePlots = (plottedLines, data, aggData) => {
   const dataSetsCount = getDataSetsCount(data);
+  const aggDataSetsCount = Object.values(aggData)
+    .filter((obj) => Object.values(obj).length > 0).length;
+  // const aggDataSetsCount = 0;
   const plottedLinesCount = Object.keys(plottedLines).length;
-  return dataSetsCount > plottedLinesCount;
+  return dataSetsCount + aggDataSetsCount > plottedLinesCount;
 };
 
 const getDomains = (data) => {
+  if (!data || !Object.values(data)?.[0]?.[0] || !Object.keys(Object.values(data)[0][0])) {
+    return { xMinMax: [0, 1], yMinMax: [0, 1] };
+  }
   const timeIntervals = Object.keys(Object.values(data)[0][0]);
 
   const xMinMax = [timeIntervals[0], timeIntervals[timeIntervals.length - 1]];
@@ -113,7 +119,7 @@ const updateScales = (svgElem, data, graphSettings, curScales) => {
 };
 
 const createPlot = (
-  svgContainer, xScale, yScale, data, index = 0, color, dashed = false, background = false
+  svgContainer, xScale, yScale, data, index = 0, background = false, dashed = false
 ) => {
   const formattedData = Object.keys(data).map((key) => [parseFloat(key), data[key]]);
 
@@ -128,10 +134,18 @@ const createPlot = (
     .classed('svg_plot_reference', dashed); // for dashed lines
 };
 
-const updatePlot = (plotElem, xScale, yScale) => plotElem
-  .attr('d', d3.line().x((d) => xScale(d[0])).y((d) => yScale(d[1])));
+const updatePlot = (plotElem, xScale, yScale, newData = null) => {
+  if (newData) {
+    const formattedData = Object.keys(newData).map((key) => [parseFloat(key), newData[key]]);
+    plotElem.datum(formattedData);
+  }
 
-const updateSvgGraph = (svgElem, data, existingSvgLines, graphSettings, { xScale, yScale }) => {
+  plotElem.attr('d', d3.line().x((d) => xScale(d[0])).y((d) => yScale(d[1])));
+};
+
+const updateSvgGraph = (
+  svgElem, data, aggData, existingSvgLines, { xScale, yScale }
+) => {
   const newLintPlots = {};
 
   if (!data || Object.keys(data).length === 0) {
@@ -150,10 +164,21 @@ const updateSvgGraph = (svgElem, data, existingSvgLines, graphSettings, { xScale
       if (existingSvgLines[lineKey]) {
         updatePlot(existingSvgLines[lineKey], xScale, yScale);
       } else {
-        const newPlot = createPlot(svgElem, xScale, yScale, dataSet, algoIndx);
+        const newPlot = createPlot(svgElem, xScale, yScale, dataSet, algoIndx, true);
         newLintPlots[lineKey] = newPlot;
       }
     });
+
+    if (aggData[alogName]) {
+      const aggDataSet = aggData[alogName];
+      const lineKey = getLineKey(alogName, 'agg');
+      if (existingSvgLines[lineKey]) {
+        updatePlot(existingSvgLines[lineKey], xScale, yScale, aggDataSet);
+      } else {
+        const newPlot = createPlot(svgElem, xScale, yScale, aggDataSet, algoIndx, false);
+        newLintPlots[lineKey] = newPlot;
+      }
+    }
   });
 
   return newLintPlots;
@@ -173,7 +198,7 @@ const graphSettings = {
 };
 
 const Graph = (props) => {
-  const { data } = props;
+  const { data, aggData } = props;
 
   if (!data) {
     return null;
@@ -182,14 +207,14 @@ const Graph = (props) => {
   const [scales, setScales] = React.useState({});
   const [plottedLines, setPlottedLines] = React.useState([]);
 
-  if (svgRef && svgRef.current && shouldUpdatePlots(plottedLines, data)) {
+  if (svgRef && svgRef.current && shouldUpdatePlots(plottedLines, data, aggData)) {
     const svg = d3.select(svgRef.current);
 
     const diffScales = updateScales(svg, data, graphSettings, scales);
     const newScales = diffScales ? { ...scales, ...diffScales } : scales;
     setScales({ ...scales, ...diffScales });
 
-    const newLinePlots = updateSvgGraph(svg, data, plottedLines, graphSettings, newScales);
+    const newLinePlots = updateSvgGraph(svg, data, aggData, plottedLines, newScales);
     if (newLinePlots && Object.keys(newLinePlots).length > 0) {
       setPlottedLines({ ...plottedLines, ...newLinePlots });
     }
@@ -210,7 +235,8 @@ const Graph = (props) => {
 };
 
 Graph.propTypes = {
-  data: PropTypes.object
+  data: PropTypes.object,
+  aggData: PropTypes.object
 };
 
 export default Graph;

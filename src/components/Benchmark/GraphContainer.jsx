@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Graph from './Graph';
 import LegendPanel from './Legend/LegendPanel';
 
-const GraphContainer = ({ name, title, benchSettings, data }) => {
+const GraphContainer = ({ name, title, benchSettings, data, aggData }) => {
   if (!data) {
     return null;
   }
@@ -15,7 +15,7 @@ const GraphContainer = ({ name, title, benchSettings, data }) => {
       <div style={{ width: 'fit-content', margin: 'auto' }}>
         <p style={{ fontWeight: 900 }}>{title}</p>
       </div>
-      <Graph benchSettings={benchSettings} data={data}/>
+      <Graph benchSettings={benchSettings} data={data} aggData={aggData}/>
       <LegendPanel algorithms={benchSettings.configs} />
     </div>
   );
@@ -25,7 +25,8 @@ GraphContainer.propTypes = {
   name: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   benchSettings: PropTypes.object,
-  data: PropTypes.object
+  data: PropTypes.object,
+  aggData: PropTypes.object
 };
 
 export default GraphContainer;

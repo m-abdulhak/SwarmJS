@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 
 let historicalData = {};
+let aggData = {};
 let benchmarking = false;
 let curBenchConfIndx = null;
 let benchData = {};
@@ -10,7 +11,7 @@ let resetSimCallBack = null;
 const getCurConfig = () => benchSettings.configs[curBenchConfIndx];
 
 export const getBenchData = () => {
-  const ret = { history: historicalData };
+  const ret = { history: historicalData, aggregates: aggData };
   if (benchmarking) {
     ret.cur = {
       name: getCurConfig().name,
@@ -23,6 +24,10 @@ export const getBenchData = () => {
 
 const resetHistroicalData = () => {
   historicalData = benchSettings.trackers.reduce((acc, tr) => ({
+    ...acc,
+    [tr.name]: benchSettings.configs.reduce((acc2, config) => ({ ...acc2, [config.name]: [] }), {})
+  }), {});
+  aggData = benchSettings.trackers.reduce((acc, tr) => ({
     ...acc,
     [tr.name]: benchSettings.configs.reduce((acc2, config) => ({ ...acc2, [config.name]: [] }), {})
   }), {});
@@ -79,13 +84,13 @@ export const updateBench = (scene, time) => {
       valuesWithinCurTimeStep.push(tracker.getValue(scene));
     } else {
       // If the new time is not within the current timestep,
-      // aggregate the temporary data and add the value to the data set
-      const newVal = tracker.aggregate(valuesWithinCurTimeStep);
-      const trackerData = benchData[tracker.name].data;
-      trackerData[trackerTimeStep * benchSettings.timeStep] = newVal;
+      // aggregate the temporary data and add the resulting value to the currentRun data set
+      const newVal = tracker.reduce(valuesWithinCurTimeStep);
+      const curRunData = benchData[tracker.name].data;
+      curRunData[trackerTimeStep * benchSettings.timeStep] = newVal;
 
-      // Update the current tracker time step, reset the temporary data
-      // and add the current value to the temporary data
+      // Change the current time step and reset the temporary data
+      // Add the new value to the temporary data
       benchData[tracker.name].curTimeStep = curTimeStep;
       benchData[tracker.name].curTimeStepValues = [tracker.getValue(scene)];
     }
@@ -94,12 +99,30 @@ export const updateBench = (scene, time) => {
   if (time >= benchSettings.maxTimeStep) {
     const curConfig = getCurConfig();
     benchSettings.trackers.forEach((tracker) => {
-      const trackerData = historicalData[tracker.name];
+      if (!historicalData[tracker.name]) {
+        historicalData[tracker.name] = {};
+      }
 
-      if (trackerData[curConfig.name] && Array.isArray(trackerData[curConfig.name])) {
-        trackerData[curConfig.name].push(benchData[tracker.name].data);
+      if (
+        historicalData[tracker.name][curConfig.name]
+        && Array.isArray(historicalData[tracker.name][curConfig.name])
+      ) {
+        historicalData[tracker.name][curConfig.name].push(benchData[tracker.name].data);
       } else {
-        historicalData[curConfig.name] = [benchData[tracker.name].data];
+        historicalData[tracker.name][curConfig.name] = [benchData[tracker.name].data];
+      }
+
+      if (!aggData[tracker.name]) {
+        aggData[tracker.name] = {};
+      }
+
+      const dataSets = historicalData[tracker.name][curConfig.name];
+      if (dataSets && dataSets.length > 0) {
+        const aggDataSet = Object.keys(dataSets[0])
+          .map((key) => ({ [key]: tracker.aggregate(dataSets.map((d) => d[key])) }))
+          .reduce((acc, cur) => ({ ...acc, ...cur }), {});
+
+        aggData[tracker.name][curConfig.name] = aggDataSet;
       }
     });
     startNewExperiment();

@@ -16,6 +16,7 @@ const Benchmark = ({ benchSettings, reset, data }) => {
         title={tracker.title}
         benchSettings={benchSettings}
         data={data.history[tracker.name]}
+        aggData={data.aggregates[tracker.name]}
       />
   ));
   return (
