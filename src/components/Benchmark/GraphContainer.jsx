@@ -3,30 +3,29 @@ import PropTypes from 'prop-types';
 import Graph from './Graph';
 import LegendPanel from './Legend/LegendPanel';
 
-const GraphContainer = ({ name, title, benchSettings, data, aggData }) => {
+const GraphContainer = (
+  { tracker, data, aggData, algorithms }
+) => {
   if (!data) {
     return null;
   }
 
   return (
-    <div id={`${name}-graph-container`} style={{
-      margin: 'auto', width: '1400px', padding: '10px', border: 'solid 1px black'
-    }}>
-      <div style={{ width: 'fit-content', margin: 'auto' }}>
-        <p style={{ fontWeight: 900 }}>{title}</p>
+    <div className='graph-container'>
+      <div className='graph-title'>
+        <p>{tracker.title}</p>
       </div>
-      <Graph benchSettings={benchSettings} data={data} aggData={aggData}/>
-      <LegendPanel algorithms={benchSettings.configs} />
+      <Graph data={data} aggData={aggData} graphSettings={tracker.graphSettings}/>
+      <LegendPanel algorithms={algorithms} aggregationType={tracker.aggregationType} />
     </div>
   );
 };
 
 GraphContainer.propTypes = {
-  name: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  benchSettings: PropTypes.object,
+  tracker: PropTypes.object.isRequired,
   data: PropTypes.object,
-  aggData: PropTypes.object
+  aggData: PropTypes.object,
+  algorithms: PropTypes.array
 };
 
 export default GraphContainer;

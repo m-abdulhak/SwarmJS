@@ -23,10 +23,6 @@ const Options = ({
       <Slider min={0.1} max={50} step={0.1} val={speed} onChange={setSpeed} />
     </div>
     <div className="ui-section">
-      <label className="key">Robots:</label>
-      <input type="range" min="1" max="30" defaultValue="20" step="1" className="slider input" id="robots-slider"/>
-    </div>
-    <div className="ui-section">
       <label className="key">Pause and Reset:</label>
       <input type="button" value="Pause" className="input-button input half-btn" id="pause-button" onClick={() => togglePause()}/>
       <input type="button" value="Reset" className="input-button input half-btn" id="reset-button" onClick={() => reset()}/>

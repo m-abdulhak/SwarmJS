@@ -90,6 +90,22 @@ body{
     }
 }
 
+.graph-container {
+    margin: auto;
+    width: 1400px;
+    padding: 10px;
+    border: solid 1px black;
+}
+
+.graph-title {
+    width: fit-content;
+    margin: auto;
+}
+
+.graph-title p {
+    font-weight: 900;
+}
+
 .graph_plot {
     fill: none;
     stroke-width: 5px;
@@ -104,6 +120,14 @@ body{
     stroke: blue;
 }
 
+.svg_color_scheme_0 {
+    color: green;
+}
+
+.svg_color_scheme_1 {
+    color: blue;
+}
+
 .svg_plot_background {
     opacity: 0.5;
     stroke-width: 1px;
@@ -111,4 +135,15 @@ body{
 
 .svg_plot_reference {
     stroke-dasharray: 10, 2;
+}
+
+.bench_legend_item {
+    text-align: center;
+    margin: 20px;
+    margin-top: 0px;
+}
+
+.bench_legend_item p {
+    display: inline;
+    margin: 5px;
 }

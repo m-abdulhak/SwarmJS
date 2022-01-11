@@ -42,36 +42,36 @@ const getDomains = (data) => {
 const getScale = (domain, range) => d3.scaleLinear().domain(domain).range(range);
 
 const addXAxis = (
-  svgElem, xScale, { actualWidth, actualHeight, margin } = {}, title
+  svgElem, xScale, { actualWidth, actualHeight, margin, xTitle } = {}
 ) => {
   svgElem.append('g')
     .classed('x-axis', true)
     .attr('transform', `translate(0, ${actualHeight || 0})`)
     .call(d3.axisBottom(xScale));
 
-  if (title) {
+  if (xTitle) {
     svgElem.append('text')
       .attr('transform', `translate(${actualWidth / 2}, ${actualHeight + margin.top + 20})`)
       .style('text-anchor', 'middle')
-      .text(title);
+      .text(xTitle);
   }
 };
 
 const addYAxis = (
-  svgElem, yScale, { actualHeight, margin } = {}, title
+  svgElem, yScale, { actualHeight, margin, yTitle } = {}
 ) => {
   svgElem.append('g')
     .classed('y-axis', true)
     .call(d3.axisLeft(yScale));
 
-  if (title) {
+  if (yTitle) {
     svgElem.append('text')
       .attr('transform', 'rotate(-90)')
       .attr('y', 0 - margin.left)
       .attr('x', 0 - (actualHeight / 2))
       .attr('dy', '1em')
       .style('text-anchor', 'middle')
-      .text(title);
+      .text(yTitle);
   }
 };
 
@@ -91,8 +91,8 @@ const initSvgGraph = (svgElem, graphSettings) => {
   const xScale = getScale([0, 1], [0, graphSettings.actualWidth]);
   const yScale = getScale([0, 1], [graphSettings.actualHeight, 0]);
 
-  addXAxis(svgElem, xScale, graphSettings, 'xAxixTitle');
-  addYAxis(svgElem, yScale, graphSettings, 'yAxisTitle');
+  addXAxis(svgElem, xScale, graphSettings);
+  addYAxis(svgElem, yScale, graphSettings);
 
   return { xScale, yScale };
 };
@@ -184,21 +184,8 @@ const updateSvgGraph = (
   return newLintPlots;
 };
 
-const graphSettings = {
-  width: 1400,
-  height: 600,
-  margin: {
-    top: 30,
-    right: 60,
-    bottom: 80,
-    left: 60
-  },
-  actualWidth: 1400 - 60 - 60,
-  actualHeight: 600 - 30 - 80
-};
-
 const Graph = (props) => {
-  const { data, aggData } = props;
+  const { graphSettings, data, aggData } = props;
 
   if (!data) {
     return null;
@@ -235,6 +222,7 @@ const Graph = (props) => {
 };
 
 Graph.propTypes = {
+  graphSettings: PropTypes.object.isRequired,
   data: PropTypes.object,
   aggData: PropTypes.object
 };

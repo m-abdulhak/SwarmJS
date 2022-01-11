@@ -85,6 +85,19 @@ const config = {
 // compoundBodyRobotSim.pucks.groups[0].radius = 7;
 // compoundBodyRobotSim.pucks.groups[1].radius = 7;
 
+const benchGraphSettings = {
+  width: 1400,
+  height: 600,
+  margin: {
+    top: 30,
+    right: 60,
+    bottom: 80,
+    left: 60
+  },
+  actualWidth: 1400 - 60 - 60,
+  actualHeight: 600 - 30 - 80
+};
+
 const benchmarkSettings = {
   configs: [
     {
@@ -123,17 +136,21 @@ const benchmarkSettings = {
       // How to aggregate values corresponding to the same time instance across multiple runs,
       // Used to generate a 'highlight' plot to show the trend across multiple runs:
       // 'min', 'max', 'average', ...
-      aggregate: (values) => values.reduce((acc, val) => acc + val, 0) / values.length
+      aggregate: (values) => values.reduce((acc, val) => acc + val, 0) / values.length,
+      aggregationType: 'Average',
+      graphSettings: { ...benchGraphSettings, xTitle: 'Time (ms)', yTitle: 'Distance (cm)' }
     },
     {
       name: 'Pucks',
       title: 'Number of Pucks Outside of Goal Area',
       getValue: (scene) => scene.pucksOutsideGoalCount,
       reduce: (values) => values.reduce((acc, val) => acc + val, 0) / values.length,
-      aggregate: (values) => values.reduce((acc, val) => acc + val, 0) / values.length
+      aggregate: (values) => values.reduce((acc, val) => acc + val, 0) / values.length,
+      aggregationType: 'Average',
+      graphSettings: { ...benchGraphSettings, xTitle: 'Time (ms)', yTitle: 'Pucks' }
     }
   ],
-  maxTimeStep: 5000,
+  maxTimeStep: 25000,
   timeStep: 100
 };
 

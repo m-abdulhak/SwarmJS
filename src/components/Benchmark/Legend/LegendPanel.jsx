@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import LegendItem from './LegendItem';
 
-const LegendPanel = ({ algorithms }) => {
+const LegendPanel = ({ algorithms, aggregationType }) => {
   if (!algorithms) {
     return null;
   }
@@ -11,9 +11,10 @@ const LegendPanel = ({ algorithms }) => {
       <div>
         {algorithms.map((algorithm, index) => (
           <LegendItem
-            key={algorithm.name}
+            key={algorithm}
             index={index}
-            algorithmName={algorithm.name}
+            algorithmName={algorithm}
+            aggregationType={aggregationType}
           />
         ))}
       </div>
@@ -21,7 +22,8 @@ const LegendPanel = ({ algorithms }) => {
 };
 
 LegendPanel.propTypes = {
-  algorithms: PropTypes.array.isRequired
+  algorithms: PropTypes.array.isRequired,
+  aggregationType: PropTypes.string
 };
 
 export default LegendPanel;

@@ -36,6 +36,10 @@
     "webpack-dev-server": "^4.4.0"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-regular-svg-icons": "^5.15.4",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/react-fontawesome": "^0.1.16",
     "d3": "^7.1.1",
     "d3-delaunay": "^6.0.2",
     "lodash": "^4.17.21",
