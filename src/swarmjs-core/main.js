@@ -76,3 +76,5 @@ export const setSimulationSpeed = (speed) => scene.setSpeed(speed);
 export const getAvailableAlgorithms = () => (scene ? scene.availableAlgorithms : []);
 
 export const changeAlgorithm = (algorithm) => scene.changeAlgorithm(algorithm);
+
+export { default as GraphRenderer } from './benchmarking/graphRenderer';
