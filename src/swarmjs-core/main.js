@@ -78,3 +78,4 @@ export const getAvailableAlgorithms = () => (scene ? scene.availableAlgorithms :
 export const changeAlgorithm = (algorithm) => scene.changeAlgorithm(algorithm);
 
 export { default as GraphRenderer } from './benchmarking/graphRenderer';
+export { default as PerformanceTrakers } from './benchmarking/performanceTrackers';

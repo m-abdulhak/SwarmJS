@@ -7,6 +7,7 @@ import { availableSensors } from './swarmjs-core/robot/sensors/sensorManager';
 import { availableActuators } from './swarmjs-core/robot/actuators/actuatorsManager';
 import getRandCollFreePosGenerator from './swarmjs-core/utils/randomPositionsGenerator';
 import App from './components/App';
+import { PerformanceTrakers } from './swarmjs-core/main';
 
 const config = {
   env: {
@@ -85,19 +86,6 @@ const config = {
 // compoundBodyRobotSim.pucks.groups[0].radius = 7;
 // compoundBodyRobotSim.pucks.groups[1].radius = 7;
 
-const benchGraphSettings = {
-  width: 1400,
-  height: 600,
-  margin: {
-    top: 30,
-    right: 60,
-    bottom: 80,
-    left: 60
-  },
-  actualWidth: 1400 - 60 - 60,
-  actualHeight: 600 - 30 - 80
-};
-
 const benchmarkSettings = {
   configs: [
     {
@@ -126,29 +114,8 @@ const benchmarkSettings = {
     }
   ],
   trackers: [
-    {
-      name: 'Distance',
-      title: 'Total Pucks To Goal Distance',
-      getValue: (scene) => scene.distance,
-      // How to reduce values measured within a single time instance to a single value:
-      // 'first', 'last', 'average', 'sum', 'min', 'max', ...
-      reduce: (values) => values.reduce((acc, val) => acc + val, 0) / values.length,
-      // How to aggregate values corresponding to the same time instance across multiple runs,
-      // Used to generate a 'highlight' plot to show the trend across multiple runs:
-      // 'min', 'max', 'average', ...
-      aggregate: (values) => values.reduce((acc, val) => acc + val, 0) / values.length,
-      aggregationType: 'Average',
-      graphSettings: { ...benchGraphSettings, xTitle: 'Time (ms)', yTitle: 'Distance (cm)' }
-    },
-    {
-      name: 'Pucks',
-      title: 'Number of Pucks Outside of Goal Area',
-      getValue: (scene) => scene.pucksOutsideGoalCount,
-      reduce: (values) => values.reduce((acc, val) => acc + val, 0) / values.length,
-      aggregate: (values) => values.reduce((acc, val) => acc + val, 0) / values.length,
-      aggregationType: 'Average',
-      graphSettings: { ...benchGraphSettings, xTitle: 'Time (ms)', yTitle: 'Pucks' }
-    }
+    PerformanceTrakers.RobotToGoalDistanceTracker,
+    PerformanceTrakers.PucksOutsideGoalTracker
   ],
   maxTimeStep: 2000,
   timeStep: 100
