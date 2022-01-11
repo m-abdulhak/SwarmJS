@@ -6,7 +6,7 @@ import {
   startBench,
   stopBench,
   getBenchData
-} from './benchmark';
+} from './benchmarking/benchmark';
 
 // Global Map Memory
 const gMaps = [];

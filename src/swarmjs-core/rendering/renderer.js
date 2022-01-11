@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-use-before-define */
 import * as d3 from 'd3';
-import { addRenderables, setDynamicAttrs, getUniqueELementType } from './renderingHelpers';
+import { addRenderables, setDynamicAttrs, getUniqueELementType } from './renderingUtils';
 
 import { SceneRenderables } from '../scene';
 import { RobotRenderables } from '../robot/robot';

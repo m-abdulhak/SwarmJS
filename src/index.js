@@ -150,7 +150,7 @@ const benchmarkSettings = {
       graphSettings: { ...benchGraphSettings, xTitle: 'Time (ms)', yTitle: 'Pucks' }
     }
   ],
-  maxTimeStep: 25000,
+  maxTimeStep: 2000,
   timeStep: 100
 };
 
