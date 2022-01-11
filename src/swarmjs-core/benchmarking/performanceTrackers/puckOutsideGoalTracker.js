@@ -10,7 +10,13 @@ class PucksOutsideGoalTracker extends Tracker {
       { xTitle: 'Time (ms)', yTitle: 'Pucks' }
     );
 
-    this.getValue = (scene) => scene.pucksOutsideGoalCount;
+    this.getValue = (scene) => {
+      // Calculate the number of pucks outside of their goal area
+      const pucksOutsideGoalCount = scene.pucks
+        .map((p) => p.reachedGoal())
+        .reduce((acc, cur) => acc + (cur ? 0 : 1), 0);
+      return pucksOutsideGoalCount;
+    };
   }
 }
 

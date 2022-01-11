@@ -183,13 +183,13 @@ export default class Robot {
 
   // TODO: move to benchmark module
   getNeighborRobotsDistanceMeasurements(robots) {
-    let minDist = -1;
+    let minDist = null;
 
     robots.forEach((r) => {
-      const distance = getDistance(this.sensors.position, r.sensotValues.position);
+      const distance = getDistance(this.sensors.position, r.sensors.position);
 
       // If first or closest neighbor, set distances min distance
-      if (minDist === -1 || distance < minDist) {
+      if (minDist === null || distance < minDist) {
         minDist = distance;
       }
     });

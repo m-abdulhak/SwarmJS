@@ -176,56 +176,13 @@ export default class Scene {
     this.robots.forEach((r) => r.timeStep());
     this.pucks.forEach((p) => p.timeStep());
 
-    this.updatePucksOutsideOfGoalMesurements();
-    // this.updateMinRobotRobotDistMesurements();
-
     this.timeInstance = this.engine.timing.timestamp;
-
-    this.updateDistance();
 
     Engine.clear(this.engine);
   }
 
   get voronoiMesh() {
     return this.voronoi.render();
-  }
-
-  // TODO: Move to benchmark module
-  updateMinRobotRobotDistMesurements() {
-    let minDist = null;
-
-    this.robots.forEach((r, i) => {
-      const distMeasurements = r.getNeighborRobotsDistanceMeasurements(this.robots.slice(i + 1), 0);
-
-      if (minDist == null || distMeasurements.minDist < minDist) {
-        minDist = distMeasurements.minDistance;
-      }
-    });
-
-    if (this.minDistance == null || minDist < this.minDistance) {
-      this.minDistance = minDist;
-    }
-  }
-
-  // TODO: Move to benchmarking module
-  updatePucksOutsideOfGoalMesurements() {
-    // Calculate the number of pucks outside of their goal area
-    const pucksOutsideGoalCount = this.pucks
-      .map((p) => p.reachedGoal())
-      .reduce((acc, cur) => acc + (cur ? 0 : 1), 0);
-    this.pucksOutsideGoalCount = pucksOutsideGoalCount;
-  }
-
-  // TODO: Move to benchmarking module
-  updateDistance() {
-    let dis = 0;
-
-    this.pucks.forEach((p) => {
-      const distToGoal = p.getDistanceTo(p.groupGoal);
-      dis += distToGoal > p.goalReachedDist ? (distToGoal - p.goalReachedDist) / 100 : 0;
-    });
-
-    this.distance = dis;
   }
 
   getCurRobotsPos() {
