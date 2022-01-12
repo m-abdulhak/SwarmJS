@@ -2,18 +2,39 @@ import { Body, World, Bodies } from 'matter-js';
 
 import { getDistance } from '../utils/geometry';
 
-import updateVelocity from './controllers/velocityController';
-import updateWaypoint from './controllers/waypointController';
-import updateGoal from './controllers/goalController';
+import updateWaypoint from './controllers/waypointControllers/waypointController';
+import updateGoal from './controllers/goalControllers/goalController';
 
 import SensorManager from './sensors/sensorManager';
 import ActuatorManager from './actuators/actuatorsManager';
+
+const getController = (robot, controllerDef) => {
+  let Func = null;
+  let params = {};
+
+  if (controllerDef && typeof controllerDef === 'function') {
+    Func = controllerDef;
+  } else if (controllerDef?.controller && typeof controllerDef.controller === 'function') {
+    Func = controllerDef.controller();
+
+    if (controllerDef.params && typeof controllerDef.params === 'object') {
+      params = controllerDef.params;
+    }
+  }
+
+  if (!Func || typeof Func !== 'function') {
+    throw new Error('Invalid controller', controllerDef);
+  }
+
+  return new Func(robot, params);
+};
 
 export default class Robot {
   constructor(
     id,
     position,
     goal,
+    controllers,
     enabledSensors,
     enabledActuators,
     radius,
@@ -76,14 +97,14 @@ export default class Robot {
     this.actuatorManager = new ActuatorManager(this.scene, this, enabledActuators);
     this.actuators = this.actuatorManager.actuators;
 
-    // Velocities calculation strategy
-    this.updateVelocity = updateVelocity(this);
+    // Goal Planning
+    this.updateGoal = updateGoal(radius, envWidth, envHeight, this.sensors.envBounds, algorithm);
 
     // Motion Planning
     this.updateWaypoint = updateWaypoint(this);
 
-    // Goal Planning
-    this.updateGoal = updateGoal(radius, envWidth, envHeight, this.sensors.envBounds, algorithm);
+    // Velocities calculation
+    this.updateVelocity = getController(this, controllers.velocity);
 
     this.sense = (sensorName, params) => this.sensorManager.sense(sensorName, params);
 
@@ -122,7 +143,7 @@ export default class Robot {
     this.setWaypoint(newWaypoint);
 
     // Update velocities, according to new waypoint
-    const velocities = this.updateVelocity();
+    const velocities = this.updateVelocity(newWaypoint);
     this.setVelocities(velocities);
   }
 

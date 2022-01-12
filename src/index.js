@@ -7,7 +7,7 @@ import { availableSensors } from './swarmjs-core/robot/sensors/sensorManager';
 import { availableActuators } from './swarmjs-core/robot/actuators/actuatorsManager';
 import getRandCollFreePosGenerator from './swarmjs-core/utils/randomPositionsGenerator';
 import App from './components/App';
-import { PerformanceTrakers } from './swarmjs-core/main';
+import { PerformanceTrakers, Controllers } from './swarmjs-core/main';
 
 const config = {
   env: {
@@ -18,6 +18,10 @@ const config = {
   robots: {
     count: 20,
     radius: 7,
+    controllers: {
+      // velocity: Controllers.velocity.omniDirVelocityController
+      velocity: Controllers.velocity.diffVelocityController
+    },
     sensors: Object.values(availableSensors),
     actuators: Object.values(availableActuators)
   },

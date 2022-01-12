@@ -7,7 +7,7 @@ import {
   shiftPointOfLineSegInDirOfPerpendicularBisector,
   pointIsInsidePolygon,
   closestPointInPolygonToPoint
-} from '../../utils/geometry';
+} from '../../../utils/geometry';
 
 // Change Options Based on algorithm
 // TODO: Change how this is handled, setting options with a string is not ideal

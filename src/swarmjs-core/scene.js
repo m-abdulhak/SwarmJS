@@ -56,6 +56,7 @@ export default class Scene {
     this.robots = this.initializeRobotsRange(
       this.numOfRobots,
       this.robotRadius,
+      robotsConfig.controllers,
       robotsConfig.sensors,
       robotsConfig.actuators,
       this.width,
@@ -193,11 +194,14 @@ export default class Scene {
     return this.robots.map((r) => r.goal);
   }
 
-  initializeRobotsRange(numOfRobots, radius, sensors, actuators, envWidth, envHeight, algorithm) {
+  initializeRobotsRange(
+    numOfRobots, radius, controllers, sensors, actuators, envWidth, envHeight, algorithm
+  ) {
     return d3.range(numOfRobots)
       .map((i) => new Robot(i,
         this.getPos(),
         this.getPos(),
+        controllers,
         sensors,
         actuators,
         radius,
