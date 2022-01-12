@@ -10,7 +10,8 @@ import {
   pointIsInsidePolygon
 } from '../../../utils/geometry';
 
-export default function updateWaypoint(robot) {
+// eslint-disable-next-line no-unused-vars
+export default function bvcWaypointController(robot, params) {
   // Initialize deadlock detection mechanisms
   const deadLockDetectionDuration = 5;
   let stuckAtWaypointDuration = 0;
@@ -273,17 +274,17 @@ export default function updateWaypoint(robot) {
     return null;
   }
 
-  return () => {
-    const cell = robot.sensors.BVC;
+  return (goal, sensors) => {
+    const cell = sensors.BVC;
     // If cell is undefined (shouldn't happen in collision-free configurations)
     // => set localgoal = goal
     if (cell == null || cell.length < 2) {
-      return robot.goal;
+      return goal;
     }
 
     // If the goal is within the Buffered Voronoi cell => set localgoal = goal
-    if (cellContains(cell, robot.goal)) {
-      return robot.goal;
+    if (cellContains(cell, goal)) {
+      return goal;
     }
 
     // If deadlocked or deadlock is expected or currently recovering from deadlock
@@ -294,6 +295,6 @@ export default function updateWaypoint(robot) {
     }
 
     // Default behavior: set local goal as the point in cell that is closest to the goal
-    return findPointInCellClosestToGoal(cell, robot.goal);
+    return findPointInCellClosestToGoal(cell, goal);
   };
 }

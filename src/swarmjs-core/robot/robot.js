@@ -2,8 +2,6 @@ import { Body, World, Bodies } from 'matter-js';
 
 import { getDistance } from '../utils/geometry';
 
-import updateWaypoint from './controllers/waypointControllers/waypointController';
-
 import SensorManager from './sensors/sensorManager';
 import ActuatorManager from './actuators/actuatorsManager';
 
@@ -99,7 +97,7 @@ export default class Robot {
     this.updateGoal = getController(this, controllers.goal);
 
     // Motion Planning
-    this.updateWaypoint = updateWaypoint(this);
+    this.updateWaypoint = getController(this, controllers.waypoint);
 
     // Velocities calculation
     this.updateVelocity = getController(this, controllers.velocity);

@@ -8,6 +8,7 @@ import { availableActuators } from './swarmjs-core/robot/actuators/actuatorsMana
 import getRandCollFreePosGenerator from './swarmjs-core/utils/randomPositionsGenerator';
 import App from './components/App';
 import { PerformanceTrakers, Controllers } from './swarmjs-core/main';
+import controllers from './swarmjs-core/robot/controllers';
 
 const config = {
   env: {
@@ -26,6 +27,7 @@ const config = {
           environmentOrbit: true
         }
       },
+      waypoint: controllers.waypoint.bvcWaypointController,
       // velocity: Controllers.velocity.omniDirVelocityController
       velocity: Controllers.velocity.diffVelocityController
     },
