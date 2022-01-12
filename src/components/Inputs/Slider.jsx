@@ -2,13 +2,12 @@ import React from 'react';
 import propTypes from 'prop-types';
 
 const Slider = ({ min, max, step, val, onChange }) => (
-    < input
+    <input
       type="range"
       min={min}
       max={max}
       value={val}
       step={step}
-      className="slider input"
       onChange={(event) => onChange(event.target.value)}
     />
 );

@@ -23,9 +23,9 @@ const Benchmark = ({ benchSettings, reset, data }) => {
 
   return (
     <div id="graph-list" style={{ position: 'absolute', left: '10px' }}>
-      <div className="ui-section">
-        <input type="button" value="Start Benchmark" className="input-button input small-btn" id="start-benchmark-button" style={{ width: '50%' }} onClick={() => startBenchmark(benchSettings, reset)}/>
-        <input type="button" value="Stop Benchmark" className="input-button input small-btn" id="stop-benchmark-button" style={{ width: '50%' }} onClick={() => stopBenchmark()}/>
+      <div>
+        <input type="button" value="Start Benchmark" style={{ width: '50%' }} onClick={() => startBenchmark(benchSettings, reset)}/>
+        <input type="button" value="Stop Benchmark" style={{ width: '50%' }} onClick={() => stopBenchmark()}/>
       </div>
       {graphsContainers}
     </div>
