@@ -16,7 +16,7 @@
 */
 
 import Sensor from '../sensor';
-import { sensorSamplingTypes, availableSensors } from '../sensorManager';
+import { sensorSamplingTypes, AvailableSensors } from '../sensorManager';
 
 const name = 'position';
 
@@ -24,7 +24,7 @@ const name = 'position';
 class PositionSensor extends Sensor {
   constructor(robot, scene) {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
-    this.dependencies = [availableSensors.prevPosition];
+    this.dependencies = [AvailableSensors.prevPosition];
     this.value = { x: null, y: null };
   }
 
@@ -40,7 +40,7 @@ class PositionSensor extends Sensor {
 // Function based sensor implementation
 // const PositionSensor = (robot) => {
 //   const type = sensorSamplingTypes.onUpdate;
-//   const dependencies = [availableSensors.prevPosition];
+//   const dependencies = [AvailableSensors.prevPosition];
 
 //   // private
 //   const { body } = robot;

@@ -1,7 +1,7 @@
 // Module to generate random initial positions for robots and pucks
 // TODO: replace with a js generator
 
-import { getDistance } from './geometry';
+import { getDistance } from '../geometry';
 
 const positions = [];
 

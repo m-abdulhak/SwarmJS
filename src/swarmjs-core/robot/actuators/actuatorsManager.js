@@ -6,7 +6,7 @@ const availableActuatorsDefitions = [
 
 // Actuators are stored in this object allowing other modules to easily reference them
 // e.g. in config when defining the enabled sensors, or in other sensors to define a dependency
-export const availableActuators = availableActuatorsDefitions.reduce((acc, actDef) => {
+export const AvailableActuators = availableActuatorsDefitions.reduce((acc, actDef) => {
   acc[actDef.name] = actDef;
   return acc;
 }, {});

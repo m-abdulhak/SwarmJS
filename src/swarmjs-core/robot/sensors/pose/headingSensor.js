@@ -1,5 +1,5 @@
 import Sensor from '../sensor';
-import { sensorSamplingTypes, availableSensors } from '../sensorManager';
+import { sensorSamplingTypes, AvailableSensors } from '../sensorManager';
 import { getAbsolutePointFromLengthAndAngle } from '../../../utils/geometry';
 
 const name = 'heading';
@@ -8,8 +8,8 @@ class HeadingSensor extends Sensor {
   constructor(robot, scene) {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
     this.dependencies = [
-      availableSensors.position,
-      availableSensors.orientation
+      AvailableSensors.position,
+      AvailableSensors.orientation
     ];
     this.value = { x: null, y: null };
   }

@@ -1,5 +1,5 @@
 import Sensor from '../sensor';
-import { sensorSamplingTypes, availableSensors } from '../sensorManager';
+import { sensorSamplingTypes, AvailableSensors } from '../sensorManager';
 
 const name = 'neighbors';
 
@@ -22,7 +22,7 @@ const getNeighbors = (scene, robotId) => {
 class NeighborsSensor extends Sensor {
   constructor(robot, scene) {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
-    this.dependencies = [availableSensors.position];
+    this.dependencies = [AvailableSensors.position];
     this.value = [];
   }
 

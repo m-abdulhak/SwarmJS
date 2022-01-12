@@ -73,6 +73,9 @@ export const togglePauseSimulation = () => scene.togglePause();
 
 export const setSimulationSpeed = (speed) => scene.setSpeed(speed);
 
+export { AvailableActuators } from './robot/actuators/actuatorsManager';
+export { AvailableSensors } from './robot/sensors/sensorManager';
+export { default as PositionsGenerator } from './utils/positionsGenerators';
 export { default as GraphRenderer } from './benchmarking/graphRenderer';
 export { default as PerformanceTrakers } from './benchmarking/performanceTrackers';
 export { default as Controllers } from './robot/controllers';

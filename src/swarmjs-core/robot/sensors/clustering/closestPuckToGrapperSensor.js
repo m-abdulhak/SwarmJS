@@ -1,5 +1,5 @@
 import Sensor from '../sensor';
-import { sensorSamplingTypes, availableSensors } from '../sensorManager';
+import { sensorSamplingTypes, AvailableSensors } from '../sensorManager';
 import { getDistance } from '../../../utils/geometry';
 
 const name = 'closestPuckToGrapper';
@@ -8,8 +8,8 @@ class ClosestPuckToGrapper extends Sensor {
   constructor(robot, scene) {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
     this.dependencies = [
-      availableSensors.heading,
-      availableSensors.pucksNearGrapper
+      AvailableSensors.heading,
+      AvailableSensors.pucksNearGrapper
     ];
     this.value = [];
   }

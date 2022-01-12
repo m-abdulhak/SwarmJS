@@ -3,12 +3,15 @@ import './stylesheets/styles.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { availableSensors } from './swarmjs-core/robot/sensors/sensorManager';
-import { availableActuators } from './swarmjs-core/robot/actuators/actuatorsManager';
-import getRandCollFreePosGenerator from './swarmjs-core/utils/randomPositionsGenerator';
+import {
+  AvailableActuators,
+  AvailableSensors,
+  PositionsGenerator,
+  PerformanceTrakers,
+  Controllers
+} from './swarmjs-core/main';
+
 import App from './components/App';
-import { PerformanceTrakers, Controllers } from './swarmjs-core/main';
-import controllers from './swarmjs-core/robot/controllers';
 
 const config = {
   env: {
@@ -27,12 +30,12 @@ const config = {
           environmentOrbit: true
         }
       },
-      waypoint: controllers.waypoint.bvcWaypointController,
+      waypoint: Controllers.waypoint.bvcWaypointController,
       // velocity: Controllers.velocity.omniDirVelocityController
       velocity: Controllers.velocity.diffVelocityController
     },
-    sensors: Object.values(availableSensors),
-    actuators: Object.values(availableActuators)
+    sensors: Object.values(AvailableSensors),
+    actuators: Object.values(AvailableActuators)
   },
   pucks: {
     groups: [
@@ -90,7 +93,7 @@ const config = {
       height: 50
     }
   ],
-  positionsGenerator: getRandCollFreePosGenerator
+  positionsGenerator: PositionsGenerator.randomCollisionFree
 };
 
 // // Configs for compound body example
@@ -99,6 +102,8 @@ const config = {
 // compoundBodyRobotSim.pucks.groups[0].radius = 7;
 // compoundBodyRobotSim.pucks.groups[1].radius = 7;
 
+// TODO: Change how the configs are defined so that only the chages from main config  need
+// to be defined and the rest can be defaulted without explicitly using the spread operator
 const benchmarkSettings = {
   configs: [
     {

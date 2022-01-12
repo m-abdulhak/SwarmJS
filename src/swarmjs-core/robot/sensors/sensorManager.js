@@ -48,7 +48,7 @@ const availableSensorDefitions = [
 
 // Sensors are stored in this object allowing other modules to easily reference them
 // e.g. in config when defining the enabled sensors, or in other sensors to define a dependency
-export const availableSensors = availableSensorDefitions.reduce((acc, sensorDef) => {
+export const AvailableSensors = availableSensorDefitions.reduce((acc, sensorDef) => {
   acc[sensorDef.name] = sensorDef;
   return acc;
 }, {});

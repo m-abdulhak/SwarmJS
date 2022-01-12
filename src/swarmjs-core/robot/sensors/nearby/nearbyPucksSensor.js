@@ -1,12 +1,12 @@
 import Sensor from '../sensor';
-import { sensorSamplingTypes, availableSensors } from '../sensorManager';
+import { sensorSamplingTypes, AvailableSensors } from '../sensorManager';
 
 const name = 'nearbyPucks';
 
 class NearbyPucksSensor extends Sensor {
   constructor(robot, scene) {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
-    this.dependencies = [availableSensors.position];
+    this.dependencies = [AvailableSensors.position];
     this.value = [];
 
     this.MAX_NEARBY_DISTANCE = robot.radius * 20;
