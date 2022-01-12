@@ -9,8 +9,6 @@ const Options = ({
   reset,
   renderingElements,
   setElementEnabled,
-  availableAlgorithms,
-  changeAlgorithm,
   time
 }) => (
   <div>
@@ -36,14 +34,6 @@ const Options = ({
         </div>
       ))}
     </div>
-    <div>
-      <label>Algorithm:</label>
-      <select id="algo-select" name="deadlock" defaultValue={availableAlgorithms[0].name} onChange={(event) => changeAlgorithm(event.target.value)}>
-        {availableAlgorithms.map((algorithm, index) => (
-          <option key={index} value={algorithm.id}>{algorithm.name}</option>
-        ))}
-      </select>
-    </div>
   </div>
 );
 
@@ -55,8 +45,6 @@ Options.propTypes = {
   reset: propTypes.func.isRequired,
   renderingElements: propTypes.array.isRequired,
   setElementEnabled: propTypes.func.isRequired,
-  availableAlgorithms: propTypes.array.isRequired,
-  changeAlgorithm: propTypes.func.isRequired,
   time: propTypes.number
 };
 

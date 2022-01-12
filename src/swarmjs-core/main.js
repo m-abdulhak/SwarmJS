@@ -73,10 +73,6 @@ export const togglePauseSimulation = () => scene.togglePause();
 
 export const setSimulationSpeed = (speed) => scene.setSpeed(speed);
 
-export const getAvailableAlgorithms = () => (scene ? scene.availableAlgorithms : []);
-
-export const changeAlgorithm = (algorithm) => scene.changeAlgorithm(algorithm);
-
 export { default as GraphRenderer } from './benchmarking/graphRenderer';
 export { default as PerformanceTrakers } from './benchmarking/performanceTrackers';
 export { default as Controllers } from './robot/controllers';

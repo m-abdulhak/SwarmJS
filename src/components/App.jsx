@@ -7,11 +7,9 @@ import Benchmark from './Benchmark';
 import {
   initSim,
   simulationIsInitialized,
-  getAvailableAlgorithms,
   resetSimulation,
   togglePauseSimulation,
-  setSimulationSpeed,
-  changeAlgorithm
+  setSimulationSpeed
 } from '../swarmjs-core/main';
 
 import {
@@ -66,8 +64,6 @@ const App = ({ config, benchSettings }) => {
       reset={reset}
       renderingElements = {getRenderingElements()}
       setElementEnabled={setElementEnabled}
-      availableAlgorithms={getAvailableAlgorithms()}
-      changeAlgorithm={changeAlgorithm}
       time={time}
     />
   ) : null;

@@ -9,22 +9,14 @@ import {
   closestPointInPolygonToPoint
 } from '../../../utils/geometry';
 
-// Change Options Based on algorithm
-// TODO: Change how this is handled, setting options with a string is not ideal
-//       maybe create a controller for each algorithm and pass controller from config
-//       or export possible options and set the desired ones in the config
-const availableAlgorithms = [
-  {
-    name: 'Proposed Algorithm',
-    limitPuckSelectionToBVC: true,
-    environmentOrbit: true
-  },
-  {
-    name: 'Baseline Algorithm',
-    limitPuckSelectionToBVC: true,
-    environmentOrbit: false
-  }
-];
+// Available Options that can be passed to the controller from config
+// limitPuckSelectionToBVC: true / false,
+// environmentOrbit: true / false
+
+const defaultOptions = {
+  limitPuckSelectionToBVC: true,
+  environmentOrbit: true
+};
 
 const pointIsReachableInEnvBounds = (env, goalPoint, radius) => {
   let reachable = true;
@@ -43,10 +35,10 @@ const pointIsReachableInEnvBounds = (env, goalPoint, radius) => {
   return reachable;
 };
 
-export default function updateGoal(radius, envWidth, envHeight, envBounds, algorithm) {
-  const algorithmOptions = algorithm
-    ? availableAlgorithms.find((a) => a.name === algorithm)
-    : availableAlgorithms[0];
+export default function sortingGoalController(robot, params) {
+  const algorithmOptions = { ...defaultOptions, ...params };
+  const { radius, envWidth, envHeight } = robot;
+  const envBounds = robot.sensors.envBounds;
 
   let lastPosition;
   let durationAtCurPosition = 0;

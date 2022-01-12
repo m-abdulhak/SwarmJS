@@ -112,29 +112,6 @@ export default class Scene {
     // Simulation Speed
     this.timeDelta = 16.666;
 
-    // Benchmark Data :
-    // Minimum Robot-Robot Distanc
-    this.minDistance = null;
-    // Total Puck-Goal Distances
-    this.distance = null;
-    // Pucks Outside Goal Count;
-    this.pucksOutsideGoalCount = null;
-
-    // Change Options Based on algorithm
-    this.availableAlgorithms = [
-      {
-        name: 'Proposed Algorithm',
-        testEnabled: true
-      },
-      {
-        name: 'Baseline Algorithm',
-        testEnabled: false
-      }
-    ];
-    this.algorithmOptions = algorithm
-      ? this.availableAlgorithms.find((a) => a.name === algorithm)
-      : this.availableAlgorithms[0];
-
     this.paused = false;
 
     this.togglePause = () => {
@@ -153,16 +130,10 @@ export default class Scene {
       this.robots.forEach((r) => { r.velocityScale = scale; });
     };
 
-    this.changeAlgorithm = (newAlgorithm) => {
-      this.algorithmOptions = this.availableAlgorithms.find((a) => a.name === newAlgorithm);
-      this.robots.forEach((r) => { r.changeAlgorithm(newAlgorithm); });
-    };
-
     this.togglePause.bind(this);
     this.pause.bind(this);
     this.unpause.bind(this);
     this.setSpeed.bind(this);
-    this.changeAlgorithm.bind(this);
 
     this.setSpeed(envConfig.speed);
   }

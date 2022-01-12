@@ -3,7 +3,6 @@ import { Body, World, Bodies } from 'matter-js';
 import { getDistance } from '../utils/geometry';
 
 import updateWaypoint from './controllers/waypointControllers/waypointController';
-import updateGoal from './controllers/goalControllers/goalController';
 
 import SensorManager from './sensors/sensorManager';
 import ActuatorManager from './actuators/actuatorsManager';
@@ -15,7 +14,7 @@ const getController = (robot, controllerDef) => {
   if (controllerDef && typeof controllerDef === 'function') {
     Func = controllerDef;
   } else if (controllerDef?.controller && typeof controllerDef.controller === 'function') {
-    Func = controllerDef.controller();
+    Func = controllerDef.controller;
 
     if (controllerDef.params && typeof controllerDef.params === 'object') {
       params = controllerDef.params;
@@ -40,8 +39,7 @@ export default class Robot {
     radius,
     envWidth,
     envHeight,
-    scene,
-    algorithm
+    scene
   ) {
     // Configs
     this.DeadLockRecovery = {
@@ -98,7 +96,7 @@ export default class Robot {
     this.actuators = this.actuatorManager.actuators;
 
     // Goal Planning
-    this.updateGoal = updateGoal(radius, envWidth, envHeight, this.sensors.envBounds, algorithm);
+    this.updateGoal = getController(this, controllers.goal);
 
     // Motion Planning
     this.updateWaypoint = updateWaypoint(this);
@@ -108,12 +106,7 @@ export default class Robot {
 
     this.sense = (sensorName, params) => this.sensorManager.sense(sensorName, params);
 
-    this.changeAlgorithm = (newAlgorithm) => {
-      this.algorithmOptions = this.availableAlgorithms.find((a) => a.name === newAlgorithm);
-    };
-
     this.sense.bind(this);
-    this.changeAlgorithm.bind(this);
   }
 
   get sensors() {

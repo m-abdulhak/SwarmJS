@@ -19,6 +19,13 @@ const config = {
     count: 20,
     radius: 7,
     controllers: {
+      goal: {
+        controller: Controllers.goal.sortingGoalController,
+        params: {
+          limitPuckSelectionToBVC: true,
+          environmentOrbit: true
+        }
+      },
       // velocity: Controllers.velocity.omniDirVelocityController
       velocity: Controllers.velocity.diffVelocityController
     },
