@@ -93,6 +93,11 @@ export default class Robot {
     this.actuatorManager = new ActuatorManager(this.scene, this, enabledActuators);
     this.actuators = this.actuatorManager.actuators;
 
+    // Actuators Controller (actuator controller is optional)
+    if (controllers.actuators) {
+      this.actuate = getController(this, controllers.actuators);
+    }
+
     // Goal Planning
     this.updateGoal = getController(this, controllers.goal);
 
@@ -134,8 +139,13 @@ export default class Robot {
     this.setWaypoint(newWaypoint);
 
     // Update velocities, according to new waypoint
-    const velocities = this.updateVelocity(newWaypoint);
+    const velocities = this.updateVelocity(newWaypoint, this.sensors, this.actuators);
     this.setVelocities(velocities);
+
+    // Actuate
+    if (this.actuate && typeof this.actuate === 'function') {
+      this.actuate(this.sensors, this.actuators);
+    }
   }
 
   setVelocities({ linearVel, angularVel }) {
@@ -607,6 +617,62 @@ const sensorsRenderables = [
       fill: 'none',
       'fill-opacity': 0,
       stroke: 'green',
+      'stroke-width': 2,
+      'stroke-opacity': 1
+    }
+  },
+  {
+    type: 'Sensor',
+    svgClass: 'wall-sensor',
+    desc: 'Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'radius',
+        modifier: (val) => val * 0.4
+      },
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.walls',
+        modifier: (val) => (val.includes('left') ? 'green' : 'red')
+      },
+      cx: { prop: 'sensors.directions.left.x' },
+      cy: { prop: 'sensors.directions.left.y' }
+    },
+    styles: {
+      fill: 'none',
+      'fill-opacity': 0,
+      'stroke-width': 2,
+      'stroke-opacity': 1
+    }
+  },
+  {
+    type: 'Sensor',
+    svgClass: 'wall-sensor',
+    desc: 'Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'radius',
+        modifier: (val) => val * 0.4
+      },
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.walls',
+        modifier: (val) => (val.includes('right') ? 'green' : 'red')
+      },
+      cx: { prop: 'sensors.directions.right.x' },
+      cy: { prop: 'sensors.directions.right.y' }
+    },
+    styles: {
+      fill: 'none',
+      'fill-opacity': 0,
       'stroke-width': 2,
       'stroke-opacity': 1
     }

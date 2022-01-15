@@ -13,7 +13,53 @@ import {
 
 import App from './components/App';
 
-const config = {
+const exampleSortingConfig = {
+  env: {
+    width: 800,
+    height: 500,
+    speed: 15
+  },
+  robots: {
+    count: 10,
+    radius: 10,
+    controllers: {
+      actuators: Controllers.actuators.exampleSortingActuatorController,
+      goal: Controllers.goal.exampleSortingGoalController,
+      waypoint: Controllers.waypoint.dummyWaypointController,
+      // velocity: Controllers.velocity.omniDirVelocityController
+      velocity: {
+        controller: Controllers.velocity.diffVelocityController,
+        params: { angularVelocityScale: 0.001 }
+      }
+    },
+    sensors: Object.values(AvailableSensors),
+    actuators: Object.values(AvailableActuators)
+  },
+  pucks: {
+    groups: [
+      {
+        id: 0,
+        count: 20,
+        radius: 7,
+        goal: { x: 150, y: 250 },
+        goalRadius: 7 * 12,
+        color: 'red'
+      },
+      {
+        id: 1,
+        count: 20,
+        radius: 7,
+        goal: { x: 650, y: 375 },
+        goalRadius: 7 * 12,
+        color: 'blue'
+      }
+    ]
+  },
+  objects: [],
+  positionsGenerator: PositionsGenerator.randomCollisionFree
+};
+
+const mainConfig = {
   env: {
     width: 800,
     height: 500,
@@ -32,7 +78,10 @@ const config = {
       },
       waypoint: Controllers.waypoint.bvcWaypointController,
       // velocity: Controllers.velocity.omniDirVelocityController
-      velocity: Controllers.velocity.diffVelocityController
+      velocity: {
+        controller: Controllers.velocity.diffVelocityController,
+        params: { angularVelocityScale: 0.01 }
+      }
     },
     sensors: Object.values(AvailableSensors),
     actuators: Object.values(AvailableActuators)
@@ -44,6 +93,7 @@ const config = {
         count: 20,
         radius: 10,
         goal: { x: 150, y: 250 },
+        goalRadius: 7 * 12,
         color: 'red'
       },
       {
@@ -51,6 +101,7 @@ const config = {
         count: 20,
         radius: 10,
         goal: { x: 650, y: 375 },
+        goalRadius: 7 * 12,
         color: 'blue'
       }
     ]
@@ -95,6 +146,8 @@ const config = {
   ],
   positionsGenerator: PositionsGenerator.randomCollisionFree
 };
+
+const config = exampleSortingConfig;
 
 // // Configs for compound body example
 // const compoundBodyRobotSim = config;

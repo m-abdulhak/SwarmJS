@@ -2,13 +2,14 @@ import { World, Bodies, Body } from 'matter-js';
 import { getDistance } from './utils/geometry';
 
 export default class Puck {
-  constructor(id, position, goal, radius, envWidth, envHeight, scene, color, map) {
+  constructor(id, position, radius, goal, goalRadius, envWidth, envHeight, scene, color, map) {
     this.id = id;
     this.prevPosition = position;
     this.velocityScale = 1;
     this.groupGoal = { ...goal };
     this.goal = goal;
     this.radius = radius;
+    this.goalRadius = goalRadius;
     this.color = color;
     this.envWidth = envWidth;
     this.envHeight = envHeight;
@@ -35,8 +36,8 @@ export default class Puck {
 
     // Distances Configurations
     // this.blockedDistance = this.radius * 1.5;
-    this.goalReachedDist = this.radius * 12;
-    this.deepInGoalDist = this.radius * 8;
+    this.goalReachedDist = this.goalRadius;
+    this.deepInGoalDist = 2 * (this.goalRadius / 3);
   }
 
   get position() {
@@ -123,8 +124,7 @@ export const PuckRenderables = [
     shape: 'circle',
     staticAttrs: {
       r: {
-        prop: 'radius',
-        modifier: (val) => val * 12
+        prop: 'goalRadius'
       },
       fill: { prop: 'color' },
       cx: { prop: 'goal.x' },

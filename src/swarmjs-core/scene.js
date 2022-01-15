@@ -1,12 +1,13 @@
 /* eslint-disable no-param-reassign */
 import * as d3 from 'd3';
-import { Engine, World, Bodies } from 'matter-js';
+import { Engine, World } from 'matter-js';
 import { Delaunay } from 'd3-delaunay';
 
 import Robot from './robot/robot';
 import Puck from './puck';
 import generateStaticObject from './staticObjects/staticObjectFactory';
 import { mapSceneToArr, getPucksGoalMap } from './distanceTransform/globalPlanning';
+import { getEnvBoundaryObjects } from './utils/matter';
 
 export default class Scene {
   constructor(
@@ -36,7 +37,8 @@ export default class Scene {
     this.engine.velocityIterations = 10;
 
     // Add Environment Boundries To World
-    this.addEnvBoundryObjects(this.width, this.height);
+    this.envBoundaryObjects = getEnvBoundaryObjects(this.width, this.height);
+    World.add(this.world, this.envBoundaryObjects);
 
     // Add Static Obstacles To World
     this.staticObjects = staticObjectsDefinitions.map(
@@ -192,8 +194,9 @@ export default class Scene {
           .map((i) => new Puck(
             i + id,
             this.getPos(),
-            puckGroup.goal,
             puckGroup.radius,
+            puckGroup.goal,
+            puckGroup.goalRadius,
             envWidth,
             envHeight,
             this,
@@ -206,40 +209,6 @@ export default class Scene {
     });
 
     return pucks;
-  }
-
-  addEnvBoundryObjects(envWidth, envHeight) {
-    World.add(this.world, [
-      // walls
-      Bodies.rectangle(
-        envWidth / 2,
-        -10,
-        envWidth,
-        20,
-        { isStatic: true }
-      ),
-      Bodies.rectangle(
-        envWidth / 2,
-        envHeight + 10,
-        envWidth,
-        20,
-        { isStatic: true }
-      ),
-      Bodies.rectangle(
-        -10,
-        envHeight / 2,
-        20,
-        envHeight,
-        { isStatic: true }
-      ),
-      Bodies.rectangle(
-        envWidth + 10,
-        envHeight / 2,
-        20,
-        envHeight,
-        { isStatic: true }
-      )
-    ]);
   }
 }
 

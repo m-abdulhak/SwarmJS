@@ -23,8 +23,9 @@ export function angleBetweenThreePointsRad(A, B, C) {
   const AB = Math.sqrt((B.x - A.x) ** 2 + (B.y - A.y) ** 2);
   const BC = Math.sqrt((B.x - C.x) ** 2 + (B.y - C.y) ** 2);
   const AC = Math.sqrt((C.x - A.x) ** 2 + (C.y - A.y) ** 2);
+  const val = (BC * BC + AB * AB - AC * AC) / (2 * BC * AB);
 
-  return Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
+  return Math.acos(Math.min(1, Math.max(-1, val)));
 }
 
 export function angleBetweenThreePointsDeg(A, B, C) {
