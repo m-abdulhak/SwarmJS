@@ -120,7 +120,8 @@ const benchmarkConfig = {
   ],
   trackers: [
     PerformanceTrakers.RobotToGoalDistanceTracker,
-    PerformanceTrakers.PucksOutsideGoalTracker
+    PerformanceTrakers.PucksOutsideGoalTracker,
+    PerformanceTrakers.MinRobotRobotDistanceTracker
   ],
   maxTimeStep: 50000,
   timeStep: 1000

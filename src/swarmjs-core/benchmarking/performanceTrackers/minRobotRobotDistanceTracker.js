@@ -14,8 +14,13 @@ class MinRobotRobotDistanceTracker extends Tracker {
       let minDist = null;
 
       scene.robots.forEach((r, i) => {
-        const distMeasurements = r
-          .getNeighborRobotsDistanceMeasurements(scene.robots.slice(i + 1), 0);
+        const remainingRobots = scene.robots.slice(i + 1);
+
+        if (!remainingRobots || remainingRobots.length === 0) {
+          return;
+        }
+
+        const distMeasurements = r.getNeighborRobotsDistanceMeasurements(remainingRobots, 0);
 
         if (minDist == null || distMeasurements.minDistance < minDist) {
           minDist = distMeasurements.minDistance;
