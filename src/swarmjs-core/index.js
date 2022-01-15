@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable no-restricted-globals */
 import Scene from './scene';
 import {
   updateBench,
@@ -79,3 +78,4 @@ export { default as PositionsGenerator } from './utils/positionsGenerators';
 export { default as GraphRenderer } from './benchmarking/graphRenderer';
 export { default as PerformanceTrakers } from './benchmarking/performanceTrackers';
 export { default as Controllers } from './robot/controllers';
+export { default as exampleConfigs } from './exampleConfigs';

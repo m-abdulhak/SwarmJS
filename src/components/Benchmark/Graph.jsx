@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { GraphRenderer } from '../../swarmjs-core/main';
+import { GraphRenderer } from '../../swarmjs-core';
 
 const Graph = ({ graphSettings, data, aggData }) => {
   const [renderer, setRenderer] = React.useState(null);

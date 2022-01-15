@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {
   startBenchmark,
   stopBenchmark
-} from '../../swarmjs-core/main';
+} from '../../swarmjs-core';
 
 import GraphContainer from './GraphContainer';
 

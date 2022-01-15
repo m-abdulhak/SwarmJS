@@ -10,7 +10,7 @@ import {
   resetSimulation,
   togglePauseSimulation,
   setSimulationSpeed
-} from '../swarmjs-core/main';
+} from '../swarmjs-core';
 
 import {
   renderScene,

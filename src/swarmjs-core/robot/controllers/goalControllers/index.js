@@ -1,7 +1,7 @@
 import sortingGoalController from './sortingGoalController';
-import exampleSortingGoalController from './exampleSortingGoalController';
+import simpleSortingGoalController from './simpleSortingGoalController';
 
 export default {
   sortingGoalController,
-  exampleSortingGoalController
+  simpleSortingGoalController
 };

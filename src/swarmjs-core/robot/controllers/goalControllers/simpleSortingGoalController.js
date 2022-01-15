@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable prefer-const */
-export default function exampleSortingGoalController(robot, params) {
+export default function simpleSortingGoalController(robot, params) {
   const getGoalFromDir = (position, dir, multi) => {
     const vector = { x: dir.x - position.x, y: dir.y - position.y };
     const goal = { x: position.x + vector.x * multi, y: position.y + vector.y * multi };

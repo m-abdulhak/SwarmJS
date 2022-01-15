@@ -1,5 +1,5 @@
-import exampleSortingActuatorController from './exampleSortingActuatorController';
+import simpleSortingActuatorController from './simpleSortingActuatorController';
 
 export default {
-  exampleSortingActuatorController
+  simpleSortingActuatorController
 };
