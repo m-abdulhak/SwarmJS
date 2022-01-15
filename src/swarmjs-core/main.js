@@ -60,9 +60,9 @@ export const resetSimulation = (config) => {
   );
 };
 
-export const startBenchmark = (benchConfig, resetSimCB) => {
+export const startBenchmark = (simConfig, benchConfig, resetSimCB) => {
   const resetSimFunc = resetSimCB && typeof resetSimCB === 'function' ? resetSimCB : resetSimulation;
-  startBench(benchConfig, resetSimFunc);
+  startBench(simConfig, benchConfig, resetSimFunc);
 };
 
 export const stopBenchmark = () => stopBench();

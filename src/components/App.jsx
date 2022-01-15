@@ -69,7 +69,7 @@ const App = ({ config, benchSettings }) => {
   ) : null;
 
   const benchElem = initialized ? (
-    <Benchmark benchSettings={benchSettings} reset={reset} data={benchmarkData}/>
+    <Benchmark simConfig={config} benchSettings={benchSettings} reset={reset} data={benchmarkData}/>
   ) : null;
 
   return (

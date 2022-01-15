@@ -1,4 +1,4 @@
-import { initSvgGraph, shouldUpdatePlots, updateScales, updateSvgGraph } from './graphRenderingUtils';
+import { initSvgGraph, countValidDataSets, updateScales, updateSvgGraph } from './graphRenderingUtils';
 
 export default class GraphRenderer {
   constructor(svg, graphSettings) {
@@ -8,7 +8,16 @@ export default class GraphRenderer {
   }
 
   updateGraph(svg, data, aggData) {
-    if (!shouldUpdatePlots(this.plottedLines, data, aggData)) {
+    const setsCount = countValidDataSets(data, aggData);
+    const plottedLinesCount = Object.keys(this.plottedLines).length;
+
+    if (setsCount < plottedLinesCount) {
+      Object.values(this.plottedLines).forEach((plot) => plot.remove());
+      this.plottedLines = {};
+      return;
+    }
+
+    if (setsCount === plottedLinesCount) {
       return;
     }
 

@@ -155,20 +155,27 @@ const config = exampleSortingConfig;
 // compoundBodyRobotSim.pucks.groups[0].radius = 7;
 // compoundBodyRobotSim.pucks.groups[1].radius = 7;
 
-// TODO: Change how the configs are defined so that only the chages from main config  need
-// to be defined and the rest can be defaulted without explicitly using the spread operator
+// Define benchmark configurations:
+// - timeStep: minimum reported time step, will be used as the time unit in the graphs
+// - maxTimeStep: length of each simulation run
+// - trackers: list of objects that provide a function to calculate a performance metric at
+//        each simulation update along with functions for readucing and aggregating values.
+//        Tracker (@swarmjs-core/benchmarking) can be used as a reference and extended as
+//        it provides most of the needed functionalities.
+//        Each tracker will result in a graph in the performance graphs tab
+// - simConfigs: list of simulation configurations that will be compared against each others
+//        across multiple runs using the performance metrics provided by the trackers.
+//        - name: a unique name that will be used to reference this config in the graphs legends
+//        - simConfig: all the changes from main config that will be applied to this simulation
 const benchmarkSettings = {
-  configs: [
+  simConfigs: [
     {
       name: '5 Robots',
       simConfig: {
-        ...config,
         env: {
-          ...config.env,
           speed: 50
         },
         robots: {
-          ...config.robots,
           count: 5
         }
       }
@@ -176,9 +183,7 @@ const benchmarkSettings = {
     {
       name: '20 Robots',
       simConfig: {
-        ...config,
         env: {
-          ...config.env,
           speed: 50
         }
       }

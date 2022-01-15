@@ -117,13 +117,11 @@ export const updateScales = (svgElem, data, graphSettings, curScales) => {
   return Object.keys(ret).length > 0 ? ret : null;
 };
 
-export const shouldUpdatePlots = (plottedLines, data, aggData) => {
+export const countValidDataSets = (data, aggData) => {
   const dataSetsCount = getDataSetsCount(data);
   const aggDataSetsCount = Object.values(aggData)
     .filter((obj) => Object.values(obj).length > 0).length;
-  // const aggDataSetsCount = 0;
-  const plottedLinesCount = Object.keys(plottedLines).length;
-  return dataSetsCount + aggDataSetsCount > plottedLinesCount;
+  return dataSetsCount + aggDataSetsCount;
 };
 
 export const initSvgGraph = (svgElem, graphSettings) => {

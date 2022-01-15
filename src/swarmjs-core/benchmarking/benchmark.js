@@ -1,4 +1,6 @@
 /* eslint-disable no-underscore-dangle */
+// import cloneDeep from loadash
+import { cloneDeep, merge } from 'lodash';
 
 let historicalData = {};
 let aggData = {};
@@ -8,7 +10,7 @@ let benchData = {};
 let benchSettings = {};
 let resetSimCallBack = null;
 
-const getCurConfig = () => benchSettings.configs[curBenchConfIndx];
+const getCurConfig = () => benchSettings.simConfigs[curBenchConfIndx];
 
 export const getBenchData = () => {
   const ret = { history: historicalData, aggregates: aggData };
@@ -25,11 +27,13 @@ export const getBenchData = () => {
 const resetHistroicalData = () => {
   historicalData = benchSettings.trackers.reduce((acc, tr) => ({
     ...acc,
-    [tr.name]: benchSettings.configs.reduce((acc2, config) => ({ ...acc2, [config.name]: [] }), {})
+    [tr.name]: benchSettings.simConfigs
+      .reduce((acc2, config) => ({ ...acc2, [config.name]: [] }), {})
   }), {});
   aggData = benchSettings.trackers.reduce((acc, tr) => ({
     ...acc,
-    [tr.name]: benchSettings.configs.reduce((acc2, config) => ({ ...acc2, [config.name]: [] }), {})
+    [tr.name]: benchSettings.simConfigs
+      .reduce((acc2, config) => ({ ...acc2, [config.name]: [] }), {})
   }), {});
 };
 
@@ -37,7 +41,7 @@ const startNewExperiment = () => {
   // Get new config index
   curBenchConfIndx = curBenchConfIndx === null
     ? 0
-    : (curBenchConfIndx + 1) % benchSettings.configs.length;
+    : (curBenchConfIndx + 1) % benchSettings.simConfigs.length;
   benchData = {};
 
   // Reset bench data for all trackers
@@ -53,8 +57,15 @@ const startNewExperiment = () => {
   benchmarking = true;
 };
 
-export const startBench = (newBenchConfig, resetSimCB) => {
-  benchSettings = newBenchConfig;
+export const startBench = (origSimConfig, newBenchConfig, resetSimCB) => {
+  // deep clone origSimConfig for each simConfigs in newBenchConfig
+  benchSettings = cloneDeep(newBenchConfig);
+  benchSettings.simConfigs = benchSettings.simConfigs.map(({ name, simConfig }) => {
+    const newSimConfig = cloneDeep(origSimConfig);
+    merge(newSimConfig, simConfig);
+    return { name, simConfig: newSimConfig };
+  });
+
   resetSimCallBack = resetSimCB;
   resetHistroicalData();
   curBenchConfIndx = null;
@@ -64,6 +75,7 @@ export const startBench = (newBenchConfig, resetSimCB) => {
 export const stopBench = () => {
   benchmarking = false;
   curBenchConfIndx = null;
+  resetHistroicalData();
 };
 
 export const updateBench = (scene, time) => {
