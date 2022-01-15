@@ -53,7 +53,8 @@ const exampleSortingConfig = {
         goalRadius: 7 * 12,
         color: 'blue'
       }
-    ]
+    ],
+    useGlobalPuckMaps: false
   },
   objects: [],
   positionsGenerator: PositionsGenerator.randomCollisionFree

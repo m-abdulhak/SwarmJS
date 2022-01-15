@@ -59,7 +59,7 @@ export default class Puck {
   }
 
   updateGoal() {
-    if (this.reachedGoal()) {
+    if (this.reachedGoal() || !this.map) {
       this.goal = this.groupGoal;
     } else {
       const mapY = Math.min(this.map.length, Math.max(0, Math.floor(this.position.y / 4)));

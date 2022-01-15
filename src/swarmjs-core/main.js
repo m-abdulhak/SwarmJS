@@ -17,7 +17,7 @@ export const createSimulation = (config, updateCallback) => {
   scene = new Scene(
     config.env,
     config.robots,
-    config.pucks.groups,
+    config.pucks,
     config.objects,
     config.algorithm,
     config.positionsGenerator,
@@ -52,7 +52,7 @@ export const resetSimulation = (config) => {
   scene = new Scene(
     config.env,
     config.robots,
-    config.pucks.groups,
+    config.pucks,
     config.objects,
     config.algorithm,
     config.positionsGenerator,

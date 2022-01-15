@@ -13,7 +13,7 @@ export default class Scene {
   constructor(
     envConfig,
     robotsConfig,
-    pucksGroups,
+    pucksConfigs,
     staticObjectsDefinitions,
     algorithm,
     positionsGenerator,
@@ -21,7 +21,7 @@ export default class Scene {
   ) {
     this.numOfRobots = robotsConfig.count;
     this.robotRadius = robotsConfig.radius;
-    this.pucksGroups = pucksGroups;
+    this.pucksGroups = pucksConfigs.groups;
     this.numOfPucks = this.pucksGroups.reduce((total, puckGroup) => total + puckGroup.count, 0);
 
     this.width = parseInt(envConfig.width, 10);
@@ -66,35 +66,39 @@ export default class Scene {
       algorithm
     );
 
+    this.puckMaps = [];
+    this.mapArray = [];
     // Generate Binary Scene Map
-    if (gMaps.mapArray) {
-      this.mapArray = gMaps.mapArray;
-    } else {
-      this.mapArray = mapSceneToArr(this.width, this.height, this.staticObjects);
-      gMaps.mapArray = this.mapArray;
+    if (pucksConfigs.useGlobalPuckMaps) {
+      if (gMaps.mapArray) {
+        this.mapArray = gMaps.mapArray;
+      } else {
+        this.mapArray = mapSceneToArr(this.width, this.height, this.staticObjects);
+        gMaps.mapArray = this.mapArray;
+      }
+
+      // Distance Transforms to Puck Goals, taking obstacles into consideration
+      this.puckMapScale = 1 / 4;
+      if (gMaps.puckMaps) {
+        this.puckMaps = gMaps.puckMaps;
+      } else {
+        this.puckMaps = this.pucksGroups.map(
+          (group) => (getPucksGoalMap(
+            this.mapArray,
+            Math.floor(this.width * this.puckMapScale),
+            Math.floor(this.height * this.puckMapScale),
+            {
+              x: Math.floor(group.goal.x * this.puckMapScale),
+              y: Math.floor(group.goal.y * this.puckMapScale)
+            },
+            this.puckMapScale
+          ))
+        );
+
+        gMaps.puckMaps = this.puckMaps;
+      }
     }
 
-    // Distance Transforms to Puck Goals, taking obstacles into consideration
-    this.puckMapScale = 1 / 4;
-    if (gMaps.puckMaps) {
-      this.puckMaps = gMaps.puckMaps;
-    } else {
-      this.puckMaps = this.pucksGroups.map(
-        (group) => (getPucksGoalMap(
-          this.mapArray,
-          Math.floor(this.width * this.puckMapScale),
-          Math.floor(this.height * this.puckMapScale),
-          {
-            x: Math.floor(group.goal.x * this.puckMapScale),
-            y: Math.floor(group.goal.y * this.puckMapScale)
-          },
-          this.puckMapScale
-        )
-        )
-      );
-
-      gMaps.puckMaps = this.puckMaps;
-    }
     // drawMap(document.getElementById('mapCanvas'), this.distanceTransformMap, true);
     // drawMap(document.getElementById('mapCanvas'), this.puckMaps[2], this.puckMapScale, true);
 
