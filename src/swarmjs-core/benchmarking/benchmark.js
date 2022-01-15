@@ -75,7 +75,6 @@ export const startBench = (origSimConfig, newBenchConfig, resetSimCB) => {
 export const stopBench = () => {
   benchmarking = false;
   curBenchConfIndx = null;
-  resetHistroicalData();
 };
 
 export const updateBench = (scene, time) => {

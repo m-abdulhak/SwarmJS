@@ -196,7 +196,7 @@ const benchmarkSettings = {
     PerformanceTrakers.PucksOutsideGoalTracker
   ],
   maxTimeStep: 50000,
-  timeStep: 100
+  timeStep: 1000
 };
 
 ReactDOM.render(
