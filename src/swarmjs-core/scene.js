@@ -21,6 +21,7 @@ export default class Scene {
   ) {
     this.numOfRobots = robotsConfig.count;
     this.robotRadius = robotsConfig.radius;
+    this.useVoronoi = robotsConfig.useVoronoiDiagram;
     this.pucksGroups = pucksConfigs.groups;
     this.numOfPucks = this.pucksGroups.reduce((total, puckGroup) => total + puckGroup.count, 0);
 
@@ -111,7 +112,7 @@ export default class Scene {
     );
 
     // Initialize Voronoi Diagram
-    this.voronoi = Delaunay
+    this.voronoi = !this.useVoronoi ? null : Delaunay
       .from(this.getCurRobotsPos(), (d) => d.x, (d) => d.y)
       .voronoi([0, 0, this.width, this.height]);
 
@@ -147,9 +148,11 @@ export default class Scene {
   update() {
     Engine.update(this.engine, this.timeDelta);
 
-    this.voronoi = Delaunay
-      .from(this.getCurRobotsPos(), (d) => d.x, (d) => d.y)
-      .voronoi([0, 0, this.width, this.height]);
+    if (this.useVoronoi) {
+      this.voronoi = Delaunay
+        .from(this.getCurRobotsPos(), (d) => d.x, (d) => d.y)
+        .voronoi([0, 0, this.width, this.height]);
+    }
 
     this.robots.forEach((r) => r.timeStep());
     this.pucks.forEach((p) => p.timeStep());
@@ -160,7 +163,7 @@ export default class Scene {
   }
 
   get voronoiMesh() {
-    return this.voronoi.render();
+    return this.useVoronoi ? this.voronoi.render() : '';
   }
 
   getCurRobotsPos() {

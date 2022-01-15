@@ -33,7 +33,8 @@ const exampleSortingConfig = {
       }
     },
     sensors: Object.values(AvailableSensors),
-    actuators: Object.values(AvailableActuators)
+    actuators: Object.values(AvailableActuators),
+    useVoronoiDiagram: false
   },
   pucks: {
     groups: [
@@ -194,7 +195,7 @@ const benchmarkSettings = {
     PerformanceTrakers.RobotToGoalDistanceTracker,
     PerformanceTrakers.PucksOutsideGoalTracker
   ],
-  maxTimeStep: 2000,
+  maxTimeStep: 50000,
   timeStep: 100
 };
 
