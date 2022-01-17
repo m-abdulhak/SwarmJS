@@ -134,6 +134,9 @@ export default class Scene {
     };
 
     this.setSpeed = (scale) => {
+      if (!scale || typeof scale !== 'number' || scale <= 0) {
+        return;
+      }
       this.robots.forEach((r) => { r.velocityScale = scale; });
     };
 

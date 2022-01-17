@@ -1,5 +1,6 @@
 .graph-container {
     margin: auto;
+    margin-bottom: 10px;
     width: 1400px;
     padding: 10px;
     border: solid 1px black;
@@ -54,4 +55,18 @@
 .bench_legend_item p {
     display: inline;
     margin: 5px;
+}
+
+#quick-actions {
+    width: fit-content;
+    height: 50px;
+    text-align: center;
+    display: flex;
+    margin: auto;
+}
+
+#quick-actions .quick-actions-icon {
+    height: 50px;
+    line-height: 50px;
+    margin: 0px 10px 0px 10px;
 }
