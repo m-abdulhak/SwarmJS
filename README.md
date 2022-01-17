@@ -28,6 +28,19 @@ The `App` component provides the entry point of the simulator, two parameters sh
 - `config` defines the simulation configuration
 - `benchSettings` defines the benchmarking configurations 
 
+Two [example configurations](src/swarmjs-core/exampleConfigs) are provided and can be used to start new simulations:
+```
+import { exampleConfigs } from './swarmjs-core';
+
+const { simConfig, benchmarkConfig } = exampleConfigs.voronoiSorting;
+// or: const { simConfig, benchmarkConfig } = exampleConfigs.simpleSorting;
+
+ReactDOM.render(
+  <App config={simConfig} benchSettings={benchmarkConfig}/>,
+  document.getElementById('root')
+);
+```
+
 ## Main Modules
 - [Index](src/swarmjs-core/index.js): Provides the interface for starting and controlling the simulation, such as `initializeSimulation`, `resetSimulation`, `startBenchmark`, and `stopBenchmark`. It also exposes important objects that are imported and used when defining simulations and benchmarks such as `AvailableActuators`, `AvailableSensors`, `PositionsGenerators`, `PerformanceTrakers`, and `Controllers`.
 - [Scene](src/swarmjs-core/scene.js): Defines the `Scene` class that initializes the simulation world and all other elements in the simulation such as static objects, robots, and pucks. It is also responsible for calculating and storing global maps and Voronoi Diagrams if they are enabled. 
