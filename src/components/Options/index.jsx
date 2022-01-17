@@ -1,9 +1,14 @@
 import React from 'react';
 import propTypes from 'prop-types';
-import Slider from '../Inputs/Slider';
+
+import SimActions from './SimActions';
+import TimeDisplay from './TimeDisplay';
+import SpeedSlider from './SpeedSlider';
+import RenderingSettings from './RenderingSettings';
 
 const Options = ({
   speed,
+  paused,
   togglePause,
   setSpeed,
   reset,
@@ -11,34 +16,20 @@ const Options = ({
   setElementEnabled,
   time
 }) => (
-  <div>
-    <div>
-      <label>Time: </label>
-      <label>{parseInt(time, 10)}</label>
-    </div>
-    <div>
-      <label>Speed:</label>
-      <Slider min={0.1} max={50} step={0.1} val={speed} onChange={setSpeed} />
-    </div>
-    <div>
-      <label>Pause and Reset:</label>
-      <input type="button" value="Pause" id="pause-button" onClick={() => togglePause()}/>
-      <input type="button" value="Reset" id="reset-button" onClick={() => reset()}/>
-    </div>
-    <div>
-      <label>Rendering:</label>
-      {renderingElements.map((element, index) => (
-        <div key={index}>
-          <input type="checkbox" id={element} defaultChecked onChange={(event) => setElementEnabled(event.target.id, event.target.checked)}/>
-          <label htmlFor={element}>{element}</label>
-        </div>
-      ))}
-    </div>
-  </div>
+  <>
+    {/* <SimActions reset={reset} paused={paused} togglePause={togglePause} /> */}
+    {/* <TimeDisplay time={time} /> */}
+    <SpeedSlider speed={speed} setSpeed={setSpeed} />
+    <RenderingSettings
+      renderingElements={renderingElements}
+      setElementEnabled={setElementEnabled}
+    />
+  </>
 );
 
 Options.propTypes = {
   speed: propTypes.number.isRequired,
+  paused: propTypes.bool.isRequired,
   togglePause: propTypes.func.isRequired,
   setSpeed: propTypes.func.isRequired,
   reset: propTypes.func.isRequired,

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import { Box, Container } from '@mui/material';
 import LegendItem from './LegendItem';
 
 const LegendPanel = ({ algorithms, aggregationType }) => {
@@ -8,7 +8,8 @@ const LegendPanel = ({ algorithms, aggregationType }) => {
     return null;
   }
   return (
-      <div>
+    <Box sx={{ width: '100%', typography: 'body1' }}>
+    <Container sx={{ textAlign: 'center' }}>
         {algorithms.map((algorithm, index) => (
           <LegendItem
             key={algorithm}
@@ -17,7 +18,8 @@ const LegendPanel = ({ algorithms, aggregationType }) => {
             aggregationType={aggregationType}
           />
         ))}
-      </div>
+      </Container>
+    </Box>
   );
 };
 

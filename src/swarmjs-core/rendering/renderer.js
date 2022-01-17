@@ -43,6 +43,11 @@ export const setElementEnabled = (element, state) => {
   activeElements = state ? [...otherActiveElements, element] : [...otherActiveElements];
 };
 
+export const toggleElementEnabled = (element) => {
+  const curState = activeElements.includes(element);
+  setElementEnabled(element, !curState);
+};
+
 export function initialize(svg, scene) {
   if (svg) {
     svg.selectAll('*').remove();

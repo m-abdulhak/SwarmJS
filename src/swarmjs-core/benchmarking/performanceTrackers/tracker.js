@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 
 // This is an awkward place to put the graph dimensions and margins,
-// but since they are in scaling the plots, I put them here for now.
+// but since they are used in scaling the plots, I put them here for now.
 const defaultGraphSettings = {
   width: 1400,
   height: 600,

@@ -118,6 +118,9 @@ export const updateScales = (svgElem, data, graphSettings, curScales) => {
 };
 
 export const countValidDataSets = (data, aggData) => {
+  if (!data || !aggData) {
+    return 0;
+  }
   const dataSetsCount = getDataSetsCount(data);
   const aggDataSetsCount = Object.values(aggData)
     .filter((obj) => Object.values(obj).length > 0).length;
