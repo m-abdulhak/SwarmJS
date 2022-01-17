@@ -5,7 +5,7 @@ import Options from './Options/index';
 import Benchmark from './Benchmark';
 
 import {
-  initSim,
+  initializeSimulation,
   simulationIsInitialized,
   resetSimulation,
   togglePauseSimulation,
@@ -51,7 +51,7 @@ const App = ({ config, benchSettings }) => {
 
   React.useEffect(() => {
     // Initialize the simulation when the component mounts
-    initSim(config, onUpdate);
+    initializeSimulation(config, onUpdate);
   }, []);
 
   const initialized = simulationIsInitialized();

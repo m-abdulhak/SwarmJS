@@ -1,7 +1,7 @@
 import {
   AvailableActuators,
   AvailableSensors,
-  PositionsGenerator,
+  PositionsGenerators,
   PerformanceTrakers,
   Controllers
 } from '..';
@@ -51,7 +51,7 @@ const simConfig = {
     useGlobalPuckMaps: false
   },
   objects: [],
-  positionsGenerator: PositionsGenerator.randomCollisionFree
+  positionsGenerator: PositionsGenerators.randomCollisionFree
 };
 
 // Define benchmark configurations:

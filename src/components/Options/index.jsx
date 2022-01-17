@@ -37,7 +37,6 @@ const Options = ({
   </div>
 );
 
-// props validation
 Options.propTypes = {
   speed: propTypes.number.isRequired,
   togglePause: propTypes.func.isRequired,

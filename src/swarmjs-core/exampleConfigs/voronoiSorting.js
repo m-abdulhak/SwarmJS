@@ -1,7 +1,7 @@
 import {
   AvailableActuators,
   AvailableSensors,
-  PositionsGenerator,
+  PositionsGenerators,
   PerformanceTrakers,
   Controllers
 } from '..';
@@ -93,7 +93,7 @@ const simConfig = {
       height: 50
     }
   ],
-  positionsGenerator: PositionsGenerator.randomCollisionFree
+  positionsGenerator: PositionsGenerators.randomCollisionFree
 };
 
 const benchmarkConfig = {

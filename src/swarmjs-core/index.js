@@ -12,7 +12,7 @@ const gMaps = [];
 
 let scene;
 
-export const createSimulation = (config, updateCallback) => {
+const createSimulation = (config, updateCallback) => {
   scene = new Scene(
     config.env,
     config.robots,
@@ -39,7 +39,7 @@ export const createSimulation = (config, updateCallback) => {
 
 export const simulationIsInitialized = () => scene !== undefined;
 
-export const initSim = (config, updateCallback) => {
+export const initializeSimulation = (config, updateCallback) => {
   if (scene) {
     return;
   }
@@ -74,7 +74,7 @@ export const setSimulationSpeed = (speed) => scene.setSpeed(speed);
 
 export { AvailableActuators } from './robot/actuators/actuatorsManager';
 export { AvailableSensors } from './robot/sensors/sensorManager';
-export { default as PositionsGenerator } from './utils/positionsGenerators';
+export { default as PositionsGenerators } from './utils/positionsGenerators';
 export { default as GraphRenderer } from './benchmarking/graphRenderer';
 export { default as PerformanceTrakers } from './benchmarking/performanceTrackers';
 export { default as Controllers } from './robot/controllers';

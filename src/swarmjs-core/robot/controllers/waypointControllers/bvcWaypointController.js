@@ -29,7 +29,6 @@ export default function bvcWaypointController(robot, params) {
   const detourPointToOutermostPointRatio = 0.3;
   const detourPointMaxDistance = 6 * robot.radius;
 
-  // DONE
   function findPointInCellClosestToGoal(cell, goal) {
     return closestPointInPolygonToPoint(cell, goal);
   }
