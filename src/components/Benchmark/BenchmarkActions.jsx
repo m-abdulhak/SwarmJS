@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Grid, Typography, Button } from '@mui/material';
+import { Box, Grid, Button } from '@mui/material';
 
 import {
   startBenchmark,
