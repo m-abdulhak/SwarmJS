@@ -4,7 +4,8 @@ import {
   updateBench,
   startBench,
   stopBench,
-  getBenchData
+  getBenchData,
+  benchmarkingActive
 } from './benchmarking/benchmark';
 
 // Global Map Memory
@@ -67,6 +68,8 @@ export const startBenchmark = (simConfig, benchConfig, resetSimCB) => {
 export const stopBenchmark = () => stopBench();
 
 export const getBenchmarkData = () => getBenchData();
+
+export const isBenchmarking = () => benchmarkingActive();
 
 export const togglePauseSimulation = () => scene.togglePause();
 

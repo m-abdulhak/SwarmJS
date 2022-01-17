@@ -72,6 +72,8 @@ export const startBench = (origSimConfig, newBenchConfig, resetSimCB) => {
   startNewExperiment();
 };
 
+export const benchmarkingActive = () => benchmarking;
+
 export const stopBench = () => {
   benchmarking = false;
   curBenchConfIndx = null;

@@ -1,12 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {
-  startBenchmark,
-  stopBenchmark
-} from '../../swarmjs-core';
-
-import GraphContainer from './GraphContainer';
+import BenchmarkActions from './BenchmarkActions';
+import GraphContainer from './Graph/GraphContainer';
 
 const Benchmark = ({ simConfig, benchSettings, reset, data }) => {
   const graphsContainers = benchSettings.trackers.map((tracker) => {
@@ -22,13 +18,10 @@ const Benchmark = ({ simConfig, benchSettings, reset, data }) => {
   });
 
   return (
-    <div id="graph-list" style={{ position: 'absolute', left: '10px' }}>
-      <div>
-        <input type="button" value="Start Benchmark" style={{ width: '50%' }} onClick={() => startBenchmark(simConfig, benchSettings, reset)}/>
-        <input type="button" value="Stop Benchmark" style={{ width: '50%' }} onClick={() => stopBenchmark()}/>
-      </div>
+    <>
+      <BenchmarkActions simConfig={simConfig} benchSettings={benchSettings} reset={reset} />
       {graphsContainers}
-    </div>
+    </>
   );
 };
 

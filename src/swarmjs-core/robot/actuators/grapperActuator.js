@@ -39,7 +39,7 @@ class GrapperActuator extends Actuator {
 
     // Set the puck as held
     puck.held = true;
-    console.log(`Activated grapper, robot: ${this.robot.id} puck: ${puck.id}`);
+    // console.log(`Activated grapper, robot: ${this.robot.id} puck: ${puck.id}`);
   }
 
   deactivate() {
