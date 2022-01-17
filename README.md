@@ -46,7 +46,7 @@ ReactDOM.render(
 - [Scene](src/swarmjs-core/scene.js): Defines the `Scene` class that initializes the simulation world and all other elements in the simulation such as static objects, robots, and pucks. It is also responsible for calculating and storing global maps and Voronoi Diagrams if they are enabled. 
 - [Robot](src/swarmjs-core/robot/robot.js): Robots are the main active objects in the simulation. Robots can have simple or complex (compound) bodies, and rely on multiple other objects to define how they sense and interact with the environment such as [Sensors](src/swarmjs-core/robot/sensors), [Actuators](src/swarmjs-core/robot/actuators), and [Controllers](src/swarmjs-core/robot/controllers). 
 - [Puck](src/swarmjs-core/puck.js): Pucks are the main passive objects in the simulation. They can be moved either passively as a result of collisions with the robot, or actively as a result of a robot actuator such as the [Grapper](src/swarmjs-core/robot/actuators/grapperActuator.js).
-- [Static Objects](src/swarmjs-core/staticObjects): Completely static elements that cannot be moved or experience any change after they defined. Two types of static objects are supported [Circles](src/swarmjs-core/staticObjects/staticCircle.js) and [Rectangles](src/swarmjs-core/staticObjects/staticRectangle.js). Other type of objects can be added but should adhere to the same interface define in the two previous classes. 
+- [Static Objects](src/swarmjs-core/staticObjects): Completely static elements that cannot be moved or experience any change after they are defined. Two types of static objects are supported [Circles](src/swarmjs-core/staticObjects/staticCircle.js) and [Rectangles](src/swarmjs-core/staticObjects/staticRectangle.js). Other type of objects can be added but should adhere to the same interface define in the two previous classes. 
 - [Benchmark](src/swarmjs-core/benchmarking/benchmark.js): This module is responsible for comparing different simulation scenarios by running and recording the simulation performance as defined by the provided [Trackers](src/swarmjs-core/benchmarking/performanceTrackers).
 - [Renderer](src/swarmjs-core/rendering/renderer.js): Responsible for drawing the various elements in the simulation as defined in the renderables configurations.
 
@@ -55,20 +55,19 @@ ReactDOM.render(
 - [Performance Trackers](src/swarmjs-core/benchmarking/performanceTrackers): Special objects that describe the simulation performance. Each object provides a function to calculate a performance metric at each simulation update. Each tracker will result in a separate graph in the benchmarking tab. Trackers should also define functions for reducing and aggregating values. [Tracker](src/swarmjs-core/benchmarking/performanceTrackers/tracker.js) can be used as a reference and extended as it provides most of the needed functionalities.
 - [Controllers](src/swarmjs-core/robot/controllers): Controllers are higher order functions that return functions that control different aspects of the robots behaviors, they are called at each timestep when the simulation is updated. There are 4 types of controllers:
   + [Goal Controller](src/swarmjs-core/robot/controllers/goalControllers/simpleSortingGoalController.js): The main controller that implements the application specific algorithm, sets the goal of the robot at each timestep.
-  + [Waypoint Controller](src/swarmjs-core/robot/controllers/waypointControllers/bvcWaypointController.js): Provides motion planning (collision avoidance and maneuverability) for the robots. While the goal controller is expected to be application-dependent, the waypoint controller should provide a more general motion planning that can be used across different simulation scenarios.
-  + 
+  + [Waypoint Controller](src/swarmjs-core/robot/controllers/waypointControllers/bvcWaypointController.js): Provides motion planning (collision avoidance and maneuverability) for the robots. While the goal controller is expected to be application-dependent, the waypoint controller can provide a more general motion planning that can be used across different simulation scenarios.
   + [Velocity Controller](src/swarmjs-core/robot/controllers/velocityControllers/omniDirVelocityController.js): provides the control signals (velocities) that should move the robot towards the waypoint.
   + [Actuator Controller](src/swarmjs-core/robot/controllers/actuatorsControllers/simpleSortingActuatorController.js): optional controller to control the actuators.
-- [Sensors](src/swarmjs-core/robot/sensors): Objects that define how the robot can sense a specific aspect of the simulation, such as its own position and orientation, the position of neighboring robots, static objects, etc. Other sensors can easily be defined by extending the [Sensor](src/swarmjs-core/robot/sensors/sensor.js) class. Sensors can be implemented as either a class or a function but should implement the following interface:
+- [Sensors](src/swarmjs-core/robot/sensors): Objects that define how the robot can sense a specific aspect of the simulation, such as its own position and orientation, the position of neighboring robots, nearby objects, etc. Other sensors can easily be defined by extending the [Sensor](src/swarmjs-core/robot/sensors/sensor.js) class. Sensors can be implemented as either a class or a function but should implement the following interface:
   + sample(): calculates the value of the sensor
   + read(): returns the latest sampled value of the sensor
   + name: used to access (sample and read) the sensor through the sensor manager
   + type: determines when the sensor is sampled, possible values: onStart, onUpdate.
   + dependencies: optional, a list specifying any other sensors needed for this sensor to work, sensorManager uses these lists to generate a dependency graph and determine the order in which the sensors should be sampled.
-The name and sensor object should be exposed by default exporting an object with the following properties:
-  + name: the name of the sensor
-  + Sensor: the sensor object
-and all sensors should be added to the 'availableSensorDefitions' list in sensorManager
+
+  The name and sensor object should be exposed by default exporting an object with the following properties, and all sensors should be added to the 'availableSensorDefitions' list in sensorManager:
+  - name: the name of the sensor
+  - Sensor: the sensor object
 
 ## Configuration
 Simulations are generated based on configuration objects passed to the SwarmJS library. Two [Example](src/swarmjs-core/exampleConfigs) configurations are provided.
@@ -103,25 +102,25 @@ Below are the 4 types of controllers that can be defined:
     - radius: radius of each puck in the group
     - goal: coordinates of the center of the goal area the pucks should be gathered at (if one exists)
     - goalRadius: radius of the goal area (if one exists)
-  + useGlobalPuckMaps: boolean, if `true` a goal map for each puck group will be calculated at the start of the simulation, for each point in the environment the map provides a corresponding goal point where the puck should go towards to reach the group goal, useful for environments with static obstacles, but has a huge impact on the startup of the simulation.
+  + useGlobalPuckMaps: boolean, if `true` a goal map for each puck group will be calculated at the start of the simulation, for each point in the environment the map provides a corresponding goal point where the puck should go towards to reach the group goal, useful for environments with static obstacles, but has a huge impact on the startup time of the simulation, should be disabled if not used.
 
 ## Benchmarking
 Benchmarks provide an easy way to run multiple simulations and compare them across multiple runs using specific metrics. Two [Example](src/swarmjs-core/exampleConfigs) benchmark configurations are provided.
 Below are the main parameters that should be preset:
 - simConfigs: a list of configuration objects that describe different simulation scenarios, each object should include:
   + name: unique name for this scenario, will be used to refer to this scenario in the benchmarking graphs.
-  + simConfig: a simulation configuration object that should adhere to the specifications described in the previous section, not all parameters should be specified here, but rather only the ones that separate this scenario from the main simulation scenario. These differences can be simple such as changing the defined static objects, number or radius of robots, number of puck groups of the number or radius of the pucks, or they can be more specific such as comparing different controllers or even changing specific parameters for the same controller.  
+  + simConfig: a simulation configuration object that should adhere to the specifications described in the previous section, not all parameters should be specified here, but rather only the ones that separate this scenario from the main simulation scenario. These differences can be simple such as changing the defined static objects, number or radius of robots, number of puck groups or the number or radius of the pucks; or they can be more specific such as comparing different controllers or even changing specific parameters for the same controller. Any property in the main simulation configuration can be overriden here.
 - timeStep: minimum reported time step in the graphs
 - maxTimeStep: length of each simulation run while benchmarking
 - trackers: list of special objects that describe the performance and provide a function to calculate a performance metric at each simulation update.
 
 ## Rendering
 A configuration-based rendering engine was built on top of [D3.js](https://github.com/d3/d3) to rapidly define renderable elements in the simulation with minimal code. A simple configuration format is used to define each renderable element, its attributes, and attach it to a specific object in the environment so that it is automatically updated while the simulation is running.
-Renderables can be defined within any module in the simulator but they always be imported and registered into [renderering module](src/swarmjs-core/rendering/renderer.js). Examples of renderable definitions can be found in the [Scene](src/swarmjs-core/scene.js), [Robot](src/swarmjs-core/robot/robot.js), and [Puck](src/swarmjs-core/puck.js) modules. 
+Renderables can be defined within any module in the simulator but they should always be imported and registered into the [renderering module](src/swarmjs-core/rendering/renderer.js). Examples of renderable definitions can be found in the [Scene](src/swarmjs-core/scene.js), [Robot](src/swarmjs-core/robot/robot.js), and [Puck](src/swarmjs-core/puck.js) modules. 
 Each renderable element can include the following parameters:
 - type: mandatory, used for grouping renderables into UI buttons to enable/disable them.
 - svgClass: optional, used to add classes to the svg elements
-- dataPoints: optional, defines the data points if the renderable is repeated for multiple objects, dataPoints are usually defined as a property of the scene with the 'sceneProp' key. If dataPoints are defined, `prop` key can be used to refer to properties of the datapoint object. Otherwise, only 'sceneProp' can be used throughout the renderable definition.
+- dataPoints: optional, defines the data points if the renderable is repeated for multiple objects such as robots, pucks, or static objects. DataPoints are usually defined as a property of the scene with the 'sceneProp' key. If dataPoints are defined, `prop` key can be used in the following configurations to refer to properties of the datapoint object. Otherwise, only 'sceneProp' can be used throughout the renderable definition.
 - shape: mandatory, svg shape to be rendered
 - staticAttrs: optional, defines the attributes to be set only once when the element is initialized
 - styles: optional, defines the styling attributes for the element, also only applied once, when the element is initialized
