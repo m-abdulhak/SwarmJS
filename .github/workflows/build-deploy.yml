@@ -1,0 +1,35 @@
+name: Build & Deploy
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build & deploy
+    runs-on: ubuntu-latest # No real reason for this in particular, seems to be common
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install NPM packages
+      run: npm ci
+
+    - name: Build project
+      run: npm run build
+
+    # maybe someday
+    # - name: Run tests
+    #   run: npm run test
+
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        branch: gh-pages # The branch the action should deploy to.
+        folder: dist # The folder the action should deploy.
