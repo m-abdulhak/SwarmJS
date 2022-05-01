@@ -5,7 +5,7 @@ SwarmJS
 ![image](https://user-images.githubusercontent.com/5468250/149712476-0fa0c7b0-bf23-409d-9dff-90b92c9cbbb7.png)
 
 ## About
-SwarmJS is an interactive 2D swarm robotics simulator built on the [Matter.js](https://github.com/liabru/matter-js) physics engine and uses [D3.js](https://github.com/d3/d3) for rendering and [React](https://github.com/facebook/react) for the UI.
+SwarmJS is an interactive 2D swarm robotics simulator built on the [Matter.js](https://github.com/liabru/matter-js) physics engine and uses [D3.js](https://github.com/d3/d3) for rendering and [React](https://github.com/facebook/react) for the UI. A demo is available [here](https://m-abdulhak.github.io/SwarmJS).
 
 ## Quick Actions
 A list of quick action buttons can be found above the simulation window including:
