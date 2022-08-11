@@ -1,5 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useRef, useEffect } from 'react';
+
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 import QuickActions from './QuickActions';
 import TabContainer from './Containers/TabContainer';
@@ -7,6 +9,9 @@ import Options from './Options/index';
 import Benchmark from './Benchmark';
 
 import {
+  stopBenchmark,
+  isBenchmarking,
+  exampleConfigs,
   initializeSimulation,
   simulationIsInitialized,
   resetSimulation,
@@ -22,13 +27,44 @@ import {
   getRenderingElements
 } from '../swarmjs-core/rendering/renderer';
 
-const App = ({ config, benchSettings }) => {
-  const [uiEnabled, setUiEnabled] = React.useState(false);
-  const [time, setTime] = React.useState(0);
-  const [speed, setSpeed] = React.useState(1);
-  const [paused, setPaused] = React.useState(false);
-  const [benchmarkData, setBenchmarkData] = React.useState({});
-  const svgRef = React.useRef(null);
+const options = Object.values(exampleConfigs).map((v) => ({
+  label: v.title, value: v.name
+}));
+
+const App = () => {
+  const [appVariant, setAppVariant] = useState(options[0].value);
+  const [config, setConfig] = useState(exampleConfigs[appVariant].simConfig);
+  const [benchSettings, setBenchSettings] = useState(exampleConfigs[appVariant].benchmarkConfig);
+  const [uiEnabled, setUiEnabled] = useState(false);
+  const [time, setTime] = useState(0);
+  const [speed, setSpeed] = useState(1);
+  const [paused, setPaused] = useState(false);
+  const [benchmarkData, setBenchmarkData] = useState({});
+  const svgRef = useRef(null);
+
+  const handleChange = (value) => {
+    setAppVariant(value);
+  };
+
+  const selectElem = (
+    <div id='simulation-selection'>
+      <p>Simulation: </p>
+      <Select
+        id='simulation-select'
+        name={appVariant.label}
+        value={appVariant}
+        onChange={(event) => {
+          handleChange(event.target.value);
+        }}
+      >
+        {options?.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label ?? option.value}
+              </MenuItem>
+        ))}
+      </Select>
+    </div>
+  );
 
   const onSpeedChange = (newSpeed) => {
     const speedNumber = parseFloat(newSpeed);
@@ -36,7 +72,10 @@ const App = ({ config, benchSettings }) => {
     setSimulationSpeed(speedNumber);
   };
 
-  const reset = (newConfig = config) => {
+  const reset = (newConfig = config, stopBench = false) => {
+    if (stopBench && isBenchmarking()) {
+      stopBenchmark();
+    }
     resetRenderer();
     resetSimulation(newConfig);
     onSpeedChange(newConfig.env.speed);
@@ -54,10 +93,19 @@ const App = ({ config, benchSettings }) => {
     setPaused(!paused);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Initialize the simulation when the component mounts
     initializeSimulation(config, onUpdate);
   }, []);
+
+  useEffect(() => {
+    setConfig(exampleConfigs[appVariant].simConfig);
+    setBenchSettings(exampleConfigs[appVariant].benchmarkConfig);
+  }, [appVariant]);
+
+  useEffect(() => {
+    reset(config, true);
+  }, [config]);
 
   const initialized = simulationIsInitialized();
 
@@ -95,6 +143,7 @@ const App = ({ config, benchSettings }) => {
 
   return (
     <div style={{ width: '100%' }}>
+      {selectElem}
       <QuickActions
         toggleElementEnabled={toggleElementEnabled}
         setUiEnabled={setUiEnabled}
@@ -117,11 +166,6 @@ const App = ({ config, benchSettings }) => {
       {ui}
     </div>
   );
-};
-
-App.propTypes = {
-  config: PropTypes.object.isRequired,
-  benchSettings: PropTypes.object.isRequired
 };
 
 export default App;

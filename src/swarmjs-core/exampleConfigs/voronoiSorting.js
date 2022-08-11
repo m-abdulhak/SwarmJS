@@ -128,6 +128,8 @@ const benchmarkConfig = {
 };
 
 export default {
+  title: 'Voronoi Sorting',
+  name: 'voronoiSorting',
   simConfig,
   benchmarkConfig
 };

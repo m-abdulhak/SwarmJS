@@ -93,11 +93,13 @@ const benchmarkConfig = {
     PerformanceTrakers.PucksOutsideGoalTracker,
     PerformanceTrakers.MinRobotRobotDistanceTracker
   ],
-  maxTimeStep: 50000,
+  maxTimeStep: 20000,
   timeStep: 1000
 };
 
 export default {
+  title: 'Simple Sorting',
+  name: 'simpleSorting',
   simConfig,
   benchmarkConfig
 };

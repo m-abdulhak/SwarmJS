@@ -57,6 +57,18 @@
     margin: 5px;
 }
 
+#simulation-selection {
+    text-align: center;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+}
+
+#simulation-selection p {
+    margin-right: 10px;
+}
+
 #quick-actions {
     width: fit-content;
     height: 50px;
