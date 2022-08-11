@@ -98,11 +98,15 @@ export default class Robot {
       this.actuate = getController(this, controllers.actuators);
     }
 
-    // Goal Planning
-    this.updateGoal = getController(this, controllers.goal);
+    // Goal Planning (goal controller is optional)
+    if (controllers.goal) {
+      this.updateGoal = getController(this, controllers.goal);
+    }
 
-    // Motion Planning
-    this.updateWaypoint = getController(this, controllers.waypoint);
+    // Motion Planning (waypoint controller is optional)
+    if (controllers.waypoint) {
+      this.updateWaypoint = getController(this, controllers.waypoint);
+    }
 
     // Velocities calculation
     this.updateVelocity = getController(this, controllers.velocity);
@@ -130,6 +134,7 @@ export default class Robot {
     this.sensorManager.update();
 
     // Update goal
+    /*
     const newGoalRaw = this.updateGoal(this.goal, this.sensors, this.actuators);
     const newGoal = this.limitGoal(newGoalRaw);
     this.goal = newGoal;
@@ -137,9 +142,11 @@ export default class Robot {
     // Update waypoint, according to new goal
     const newWaypoint = this.updateWaypoint(this.goal, this.sensors, this.actuators);
     this.setWaypoint(newWaypoint);
+    */
 
     // Update velocities, according to new waypoint
-    const velocities = this.updateVelocity(newWaypoint, this.sensors, this.actuators);
+    //const velocities = this.updateVelocity(newWaypoint, this.sensors, this.actuators);
+    const velocities = this.updateVelocity(this.waypoint, this.sensors, this.actuators);
     this.setVelocities(velocities);
 
     // Actuate
@@ -398,6 +405,7 @@ const bodyRenderables = [
   }
 ];
 
+/*
 const waypointRenderables = [
   {
     type: 'Waypoint',
@@ -590,6 +598,7 @@ const vornoiRenderables = [
     }
   }
 ];
+*/
 
 const sensorsRenderables = [
   {
@@ -637,10 +646,10 @@ const sensorsRenderables = [
     dynamicAttrs: {
       fill: {
         prop: 'sensors.walls',
-        modifier: (val) => (val.includes('left') ? 'green' : 'red')
+        modifier: (val) => (val.includes('forwardLeft') ? 'green' : 'red')
       },
-      cx: { prop: 'sensors.directions.left.x' },
-      cy: { prop: 'sensors.directions.left.y' }
+      cx: { prop: 'sensors.directions.forwardLeft.x' },
+      cy: { prop: 'sensors.directions.forwardLeft.y' }
     },
     styles: {
       fill: 'none',
@@ -665,10 +674,10 @@ const sensorsRenderables = [
     dynamicAttrs: {
       fill: {
         prop: 'sensors.walls',
-        modifier: (val) => (val.includes('right') ? 'green' : 'red')
+        modifier: (val) => (val.includes('forwardRight') ? 'green' : 'red')
       },
-      cx: { prop: 'sensors.directions.right.x' },
-      cy: { prop: 'sensors.directions.right.y' }
+      cx: { prop: 'sensors.directions.forwardRight.x' },
+      cy: { prop: 'sensors.directions.forwardRight.y' }
     },
     styles: {
       fill: 'none',
@@ -681,8 +690,8 @@ const sensorsRenderables = [
 
 export const RobotRenderables = [
   ...sensorsRenderables,
-  ...bodyRenderables,
-  ...waypointRenderables,
-  ...goalRenderables,
-  ...vornoiRenderables
+  ...bodyRenderables//,
+//  ...waypointRenderables,
+//  ...goalRenderables,
+//  ...vornoiRenderables
 ];

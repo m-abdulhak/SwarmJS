@@ -24,10 +24,12 @@ class WallSensor extends Sensor {
   sample() {
     // Get All points where walls need to be detected
     const sensingPoints = {
-      forward: this.robot.sensors.directions.forward,
-      backward: this.robot.sensors.directions.backward,
-      left: this.robot.sensors.directions.left,
-      right: this.robot.sensors.directions.right
+//      forward: this.robot.sensors.directions.forward,
+//      backward: this.robot.sensors.directions.backward,
+//      left: this.robot.sensors.directions.left,
+//      right: this.robot.sensors.directions.right
+      forwardLeft: this.robot.sensors.directions.forwardLeft,
+      forwardRight: this.robot.sensors.directions.forwardRight
     };
 
     // Get all obstacles from the environment boundary

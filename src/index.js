@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import App from './components/App';
 import { exampleConfigs } from './swarmjs-core';
 
-const { simConfig, benchmarkConfig } = exampleConfigs.voronoiSorting;
+const { simConfig, benchmarkConfig } = exampleConfigs.beeClust;
 
 ReactDOM.render(
   <App config={simConfig} benchSettings={benchmarkConfig}/>,
