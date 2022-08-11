@@ -13,7 +13,7 @@ const simConfig = {
     speed: 15
   },
   robots: {
-    count: 40,
+    count: 20,
     radius: 10,
     controllers: {
       actuators: Controllers.actuators.simpleSortingActuatorController,

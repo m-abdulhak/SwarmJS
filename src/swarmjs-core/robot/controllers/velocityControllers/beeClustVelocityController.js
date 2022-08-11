@@ -10,6 +10,9 @@ function generateRandomNumberFromNormalDist() {
   }
 
 export default function beeClustVelocityController(robot, { angularVelocityScale }) {
+
+  let waitTime = 0;
+
   return (point) => {
     // point is ignored.  This should not be a "Velocity Controller" that expects
     // a waypoint as input, but a "Reactive Controller" whose input is sensor
@@ -19,16 +22,16 @@ export default function beeClustVelocityController(robot, { angularVelocityScale
 
     // Where should we define state variables for the controller?  Trying to
     // store them in the robot object here.  Bad idea?
-    if (!'waitTime' in robot) {
-        robot['waitTime'] = 0;
-    }
+    //if (!'waitTime' in robot) {
+    //    robot['waitTime'] = 0;
+    //}
 
     //
     // Constant parameters of the controller.  Where should they be defined?
     //
 
     // This should be a property of the sensor, not the controller.
-    const sensingRadius = 10; 
+    const sensingRadius = 40; 
 
     // Maximum time a robot should wait.
     const maxWaitTime = 100; 
@@ -42,9 +45,13 @@ export default function beeClustVelocityController(robot, { angularVelocityScale
     // If the robot is not waiting, we move forward at a constant speed
     let forwardVel = 0.1 * robot.velocityScale; 
 
-    if (robot['waitTime'] > 0) {
+    //if (robot['waitTime'] > 0) {
+    //    forwardVel = 0;
+    //    --robot['waitTime'];
+    //}
+    if (waitTime > 0) {
         forwardVel = 0;
-        --robot['waitTime'];
+        --waitTime;
     }
 
     // Choose an angular velocity based on the normal distribution.  Override
@@ -75,11 +82,12 @@ export default function beeClustVelocityController(robot, { angularVelocityScale
     if (count > 0) {
         // LOCALLY-FAKED SENSOR 2: 
         // We need a temperature field to sense.  Assume temperature is equal to
-        // 100 - distance from the centre of the arena.
+        // 1000 - distance from the centre of the arena.
         const x = robot.body.position.x;
         const y = robot.body.position.y;
-        const temperature = 100 - Math.hypot(x - 400, y - 250);
-        robot.waitTime = Math.round(maxWaitTime * temperature**2 / (temperature**2 + waitOffset));
+        const temperature = 1000 - Math.hypot(x - 400, y - 250);
+        //robot.waitTime = Math.round(maxWaitTime * temperature**2 / (temperature**2 + waitOffset));
+        waitTime = Math.round(maxWaitTime * temperature**2 / (temperature**2 + waitOffset));
     }
 
     // Translate the linear velocity from the robot's reference frame to the
