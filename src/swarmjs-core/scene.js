@@ -70,11 +70,18 @@ export default class Scene {
     this.puckMaps = [];
     this.mapArray = [];
     // Generate Binary Scene Map
+    const mapKey = `${this.width}-${this.height}-${JSON.stringify(staticObjectsDefinitions || [])}`;
     if (pucksConfigs.useGlobalPuckMaps) {
       if (gMaps.mapArray) {
         this.mapArray = gMaps.mapArray;
       } else {
-        this.mapArray = mapSceneToArr(this.width, this.height, this.staticObjects);
+        const storedMap = localStorage.getItem(mapKey);
+        if (storedMap) {
+          this.mapArray = JSON.parse(storedMap);
+        } else {
+          this.mapArray = mapSceneToArr(this.width, this.height, this.staticObjects);
+          localStorage.setItem(mapKey, JSON.stringify(this.mapArray));
+        }
         gMaps.mapArray = this.mapArray;
       }
 
@@ -84,16 +91,26 @@ export default class Scene {
         this.puckMaps = gMaps.puckMaps;
       } else {
         this.puckMaps = this.pucksGroups.map(
-          (group) => (getPucksGoalMap(
-            this.mapArray,
-            Math.floor(this.width * this.puckMapScale),
-            Math.floor(this.height * this.puckMapScale),
-            {
-              x: Math.floor(group.goal.x * this.puckMapScale),
-              y: Math.floor(group.goal.y * this.puckMapScale)
-            },
-            this.puckMapScale
-          ))
+          (group) => {
+            const puckMapKey = `${mapKey}-${group.goal.x}-${group.goal.y}`;
+            const storedMap = localStorage.getItem(puckMapKey);
+            if (storedMap) {
+              return JSON.parse(storedMap);
+            }
+            const newMap = getPucksGoalMap(
+              this.mapArray,
+              Math.floor(this.width * this.puckMapScale),
+              Math.floor(this.height * this.puckMapScale),
+              {
+                x: Math.floor(group.goal.x * this.puckMapScale),
+                y: Math.floor(group.goal.y * this.puckMapScale)
+              },
+              this.puckMapScale
+            );
+            localStorage.setItem(puckMapKey, JSON.stringify(newMap));
+
+            return newMap;
+          }
         );
 
         gMaps.puckMaps = this.puckMaps;
