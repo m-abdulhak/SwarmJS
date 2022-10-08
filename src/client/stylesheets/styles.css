@@ -1,0 +1,84 @@
+.graph-container {
+    margin: auto;
+    margin-bottom: 10px;
+    width: 1400px;
+    padding: 10px;
+    border: solid 1px black;
+}
+
+.graph-title {
+    width: fit-content;
+    margin: auto;
+}
+
+.graph-title p {
+    font-weight: 900;
+}
+
+.graph_plot {
+    fill: none;
+    stroke-width: 5px;
+    opacity: 1;
+}
+
+.svg_stroke_scheme_0 {
+    stroke: green;
+}
+
+.svg_stroke_scheme_1 {
+    stroke: blue;
+}
+
+.svg_color_scheme_0 {
+    color: green;
+}
+
+.svg_color_scheme_1 {
+    color: blue;
+}
+
+.svg_plot_background {
+    opacity: 0.5;
+    stroke-width: 1px;
+}
+
+.svg_plot_reference {
+    stroke-dasharray: 10, 2;
+}
+
+.bench_legend_item {
+    text-align: center;
+    margin: 20px;
+    margin-top: 0px;
+}
+
+.bench_legend_item p {
+    display: inline;
+    margin: 5px;
+}
+
+#simulation-selection {
+    text-align: center;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+}
+
+#simulation-selection p {
+    margin-right: 10px;
+}
+
+#quick-actions {
+    width: fit-content;
+    height: 50px;
+    text-align: center;
+    display: flex;
+    margin: auto;
+}
+
+#quick-actions .quick-actions-icon {
+    height: 50px;
+    line-height: 50px;
+    margin: 0px 10px 0px 10px;
+}
