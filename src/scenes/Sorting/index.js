@@ -1,10 +1,16 @@
 import {
-  AvailableActuators,
-  AvailableSensors,
-  PositionsGenerators,
-  PerformanceTrakers,
-  Controllers
-} from '..';
+  CoreActuators,
+  CoreSensors,
+  CorePositionsGenerators,
+  CorePerformanceTrakers,
+  CoreControllers
+} from '@common';
+
+import actuatorController from './robot/controllers/actuatorController';
+import goalContoller from './robot/controllers/goalController';
+
+import pucksNearGrabberSensor from './robot/sensors/pucksNearGrabberSensor';
+import closestPuckToGrabberSensor from './robot/sensors/closestPuckToGrabberSensor';
 
 const simConfig = {
   env: {
@@ -16,18 +22,20 @@ const simConfig = {
     count: 10,
     radius: 10,
     controllers: {
-      actuators: Controllers.actuators.simpleSortingActuatorController,
-      goal: Controllers.goal.simpleSortingGoalController,
-      waypoint: Controllers.waypoint.dummyWaypointController,
-      // velocity: Controllers.velocity.omniDirVelocityController
+      actuators: actuatorController,
+      goal: goalContoller,
       velocity: {
-        controller: Controllers.velocity.diffVelocityController,
+        controller: CoreControllers.velocity.diffVelocityController,
         params: { angularVelocityScale: 0.001 }
       }
     },
-    sensors: Object.values(AvailableSensors),
-    actuators: Object.values(AvailableActuators),
-    useVoronoiDiagram: false
+    sensors: [ ...Object.values(CoreSensors), pucksNearGrabberSensor, closestPuckToGrabberSensor],
+    actuators: [ CoreActuators.grabber ],
+    useVoronoiDiagram: false,
+    misc: {
+      // EXAMPLE: passing misc objects from config to robots (has to be under 'misc' key)
+      sceneSpecificMap: 'test'
+    }
   },
   pucks: {
     groups: [
@@ -51,7 +59,7 @@ const simConfig = {
     useGlobalPuckMaps: false
   },
   objects: [],
-  positionsGenerator: PositionsGenerators.randomCollisionFree
+  positionsGenerator: CorePositionsGenerators.randomCollisionFree
 };
 
 // Define benchmark configurations:
@@ -89,9 +97,9 @@ const benchmarkConfig = {
     }
   ],
   trackers: [
-    PerformanceTrakers.RobotToGoalDistanceTracker,
-    PerformanceTrakers.PucksOutsideGoalTracker,
-    PerformanceTrakers.MinRobotRobotDistanceTracker
+    CorePerformanceTrakers.RobotToGoalDistanceTracker,
+    CorePerformanceTrakers.PucksOutsideGoalTracker,
+    CorePerformanceTrakers.MinRobotRobotDistanceTracker
   ],
   maxTimeStep: 20000,
   timeStep: 1000

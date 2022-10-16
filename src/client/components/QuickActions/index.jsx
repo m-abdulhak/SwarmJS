@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDrawPolygon, faSync, faCog, faPause, faClock, faStopwatch } from '@fortawesome/free-solid-svg-icons';
-import { countValidDataSets } from '../../../common/benchmarking/graphRenderingUtils';
+import { countValidDataSets } from '@common/benchmarking/graphRenderingUtils';
 
 import {
   startBenchmark,
   stopBenchmark,
   isBenchmarking
-} from '../../../common';
+} from '@common';
 
 const QuickActions = ({
   toggleElementEnabled,

@@ -19,7 +19,7 @@ const getController = (robot, controllerDef) => {
     }
   }
 
-  if (!Func || typeof Func !== 'function') {
+  if (Func && typeof Func !== 'function') {
     throw new Error('Invalid controller', controllerDef);
   }
 
@@ -37,7 +37,8 @@ export default class Robot {
     radius,
     envWidth,
     envHeight,
-    scene
+    scene,
+    misc
   ) {
     // Configs
     this.DeadLockRecovery = {
@@ -56,6 +57,11 @@ export default class Robot {
     this.scene = scene;
     this.engine = this.scene.engine;
     this.world = this.scene.world;
+    
+    // Add scene specific misc values to robots
+    if (misc && typeof misc === 'object' && Object.keys(misc).length > 0) {
+      Object.entries(misc).forEach(([miscKey, miscVal]) => this[miscKey] = miscVal); 
+    }
 
     // Create Matter.js body and attach it to world
     const compoundBody = Body.create({
@@ -102,7 +108,7 @@ export default class Robot {
     this.updateGoal = getController(this, controllers.goal);
 
     // Motion Planning
-    this.updateWaypoint = getController(this, controllers.waypoint);
+    this.updateWaypoint = controllers.waypoint ? getController(this, controllers.waypoint) : null;
 
     // Velocities calculation
     this.updateVelocity = getController(this, controllers.velocity);
@@ -130,21 +136,25 @@ export default class Robot {
     this.sensorManager.update();
 
     // Update goal
-    const newGoalRaw = this.updateGoal(this.goal, this.sensors, this.actuators);
-    const newGoal = this.limitGoal(newGoalRaw);
-    this.goal = newGoal;
+    if (this.updateGoal && typeof this.updateGoal === 'function') {
+      const newGoalRaw = this.updateGoal(this.goal, this.sensors, this.actuators);
+      const newGoal = this.limitGoal(newGoalRaw);
+      this.goal = newGoal;
+    }
 
     // Update waypoint, according to new goal
-    const newWaypoint = this.updateWaypoint(this.goal, this.sensors, this.actuators);
+    const newWaypoint = this.updateWaypoint && typeof this.updateWaypoint === 'function' ?
+      this.updateWaypoint(this.goal, this.sensors, this.actuators) :
+      this.goal;
     this.setWaypoint(newWaypoint);
 
     // Update velocities, according to new waypoint
-    const velocities = this.updateVelocity(newWaypoint, this.sensors, this.actuators);
+    const velocities = this.updateVelocity(this.goal, this.sensors, this.actuators, newWaypoint);
     this.setVelocities(velocities);
 
     // Actuate
     if (this.actuate && typeof this.actuate === 'function') {
-      this.actuate(this.sensors, this.actuators);
+      this.actuate(this.goal, this.sensors, this.actuators, newWaypoint);
     }
   }
 
@@ -607,7 +617,7 @@ const sensorsRenderables = [
     },
     dynamicAttrs: {
       stroke: {
-        prop: 'sensors.closestPuckToGrapper',
+        prop: 'sensors.closestPuckToGrabber',
         modifier: (val) => (val ? 'green' : 'red')
       },
       cx: { prop: 'sensors.directions.forward.x' },

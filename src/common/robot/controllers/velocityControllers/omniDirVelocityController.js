@@ -1,7 +1,7 @@
 // Returns a function that takes a target and returns a velocity vector
 // Example: { linearVel: { x: 0, y: 0 }, angularVel: 0 }
 export default function omniDirVelocityController(robot) {
-  return (point) => {
+  return (goal, sensors, actuators, point) => {
     // If goal point is reached (default)
     let newXVel = 0;
     let newYVel = 0;

@@ -2,6 +2,7 @@
     sensors are imported and stored in this module,
     all sampling is done through this module.
 */
+const toposort = require('toposort');
 
 import EnvironmentBoundsSensor from './env/envBoundsSensor';
 import PositionSensor from './pose/positionSensor';
@@ -17,19 +18,15 @@ import ObstaclesAwareVoronoiCellSensor from './voronoi/obstaclesAwareVoronoiCell
 import BufferedVoronoiCellSensor from './voronoi/bufferedVoronoiCellSensor';
 import ReachedGoalSensor from './state/reachedGoalSensor';
 import ReachedWaypointSensor from './state/reachedWaypointSensor';
-import PucksNearGrapperSensor from './clustering/pucksNearGrapperSensor';
-import ClosestPuckToGrapperSensor from './clustering/closestPuckToGrapperSensor';
 import WallSensor from './env/wallSensor';
 import PuckGoalAreaSensor from './state/puckGoalAreaSensor';
-
-const toposort = require('toposort');
 
 export const sensorSamplingTypes = {
   onStart: 'onStart',
   onUpdate: 'onUpdate'
 };
 
-const availableSensorDefitions = [
+const availableSensorDefinitions = [
   EnvironmentBoundsSensor,
   WallSensor,
   PuckGoalAreaSensor,
@@ -46,13 +43,11 @@ const availableSensorDefitions = [
   BufferedVoronoiCellSensor,
   ReachedGoalSensor,
   ReachedWaypointSensor,
-  PucksNearGrapperSensor,
-  ClosestPuckToGrapperSensor
 ];
 
 // Sensors are stored in this object allowing other modules to easily reference them
 // e.g. in config when defining the enabled sensors, or in other sensors to define a dependency
-export const AvailableSensors = availableSensorDefitions.reduce((acc, sensorDef) => {
+export const AvailableSensors = availableSensorDefinitions.reduce((acc, sensorDef) => {
   acc[sensorDef.name] = sensorDef;
   return acc;
 }, {});

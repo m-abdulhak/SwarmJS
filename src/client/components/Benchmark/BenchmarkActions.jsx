@@ -6,7 +6,7 @@ import {
   startBenchmark,
   stopBenchmark,
   isBenchmarking
-} from '../../../common';
+} from '@common';
 
 const BenchmarkActions = ({ simConfig, benchSettings, reset }) => {
   const btn = !isBenchmarking()

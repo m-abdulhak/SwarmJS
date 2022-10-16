@@ -34,7 +34,10 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx'],
+    alias: {
+        '@common': path.join(__dirname, '../common'),
+    },
   },
   plugins: [
     new HtmlWebpackPlugin({

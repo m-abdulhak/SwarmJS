@@ -64,7 +64,7 @@ export default class Scene {
       robotsConfig.actuators,
       this.width,
       this.height,
-      algorithm
+      robotsConfig.misc
     );
 
     this.puckMaps = [];
@@ -195,10 +195,11 @@ export default class Scene {
   }
 
   initializeRobotsRange(
-    numOfRobots, radius, controllers, sensors, actuators, envWidth, envHeight, algorithm
+    numOfRobots, radius, controllers, sensors, actuators, envWidth, envHeight, misc
   ) {
     return d3.range(numOfRobots)
-      .map((i) => new Robot(i,
+      .map((i) => new Robot(
+        i,
         this.getPos(),
         this.getPos(),
         controllers,
@@ -208,7 +209,8 @@ export default class Scene {
         envWidth,
         envHeight,
         this,
-        algorithm));
+        misc
+    ));
   }
 
   initializePucksRange(pucksGroups, envWidth, envHeight, maps) {

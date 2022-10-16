@@ -1,6 +1,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-const */
-export default function simpleSortingGoalController(robot, params) {
+export default function goalController(robot, params) {
+  // EXAMPLE: using misc objects passed from config in sensors
+  // console.log('sceneSpecificMap in controller:', robot);
+  
   const getGoalFromDir = (position, dir, multi) => {
     const vector = { x: dir.x - position.x, y: dir.y - position.y };
     const goal = { x: position.x + vector.x * multi, y: position.y + vector.y * multi };
@@ -13,7 +16,7 @@ export default function simpleSortingGoalController(robot, params) {
 
   return (oldGoal, sensors, actuators) => {
     const curGoalArea = sensors.puckGoalAreaSensor;
-    const grappedPuck = actuators.grapper.getState();
+    const grappedPuck = actuators.grabber.getState();
 
     if (curGoalArea && grappedPuck && curGoalArea === grappedPuck.color) {
       curGoalHoldTime = 0;

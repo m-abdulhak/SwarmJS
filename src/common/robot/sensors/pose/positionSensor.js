@@ -12,7 +12,7 @@
   The name and sensor object should be exposed by default exporting an object with properties:
     name: the name of the sensor
     Sensor: the sensor object (function or class)
-  and all sensors should be added to the 'availableSensorDefitions' list in sensorManager
+  and all sensors should be added to the 'availableSensorDefinitions' list in sensorManager
 */
 
 import Sensor from '../sensor';

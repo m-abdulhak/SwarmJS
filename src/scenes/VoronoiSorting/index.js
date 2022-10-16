@@ -1,10 +1,12 @@
 import {
-  AvailableActuators,
-  AvailableSensors,
-  PositionsGenerators,
-  PerformanceTrakers,
-  Controllers
-} from '..';
+  CoreActuators,
+  CoreSensors,
+  CorePositionsGenerators,
+  CorePerformanceTrakers,
+  CoreControllers
+} from '@common';
+
+import goalController from './controllers/goalController';
 
 const simConfig = {
   env: {
@@ -17,21 +19,21 @@ const simConfig = {
     radius: 7,
     controllers: {
       goal: {
-        controller: Controllers.goal.sortingGoalController,
+        controller: goalController,
         params: {
           limitPuckSelectionToBVC: true,
           environmentOrbit: true
         }
       },
-      waypoint: Controllers.waypoint.bvcWaypointController,
-      // velocity: Controllers.velocity.omniDirVelocityController
+      waypoint: CoreControllers.waypoint.bvcWaypointController,
+      // velocity: CoreControllers.velocity.omniDirVelocityController
       velocity: {
-        controller: Controllers.velocity.diffVelocityController,
+        controller: CoreControllers.velocity.diffVelocityController,
         params: { angularVelocityScale: 0.01 }
       }
     },
-    sensors: Object.values(AvailableSensors),
-    actuators: Object.values(AvailableActuators),
+    sensors: Object.values(CoreSensors),
+    actuators: Object.values(CoreActuators),
     useVoronoiDiagram: true
   },
   pucks: {
@@ -93,7 +95,7 @@ const simConfig = {
       height: 50
     }
   ],
-  positionsGenerator: PositionsGenerators.randomCollisionFree
+  positionsGenerator: CorePositionsGenerators.randomCollisionFree
 };
 
 const benchmarkConfig = {
@@ -119,9 +121,9 @@ const benchmarkConfig = {
     }
   ],
   trackers: [
-    PerformanceTrakers.RobotToGoalDistanceTracker,
-    PerformanceTrakers.PucksOutsideGoalTracker,
-    PerformanceTrakers.MinRobotRobotDistanceTracker
+    CorePerformanceTrakers.RobotToGoalDistanceTracker,
+    CorePerformanceTrakers.PucksOutsideGoalTracker,
+    CorePerformanceTrakers.MinRobotRobotDistanceTracker
   ],
   maxTimeStep: 50000,
   timeStep: 1000

@@ -2,22 +2,22 @@
 import { World, Constraint, Vector } from 'matter-js';
 import Actuator from './actuator';
 
-const name = 'grapper';
+const name = 'grabber';
 
-class GrapperActuator extends Actuator {
+class GrabberActuator extends Actuator {
   constructor(robot, scene) {
     super(robot, scene, name);
     this.constraints = [];
   }
 
   activate() {
-    if (!this.robot.sensors.closestPuckToGrapper) {
-      console.log(`Failed to activate grapper, no puck found! robot: ${this.robot.id}`);
+    if (!this.robot.sensors.closestPuckToGrabber) {
+      console.log(`Failed to activate grabber, no puck found! robot: ${this.robot.id}`);
       return;
     }
 
     // Set closest puck to the robot
-    const puck = this.robot.sensors.closestPuckToGrapper;
+    const puck = this.robot.sensors.closestPuckToGrabber;
 
     // Define the attachment point
     const relativeAttachmentPoint = { x: this.robot.radius + puck.radius, y: 0 };
@@ -39,7 +39,7 @@ class GrapperActuator extends Actuator {
 
     // Set the puck as held
     puck.held = true;
-    // console.log(`Activated grapper, robot: ${this.robot.id} puck: ${puck.id}`);
+    // console.log(`Activated grabber, robot: ${this.robot.id} puck: ${puck.id}`);
   }
 
   deactivate() {
@@ -58,5 +58,5 @@ class GrapperActuator extends Actuator {
 
 export default {
   name,
-  Actuator: GrapperActuator
+  Actuator: GrabberActuator
 };

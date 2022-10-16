@@ -8,12 +8,12 @@ export default class Actuator {
   }
 
   activate() {
-    // Should be overridden by each sensor, state should be set after activation
+    // Should be overridden by each actuator, state should be set after activation
     throw new Error('Actuator.activate() not implemented');
   }
 
   deactivate() {
-    // Should be overridden by each sensorm, state should be set after deactivation
+    // Should be overridden by each actuator, state should be set after deactivation
     throw new Error('Actuator.deactivate() not implemented');
   }
 

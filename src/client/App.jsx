@@ -8,16 +8,16 @@ import TabContainer from './components/Layouts/TabContainer';
 import Options from './components/Options/index';
 import Benchmark from './components/Benchmark';
 
+import exampleConfigs from '../scenes';
 import {
   stopBenchmark,
   isBenchmarking,
-  exampleConfigs,
   initializeSimulation,
   simulationIsInitialized,
   resetSimulation,
   togglePauseSimulation,
   setSimulationSpeed
-} from '../common';
+} from '@common';
 
 import {
   renderScene,
@@ -25,16 +25,16 @@ import {
   setElementEnabled,
   toggleElementEnabled,
   getRenderingElements
-} from '../common/rendering/renderer';
+} from '@common/rendering/renderer';
 
 const options = Object.values(exampleConfigs).map((v) => ({
   label: v.title, value: v.name
 }));
 
 const App = () => {
-  const [appVariant, setAppVariant] = useState(options[0].value);
-  const [config, setConfig] = useState(exampleConfigs[appVariant].simConfig);
-  const [benchSettings, setBenchSettings] = useState(exampleConfigs[appVariant].benchmarkConfig);
+  const [selectedScene, setSelectedScene] = useState(options[0].value);
+  const [config, setConfig] = useState(exampleConfigs[selectedScene].simConfig);
+  const [benchSettings, setBenchSettings] = useState(exampleConfigs[selectedScene].benchmarkConfig);
   const [uiEnabled, setUiEnabled] = useState(false);
   const [time, setTime] = useState(0);
   const [speed, setSpeed] = useState(1);
@@ -43,7 +43,7 @@ const App = () => {
   const svgRef = useRef(null);
 
   const handleChange = (value) => {
-    setAppVariant(value);
+    setSelectedScene(value);
   };
 
   const selectElem = (
@@ -51,8 +51,8 @@ const App = () => {
       <p>Simulation: </p>
       <Select
         id='simulation-select'
-        name={appVariant.label}
-        value={appVariant}
+        name={selectedScene.label}
+        value={selectedScene}
         onChange={(event) => {
           handleChange(event.target.value);
         }}
@@ -99,9 +99,9 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    setConfig(exampleConfigs[appVariant].simConfig);
-    setBenchSettings(exampleConfigs[appVariant].benchmarkConfig);
-  }, [appVariant]);
+    setConfig(exampleConfigs[selectedScene].simConfig);
+    setBenchSettings(exampleConfigs[selectedScene].benchmarkConfig);
+  }, [selectedScene]);
 
   useEffect(() => {
     reset(config, true);

@@ -7,7 +7,7 @@ import {
   shiftPointOfLineSegInDirOfPerpendicularBisector,
   pointIsInsidePolygon,
   closestPointInPolygonToPoint
-} from '../../../utils/geometry';
+} from '@common/utils/geometry';
 
 // Available Options that can be passed to the controller from config
 // limitPuckSelectionToBVC: true / false,
@@ -35,7 +35,7 @@ const pointIsReachableInEnvBounds = (env, goalPoint, radius) => {
   return reachable;
 };
 
-export default function sortingGoalController(robot, params) {
+export default function goalController(robot, params) {
   const algorithmOptions = { ...defaultOptions, ...params };
   const { radius, envWidth, envHeight } = robot;
   const envBounds = robot.sensors.envBounds;

@@ -1,8 +1,7 @@
 import { angleBetweenThreePointsDeg, pointIsOnRightSideOfVector } from '../../../utils/geometry';
 
 export default function diffVelocityController(robot, { angularVelocityScale }) {
-  return (point) => {
-    const sensors = robot.sensors;
+  return (goal, sensors, actuators, point) => {
     // If goal point is reached (default)
     let linearVelX = 0;
     let linearVelY = 0;

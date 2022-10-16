@@ -1,7 +1,7 @@
-import GrapperActuator from './grapperActuator';
+import GrabberActuator from './grabberActuator';
 
 const availableActuatorsDefitions = [
-  GrapperActuator
+  GrabberActuator
 ];
 
 // Actuators are stored in this object allowing other modules to easily reference them

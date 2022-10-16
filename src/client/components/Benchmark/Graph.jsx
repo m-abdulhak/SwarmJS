@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { GraphRenderer } from '../../../common';
+import { GraphRenderer } from '@common';
 
 const Graph = ({ graphSettings, data, aggData }) => {
   const [renderer, setRenderer] = React.useState(null);
