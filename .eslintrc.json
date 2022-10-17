@@ -12,14 +12,17 @@
             "node": {
                 "root": true,
                 "extensions": [".js",".jsx"]
-            }
+            },
+            "webpack": {
+                "config": "./src/client/webpack.config.js"
+            }        
         }
     },
     "parserOptions": {
         "ecmaVersion": 2020
     },
     "rules": {
-        "linebreak-style":"off",
+        "linebreak-style": "off",
         "strict": 0,
         "comma-dangle": ["error", "never"],
         "prefer-destructuring": ["off", {
@@ -31,6 +34,7 @@
             "ObjectPattern": {
               "multiline": true
             }
-        }]
+        }],
+        "import/no-extraneous-dependencies": "off"
     }
 }

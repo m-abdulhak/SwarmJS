@@ -3,7 +3,7 @@
 export default function goalController(robot, params) {
   // EXAMPLE: using misc objects passed from config in sensors
   // console.log('sceneSpecificMap in controller:', robot);
-  
+
   const getGoalFromDir = (position, dir, multi) => {
     const vector = { x: dir.x - position.x, y: dir.y - position.y };
     const goal = { x: position.x + vector.x * multi, y: position.y + vector.y * multi };

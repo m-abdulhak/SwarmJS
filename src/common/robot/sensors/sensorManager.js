@@ -2,7 +2,6 @@
     sensors are imported and stored in this module,
     all sampling is done through this module.
 */
-const toposort = require('toposort');
 
 import EnvironmentBoundsSensor from './env/envBoundsSensor';
 import PositionSensor from './pose/positionSensor';
@@ -20,6 +19,8 @@ import ReachedGoalSensor from './state/reachedGoalSensor';
 import ReachedWaypointSensor from './state/reachedWaypointSensor';
 import WallSensor from './env/wallSensor';
 import PuckGoalAreaSensor from './state/puckGoalAreaSensor';
+
+const toposort = require('toposort');
 
 export const sensorSamplingTypes = {
   onStart: 'onStart',
@@ -42,7 +43,7 @@ const availableSensorDefinitions = [
   ObstaclesAwareVoronoiCellSensor,
   BufferedVoronoiCellSensor,
   ReachedGoalSensor,
-  ReachedWaypointSensor,
+  ReachedWaypointSensor
 ];
 
 // Sensors are stored in this object allowing other modules to easily reference them

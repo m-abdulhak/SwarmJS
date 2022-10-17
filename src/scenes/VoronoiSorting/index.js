@@ -6,7 +6,17 @@ import {
   CoreControllers
 } from '@common';
 
+import SceneRenderables from '@common/scene/renderables';
+import RobotRenderables from '@common/robot/renderables';
+import PuckRenderables from '@common/puck/renderables';
+
 import goalController from './controllers/goalController';
+
+const renderables = [
+  { module: 'Scene', elements: SceneRenderables },
+  { module: 'Puck', elements: PuckRenderables },
+  { module: 'Robot', elements: RobotRenderables }
+];
 
 const simConfig = {
   env: {
@@ -95,7 +105,8 @@ const simConfig = {
       height: 50
     }
   ],
-  positionsGenerator: CorePositionsGenerators.randomCollisionFree
+  positionsGenerator: CorePositionsGenerators.randomCollisionFree,
+  renderables
 };
 
 const benchmarkConfig = {

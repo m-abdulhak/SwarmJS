@@ -1,5 +1,5 @@
 import { World, Bodies, Body } from 'matter-js';
-import { getDistance } from './utils/geometry';
+import { getDistance } from '../utils/geometry';
 
 export default class Puck {
   constructor(id, position, radius, goal, goalRadius, envWidth, envHeight, scene, color, map) {
@@ -115,68 +115,3 @@ export default class Puck {
     };
   }
 }
-
-export const PuckRenderables = [
-  {
-    type: 'Goal',
-    svgClass: 'puck-goal',
-    dataPoints: { sceneProp: 'pucksGroups' },
-    shape: 'circle',
-    staticAttrs: {
-      r: {
-        prop: 'goalRadius'
-      },
-      fill: { prop: 'color' },
-      cx: { prop: 'goal.x' },
-      cy: { prop: 'goal.y' }
-    },
-    dynamicAttrs: {
-    },
-    styles: {
-      'fill-opacity': 0.1,
-      'stroke-opacity': 0.1
-    }
-  },
-  {
-    type: 'Body',
-    svgClass: 'puck-body',
-    dataPoints: { sceneProp: 'pucks' },
-    shape: 'circle',
-    staticAttrs: {
-      r: { prop: 'radius' },
-      id: { prop: 'id' },
-      fill: { prop: 'color' }
-    },
-    dynamicAttrs: {
-      cx: { prop: 'position.x' },
-      cy: { prop: 'position.y' }
-    },
-    styles: {
-      stroke: 'black',
-      'stroke-width': 1,
-      'stroke-opacity': 1,
-      'fill-opacity': 1
-    },
-    drag: {
-      prop: 'position',
-      pause: true,
-      onStart: {
-        styles: {
-          stroke: 'lightgray'
-        },
-        log: [
-          { prop: 'color' },
-          { prop: 'groupGoal' },
-          { prop: 'goal' },
-          { prop: 'position' },
-          { prop: 'velocity' }
-        ]
-      },
-      onEnd: {
-        styles: {
-          stroke: 'black'
-        }
-      }
-    }
-  }
-];

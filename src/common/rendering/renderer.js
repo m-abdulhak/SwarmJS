@@ -4,39 +4,25 @@
 import * as d3 from 'd3';
 import { addRenderables, setDynamicAttrs, getUniqueELementType } from './renderingUtils';
 
-import { SceneRenderables } from '../scene';
-import { RobotRenderables } from '../robot/robot';
-import { PuckRenderables } from '../puck';
-
+let resetOnNextRender = false;
 let initialized = false;
 let lastSvgEl = null;
 let lastScene = null;
 
-// All renderables should be registered in this list and assigned a module property
-// This is necessary to avoid imposing a unique restriction on renderable type in different modules
-// So if both robots and pucks have 'body' type renderables, they can still be treated as separate
-// types and be disabled/enabled independently from the UI while also having a readable name
-// There could be a cleaner way to do this, but it works for now
-// Ordering is also important, as it determines which elements are shown on top
-// Elements defined last are shown on top
-const renderables = [
-  { module: 'Scene', rendList: SceneRenderables },
-  { module: 'Puck', rendList: PuckRenderables },
-  { module: 'Robot', rendList: RobotRenderables }
-];
+export const uniqueRenderingElements = (renderables) => ([
+  'All',
+  ...new Set(
+    renderables
+      .map((renderable) => renderable.elements.map(
+        (def) => getUniqueELementType(renderable.module, def.type)
+      ))
+      .reduce((acc, curr) => acc.concat(curr), [])
+  )
+]);
 
-const uniqueRenderingElements = ['All', ...new Set(renderables
-  .map((renderable) => renderable.rendList.map(
-    (def) => getUniqueELementType(renderable.module, def.type)
-  ))
-  .reduce((acc, curr) => acc.concat(curr), []))
-];
-
-let activeElements = [...uniqueRenderingElements];
+let activeElements = [];
 
 const renderedElems = [];
-
-export const getRenderingElements = () => [...uniqueRenderingElements];
 
 export const setElementEnabled = (element, state) => {
   const otherActiveElements = activeElements.filter((e) => e !== element);
@@ -48,20 +34,23 @@ export const toggleElementEnabled = (element) => {
   setElementEnabled(element, !curState);
 };
 
-export function initialize(svg, scene) {
+export function initialize(svg, scene, renderables) {
   if (svg) {
     svg.selectAll('*').remove();
   }
+
+  activeElements = [...uniqueRenderingElements(renderables)];
+
   renderedElems.length = 0;
 
   renderables.forEach((renderable) => {
-    renderedElems.push(...addRenderables(svg, scene, renderable.rendList, renderable.module));
+    renderedElems.push(...addRenderables(svg, scene, renderable.elements, renderable.module));
   });
 
   initialized = true;
 }
 
-export function renderScene(curSvgEl, curScene) {
+export function renderScene(curSvgEl, curScene, elements) {
   const svgEl = curSvgEl || lastSvgEl;
   const scene = curScene || lastScene;
 
@@ -75,7 +64,7 @@ export function renderScene(curSvgEl, curScene) {
   const svg = d3.select(svgEl);
 
   if (!initialized) {
-    initialize(svg, scene);
+    initialize(svg, scene, elements);
   }
 
   if (!activeElements.includes('All')) {
@@ -95,8 +84,13 @@ export function renderScene(curSvgEl, curScene) {
         .attr('fill-opacity', '0%');
     }
   });
+
+  if (resetOnNextRender) {
+    resetOnNextRender = false;
+    initialized = false;
+  }
 }
 
 export const resetRenderer = () => {
-  initialized = false;
+  resetOnNextRender = true;
 };

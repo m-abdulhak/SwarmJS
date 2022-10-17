@@ -29,9 +29,7 @@ const getDomains = (data) => {
 
 const getScale = (domain, range) => d3.scaleLinear().domain(domain).range(range);
 
-const addXAxis = (
-  svgElem, xScale, { actualWidth, actualHeight, margin, xTitle } = {}
-) => {
+const addXAxis = (svgElem, xScale, { actualWidth, actualHeight, margin, xTitle } = {}) => {
   svgElem.append('g')
     .classed('x-axis', true)
     .attr('transform', `translate(0, ${actualHeight || 0})`)
@@ -45,9 +43,7 @@ const addXAxis = (
   }
 };
 
-const addYAxis = (
-  svgElem, yScale, { actualHeight, margin, yTitle } = {}
-) => {
+const addYAxis = (svgElem, yScale, { actualHeight, margin, yTitle } = {}) => {
   svgElem.append('g')
     .classed('y-axis', true)
     .call(d3.axisLeft(yScale));
@@ -72,7 +68,13 @@ const removeYAxis = (svgElem) => {
 };
 
 const createPlot = (
-  svgContainer, xScale, yScale, data, index = 0, background = false, dashed = false
+  svgContainer,
+  xScale,
+  yScale,
+  data,
+  index = 0,
+  background = false,
+  dashed = false
 ) => {
   const formattedData = Object.keys(data).map((key) => [parseFloat(key), data[key]]);
 
@@ -141,9 +143,7 @@ export const initSvgGraph = (svgElem, graphSettings) => {
   return { xScale, yScale };
 };
 
-export const updateSvgGraph = (
-  svgElem, data, aggData, existingSvgLines, { xScale, yScale }
-) => {
+export const updateSvgGraph = (svgElem, data, aggData, existingSvgLines, { xScale, yScale }) => {
   const newLinePlots = {};
 
   if (!data || Object.keys(data).length === 0) {

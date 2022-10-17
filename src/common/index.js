@@ -12,6 +12,7 @@ import {
 const gMaps = [];
 
 let scene;
+let renderScene;
 
 const createSimulation = (config, updateCallback) => {
   scene = new Scene(
@@ -24,31 +25,33 @@ const createSimulation = (config, updateCallback) => {
     gMaps
   );
 
-  const renderScene = () => {
+  renderScene = () => {
     if (!scene.paused) {
       scene.update();
       updateBench(scene, scene.timeInstance);
       if (updateCallback && typeof updateCallback === 'function') {
         const benchData = getBenchData();
-        updateCallback(scene.timeInstance, scene, benchData);
+        updateCallback(scene.timeInstance, scene, benchData, config.renderables);
       }
     }
     requestAnimationFrame(renderScene);
   };
+
   renderScene();
 };
 
 export const simulationIsInitialized = () => scene !== undefined;
 
-export const initializeSimulation = (config, updateCallback) => {
+export const initializeSimulation = (config, updateCB) => {
   if (scene) {
     return;
   }
   console.log('Creating Sim With Config: ', config);
-  createSimulation(config, updateCallback);
+  createSimulation(config, updateCB);
 };
 
-export const resetSimulation = (config) => {
+export const resetSimulation = (config, updateCallback) => {
+  console.log('Creating Sim With Config: ', config);
   scene = new Scene(
     config.env,
     config.robots,
@@ -58,6 +61,18 @@ export const resetSimulation = (config) => {
     config.positionsGenerator,
     gMaps
   );
+
+  renderScene = () => {
+    if (!scene.paused) {
+      scene.update();
+      updateBench(scene, scene.timeInstance);
+      if (updateCallback && typeof updateCallback === 'function') {
+        const benchData = getBenchData();
+        updateCallback(scene.timeInstance, scene, benchData, config.renderables);
+      }
+    }
+    requestAnimationFrame(renderScene);
+  };
 };
 
 export const startBenchmark = (simConfig, benchConfig, resetSimCB) => {

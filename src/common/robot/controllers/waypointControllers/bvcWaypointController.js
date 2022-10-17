@@ -92,7 +92,9 @@ export default function bvcWaypointController(robot, params) {
     // Get vertices of cell that lie on the current maneuver direction
     const vertecies = getVerteciesOnManeuverDir(cell, robot.sensors.position, robot.goal);
     const outermostPoint = getFurthestVertexFromLineSeg(
-      vertecies, robot.sensors.position, robot.goal
+      vertecies,
+      robot.sensors.position,
+      robot.goal
     );
     const distanceToOutermostPoint = robot.getDistanceTo(outermostPoint);
     if (distanceToOutermostPoint < detourPointMaxDistance) {
@@ -181,9 +183,14 @@ export default function bvcWaypointController(robot, params) {
     if (Math.random() > 0.8) return Math.random() > 0.5;
 
     const furthestPoint = getFurthestVertexFromLineSeg(cell, robot.sensors.position, robot.goal);
-    const furthestPointDir = pointIsOnRightSideOfVector(furthestPoint.x, furthestPoint.y,
-      robot.sensors.position.x, robot.sensors.position.y,
-      robot.goal.x, robot.goal.y);
+    const furthestPointDir = pointIsOnRightSideOfVector(
+      furthestPoint.x,
+      furthestPoint.y,
+      robot.sensors.position.x,
+      robot.sensors.position.y,
+      robot.goal.x,
+      robot.goal.y
+    );
     return furthestPointDir;
   }
 

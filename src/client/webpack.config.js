@@ -6,7 +6,7 @@ module.exports = {
   entry: [
     path.join(__dirname, 'index.js')
   ],
-  devtool: "source-map",
+  devtool: 'source-map',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
@@ -36,8 +36,8 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx'],
     alias: {
-        '@common': path.join(__dirname, '../common'),
-    },
+      '@common': path.join(__dirname, '../common')
+    }
   },
   plugins: [
     new HtmlWebpackPlugin({

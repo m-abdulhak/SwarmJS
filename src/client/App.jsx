@@ -3,12 +3,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 
-import QuickActions from './components/QuickActions';
-import TabContainer from './components/Layouts/TabContainer';
-import Options from './components/Options/index';
-import Benchmark from './components/Benchmark';
-
-import exampleConfigs from '../scenes';
 import {
   stopBenchmark,
   isBenchmarking,
@@ -21,11 +15,18 @@ import {
 
 import {
   renderScene,
+  uniqueRenderingElements,
   resetRenderer,
   setElementEnabled,
-  toggleElementEnabled,
-  getRenderingElements
+  toggleElementEnabled
 } from '@common/rendering/renderer';
+
+import QuickActions from './components/QuickActions';
+import TabContainer from './components/Layouts/TabContainer';
+import Options from './components/Options/index';
+import Benchmark from './components/Benchmark';
+
+import exampleConfigs from '../scenes';
 
 const options = Object.values(exampleConfigs).map((v) => ({
   label: v.title, value: v.name
@@ -72,20 +73,20 @@ const App = () => {
     setSimulationSpeed(speedNumber);
   };
 
+  const onUpdate = (newTime, scene, benchData, renderables) => {
+    setTime(newTime);
+    renderScene(svgRef.current, scene, renderables);
+    setBenchmarkData(benchData);
+  };
+
   const reset = (newConfig = config, stopBench = false) => {
     if (stopBench && isBenchmarking()) {
       stopBenchmark();
     }
-    resetRenderer();
-    resetSimulation(newConfig);
+    resetSimulation(newConfig, onUpdate);
     onSpeedChange(newConfig.env.speed);
     setPaused(false);
-  };
-
-  const onUpdate = (newTime, scene, benchData) => {
-    setTime(newTime);
-    renderScene(svgRef.current, scene);
-    setBenchmarkData(benchData);
+    resetRenderer();
   };
 
   const onTogglePause = () => {
@@ -117,7 +118,7 @@ const App = () => {
       togglePause={onTogglePause}
       setSpeed={onSpeedChange}
       reset={reset}
-      renderingElements = {getRenderingElements()}
+      renderingElements = {uniqueRenderingElements(config.renderables)}
       setElementEnabled={setElementEnabled}
     />
   ) : <></>;

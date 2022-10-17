@@ -3,11 +3,11 @@ import * as d3 from 'd3';
 import { Engine, World } from 'matter-js';
 import { Delaunay } from 'd3-delaunay';
 
-import Robot from './robot/robot';
-import Puck from './puck';
-import generateStaticObject from './staticObjects/staticObjectFactory';
-import { mapSceneToArr, getPucksGoalMap } from './distanceTransform/globalPlanning';
-import { getEnvBoundaryObjects } from './utils/matter';
+import Robot from '../robot/robot';
+import Puck from '../puck';
+import generateStaticObject from '../staticObjects/staticObjectFactory';
+import { mapSceneToArr, getPucksGoalMap } from '../distanceTransform/globalPlanning';
+import { getEnvBoundaryObjects } from '../utils/matter';
 
 export default class Scene {
   constructor(
@@ -195,7 +195,14 @@ export default class Scene {
   }
 
   initializeRobotsRange(
-    numOfRobots, radius, controllers, sensors, actuators, envWidth, envHeight, misc
+    numOfRobots,
+    radius,
+    controllers,
+    sensors,
+    actuators,
+    envWidth,
+    envHeight,
+    misc
   ) {
     return d3.range(numOfRobots)
       .map((i) => new Robot(
@@ -210,7 +217,7 @@ export default class Scene {
         envHeight,
         this,
         misc
-    ));
+      ));
   }
 
   initializePucksRange(pucksGroups, envWidth, envHeight, maps) {
@@ -240,41 +247,3 @@ export default class Scene {
     return pucks;
   }
 }
-
-export const SceneRenderables = [
-  {
-    type: 'Obstacles',
-    svgClass: 'obstacle',
-    dataPoints: {
-      sceneProp: 'staticObjects',
-      modifier: (list) => list.filter((o) => o.def.type === 'rectangle')
-    }, // property of scene
-    shape: 'rect',
-    staticAttrs: {
-      x: { prop: 'left' },
-      y: { prop: 'top' },
-      width: { prop: 'width' },
-      height: { prop: 'height' }
-    },
-    styles: {
-      fill: '#000000'
-    }
-  },
-  {
-    type: 'Obstacles',
-    svgClass: 'obstacle',
-    dataPoints: {
-      sceneProp: 'staticObjects',
-      modifier: (list) => list.filter((o) => o.def.type === 'circle')
-    }, // property of scene
-    shape: 'circle',
-    staticAttrs: {
-      cx: { prop: 'center.x' },
-      cy: { prop: 'center.y' },
-      r: { prop: 'radius' }
-    },
-    styles: {
-      fill: '#000000'
-    }
-  }
-];

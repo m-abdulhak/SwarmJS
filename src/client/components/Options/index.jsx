@@ -1,20 +1,14 @@
 import React from 'react';
 import propTypes from 'prop-types';
 
-import SimActions from './SimActions';
-import TimeDisplay from './TimeDisplay';
 import SpeedSlider from './SpeedSlider';
 import RenderingSettings from './RenderingSettings';
 
 const Options = ({
   speed,
-  paused,
-  togglePause,
   setSpeed,
-  reset,
   renderingElements,
-  setElementEnabled,
-  time
+  setElementEnabled
 }) => (
   <>
     {/* <SimActions reset={reset} paused={paused} togglePause={togglePause} /> */}
