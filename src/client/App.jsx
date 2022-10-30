@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 import {
   stopBenchmark,
@@ -33,6 +35,7 @@ const options = Object.values(exampleConfigs).map((v) => ({
 }));
 
 const App = () => {
+  const [loading, setLoading] = useState(true);
   const [selectedScene, setSelectedScene] = useState(options[0].value);
   const [config, setConfig] = useState(exampleConfigs[selectedScene].simConfig);
   const [benchSettings, setBenchSettings] = useState(exampleConfigs[selectedScene].benchmarkConfig);
@@ -97,6 +100,7 @@ const App = () => {
   useEffect(() => {
     // Initialize the simulation when the component mounts
     initializeSimulation(config, onUpdate);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -142,7 +146,17 @@ const App = () => {
     <TabContainer tabContents={tabContents} />
   ) : <></>;
 
-  return (
+  const loadingElem = (
+      <Box className='loading-screen'>
+        <div className='loading-message'>
+          <p>Generating Scene</p>
+          <img src="loading.svg" />
+          <CircularProgress color="success" />
+        </div>
+      </Box>
+  );
+
+  return loading ? loadingElem : (
     <div style={{ width: '100%' }}>
       {selectElem}
       <QuickActions
