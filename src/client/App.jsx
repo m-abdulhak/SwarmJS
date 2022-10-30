@@ -49,7 +49,7 @@ const App = () => {
 
   const selectElem = (
     <div id='simulation-selection'>
-      <p>Simulation: </p>
+      <p>Scene: </p>
       <Select
         id='simulation-select'
         name={selectedScene.label}
