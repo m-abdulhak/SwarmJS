@@ -4,7 +4,7 @@
   "description": "Simulation of a distributed multi-robot collision avoidance algorithm based on the concept of Buffered Voronoi Cells (BVC)*.\\\r An algorithm for deadlock prediction, deadlock recovery, and deadlock recovery success prediction is proposed and implemented.\\\r Deadlock avoidance with right-hand heuristics is also implemented for comparison.",
   "main": "index.js",
   "scripts": {
-    "postinstall": "(cd src/client && npm install) && (cd ../../src/common && npm install) && (cd ../../src/scenes && npm install)",
+    "postinstall": "(cd src/client && npm install) && (cd src/common && npm install) && (cd src/scenes && npm install)",
     "build": "cd src/client && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cd src/client && npm run dev"
