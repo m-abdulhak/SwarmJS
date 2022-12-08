@@ -104,11 +104,15 @@ export default class Robot {
       this.actuate = getController(this, controllers.actuators);
     }
 
-    // Goal Planning
-    this.updateGoal = getController(this, controllers.goal);
+    // Goal Planning (goal controller is optional)
+    if (controllers.goal) {
+      this.updateGoal = getController(this, controllers.goal);
+    }
 
-    // Motion Planning
-    this.updateWaypoint = controllers.waypoint ? getController(this, controllers.waypoint) : null;
+    // Motion Planning (waypoint controller is optional)
+    if (controllers.waypoint) {
+      this.updateWaypoint = controllers.waypoint ? getController(this, controllers.waypoint) : null;
+    }
 
     // Velocities calculation
     this.updateVelocity = getController(this, controllers.velocity);
