@@ -3,10 +3,16 @@ export default function velocityController(robot, { angularVelocityScale }) {
     const neighborSensingRadius = 30;
     const angularMax = 1;
     const maxForwardSpeed = 3;
+    const minNearbyNeighborsToTriggerWait = 2;
 
+    // State of the robot which can be either "NORMAL" or "WAIT".
+    // BAD: Does JS have something like enums to make sure the state is only
+    // one of the above?
     var state = "NORMAL";
     var stateTimeOut = 0;
 
+    // BAD: There should be a type of controller which is provided only with
+    // sensors.
     return (goal, sensors, actuators, point) => {
 
         //
@@ -23,7 +29,7 @@ export default function velocityController(robot, { angularVelocityScale }) {
             }
         }
 
-        if (nNearby >= 2) {
+        if (nNearby >= minNearbyNeighborsToTriggerWait) {
             state = "WAIT";
             stateTimeOut = 100;
         } else if (stateTimeOut == 0) {
@@ -34,18 +40,29 @@ export default function velocityController(robot, { angularVelocityScale }) {
         // Actions based on current state
         //
 
+        let forwardSpeed = 0;
+        let angularSpeed = 0;
         if (state == "NORMAL") {
             // Choose a random angle.
-            let angularSpeed = angularMax*Math.random() - angularMax / 2;
+            angularSpeed = angularMax*Math.random() - angularMax / 2;
 
-            let theta = sensors.orientation;
-            const linearVel = { x: maxForwardSpeed * Math.cos(theta), y: maxForwardSpeed * Math.sin(theta) };
-
-            return { linearVel, angularVel: angularSpeed };
+            // Go full speed ahead.
+            forwardSpeed = maxForwardSpeed;
 
         } else if (state == "WAIT") {
-            const linearVel = { x: 0, y: 0 };
-            return { linearVel, angularVel: 0 };
+            // Keep the default speeds of 0, 0.
         }
+
+        // BAD: A robot should be able to supply a forward speed and angular
+        // speed and then let the simulator figure out how to update its internal
+        // representation of the robot's velocity.  Requiring knowledge of the
+        // robot's orientation is inconsistent with the idea of a simple reactive
+        // robot.
+
+        // In other words, it would be nice to have a type of controller which
+        // just returned forwardSpeed and angularSpeed.
+        let theta = sensors.orientation;
+        const linearVel = { x: forwardSpeed * Math.cos(theta), y: forwardSpeed * Math.sin(theta) };
+        return { linearVel, angularVel: angularSpeed };
     };
 }
