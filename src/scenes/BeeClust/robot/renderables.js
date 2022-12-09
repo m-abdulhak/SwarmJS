@@ -186,7 +186,7 @@ const bodyRenderables = [
       staticAttrs: {
         r: {
           prop: 'radius',
-          modifier: (val) => val * 0.4
+          //modifier: (val) => val * 0.4
         },
         id: { prop: 'id' }
       },
@@ -214,7 +214,7 @@ const bodyRenderables = [
       staticAttrs: {
         r: {
           prop: 'radius',
-          modifier: (val) => val * 0.4
+          //modifier: (val) => val * 0.4
         },
         id: { prop: 'id' }
       },

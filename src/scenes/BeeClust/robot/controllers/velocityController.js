@@ -1,46 +1,51 @@
 export default function velocityController(robot, { angularVelocityScale }) {
+    // PARAMETERS:
+    const neighborSensingRadius = 30;
+    const angularMax = 1;
+    const maxForwardSpeed = 3;
+
+    var state = "NORMAL";
+    var stateTimeOut = 0;
+
     return (goal, sensors, actuators, point) => {
 
-        /*
-        // If goal point is reached (default)
-        let linearVelX = 0;
-        let linearVelY = 0;
-        let angularVel = 0;
-    
-        if (robot.reached(point)) {
-          return { linearVel: { x: 0, y: 0 }, angularVel };
+        //
+        // State transitions...
+        //
+
+        stateTimeOut -= 1;
+
+        // Determine number of neighbors within a fixed radius.
+        var nNearby = 0;
+        for (var neighbor of sensors.neighbors) {
+            if (robot.getDistanceTo(neighbor.body.position) < neighborSensingRadius) {
+                nNearby += 1;
+            }
         }
-    
-        const angle = angleBetweenThreePointsDeg(sensors.heading, sensors.position, point);
-        const directionOnRight = pointIsOnRightSideOfVector(
-          sensors.heading.x,
-          sensors.heading.y,
-          sensors.position.x,
-          sensors.position.y,
-          point.x,
-          point.y
-        );
-    
-        if (angle < 5) {
-          linearVelX = robot.velocityScale * (sensors.heading.x - sensors.position.x);
-          linearVelY = robot.velocityScale * (sensors.heading.y - sensors.position.y);
-        } else if (directionOnRight) {
-          angularVel = -1 * angularVelocityScale * angle;
-        } else {
-          angularVel = angularVelocityScale * angle;
+
+        if (nNearby >= 2) {
+            state = "WAIT";
+            stateTimeOut = 100;
+        } else if (stateTimeOut == 0) {
+            state = "NORMAL";
         }
-    
-        const linearVel = { x: linearVelX / 50, y: linearVelY / 50 };
-        */
 
-        let forwardSpeed = 3;
+        //
+        // Actions based on current state
+        //
 
-        let angularMax = 1;
-        let angularSpeed = angularMax*Math.random() - angularMax / 2;
+        if (state == "NORMAL") {
+            // Choose a random angle.
+            let angularSpeed = angularMax*Math.random() - angularMax / 2;
 
-        let theta = sensors.orientation;
-        const linearVel = { x: forwardSpeed * Math.cos(theta), y: forwardSpeed * Math.sin(theta) };
+            let theta = sensors.orientation;
+            const linearVel = { x: maxForwardSpeed * Math.cos(theta), y: maxForwardSpeed * Math.sin(theta) };
 
-        return { linearVel, angularVel: angularSpeed };
+            return { linearVel, angularVel: angularSpeed };
+
+        } else if (state == "WAIT") {
+            const linearVel = { x: 0, y: 0 };
+            return { linearVel, angularVel: 0 };
+        }
     };
 }

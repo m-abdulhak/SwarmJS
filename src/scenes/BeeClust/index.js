@@ -39,7 +39,8 @@ const simConfig = {
     },
     sensors: [...Object.values(CoreSensors)],
     actuators: [],
-    useVoronoiDiagram: false,
+    // The neighbors sensor doesn't work unless the Voronoi diagram is used.
+    useVoronoiDiagram: true,
     misc: {
       // EXAMPLE: passing misc objects from config to robots (has to be under 'misc' key)
       sceneSpecificMap: 'test'
