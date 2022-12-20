@@ -35,6 +35,7 @@
               "multiline": true
             }
         }],
-        "import/no-extraneous-dependencies": "off"
+        "import/no-extraneous-dependencies": "off",
+        "no-restricted-syntax": "off"
     }
 }

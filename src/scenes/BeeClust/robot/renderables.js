@@ -113,130 +113,129 @@
 // ];
 
 const bodyRenderables = [
-    {
-      type: 'Body',
-      svgClass: 'robot-body',
-      dataPoints: { sceneProp: 'robots' },
-      shape: 'circle',
-      staticAttrs: {
-        r: { prop: 'radius' },
-        id: { prop: 'id' }
-      },
-      dynamicAttrs: {
-        cx: { prop: 'sensors.position.x' },
-        cy: { prop: 'sensors.position.y' }
-      },
-      styles: {
-        fill: '#FFC53A',
-        stroke: 'black',
-        'stroke-width': 1,
-        'stroke-opacity': 1,
-        'fill-opacity': 1
-      },
-      drag: {
-        prop: 'position',
-        pause: true,
-        onStart: {
-          styles: {
-            stroke: 'green'
-          },
-          log: [
-            { prop: 'sensors' }
-          ]
-        },
-        onEnd: {
-          styles: {
-            stroke: 'black'
-          }
-        }
-      }
+  {
+    type: 'Body',
+    svgClass: 'robot-body',
+    dataPoints: { sceneProp: 'robots' },
+    shape: 'circle',
+    staticAttrs: {
+      r: { prop: 'radius' },
+      id: { prop: 'id' }
     },
-    {
-      type: 'Body',
-      svgClass: 'robot-orientation',
-      desc: 'Line segments between robots and headings',
-      dataPoints: { sceneProp: 'robots' },
-      shape: 'path',
-      staticAttrs: {
-        id: { prop: 'id' }
-      },
-      dynamicAttrs: {
-        points: [
-          { prop: 'sensors.position' },
-          { prop: 'sensors.heading' }
+    dynamicAttrs: {
+      cx: { prop: 'sensors.position.x' },
+      cy: { prop: 'sensors.position.y' }
+    },
+    styles: {
+      fill: '#FFC53A',
+      stroke: 'black',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
+    },
+    drag: {
+      prop: 'position',
+      pause: true,
+      onStart: {
+        styles: {
+          stroke: 'green'
+        },
+        log: [
+          { prop: 'sensors' }
         ]
       },
-      styles: {
-        fill: 'none',
-        stroke: 'black',
-        'stroke-width': 3,
-        'stroke-opacity': 1,
-        'fill-opacity': 1
+      onEnd: {
+        styles: {
+          stroke: 'black'
+        }
       }
     }
-  ];
-  
-  const sensorsRenderables = [
-    {
-      type: 'Sensor',
-      svgClass: 'wall-sensor',
-      desc: 'Sensor',
-      shape: 'circle',
-      dataPoints: { sceneProp: 'robots' },
-      staticAttrs: {
-        r: {
-          prop: 'radius',
-          //modifier: (val) => val * 0.4
-        },
-        id: { prop: 'id' }
-      },
-      dynamicAttrs: {
-        fill: {
-          prop: 'sensors.walls',
-          modifier: (val) => (val.includes('left') ? 'green' : 'red')
-        },
-        cx: { prop: 'sensors.directions.left.x' },
-        cy: { prop: 'sensors.directions.left.y' }
-      },
-      styles: {
-        fill: 'none',
-        'fill-opacity': 0,
-        'stroke-width': 2,
-        'stroke-opacity': 1
-      }
+  },
+  {
+    type: 'Body',
+    svgClass: 'robot-orientation',
+    desc: 'Line segments between robots and headings',
+    dataPoints: { sceneProp: 'robots' },
+    shape: 'path',
+    staticAttrs: {
+      id: { prop: 'id' }
     },
-    {
-      type: 'Sensor',
-      svgClass: 'wall-sensor',
-      desc: 'Sensor',
-      shape: 'circle',
-      dataPoints: { sceneProp: 'robots' },
-      staticAttrs: {
-        r: {
-          prop: 'radius',
-          //modifier: (val) => val * 0.4
-        },
-        id: { prop: 'id' }
-      },
-      dynamicAttrs: {
-        fill: {
-          prop: 'sensors.walls',
-          modifier: (val) => (val.includes('right') ? 'green' : 'red')
-        },
-        cx: { prop: 'sensors.directions.right.x' },
-        cy: { prop: 'sensors.directions.right.y' }
-      },
-      styles: {
-        fill: 'none',
-        'fill-opacity': 0,
-        'stroke-width': 2,
-        'stroke-opacity': 1
-      }
+    dynamicAttrs: {
+      points: [
+        { prop: 'sensors.position' },
+        { prop: 'sensors.heading' }
+      ]
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'stroke-width': 3,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
     }
-  ];
-  
-  export default [
-    ...sensorsRenderables,
-    ...bodyRenderables
-  ];
-  
+  }
+];
+
+const sensorsRenderables = [
+  {
+    type: 'Sensor',
+    svgClass: 'wall-sensor',
+    desc: 'Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'radius'
+        // modifier: (val) => val * 0.4
+      },
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.walls',
+        modifier: (val) => (val.includes('left') ? 'green' : 'red')
+      },
+      cx: { prop: 'sensors.directions.forwardLeft.x' },
+      cy: { prop: 'sensors.directions.forwardLeft.y' }
+    },
+    styles: {
+      fill: 'none',
+      'fill-opacity': 0,
+      'stroke-width': 2,
+      'stroke-opacity': 1
+    }
+  },
+  {
+    type: 'Sensor',
+    svgClass: 'wall-sensor',
+    desc: 'Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'radius'
+        // modifier: (val) => val * 0.4
+      },
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.walls',
+        modifier: (val) => (val.includes('right') ? 'green' : 'red')
+      },
+      cx: { prop: 'sensors.directions.forwardRight.x' },
+      cy: { prop: 'sensors.directions.forwardRight.y' }
+    },
+    styles: {
+      fill: 'none',
+      'fill-opacity': 0,
+      'stroke-width': 2,
+      'stroke-opacity': 1
+    }
+  }
+];
+
+export default [
+  ...sensorsRenderables,
+  ...bodyRenderables
+];

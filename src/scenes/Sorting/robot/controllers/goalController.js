@@ -14,7 +14,7 @@ export default function goalController(robot, params) {
   let curGoalHoldTime = 0;
   let goalDistance = 20;
 
-  return (oldGoal, sensors, actuators) => {
+  return (sensors, actuators, oldGoal) => {
     const curGoalArea = sensors.puckGoalAreaSensor;
     const grappedPuck = actuators.grabber.getState();
 

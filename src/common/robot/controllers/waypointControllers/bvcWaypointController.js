@@ -280,7 +280,7 @@ export default function bvcWaypointController(robot, params) {
     return null;
   }
 
-  return (goal, sensors) => {
+  return (sensors, actuators, goal) => {
     const cell = sensors.BVC;
     // If cell is undefined (shouldn't happen in collision-free configurations)
     // => set localgoal = goal

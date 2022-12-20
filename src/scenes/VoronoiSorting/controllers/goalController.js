@@ -268,7 +268,7 @@ export default function goalController(robot, params) {
     return newBestPuck;
   }
 
-  return (oldGoal, sensors) => {
+  return (sensors, actuators, oldGoal) => {
     // If robot was stuck and is still recovering, do not change robot goal
     if (stuck && avoidingStuckDuration <= MIN_STUCK_MANEUVER_DURATION) {
       avoidingStuckDuration += 1;

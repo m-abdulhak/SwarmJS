@@ -5,6 +5,11 @@ import { getDistance } from '../utils/geometry';
 import SensorManager from './sensors/sensorManager';
 import ActuatorManager from './actuators/actuatorsManager';
 
+const SPEED_TYPES = {
+  RELATIVE: 'RELATIVE',
+  ABSOLUTE: 'ABSOLUTE'
+};
+
 const getController = (robot, controllerDef) => {
   let Func = null;
   let params = {};
@@ -46,6 +51,7 @@ export default class Robot {
       Simple: 1,
       Advanced: 2
     };
+    this.SPEED_TYPES = SPEED_TYPES;
     this.id = id;
     this.radius = radius;
     this.velocity = { x: 0, y: 0 };
@@ -111,7 +117,7 @@ export default class Robot {
 
     // Motion Planning (waypoint controller is optional)
     if (controllers.waypoint) {
-      this.updateWaypoint = controllers.waypoint ? getController(this, controllers.waypoint) : null;
+      this.updateWaypoint = getController(this, controllers.waypoint);
     }
 
     // Velocities calculation
@@ -141,24 +147,31 @@ export default class Robot {
 
     // Update goal
     if (this.updateGoal && typeof this.updateGoal === 'function') {
-      const newGoalRaw = this.updateGoal(this.goal, this.sensors, this.actuators);
+      const newGoalRaw = this.updateGoal(this.sensors, this.actuators, this.goal);
       const newGoal = this.limitGoal(newGoalRaw);
       this.goal = newGoal;
     }
 
     // Update waypoint, according to new goal
     const newWaypoint = this.updateWaypoint && typeof this.updateWaypoint === 'function'
-      ? this.updateWaypoint(this.goal, this.sensors, this.actuators)
+      ? this.updateWaypoint(this.sensors, this.actuators, this.goal)
       : this.goal;
     this.setWaypoint(newWaypoint);
 
     // Update velocities, according to new waypoint
-    const velocities = this.updateVelocity(this.goal, this.sensors, this.actuators, newWaypoint);
+    const velocities = this.updateVelocity(this.sensors, this.actuators, this.goal, newWaypoint);
+    if (velocities.type === this.SPEED_TYPES.RELATIVE) {
+      const theta = this.sensors.orientation;
+      velocities.linearVel = {
+        x: velocities.linearVel * Math.cos(theta),
+        y: velocities.linearVel * Math.sin(theta)
+      };
+    }
     this.setVelocities(velocities);
 
     // Actuate
     if (this.actuate && typeof this.actuate === 'function') {
-      this.actuate(this.goal, this.sensors, this.actuators, newWaypoint);
+      this.actuate(this.sensors, this.actuators, this.goal, newWaypoint);
     }
   }
 
