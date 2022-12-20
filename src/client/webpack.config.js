@@ -19,6 +19,11 @@ module.exports = {
         use: ['style-loader', 'css-loader']
       },
       {
+        test: /\.(png|jpg|gif|svg)$/,
+        loader: 'file-loader',
+        options: { name: '[name].[ext]?[hash]' }
+      },
+      {
         test: /\.(js|jsx)$/,
         resolve: {
           extensions: ['.js', '.jsx']

@@ -41,6 +41,12 @@ export function initialize(svg, scene, renderables) {
 
   activeElements = [...uniqueRenderingElements(renderables)];
 
+  if (scene.background) {
+    svg.style('background-image', `url(${scene.background})`);
+  } else {
+    svg.style('background-image', '');
+  }
+
   renderedElems.length = 0;
 
   renderables.forEach((renderable) => {

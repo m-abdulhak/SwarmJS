@@ -10,6 +10,8 @@ import RobotRenderables from './robot/renderables';
 
 import velocityController from './robot/controllers/velocityController';
 
+import mapUrl from './map.png';
+
 // All renderables should be registered in this list and assigned a module property
 // This is necessary to avoid imposing a unique restriction on renderable type in different modules
 // So if both robots and pucks have 'body' type renderables, they can still be treated as separate
@@ -26,7 +28,8 @@ const simConfig = {
   env: {
     width: 600,
     height: 600,
-    speed: 15
+    speed: 15,
+    background: mapUrl
   },
   robots: {
     count: 30,

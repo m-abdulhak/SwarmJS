@@ -150,7 +150,6 @@ const App = () => {
       <Box className='loading-screen'>
         <div className='loading-message'>
           <p>Generating Scene</p>
-          <img src="loading.svg" />
           <CircularProgress color="success" />
         </div>
       </Box>

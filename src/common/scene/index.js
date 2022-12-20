@@ -27,6 +27,7 @@ export default class Scene {
 
     this.width = parseInt(envConfig.width, 10);
     this.height = parseInt(envConfig.height, 10);
+    this.background = envConfig.background || null;
 
     // Create Matter.js Physics Engine
     this.engine = Engine.create();
