@@ -3,7 +3,7 @@
 
 import Sensor from '../sensor';
 import { sensorSamplingTypes, AvailableSensors } from '../sensorManager';
-import { getAbsolutePointFromLengthAndAngle } from '../../../utils/geometry';
+import { getAbsolutePointFromDistanceAndAngle } from '../../../utils/geometry';
 
 const name = 'directions';
 const directionsDefinitions = {
@@ -33,8 +33,10 @@ class DirectionsSensor extends Sensor {
   sample() {
     this.value = Object.keys(directionsDefinitions).reduce((acc, direction) => {
       const angle = this.robot.sensors.orientation + directionsDefinitions[direction];
-      acc[direction] = getAbsolutePointFromLengthAndAngle(
-        this.robot.sensors.position, this.robot.radius * 2, angle
+      acc[direction] = getAbsolutePointFromDistanceAndAngle(
+        this.robot.sensors.position,
+        this.robot.radius * 2,
+        angle
       );
       return acc;
     }, {});

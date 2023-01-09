@@ -195,8 +195,8 @@ const sensorsRenderables = [
         prop: 'sensors.walls',
         modifier: (val) => (val.includes('left') ? 'green' : 'red')
       },
-      cx: { prop: 'sensors.directions.forwardLeft.x' },
-      cy: { prop: 'sensors.directions.forwardLeft.y' }
+      cx: { prop: 'sensors.directions.left.x' },
+      cy: { prop: 'sensors.directions.left.y' }
     },
     styles: {
       fill: 'none',
@@ -223,13 +223,83 @@ const sensorsRenderables = [
         prop: 'sensors.walls',
         modifier: (val) => (val.includes('right') ? 'green' : 'red')
       },
-      cx: { prop: 'sensors.directions.forwardRight.x' },
-      cy: { prop: 'sensors.directions.forwardRight.y' }
+      cx: { prop: 'sensors.directions.right.x' },
+      cy: { prop: 'sensors.directions.right.y' }
     },
     styles: {
       fill: 'none',
       'fill-opacity': 0,
       'stroke-width': 2,
+      'stroke-opacity': 1
+    }
+  },
+  {
+    type: 'Sensor',
+    svgClass: 'field-sensor',
+    desc: 'Forward Field Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'radius',
+        modifier: (val) => val * 0.4
+      },
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.fields.heatMap.backward',
+        modifier: (val) => {
+          if (!val) {
+            return 'black';
+          }
+          const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
+          return res;
+        }
+      },
+      cx: { prop: 'sensors.directions.forward.x' },
+      cy: { prop: 'sensors.directions.forward.y' }
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'fill-opacity': 0,
+      'stroke-width': 1,
+      'stroke-opacity': 1
+    }
+  },
+  {
+    type: 'Sensor',
+    svgClass: 'field-sensor',
+    desc: 'Back Field Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'radius',
+        modifier: (val) => val * 0.4
+      },
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.fields.heatMap.forward',
+        modifier: (val) => {
+          if (!val) {
+            return 'black';
+          }
+          const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
+          return res;
+        }
+      },
+      cx: { prop: 'sensors.directions.backward.x' },
+      cy: { prop: 'sensors.directions.backward.y' }
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'fill-opacity': 0,
+      'stroke-width': 1,
       'stroke-opacity': 1
     }
   }

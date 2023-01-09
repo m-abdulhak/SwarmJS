@@ -24,12 +24,86 @@ const renderables = [
   { module: 'Robot', elements: [...RobotRenderables] }
 ];
 
+const usedSensors = {
+  ...CoreSensors,
+  walls: {
+    ...CoreSensors.walls,
+    params: {
+      detectionRadius: 10
+    }
+  },
+  fields: {
+    ...CoreSensors.fields,
+    params: {
+      // We can define points relative to a robot located at (0, 0) headed along positive X axis
+      // With Cartesian coordinates forward is [1, 0], back: [-1, 0], left: [0, 1], right: [0, -1]
+      // With Polar coordinates (positive angles are clockwise)
+      // forward is [1, 0], back: [1, PI], left: [1, -(PI / 2)], right: [1, PI / 2]
+      points: [
+        {
+          type: 'Cartesian',
+          name: 'exampleBack',
+          coords: {
+            x: -20,
+            y: 0
+          }
+        },
+        {
+          type: 'Cartesian',
+          name: 'exampleLeft',
+          coords: {
+            x: 0,
+            y: 20
+          }
+        },
+        {
+          type: 'Cartesian',
+          name: 'exampleRight',
+          coords: {
+            x: 0,
+            y: -20
+          }
+        },
+        {
+          type: 'Polar',
+          name: 'exampleBackPolar',
+          coords: {
+            distance: 20,
+            angle: Math.PI
+          }
+        },
+        {
+          type: 'Polar',
+          name: 'exampleLeftPolar',
+          coords: {
+            distance: 20,
+            angle: -1 * (Math.PI / 2)
+          }
+        },
+        {
+          type: 'Polar',
+          name: 'exampleRightPolar',
+          coords: {
+            distance: 20,
+            angle: Math.PI / 2
+          }
+        }
+      ]
+    }
+  }
+};
+
 const simConfig = {
   env: {
     width: 600,
     height: 600,
     speed: 15,
-    background: mapUrl
+    background: mapUrl,
+    fields: {
+      heatMap: {
+        url: mapUrl
+      }
+    }
   },
   robots: {
     count: 30,
@@ -40,7 +114,7 @@ const simConfig = {
         params: { angularVelocityScale: 0.001 }
       }
     },
-    sensors: [...Object.values(CoreSensors)],
+    sensors: [...Object.values(usedSensors)],
     actuators: [],
     // The neighbors sensor doesn't work unless the Voronoi diagram is used.
     useVoronoiDiagram: true,

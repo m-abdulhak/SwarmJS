@@ -19,6 +19,7 @@ import ReachedGoalSensor from './state/reachedGoalSensor';
 import ReachedWaypointSensor from './state/reachedWaypointSensor';
 import WallSensor from './env/wallSensor';
 import PuckGoalAreaSensor from './state/puckGoalAreaSensor';
+import fieldSensor from './env/fieldSensor';
 
 const toposort = require('toposort');
 
@@ -43,7 +44,8 @@ const availableSensorDefinitions = [
   ObstaclesAwareVoronoiCellSensor,
   BufferedVoronoiCellSensor,
   ReachedGoalSensor,
-  ReachedWaypointSensor
+  ReachedWaypointSensor,
+  fieldSensor
 ];
 
 // Sensors are stored in this object allowing other modules to easily reference them
@@ -76,7 +78,7 @@ export default class SensorManager {
     this.robot = robot;
 
     this.activeSensors = orderSensors(
-      enabledSensors.map(({ Sensor }) => new Sensor(robot, scene))
+      enabledSensors.map(({ Sensor, params }) => new Sensor(robot, scene, params))
     );
     this.sensorsOnStart = this.activeSensors
       .filter((s) => s.type === sensorSamplingTypes.onStart);

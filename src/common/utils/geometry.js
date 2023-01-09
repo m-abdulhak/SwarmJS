@@ -33,7 +33,7 @@ export function angleBetweenThreePointsDeg(A, B, C) {
   return radToDeg(angleRad);
 }
 
-export function getPointFromLengthAndAngle(length, angle) {
+export function getPointFromDistnaceAndAngle(length, angle) {
   return {
     x: length * Math.cos(angle),
     y: length * Math.sin(angle)
@@ -47,8 +47,14 @@ export function getAbsolutePointFromRelativePoint(center, point) {
   };
 }
 
-export function getAbsolutePointFromLengthAndAngle(center, length, angle) {
-  return getAbsolutePointFromRelativePoint(center, getPointFromLengthAndAngle(length, angle));
+export function getPolarCoordsFromCartesian(x, y) {
+  const distance = Math.sqrt(x ** 2 + y ** 2);
+  const angle = Math.atan2(y, x);
+  return { distance, angle };
+}
+
+export function getAbsolutePointFromDistanceAndAngle(center, length, angle) {
+  return getAbsolutePointFromRelativePoint(center, getPointFromDistnaceAndAngle(length, angle));
 }
 
 export function closePolygon(poly) {
