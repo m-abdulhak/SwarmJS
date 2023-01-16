@@ -91,6 +91,7 @@ export default class Robot {
     this.body.frictionAir = 0;
     this.body.frictionStatic = 0;
     this.body.restitution = 0;
+    this.body.angle = Math.random() * 2 * Math.PI; // Randomize orientations
     World.add(this.world, this.body);
     Body.setAngularVelocity(this.body, 1);
     this.engine.velocityIterations = 10;
