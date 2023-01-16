@@ -169,7 +169,7 @@ const bodyRenderables = [
     styles: {
       fill: 'none',
       stroke: 'black',
-      'stroke-width': 3,
+      'stroke-width': 2,
       'stroke-opacity': 1,
       'fill-opacity': 1
     }
@@ -177,6 +177,7 @@ const bodyRenderables = [
 ];
 
 const sensorsRenderables = [
+  /*
   {
     type: 'Sensor',
     svgClass: 'wall-sensor',
@@ -233,9 +234,10 @@ const sensorsRenderables = [
       'stroke-opacity': 1
     }
   },
+  */
   {
     type: 'Sensor',
-    svgClass: 'field-sensor',
+    svgClass: '',
     desc: 'Forward Field Sensor',
     shape: 'circle',
     dataPoints: { sceneProp: 'robots' },
@@ -248,7 +250,7 @@ const sensorsRenderables = [
     },
     dynamicAttrs: {
       fill: {
-        prop: 'sensors.fields.heatMap.backward',
+        prop: 'sensors.fields.heatMap.forward',
         modifier: (val) => {
           if (!val) {
             return 'black';
@@ -270,30 +272,25 @@ const sensorsRenderables = [
   },
   {
     type: 'Sensor',
-    svgClass: 'field-sensor',
-    desc: 'Back Field Sensor',
+    svgClass: '',
+    desc: 'Other Robots',
     shape: 'circle',
     dataPoints: { sceneProp: 'robots' },
     staticAttrs: {
       r: {
         prop: 'radius',
-        modifier: (val) => val * 0.4
+        modifier: (val) => val * 2
       },
-      id: { prop: 'id' }
+      id: { prop: 'id' },
+      stroke: 'none'
     },
     dynamicAttrs: {
       fill: {
-        prop: 'sensors.fields.heatMap.forward',
-        modifier: (val) => {
-          if (!val) {
-            return 'black';
-          }
-          const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
-          return res;
-        }
+        prop: 'sensors.otherRobot',
+        modifier: (val) => (val ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
       },
-      cx: { prop: 'sensors.directions.backward.x' },
-      cy: { prop: 'sensors.directions.backward.y' }
+      cx: { prop: 'sensors.directions.forward.x' },
+      cy: { prop: 'sensors.directions.forward.y' }
     },
     styles: {
       fill: 'none',

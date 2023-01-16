@@ -8,7 +8,8 @@ import SceneRenderables from '@common/scene/renderables';
 
 import RobotRenderables from './robot/renderables';
 
-import velocityController from './robot/controllers/velocityController';
+import controller from './robot/controllers/controller';
+import otherRobotSensor from './robot/sensors/otherRobotSensor';
 
 import mapUrl from './map.png';
 
@@ -26,6 +27,7 @@ const renderables = [
 
 const usedSensors = {
   ...CoreSensors,
+  otherRobotSensor,
   walls: {
     ...CoreSensors.walls,
     params: {
@@ -35,57 +37,14 @@ const usedSensors = {
   fields: {
     ...CoreSensors.fields,
     params: {
-      // We can define points relative to a robot located at (0, 0) headed along positive X axis
-      // With Cartesian coordinates forward is [1, 0], back: [-1, 0], left: [0, 1], right: [0, -1]
-      // With Polar coordinates (positive angles are clockwise)
-      // forward is [1, 0], back: [1, PI], left: [1, -(PI / 2)], right: [1, PI / 2]
+      // See the comments in FieldSensorExample for how to define points.
       points: [
         {
           type: 'Cartesian',
-          name: 'exampleBack',
+          name: 'forward',
           coords: {
-            x: -20,
+            x: 1,
             y: 0
-          }
-        },
-        {
-          type: 'Cartesian',
-          name: 'exampleLeft',
-          coords: {
-            x: 0,
-            y: 20
-          }
-        },
-        {
-          type: 'Cartesian',
-          name: 'exampleRight',
-          coords: {
-            x: 0,
-            y: -20
-          }
-        },
-        {
-          type: 'Polar',
-          name: 'exampleBackPolar',
-          coords: {
-            distance: 20,
-            angle: Math.PI
-          }
-        },
-        {
-          type: 'Polar',
-          name: 'exampleLeftPolar',
-          coords: {
-            distance: 20,
-            angle: -1 * (Math.PI / 2)
-          }
-        },
-        {
-          type: 'Polar',
-          name: 'exampleRightPolar',
-          coords: {
-            distance: 20,
-            angle: Math.PI / 2
           }
         }
       ]
@@ -96,7 +55,7 @@ const usedSensors = {
 const simConfig = {
   env: {
     width: 600,
-    height: 600,
+    height: 400,
     speed: 15,
     background: mapUrl,
     fields: {
@@ -106,11 +65,11 @@ const simConfig = {
     }
   },
   robots: {
-    count: 30,
-    radius: 10,
+    count: 100,
+    radius: 5,
     controllers: {
       velocity: {
-        controller: velocityController,
+        controller: controller,
         params: { angularVelocityScale: 0.001 }
       }
     },
