@@ -65,7 +65,7 @@ class FieldSensor extends Sensor {
 
     const sensingPoints = {
       center: this.robot.sensors.position,
-      ...this.robot.sensors.directions,
+      //...this.robot.sensors.directions,
       ...this.sceneDefinedSensingPoints
     };
 
