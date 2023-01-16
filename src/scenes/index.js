@@ -1,8 +1,10 @@
+import beeClust from './BeeClust';
+import fieldSensorExample from './FieldSensorExample';
 import voronoiSorting from './VoronoiSorting';
 import simpleSorting from './Sorting';
-import beeClust from './BeeClust';
 
 export default {
+  fieldSensorExample,
   beeClust,
   voronoiSorting,
   simpleSorting
