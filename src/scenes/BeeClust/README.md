@@ -2,7 +2,7 @@ BAD: There should be some nominal location and format for a document relating to
 
 # BEEClust
 
-Here we provide a partial implementation of the BEECLUST algorithm which was originally proposed to model the ability of young bees to congregate at the warmest point in a temperature field.  The implementation is "partial" since we don't currently have a temperature field which can be displayed and sense.  So implicitly, the temperature is the same everywhere.
+Here we provide an implementation of the BEECLUST algorithm which was originally proposed to model the ability of young bees to congregate at the warmest point in a temperature field.
 
 (A nice informal description of the BEECLUST algorithm)[https://www.thomasschmickl.eu/complexity/beeclust]
 
@@ -10,6 +10,5 @@ Here we provide a partial implementation of the BEECLUST algorithm which was ori
 
 # TBD
 
-- Add the temperature field, including the ability to sense from it, as well as display it.
-
-- Add avoidance behaviour when detecting the walls, and potentially other robots.
+- There is currently only one other-robot sensor, so when determining which direction to turn after leaving the WAIT state, we don't necessarily turn away from that other robot.
+- Fine-tune the performance by adjusting the parameters of the wait time function.

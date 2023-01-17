@@ -9,7 +9,6 @@ import SceneRenderables from '@common/scene/renderables';
 import RobotRenderables from './robot/renderables';
 
 import controller from './robot/controllers/controller';
-import otherRobotSensor from './robot/sensors/otherRobotSensor';
 
 import mapUrl from './map.png';
 
@@ -27,7 +26,6 @@ const renderables = [
 
 const usedSensors = {
   ...CoreSensors,
-  otherRobotSensor,
   walls: {
     ...CoreSensors.walls,
     params: {

@@ -1,10 +1,10 @@
-import Sensor from '@common/robot/sensors/sensor';
-import { sensorSamplingTypes, AvailableSensors as CoreSensors } from '@common/robot/sensors/sensorManager';
+import Sensor from '../sensor';
+import { sensorSamplingTypes, AvailableSensors as CoreSensors } from '../sensorManager';
 import { getDistance } from '@common/utils/geometry';
 
-const name = 'otherRobot';
+const name = 'otherRobots';
 
-class OtherRobotSensor extends Sensor {
+class OtherRobotsSensor extends Sensor {
   constructor(robot, scene, { detectionRadius } = {}) {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
     this.dependencies = [
@@ -29,5 +29,5 @@ class OtherRobotSensor extends Sensor {
 
 export default {
   name,
-  Sensor: OtherRobotSensor
+  Sensor: OtherRobotsSensor
 };

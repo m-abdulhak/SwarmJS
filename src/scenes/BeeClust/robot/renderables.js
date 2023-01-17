@@ -286,7 +286,7 @@ const sensorsRenderables = [
     },
     dynamicAttrs: {
       fill: {
-        prop: 'sensors.otherRobot',
+        prop: 'sensors.otherRobots',
         modifier: (val) => (val ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
       },
       cx: { prop: 'sensors.directions.forward.x' },

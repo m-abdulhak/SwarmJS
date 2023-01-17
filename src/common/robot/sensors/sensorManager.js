@@ -20,6 +20,7 @@ import ReachedWaypointSensor from './state/reachedWaypointSensor';
 import WallSensor from './env/wallSensor';
 import PuckGoalAreaSensor from './state/puckGoalAreaSensor';
 import fieldSensor from './env/fieldSensor';
+import OtherRobotsSensor from './otherRobots/otherRobotsSensor';
 
 const toposort = require('toposort');
 
@@ -45,7 +46,8 @@ const availableSensorDefinitions = [
   BufferedVoronoiCellSensor,
   ReachedGoalSensor,
   ReachedWaypointSensor,
-  fieldSensor
+  fieldSensor,
+  OtherRobotsSensor
 ];
 
 // Sensors are stored in this object allowing other modules to easily reference them

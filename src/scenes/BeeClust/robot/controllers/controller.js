@@ -53,7 +53,7 @@ export default function controller(robot, { angularVelocityScale }) {
             if (sensors.walls.includes('forward') || sensors.walls.includes('left') || sensors.walls.includes('right')) {
                 enterTurnState(sensors);
 
-            } else if (sensors.otherRobot >= minNearbyNeighborsToTriggerWait) {
+            } else if (sensors.otherRobots >= minNearbyNeighborsToTriggerWait) {
                 stateTimeOut = sensors.potentialWaitTime
                 state = ROBOT_STATE.WAIT;
             }
