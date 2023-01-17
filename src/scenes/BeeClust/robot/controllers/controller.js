@@ -7,7 +7,7 @@ export default function controller(robot, { angularVelocityScale }) {
     const maxTurnTime = 10;
 
     const ROBOT_STATE = {
-        NORMAL: 'MOVE_FORWARD',
+        MOVE_FORWARD: 'MOVE_FORWARD',
         TURN: 'TURN',
         WAIT: 'WAIT'
     };
