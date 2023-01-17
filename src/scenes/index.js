@@ -4,8 +4,8 @@ import voronoiSorting from './VoronoiSorting';
 import simpleSorting from './Sorting';
 
 export default {
-  fieldSensorExample,
   beeClust,
+  fieldSensorExample,
   voronoiSorting,
   simpleSorting
 };

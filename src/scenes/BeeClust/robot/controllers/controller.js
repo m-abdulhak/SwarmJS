@@ -2,7 +2,7 @@ export default function controller(robot, { angularVelocityScale }) {
     // PARAMETERS:
     const maxAngularSpeed = 0.1;
     const maxForwardSpeed = 5;
-    const minNearbyNeighborsToTriggerWait = 2;
+    const minNearbyNeighborsToTriggerWait = 1;
     const minTurnTime = 5;
     const maxTurnTime = 10;
 
@@ -35,9 +35,15 @@ export default function controller(robot, { angularVelocityScale }) {
         var sensorReading = sensors.fields.heatMap.forward;
         if (sensorReading) {
             var temperatureScaled = sensorReading[0] / 256;
+
+            // This would be more consistent with the paper, but this form
+            // is harder to tune for a given temperature field.
             // sensors.potentialWaitTime = 50 * temperatureScaled ** 2 / (temperatureScaled ** 2 + 0.25);
+
+            // The following shifts the wait-time function to the right, making
+            // it 0 for all values below tempShift.
             const tempShift = 0.4;
-            if (temperatureScaled < 0.4)
+            if (temperatureScaled < tempShift)
                 sensors.potentialWaitTime = 0;
             else
                 sensors.potentialWaitTime = 50 * (temperatureScaled-tempShift)**2 / ((temperatureScaled-tempShift)**2 + 0.05) 
@@ -77,7 +83,7 @@ export default function controller(robot, { angularVelocityScale }) {
             // Go full speed ahead.
             forwardSpeed = maxForwardSpeed;
         } else if (state === ROBOT_STATE.TURN) {
-            angularSpeed = maxAngularSpeed;
+            angularSpeed = turnDir * maxAngularSpeed;
         } else if (state === ROBOT_STATE.WAIT) {
             // Keep the default speeds of 0, 0.
         }

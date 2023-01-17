@@ -63,7 +63,7 @@ const simConfig = {
     }
   },
   robots: {
-    count: 100,
+    count: 50,
     radius: 5,
     controllers: {
       velocity: {
