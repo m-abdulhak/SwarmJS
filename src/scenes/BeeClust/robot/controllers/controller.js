@@ -32,7 +32,7 @@ export default function controller(robot, { angularVelocityScale }) {
         // Putting this in 'sensors' to be visualized in renderables.js.
         sensors.potentialWaitTime = 0;
 
-        var sensorReading = sensors.fields.heatMap.forward;
+        var sensorReading = sensors.fields.readings.heatMap.forward;
         if (sensorReading) {
             var temperatureScaled = sensorReading[0] / 256;
 

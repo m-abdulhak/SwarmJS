@@ -1,11 +1,13 @@
+import orbitalConstruction from './OrbitalConstruction';
 import beeClust from './BeeClust';
-import fieldSensorExample from './FieldSensorExample';
 import voronoiSorting from './VoronoiSorting';
 import simpleSorting from './Sorting';
+import fieldSensorExample from './FieldSensorExample';
 
 export default {
+  orbitalConstruction,
   beeClust,
-  fieldSensorExample,
   voronoiSorting,
-  simpleSorting
+  simpleSorting,
+  fieldSensorExample
 };

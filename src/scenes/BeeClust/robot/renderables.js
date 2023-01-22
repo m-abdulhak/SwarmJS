@@ -250,7 +250,7 @@ const sensorsRenderables = [
         },
         dynamicAttrs: {
             stroke: {
-                prop: 'sensors.fields.heatMap.forward',
+                prop: 'sensors.fields.readings.heatMap.forward',
                 modifier: (val) => {
                     if (!val) {
                         return 'black';
@@ -260,7 +260,7 @@ const sensorsRenderables = [
                 }
             },
             fill: {
-                prop: 'sensors.fields.heatMap.forward',
+                prop: 'sensors.fields.readings.heatMap.forward',
                 modifier: (val) => {
                     if (!val) {
                         return 'black';
@@ -269,8 +269,8 @@ const sensorsRenderables = [
                     return res;
                 }
             },
-            cx: { prop: 'sensors.directions.forward.x' },
-            cy: { prop: 'sensors.directions.forward.y' }
+            cx: { prop: 'sensors.fields.sensingPoints.forward.x' },
+            cy: { prop: 'sensors.fields.sensingPoints.forward.y' }
         },
         styles: {
             fill: 'none',

@@ -38,56 +38,24 @@ const usedSensors = {
           type: 'Cartesian',
           name: 'forward',
           coords: {
-            x: 1,
+            x: 10,
             y: 0
           }
         },
         {
           type: 'Cartesian',
-          name: 'frontField',
-          coords: {
-            x: 20,
-            y: 0
-          }
-        },
-        {
-          type: 'Cartesian',
-          name: 'leftField',
+          name: 'left',
           coords: {
             x: 0,
-            y: 20
-          }
-        },
-        {
-          type: 'Cartesian',
-          name: 'rightField',
-          coords: {
-            x: 0,
-            y: -20
+            y: 10
           }
         },
         {
           type: 'Polar',
-          name: 'exampleBackPolar',
+          name: 'right45',
           coords: {
-            distance: 20,
-            angle: Math.PI
-          }
-        },
-        {
-          type: 'Polar',
-          name: 'exampleLeftPolar',
-          coords: {
-            distance: 20,
-            angle: -1 * (Math.PI / 2)
-          }
-        },
-        {
-          type: 'Polar',
-          name: 'exampleRightPolar',
-          coords: {
-            distance: 20,
-            angle: Math.PI / 2
+            distance: 10,
+            angle: Math.PI / 4.0
           }
         }
       ]

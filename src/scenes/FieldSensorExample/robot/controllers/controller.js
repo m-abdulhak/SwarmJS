@@ -2,7 +2,7 @@ export default function controller(robot, { angularVelocityScale }) {
 
     return (sensors) => {
 
-        console.log(sensors.fields.heatMap);
+        //console.log(sensors.fields.sensingPoints.forward);
 
         return {
             linearVel: 0,

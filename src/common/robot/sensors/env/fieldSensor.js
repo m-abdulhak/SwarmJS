@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import Sensor from '../sensor';
 import { sensorSamplingTypes, AvailableSensors } from '../sensorManager';
-import { getPolarCoordsFromCartesian, getAbsolutePointFromDistanceAndAngle } from '../../../utils/geometry';
+import { getSceneDefinedPointDefinitions, getSceneDefinedPoints } from '../sensorUtils';
 
 const name = 'fields';
 
@@ -11,7 +11,7 @@ const sampleFieldAtPoint = (context, p) => {
   }
 
   if (p.x < 0 || p.y < 0 || p.x >= context.canvas.width || p.y >= context.canvas.width) {
-    return null;
+    return [0, 0, 0, 0];
   }
 
   const imageVal = context.getImageData(p.x, p.y, 1, 1);
@@ -27,54 +27,18 @@ class FieldSensor extends Sensor {
     ];
     this.value = [];
 
-    this.sceneDefinedSensingPointsDefinitions = points.reduce((acc, pDef) => {
-      if (!pDef.name || !pDef.coords || !pDef.type || (pDef.type !== 'Cartesian' && pDef.type !== 'Polar')) {
-        console.error('Unrecognized point definitinon:', pDef);
-        return acc;
-      }
-      if (pDef.type === 'Cartesian') {
-        const coords = getPolarCoordsFromCartesian(pDef.coords.x, pDef.coords.y);
-
-        // Keep compatibility with other angles using positive angle direction as clockwise
-        coords.angle *= -1;
-
-        acc[pDef.name] = coords;
-        return acc;
-      }
-      if (pDef.type === 'Polar') {
-        acc[pDef.name] = pDef.coords;
-        return acc;
-      }
-      return acc;
-    }, {});
+    this.sceneDefinedSensingPointsDefinitions = getSceneDefinedPointDefinitions(points);
   }
 
   sample() {
-    this.sceneDefinedSensingPoints = Object.entries(this.sceneDefinedSensingPointsDefinitions)
-      .reduce((acc, [pointDefKey, pointDef]) => {
-        const angle = this.robot.sensors.orientation + pointDef.angle;
-        const distance = pointDef.distance;
-        acc[pointDefKey] = getAbsolutePointFromDistanceAndAngle(
-          this.robot.sensors.position,
-          distance,
-          angle
-        );
-
-        return acc;
-      }, {});
-
-    const sensingPoints = {
-      center: this.robot.sensors.position,
-      //...this.robot.sensors.directions,
-      ...this.sceneDefinedSensingPoints
-    };
+    this.sceneDefinedSensingPoints = getSceneDefinedPoints(this.sceneDefinedSensingPointsDefinitions, this.robot.sensors);
 
     const res = {};
 
     Object.entries(this.scene.fields).forEach(([fieldKey, field]) => {
       res[fieldKey] = {};
 
-      Object.entries(sensingPoints).forEach(([key, sensingPoint]) => {
+      Object.entries(this.sceneDefinedSensingPoints).forEach(([key, sensingPoint]) => {
         if (!field.src) {
           res[fieldKey][key] = null;
           return;
@@ -84,7 +48,10 @@ class FieldSensor extends Sensor {
       });
     });
 
-    this.value = res;
+    this.value = {
+        readings: res,
+        sensingPoints: this.sceneDefinedSensingPoints
+    };
   }
 }
 
