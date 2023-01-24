@@ -1,7 +1,7 @@
 export default function controller(robot, { angularVelocityScale }) {
     // PARAMETERS:
     const tau = 0.75;
-    const maxAngularSpeed = 1;
+    const maxAngularSpeed = 0.25;
     const maxForwardSpeed = 2.5;
     const innie = false;
 
@@ -21,11 +21,15 @@ export default function controller(robot, { angularVelocityScale }) {
         let c = (sensors.fields.readings.heatMap.frontField)[0] / 255;
         let r = (sensors.fields.readings.heatMap.rightField)[0] / 255;
 
-        let leftPucks = sensors.circlePucks.readings.leftPucks;
-        let rightPucks = sensors.circlePucks.readings.rightPucks;
+        let leftPucks = sensors.polygonPucks.reading;
+        let rightPucks = 0; // NOT SUPPORTED YET
+        //console.log(sensors);
+
+        //let leftPucks = sensors.circlePucks.readings.leftPucks;
+        //let rightPucks = sensors.circlePucks.readings.rightPucks;
 
         //console.log(`l: ${l.toPrecision(4)}, c: ${c.toPrecision(4)}, r: ${r.toPrecision(4)}`);
-        //console.log(`leftPucks: ${leftPucks}, rightPucks: ${rightPucks}`);
+        console.log(`leftPucks: ${leftPucks}, rightPucks: ${rightPucks}`);
 
         // if (OBSTACLE ON LEFT)
         //     
@@ -53,6 +57,9 @@ export default function controller(robot, { angularVelocityScale }) {
 
         let forwardSpeed = maxForwardSpeed;
         let angularSpeed = getAngularSpeed(sensors);
+
+//forwardSpeed = 0;
+//angularSpeed = 0;
 
         return {
             linearVel: forwardSpeed,

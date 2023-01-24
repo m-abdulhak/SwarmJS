@@ -38,7 +38,18 @@ export function getSceneDefinedPoints(pointDefinitions, sensors) {
                 distance,
                 angle
             );
-
             return acc;
         }, {});
+}
+
+export function getSceneDefinedPointsAsArray(pointDefinitions, sensors) {
+
+    var pointsObject = getSceneDefinedPoints(pointDefinitions, sensors);
+    var outputArray = [];
+    for (const [key, point] of Object.entries(pointsObject)) {
+        // We will ignore the key (i.e. the name) and just add each point
+        // as a row.
+        outputArray.push([point.x, point.y])
+    }
+    return outputArray;
 }

@@ -1,7 +1,8 @@
 /* eslint-disable no-console */
 import Sensor from '../sensor';
 import { sensorSamplingTypes, AvailableSensors } from '../sensorManager';
-import { getSceneDefinedPointDefinitions, getSceneDefinedPoints } from '../sensorUtils';
+import { getSceneDefinedPointDefinitions, getSceneDefinedPointsAsArray } from '../sensorUtils';
+import { circleIntersectsPolygon } from '../../../utils/geometry';
 
 const name = 'polygonPucks';
 
@@ -17,15 +18,16 @@ class PolygonPuckSensor extends Sensor {
     }
 
     sample() {
-        this.sceneDefinedVertices = getSceneDefinedPoints(this.sceneDefinedVerticesDefinitions, this.robot.sensors);
+        this.sceneDefinedVertexArray = getSceneDefinedPointsAsArray(this.sceneDefinedVerticesDefinitions, this.robot.sensors);
+        console.log(this.sceneDefinedVertices);
 
         const result = this.scene?.pucks?.filter(
-                (puck) => !puck.held && pointIsInsidePolygon(puck.position, this.sceneDefinedVertices) 
+                (puck) => !puck.held && circleIntersectsPolygon(puck.position, puck.radius, this.sceneDefinedVertexArray) 
         ).length;
 
         this.value = {
             reading: result,
-            vertices: this.sceneDefinedVertices
+            vertices: this.sceneDefinedVertexArray
         };
     }
 }

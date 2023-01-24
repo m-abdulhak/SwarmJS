@@ -58,27 +58,49 @@ const usedSensors = {
             ]
         }
     },
-    circlePucks: {
-        ...CoreSensors.circlePucks,
+    polygonPucks: {
+        ...CoreSensors.polygonPucks,
         params: {
-            detectionRadius: 40,
-
             // See the comments in FieldSensorExample for how to define points.
-            points: [
+            vertices: [
                 {
-                    type: 'Polar',
-                    name: 'leftPucks',
+                    type: 'Cartesian',
+                    name: 'bottomRight',
                     coords: {
-                        distance: 50,
-                        angle: -Math.PI / 4
+                        x: 0,
+                        y: 5
                     }
                 },
                 {
-                    type: 'Polar',
-                    name: 'rightPucks',
+                    type: 'Cartesian',
+                    name: 'upperRight',
                     coords: {
-                        distance: 50,
-                        angle: Math.PI / 4
+                        x: 50,
+                        y: 5
+                    }
+                },
+                {
+                    type: 'Cartesian',
+                    name: 'upperLeft',
+                    coords: {
+                        x: 50,
+                        y: 100
+                    }
+                },
+                {
+                    type: 'Cartesian',
+                    name: 'bottomLeft',
+                    coords: {
+                        x: 0,
+                        y: 100
+                    }
+                },
+                {
+                    type: 'Cartesian',
+                    name: 'bottomRight',
+                    coords: {
+                        x: 0,
+                        y: 5
                     }
                 }
             ]
