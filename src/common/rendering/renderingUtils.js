@@ -101,7 +101,11 @@ function setAttrs(attrDef, rends, scene) {
   if (attrDef && typeof attrDef === 'object') {
     Object.keys(attrDef).forEach((attrKey) => {
       const attrValue = attrDef[attrKey];
-      rends.attr(attrKey, (d) => parseAttr(d, attrValue, scene));
+      if (attrKey === 'text') {
+        rends.text((d) => parseAttr(d, attrValue, scene));
+      } else {
+        rends.attr(attrKey, (d) => parseAttr(d, attrValue, scene));
+      }
     });
   }
 }
