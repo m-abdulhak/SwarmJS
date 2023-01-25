@@ -178,16 +178,90 @@ const bodyRenderables = [
 
 const sensorsRenderables = [
     {
+      type: 'Sensor',
+      svgClass: 'wall-sensor',
+      desc: 'Sensor',
+      shape: 'circle',
+      dataPoints: { sceneProp: 'robots' },
+      staticAttrs: {
+        r: 4,
+        id: { prop: 'id' }
+      },
+      dynamicAttrs: {
+        fill: {
+          prop: 'sensors.walls',
+          modifier: (val) => (val.includes('left') ? 'green' : 'red')
+        },
+        cx: { prop: 'sensors.directions.left.x' },
+        cy: { prop: 'sensors.directions.left.y' }
+      },
+      styles: {
+        fill: 'none',
+        'fill-opacity': 0,
+        'stroke-width': 2,
+        'stroke-opacity': 1
+      }
+    },
+    {
+      type: 'Sensor',
+      svgClass: 'wall-sensor',
+      desc: 'Sensor',
+      shape: 'circle',
+      dataPoints: { sceneProp: 'robots' },
+      staticAttrs: {
+        r: 4,
+        id: { prop: 'id' }
+      },
+      dynamicAttrs: {
+        fill: {
+          prop: 'sensors.walls',
+          modifier: (val) => (val.includes('right') ? 'green' : 'red')
+        },
+        cx: { prop: 'sensors.directions.right.x' },
+        cy: { prop: 'sensors.directions.right.y' }
+      },
+      styles: {
+        fill: 'none',
+        'fill-opacity': 0,
+        'stroke-width': 2,
+        'stroke-opacity': 1
+      }
+    },
+    {
+        type: 'Sensor',
+        svgClass: '',
+        desc: 'Other Robots',
+        shape: 'circle',
+        dataPoints: { sceneProp: 'robots' },
+        staticAttrs: {
+            r: 4,
+            id: { prop: 'id' },
+            stroke: 'none'
+        },
+        dynamicAttrs: {
+            fill: {
+                prop: 'sensors.otherRobots',
+                modifier: (val) => (val ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
+            },
+            cx: { prop: 'sensors.directions.forward.x' },
+            cy: { prop: 'sensors.directions.forward.y' }
+        },
+        styles: {
+            fill: 'none',
+            stroke: 'black',
+            'fill-opacity': 0,
+            'stroke-width': 1,
+            'stroke-opacity': 1
+        }
+    },
+    {
         type: 'Sensor',
         svgClass: '',
         desc: 'Left Field Sensor',
         shape: 'circle',
         dataPoints: { sceneProp: 'robots' },
         staticAttrs: {
-            r: {
-                prop: 'radius',
-                modifier: (val) => val * 0.4
-            },
+            r: 1,
             id: { prop: 'id' }
         },
         dynamicAttrs: {
@@ -229,10 +303,7 @@ const sensorsRenderables = [
         shape: 'circle',
         dataPoints: { sceneProp: 'robots' },
         staticAttrs: {
-            r: {
-                prop: 'radius',
-                modifier: (val) => val * 0.4
-            },
+            r: 1,
             id: { prop: 'id' }
         },
         dynamicAttrs: {
@@ -274,10 +345,7 @@ const sensorsRenderables = [
         shape: 'circle',
         dataPoints: { sceneProp: 'robots' },
         staticAttrs: {
-            r: {
-                prop: 'radius',
-                modifier: (val) => val * 0.4
-            },
+            r: 1,
             id: { prop: 'id' }
         },
         dynamicAttrs: {
@@ -315,7 +383,7 @@ const sensorsRenderables = [
     {
         type: 'Sensor',
         svgClass: '',
-        desc: 'Polygon Puck Sensor',
+        desc: 'Left Polygon Puck Sensor',
         shape: 'polygon',
         dataPoints: { sceneProp: 'robots' },
         staticAttrs: {
@@ -323,10 +391,34 @@ const sensorsRenderables = [
         },
         dynamicAttrs: {
             fill: {
-                prop: 'sensors.polygonPucks.reading',
+                prop: 'sensors.polygonPucks.left.reading',
                 modifier: (val) => val ? `rgb(255, 0, 0, ${0.2*val}` : 'rgb(0, 0, 0, 0.1)'
             },
-            points: { prop: 'sensors.polygonPucks.vertices' }
+            points: { prop: 'sensors.polygonPucks.left.vertices' }
+        },
+        styles: {
+            fill: 'none',
+            stroke: 'black',
+            'fill-opacity': 0,
+            'stroke-width': 1,
+            'stroke-opacity': 1
+        }
+    },
+    {
+        type: 'Sensor',
+        svgClass: '',
+        desc: 'Right Polygon Puck Sensor',
+        shape: 'polygon',
+        dataPoints: { sceneProp: 'robots' },
+        staticAttrs: {
+            stroke: 'none'
+        },
+        dynamicAttrs: {
+            fill: {
+                prop: 'sensors.polygonPucks.right.reading',
+                modifier: (val) => val ? `rgb(255, 0, 0, ${0.2*val}` : 'rgb(0, 0, 0, 0.1)'
+            },
+            points: { prop: 'sensors.polygonPucks.right.vertices' }
         },
         styles: {
             fill: 'none',

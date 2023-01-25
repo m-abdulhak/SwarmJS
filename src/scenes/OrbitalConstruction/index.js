@@ -10,7 +10,7 @@ import RobotRenderables from './robot/renderables';
 
 import controller from './robot/controllers/controller';
 
-import mapUrl from './map.png';
+import mapUrl from '../../../python_scripts/scalar_field.png';
 
 const renderables = [
     { module: 'Scene', elements: SceneRenderables },
@@ -35,7 +35,7 @@ const usedSensors = {
                     type: 'Polar',
                     name: 'leftField',
                     coords: {
-                        distance: 10,
+                        distance: 6,
                         angle: -Math.PI / 4
                     }
                 },
@@ -43,7 +43,7 @@ const usedSensors = {
                     type: 'Polar',
                     name: 'frontField',
                     coords: {
-                        distance: 10,
+                        distance: 6,
                         angle: 0
                     }
                 },
@@ -51,7 +51,7 @@ const usedSensors = {
                     type: 'Polar',
                     name: 'rightField',
                     coords: {
-                        distance: 10,
+                        distance: 6,
                         angle: Math.PI / 4
                     }
                 }
@@ -62,48 +62,93 @@ const usedSensors = {
         ...CoreSensors.polygonPucks,
         params: {
             // See the comments in FieldSensorExample for how to define points.
-            vertices: [
-                {
-                    type: 'Cartesian',
-                    name: 'bottomRight',
-                    coords: {
-                        x: 0,
-                        y: 5
+            vertices:
+            {
+                left: [
+                    {
+                        type: 'Cartesian',
+                        name: 'bottomRight',
+                        coords: {
+                            x: 0,
+                            y: 5
+                        }
+                    },
+                    {
+                        type: 'Cartesian',
+                        name: 'upperRight',
+                        coords: {
+                            x: 50,
+                            y: 5
+                        }
+                    },
+                    {
+                        type: 'Cartesian',
+                        name: 'upperLeft',
+                        coords: {
+                            x: 50,
+                            y: 100
+                        }
+                    },
+                    {
+                        type: 'Cartesian',
+                        name: 'bottomLeft',
+                        coords: {
+                            x: 0,
+                            y: 100
+                        }
+                    },
+                    {
+                        type: 'Cartesian',
+                        name: 'bottomRight',
+                        coords: {
+                            x: 0,
+                            y: 5
+                        }
                     }
-                },
-                {
-                    type: 'Cartesian',
-                    name: 'upperRight',
-                    coords: {
-                        x: 50,
-                        y: 5
+                ],
+                right: [
+                    {
+                        type: 'Cartesian',
+                        name: 'bottomRight',
+                        coords: {
+                            x: 0,
+                            y: -5
+                        }
+                    },
+                    {
+                        type: 'Cartesian',
+                        name: 'upperRight',
+                        coords: {
+                            x: 20,
+                            y: -5
+                        }
+                    },
+                    {
+                        type: 'Cartesian',
+                        name: 'upperLeft',
+                        coords: {
+                            x: 20,
+                            y: -50
+                        }
+                    },
+                    {
+                        type: 'Cartesian',
+                        name: 'bottomLeft',
+                        coords: {
+                            x: 0,
+                            y: -50
+                        }
+                    },
+                    {
+                        type: 'Cartesian',
+                        name: 'bottomRight',
+                        coords: {
+                            x: 0,
+                            y: -5
+                        }
                     }
-                },
-                {
-                    type: 'Cartesian',
-                    name: 'upperLeft',
-                    coords: {
-                        x: 50,
-                        y: 100
-                    }
-                },
-                {
-                    type: 'Cartesian',
-                    name: 'bottomLeft',
-                    coords: {
-                        x: 0,
-                        y: 100
-                    }
-                },
-                {
-                    type: 'Cartesian',
-                    name: 'bottomRight',
-                    coords: {
-                        x: 0,
-                        y: 5
-                    }
-                }
-            ]
+                ]
+            }
         }
     }
 };
@@ -121,8 +166,8 @@ const simConfig = {
         }
     },
     robots: {
-        count: 20,
-        radius: 5,
+        count: 30,
+        radius: 4,
         controllers: {
             velocity: {
                 controller: controller,

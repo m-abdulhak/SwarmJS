@@ -14,20 +14,35 @@ class PolygonPuckSensor extends Sensor {
         ];
         this.value = [];
 
-        this.sceneDefinedVerticesDefinitions = getSceneDefinedPointDefinitions(vertices);
+        this.sceneDefinedVerticesDefinitions = {
+            left: getSceneDefinedPointDefinitions(vertices.left),
+            right: getSceneDefinedPointDefinitions(vertices.right)
+        }
     }
 
     sample() {
-        this.sceneDefinedVertexArray = getSceneDefinedPointsAsArray(this.sceneDefinedVerticesDefinitions, this.robot.sensors);
-        console.log(this.sceneDefinedVertices);
+        this.sceneDefinedVertexArray = { 
+            left: getSceneDefinedPointsAsArray(this.sceneDefinedVerticesDefinitions.left, this.robot.sensors),
+            right: getSceneDefinedPointsAsArray(this.sceneDefinedVerticesDefinitions.right, this.robot.sensors)
+        };
 
-        const result = this.scene?.pucks?.filter(
-                (puck) => !puck.held && circleIntersectsPolygon(puck.position, puck.radius, this.sceneDefinedVertexArray) 
+        const leftCount = this.scene?.pucks?.filter(
+            (puck) => !puck.held && circleIntersectsPolygon(puck.position, puck.radius, this.sceneDefinedVertexArray.left)
+        ).length;
+
+        const rightCount = this.scene?.pucks?.filter(
+            (puck) => !puck.held && circleIntersectsPolygon(puck.position, puck.radius, this.sceneDefinedVertexArray.right)
         ).length;
 
         this.value = {
-            reading: result,
-            vertices: this.sceneDefinedVertexArray
+            left: {
+                reading: leftCount,
+                vertices: this.sceneDefinedVertexArray.left,
+            },
+            right: {
+                reading: rightCount,
+                vertices: this.sceneDefinedVertexArray.right,
+            }
         };
     }
 }

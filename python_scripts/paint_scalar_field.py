@@ -36,8 +36,8 @@ cell_width = cell_radius * 2 + 1
 filename = "scalar_field.png"
 
 # Location of centre --- if using value_function_centre()
-cx = 3*width/4
-cy = height/4
+cx = width/2
+cy = height/2
 #cy = height
 #max_distance_from_centre = sqrt(cx**2 + cy**2)
 #max_distance_from_centre = min(cx, cy)
