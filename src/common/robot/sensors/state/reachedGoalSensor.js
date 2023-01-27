@@ -1,12 +1,12 @@
 import Sensor from '../sensor';
-import { AvailableSensors, sensorSamplingTypes } from '../sensorManager';
+import { CoreSensors, sensorSamplingTypes } from '../sensorManager';
 
 const name = 'reachedGoal';
 
 class ReachedGoalSensor extends Sensor {
   constructor(robot, scene) {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
-    this.dependencies = [AvailableSensors.position];
+    this.dependencies = [CoreSensors.position];
     this.value = false;
   }
 

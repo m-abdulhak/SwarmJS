@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import Sensor from '../sensor';
-import { sensorSamplingTypes, AvailableSensors } from '../sensorManager';
+import { sensorSamplingTypes, CoreSensors } from '../sensorManager';
 import { getSceneDefinedPointDefinitions, getSceneDefinedPointsAsArray } from '../sensorUtils';
 import { circleIntersectsPolygon } from '../../../utils/geometry';
 
@@ -10,7 +10,7 @@ class PolygonPuckSensor extends Sensor {
     constructor(robot, scene, { vertices = [] } = {}) {
         super(robot, scene, name, sensorSamplingTypes.onUpdate);
         this.dependencies = [
-            AvailableSensors.position,
+            CoreSensors.position,
         ];
         this.value = [];
 

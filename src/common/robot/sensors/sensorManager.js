@@ -31,7 +31,7 @@ export const sensorSamplingTypes = {
   onUpdate: 'onUpdate'
 };
 
-const availableSensorDefinitions = [
+const coreSensorDefinitions = [
   EnvironmentBoundsSensor,
   WallSensor,
   PuckGoalAreaSensor,
@@ -50,13 +50,22 @@ const availableSensorDefinitions = [
   ReachedWaypointSensor,
   fieldSensor,
   OtherRobotsSensor,
-  CirclePuckSensor,
-  PolygonPuckSensor
+  CirclePuckSensor
 ];
 
-// Sensors are stored in this object allowing other modules to easily reference them
+// Sensors that individual scenes may include, but will not generally be
+// included by all scenes.
+const extraSensorDefinitions = [
+  PolygonPuckSensor
+]
+
+// Sensors are stored in these objects allowing other modules to easily reference them
 // e.g. in config when defining the enabled sensors, or in other sensors to define a dependency
-export const AvailableSensors = availableSensorDefinitions.reduce((acc, sensorDef) => {
+export const CoreSensors = coreSensorDefinitions.reduce((acc, sensorDef) => {
+  acc[sensorDef.name] = sensorDef;
+  return acc;
+}, {});
+export const ExtraSensors = extraSensorDefinitions.reduce((acc, sensorDef) => {
   acc[sensorDef.name] = sensorDef;
   return acc;
 }, {});

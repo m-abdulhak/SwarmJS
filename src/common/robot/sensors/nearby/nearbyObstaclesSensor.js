@@ -1,5 +1,5 @@
 import Sensor from '../sensor';
-import { sensorSamplingTypes, AvailableSensors } from '../sensorManager';
+import { sensorSamplingTypes, CoreSensors } from '../sensorManager';
 import generateStaticObject from '../../../staticObjects/staticObjectFactory';
 
 const name = 'nearbyObstacles';
@@ -16,8 +16,8 @@ class NearbyObstaclesSensor extends Sensor {
   constructor(robot, scene, { detectionRadius } = {}) {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
     this.dependencies = [
-      AvailableSensors.position,
-      AvailableSensors.nearbyPucks
+      CoreSensors.position,
+      CoreSensors.nearbyPucks
     ];
     this.value = [];
 

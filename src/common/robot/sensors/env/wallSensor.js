@@ -1,5 +1,5 @@
 import Sensor from '../sensor';
-import { sensorSamplingTypes, AvailableSensors } from '../sensorManager';
+import { sensorSamplingTypes, CoreSensors } from '../sensorManager';
 import { distanceBetweenPointAndLine } from '../../../utils/geometry';
 
 const name = 'walls';
@@ -13,8 +13,8 @@ class WallSensor extends Sensor {
   constructor(robot, scene, { detectionRadius } = {}) {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
     this.dependencies = [
-      AvailableSensors.position,
-      AvailableSensors.directions
+      CoreSensors.position,
+      CoreSensors.directions
     ];
     this.value = [];
 

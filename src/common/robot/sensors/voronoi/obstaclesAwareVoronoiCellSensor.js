@@ -7,7 +7,7 @@
 import splitPolygon from 'split-polygon';
 
 import Sensor from '../sensor';
-import { AvailableSensors, sensorSamplingTypes } from '../sensorManager';
+import { CoreSensors, sensorSamplingTypes } from '../sensorManager';
 import {
   shiftPointOfLineSegInDirOfPerpendicularBisector,
   getLineEquationParams,
@@ -52,8 +52,8 @@ class ObstaclesAwareVoronoiCellSensor extends Sensor {
   constructor(robot, scene) {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
     this.dependencies = [
-      AvailableSensors.position,
-      AvailableSensors.closestObstaclePoint
+      CoreSensors.position,
+      CoreSensors.closestObstaclePoint
     ];
     this.value = [];
   }

@@ -1,5 +1,5 @@
 import Sensor from '../sensor';
-import { sensorSamplingTypes, AvailableSensors as CoreSensors } from '../sensorManager';
+import { sensorSamplingTypes, CoreSensors as CoreSensors } from '../sensorManager';
 import { getDistance } from '@common/utils/geometry';
 
 const name = 'otherRobots';

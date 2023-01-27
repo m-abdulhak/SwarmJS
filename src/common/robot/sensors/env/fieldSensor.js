@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import Sensor from '../sensor';
-import { sensorSamplingTypes, AvailableSensors } from '../sensorManager';
+import { sensorSamplingTypes, CoreSensors } from '../sensorManager';
 import { getSceneDefinedPointDefinitions, getSceneDefinedPoints } from '../sensorUtils';
 
 const name = 'fields';
@@ -22,8 +22,8 @@ class FieldSensor extends Sensor {
   constructor(robot, scene, { points = [] } = {}) {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
     this.dependencies = [
-      AvailableSensors.position,
-      AvailableSensors.directions
+      CoreSensors.position,
+      CoreSensors.directions
     ];
     this.value = [];
 
