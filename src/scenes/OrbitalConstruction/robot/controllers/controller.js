@@ -1,12 +1,11 @@
 export default function controller(robot, { angularVelocityScale }) {
     // PARAMETERS:
-    const middleTau = 0.75;
+    const middleTau = 0.6;
     const maxAngularSpeed = 0.25;
     const maxForwardSpeed = 2.5;
 
     // We'll define 25% of the robots as innies (pretty arbitrary)
-    const //innie = Math.random() < 0.25;
-innie = false;
+    const innie = Math.random() < 0.25;
     const tau = innie ? middleTau + 0.05 : middleTau - 0.05;
 
     function getAngularSpeed(sensors) {

@@ -1,5 +1,6 @@
 import {
     CoreSensors,
+    ExtraSensors,
     CorePositionsGenerators,
     CorePerformanceTrakers
 } from '@common';
@@ -59,94 +60,25 @@ const usedSensors = {
         }
     },
     polygonPucks: {
-        ...CoreSensors.polygonPucks,
+        ...ExtraSensors.polygonPucks,
         params: {
             // See the comments in FieldSensorExample for how to define points.
             vertices:
             {
                 left: [
-                    {
-                        type: 'Cartesian',
-                        name: 'bottomRight',
-                        coords: {
-                            x: 0,
-                            y: 5
-                        }
-                    },
-                    {
-                        type: 'Cartesian',
-                        name: 'upperRight',
-                        coords: {
-                            x: 50,
-                            y: 5
-                        }
-                    },
-                    {
-                        type: 'Cartesian',
-                        name: 'upperLeft',
-                        coords: {
-                            x: 50,
-                            y: 100
-                        }
-                    },
-                    {
-                        type: 'Cartesian',
-                        name: 'bottomLeft',
-                        coords: {
-                            x: 0,
-                            y: 100
-                        }
-                    },
-                    {
-                        type: 'Cartesian',
-                        name: 'bottomRight',
-                        coords: {
-                            x: 0,
-                            y: 5
-                        }
-                    }
+                    { type: 'Polar', name: '0', coords: { distance: 100, angle: -1.0 * Math.PI / 2 } },
+                    { type: 'Polar', name: '1', coords: { distance: 100, angle: -0.75 * Math.PI / 2 } },
+                    { type: 'Polar', name: '2', coords: { distance: 100, angle: -0.5 * Math.PI / 2 } },
+                    { type: 'Polar', name: '3', coords: { distance: 100, angle: -0.25 * Math.PI / 2 } },
+                    { type: 'Polar', name: '4', coords: { distance: 100, angle: 0.0 * Math.PI / 2 } },
+                    { type: 'Cartesian', name: 'bottomRight', coords: { x: 0, y: 5 } }
                 ],
                 right: [
-                    {
-                        type: 'Cartesian',
-                        name: 'bottomRight',
-                        coords: {
-                            x: 0,
-                            y: -5
-                        }
-                    },
-                    {
-                        type: 'Cartesian',
-                        name: 'upperRight',
-                        coords: {
-                            x: 20,
-                            y: -5
-                        }
-                    },
-                    {
-                        type: 'Cartesian',
-                        name: 'upperLeft',
-                        coords: {
-                            x: 20,
-                            y: -50
-                        }
-                    },
-                    {
-                        type: 'Cartesian',
-                        name: 'bottomLeft',
-                        coords: {
-                            x: 0,
-                            y: -50
-                        }
-                    },
-                    {
-                        type: 'Cartesian',
-                        name: 'bottomRight',
-                        coords: {
-                            x: 0,
-                            y: -5
-                        }
-                    }
+                    { type: 'Polar', name: '0', coords: { distance: 50, angle: 1.0 * Math.PI / 2 } },
+                    { type: 'Polar', name: '1', coords: { distance: 50, angle: 0.75 * Math.PI / 2 } },
+                    { type: 'Polar', name: '2', coords: { distance: 50, angle: 0.5 * Math.PI / 2 } },
+                    { type: 'Polar', name: '3', coords: { distance: 50, angle: 0.25 * Math.PI / 2 } },
+                    { type: 'Cartesian', name: 'bottomRight', coords: { x: 0, y: -5 } }
                 ]
             }
         }
