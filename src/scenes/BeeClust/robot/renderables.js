@@ -331,14 +331,14 @@ const sensorsRenderables = [
           if (!val) {
             return 'black';
           }
-          const res = val[0] + val[1] + val[2];
+          const res = val[0]
           return res;
         }
       }
     },
     styles: {
       'text-anchor': 'middle',
-      'font-size': 20,
+      'font-size': 16,
       fill: 'black',
       stroke: 'grey',
       'stroke-width': 1
