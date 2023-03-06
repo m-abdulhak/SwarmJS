@@ -379,7 +379,9 @@ const sensorsRenderables = [
             'stroke-width': 1,
             'stroke-opacity': 1
         }
-    },
+    }
+    /*
+    ,
     {
         type: 'Sensor',
         svgClass: '',
@@ -428,6 +430,7 @@ const sensorsRenderables = [
             'stroke-opacity': 1
         }
     }
+    */
 ];
 
 export default [
