@@ -29,6 +29,7 @@ import Options from './components/Options/index';
 import Benchmark from './components/Benchmark';
 
 import exampleConfigs from '../scenes';
+import ProgrammingPane from '../client/ProgrammingPane';
 
 const options = Object.values(exampleConfigs).map((v) => ({
   label: v.title, value: v.name
@@ -156,7 +157,9 @@ const App = () => {
   );
 
   return loading ? loadingElem : (
-    <div style={{ width: '100%' }}>
+    <div className="parentPane">
+
+    <div className="simulationPane">
       {selectElem}
       <QuickActions
         toggleElementEnabled={toggleElementEnabled}
@@ -178,6 +181,10 @@ const App = () => {
         />
       </div>
       {ui}
+    </div>
+
+    {config.useProgrammingPane && <ProgrammingPane />}
+
     </div>
   );
 };

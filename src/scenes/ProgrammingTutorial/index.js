@@ -10,7 +10,6 @@ import PuckRenderables from '@common/puck/renderables';
 import RobotRenderables from './robot/renderables';
 
 import controller from './robot/controllers/controller';
-
 import mapUrl from '../../../python_scripts/scalar_field.png';
 
 const renderables = [
@@ -128,7 +127,7 @@ const simConfig = {
     },
     objects: [],
     positionsGenerator: CorePositionsGenerators.randomCollisionFree,
-    useProgrammingPane: false,
+    useProgrammingPane: true,
     renderables
 };
 
@@ -163,8 +162,8 @@ const benchmarkConfig = {
 };
 
 export default {
-    title: 'Orbital Construction',
-    name: 'orbitalConstruction',
+    title: 'Programming Tutorial',
+    name: 'programmingTutorial',
     simConfig,
     benchmarkConfig
 };

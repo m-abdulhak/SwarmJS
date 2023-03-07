@@ -98,3 +98,20 @@
     line-height: 50px;
     margin: 0px 10px 0px 10px;
 }
+
+.parentPane {
+    display: flex;
+    width: 50%;
+    font-family: 'roboto';
+}
+
+.simulationPane {
+    flex: 1;
+    margin: 10px;
+    margin-right: 20px;
+}
+
+.programmingPane {
+    margin-left: 20px;
+    display: block;
+}
