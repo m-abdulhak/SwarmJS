@@ -182,12 +182,19 @@ export default class Scene {
       this.robots.forEach((r) => { r.velocityScale = scale; });
     };
 
+    this.setProgrammingCode = (setup, loop) => {
+      this.setup = setup;
+      this.loop = loop;
+    };
+
     this.togglePause.bind(this);
     this.pause.bind(this);
     this.unpause.bind(this);
     this.setSpeed.bind(this);
+    this.setProgrammingCode.bind(this);
 
     this.setSpeed(envConfig.speed);
+    this.setProgrammingCode("", "");
   }
 
   update() {

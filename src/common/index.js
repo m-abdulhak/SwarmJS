@@ -90,6 +90,8 @@ export const togglePauseSimulation = () => scene.togglePause();
 
 export const setSimulationSpeed = (speed) => scene.setSpeed(speed);
 
+export const setProgrammingCode = (setup, loop) => scene.setProgrammingCode(setup, loop);
+
 export { AvailableActuators as CoreActuators } from './robot/actuators/actuatorsManager';
 export { CoreSensors } from './robot/sensors/sensorManager';
 export { ExtraSensors } from './robot/sensors/sensorManager';

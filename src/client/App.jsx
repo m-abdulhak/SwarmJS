@@ -12,7 +12,8 @@ import {
   simulationIsInitialized,
   resetSimulation,
   togglePauseSimulation,
-  setSimulationSpeed
+  setSimulationSpeed,
+  setProgrammingCode
 } from '@common';
 
 import {
@@ -183,7 +184,11 @@ const App = () => {
       {ui}
     </div>
 
-    {config.useProgrammingPane && <ProgrammingPane />}
+    {/* Conditionally render ProgrammingPane if the scene's config specifies.
+    Also pass the scene itself to the ProgrammingPane so that it can update the
+    program's text.
+    */} 
+    {config.useProgrammingPane && <ProgrammingPane callback={setProgrammingCode} />}
 
     </div>
   );

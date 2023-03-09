@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function ProgrammingPane() {
+export default function ProgrammingPane(props) {
     const [formData, setFormData] = React.useState(
         {setup: "", loop: ""}
     )
@@ -16,7 +16,8 @@ export default function ProgrammingPane() {
 
     function handleSubmit(event) {
         event.preventDefault()
-        console.log(formData)
+        props.callback(formData.setup, formData.loop);
+        //console.log(formData)
     }
 
     return (
@@ -34,7 +35,7 @@ export default function ProgrammingPane() {
             </div>
 
             <div>
-                <label>Loop:</label>
+                <label>Loop: Code executed on every iteration, for every robot.</label>
                 <textarea 
                     rows="20"
                     cols="50"
@@ -45,7 +46,7 @@ export default function ProgrammingPane() {
                 />
             </div>
 
-            <button>Apply</button>
+            <button onClick={handleSubmit}>Apply</button>
         </div>
     )
 }
