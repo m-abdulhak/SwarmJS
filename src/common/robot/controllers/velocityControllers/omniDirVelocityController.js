@@ -1,6 +1,15 @@
+/* eslint-disable no-eval */
 // Returns a function that takes a target and returns a velocity vector
 // Example: { linearVel: { x: 0, y: 0 }, angularVel: 0 }
-export default function omniDirVelocityController(robot) {
+export default function omniDirVelocityController(robot, params, userDefinedFunc = null) {
+  if (userDefinedFunc) {
+    const func = eval(userDefinedFunc);
+
+    if (func && typeof func === 'function') {
+      return func;
+    }
+  }
+
   return (sensors, actuators, goal, point) => {
     // If goal point is reached (default)
     let newXVel = 0;

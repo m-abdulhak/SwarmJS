@@ -13,6 +13,7 @@ const SPEED_TYPES = {
 const getController = (robot, controllerDef) => {
   let Func = null;
   let params = {};
+  let userDefinedFunc = null;
 
   if (controllerDef && typeof controllerDef === 'function') {
     Func = controllerDef;
@@ -24,11 +25,15 @@ const getController = (robot, controllerDef) => {
     }
   }
 
+  if (controllerDef.userDefinedFunc) {
+    userDefinedFunc = controllerDef.userDefinedFunc;
+  }
+
   if (Func && typeof Func !== 'function') {
     throw new Error('Invalid controller', controllerDef);
   }
 
-  return new Func(robot, params);
+  return new Func(robot, params, userDefinedFunc);
 };
 
 export default class Robot {
@@ -56,6 +61,7 @@ export default class Robot {
     this.radius = radius;
     this.velocity = { x: 0, y: 0 };
     this.velocityScale = 1;
+    this.controllers = controllers;
     this.goal = goal;
     this.waypoint = { x: position.x, y: position.y };
     this.envWidth = envWidth;
@@ -136,6 +142,35 @@ export default class Robot {
   set position(val) {
     Body.set(this.body, 'position', { x: val.x, y: val.y });
     this.sensorManager.update();
+  }
+
+  checkIfControllerIsValid(controllerCode) {
+    const ret = { valid: false };
+    if (!controllerCode || typeof controllerCode !== 'string') {
+      ret.error = 'Provided controller code not valid string.';
+      return ret;
+    }
+
+    try {
+      const controllerConfig = {
+        ...this.controllers.velocity,
+        userDefinedFunc: controllerCode
+      };
+      const controller = getController(this, controllerConfig);
+
+      if (controller && typeof controller === 'function') {
+        // TODO: make sure returned value is valid velocities as well?
+        controller(this.sensors, this.actuators, this.goal, this.newWaypoint);
+        ret.valid = true;
+        return ret;
+      }
+
+      ret.error = `Compiled code is not a valid function. Type: ${typeof controller}`;
+    } catch (err) {
+      ret.error = err;
+    }
+
+    return ret;
   }
 
   setWaypoint(waypoint) {

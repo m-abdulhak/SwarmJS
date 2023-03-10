@@ -23,6 +23,17 @@ export const uniqueRenderingElements = (renderables) => ([
 let activeElements = [];
 
 const renderedElems = [];
+let background = null;
+
+const setBackground = (svg, scene) => {
+  if (scene.background) {
+    background = scene.background;
+    svg.style('background-image', `url(${background})`);
+  } else {
+    background = null;
+    svg.style('background-image', '');
+  }
+};
 
 export const setElementEnabled = (element, state) => {
   const otherActiveElements = activeElements.filter((e) => e !== element);
@@ -41,11 +52,7 @@ export function initialize(svg, scene, renderables) {
 
   activeElements = [...uniqueRenderingElements(renderables)];
 
-  if (scene.background) {
-    svg.style('background-image', `url(${scene.background})`);
-  } else {
-    svg.style('background-image', '');
-  }
+  setBackground(svg, scene);
 
   renderedElems.length = 0;
 
@@ -68,6 +75,10 @@ export function renderScene(curSvgEl, curScene, elements) {
   lastScene = scene;
 
   const svg = d3.select(svgEl);
+
+  if (scene.background !== background) {
+    setBackground(svg, scene);
+  }
 
   if (!initialized) {
     initialize(svg, scene, elements);

@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { parseFunctionToEditorCode } from './utils/codeParsing';
 import Scene from './scene';
 import {
   updateBench,
@@ -50,8 +51,15 @@ export const initializeSimulation = (config, updateCB) => {
   createSimulation(config, updateCB);
 };
 
-export const resetSimulation = (config, updateCallback) => {
+export const resetSimulation = (config, updateCallback, setDefaultControllerCode) => {
   console.log('Creating Sim With Config: ', config);
+  const robotControllerConfig = config?.robots?.controllers?.velocity?.controller;
+
+  if (robotControllerConfig && setDefaultControllerCode && typeof setDefaultControllerCode === 'function') {
+    const defaultControllerCode = parseFunctionToEditorCode(robotControllerConfig());
+    setDefaultControllerCode(defaultControllerCode);
+  }
+
   scene = new Scene(
     config.env,
     config.robots,
@@ -73,6 +81,18 @@ export const resetSimulation = (config, updateCallback) => {
     }
     requestAnimationFrame(renderScene);
   };
+};
+
+export const checkIfControllerIsValid = (controllerCode) => {
+  if (!scene?.robots?.length) {
+    return { valid: false, error: 'Could not find test robots.' };
+  }
+
+  // TODO: this is dangerous as tested code can curropt robot,
+  // use a special scene or robot for testing ??
+  const res = scene.robots[0].checkIfControllerIsValid(controllerCode);
+
+  return res;
 };
 
 export const startBenchmark = (simConfig, benchConfig, resetSimCB) => {

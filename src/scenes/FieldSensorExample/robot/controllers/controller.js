@@ -1,13 +1,20 @@
-export default function controller(robot, { angularVelocityScale }) {
+/* eslint-disable no-eval */
+export default function controller(robot, params, userDefinedFunc) {
+  if (userDefinedFunc) {
+    const func = eval(userDefinedFunc);
 
-    return (sensors) => {
+    if (func && typeof func === 'function') {
+      return func;
+    }
+  }
 
-        //console.log(sensors.fields.sensingPoints.forward);
+  return (sensors) => {
+    // console.log(sensors.fields.sensingPoints.forward);
 
-        return {
-            linearVel: 0,
-            angularVel: 0,
-            type: robot.SPEED_TYPES.RELATIVE
-        };
+    return {
+      linearVel: 0,
+      angularVel: 0,
+      type: robot.SPEED_TYPES.RELATIVE
     };
+  };
 }

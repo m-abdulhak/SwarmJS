@@ -121,7 +121,7 @@ Each renderable element can include the following parameters:
 - type: mandatory, used for grouping renderables into UI buttons to enable/disable them.
 - svgClass: optional, used to add classes to the svg elements
 - dataPoints: optional, defines the data points if the renderable is repeated for multiple objects such as robots, pucks, or static objects. DataPoints are usually defined as a property of the scene with the 'sceneProp' key. If dataPoints are defined, `prop` key can be used in the following configurations to refer to properties of the datapoint object. Otherwise, only 'sceneProp' can be used throughout the renderable definition.
-- shape: mandatory, svg shape to be rendered
+- shape: mandatory, svg shape to be rendered (https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Basic_Shapes)
 - staticAttrs: optional, defines the attributes to be set only once when the element is initialized
 - styles: optional, defines the styling attributes for the element, also only applied once, when the element is initialized
 - dynamicAttrs: optional, defines the attributes to be set on every simulation update
@@ -140,3 +140,10 @@ Any property can be one of the following:
 - `{ sceneProp }`: the value is parsed as a property of the scene, a `modifier` function can be defined to modify the value after it is parsed
 - `{ special }` : used for special behaviors, such as setting a color according to the color schema, currently only `schemaColor` is supported
 
+### TODO:
+- add info about scenes
+- add info about overriding sensors & renderables
+- add info about 'relative' vs 'absolute' velocity controllers
+- add info about adding background image to scenes 
+- add info about fields and field sensor
+- add info about user-defined controller 

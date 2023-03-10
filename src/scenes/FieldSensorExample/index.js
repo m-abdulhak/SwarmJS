@@ -80,7 +80,7 @@ const simConfig = {
     radius: 5,
     controllers: {
       velocity: {
-        controller: controller,
+        controller,
         params: { angularVelocityScale: 0.001 }
       }
     },

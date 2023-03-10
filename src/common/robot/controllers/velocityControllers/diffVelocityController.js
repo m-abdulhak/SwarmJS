@@ -1,6 +1,19 @@
+/* eslint-disable no-eval */
 import { angleBetweenThreePointsDeg, pointIsOnRightSideOfVector } from '../../../utils/geometry';
 
-export default function diffVelocityController(robot, { angularVelocityScale }) {
+export default function diffVelocityController(
+  robot,
+  { angularVelocityScale = 0.001 } = {},
+  userDefinedFunc = null
+) {
+  if (userDefinedFunc) {
+    const func = eval(userDefinedFunc);
+
+    if (func && typeof func === 'function') {
+      return func;
+    }
+  }
+
   return (sensors, actuators, goal, point) => {
     // If goal point is reached (default)
     let linearVelX = 0;

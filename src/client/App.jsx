@@ -12,7 +12,8 @@ import {
   simulationIsInitialized,
   resetSimulation,
   togglePauseSimulation,
-  setSimulationSpeed
+  setSimulationSpeed,
+  checkIfControllerIsValid
 } from '@common';
 
 import {
@@ -27,6 +28,7 @@ import QuickActions from './components/QuickActions';
 import TabContainer from './components/Layouts/TabContainer';
 import Options from './components/Options/index';
 import Benchmark from './components/Benchmark';
+import CodeEditor from './components/CodeEditor';
 
 import exampleConfigs from '../scenes';
 
@@ -39,36 +41,18 @@ const App = () => {
   const [selectedScene, setSelectedScene] = useState(options[0].value);
   const [config, setConfig] = useState(exampleConfigs[selectedScene].simConfig);
   const [benchSettings, setBenchSettings] = useState(exampleConfigs[selectedScene].benchmarkConfig);
-  const [uiEnabled, setUiEnabled] = useState(false);
+  const [uiEnabled, setUiEnabled] = useState(true);
   const [time, setTime] = useState(0);
   const [speed, setSpeed] = useState(1);
   const [paused, setPaused] = useState(false);
   const [benchmarkData, setBenchmarkData] = useState({});
+  const [defaultControllerCode, setDefaultControllerCode] = useState('');
+  const [userDefinedController, setUserDefinedController] = useState(null);
   const svgRef = useRef(null);
 
-  const handleChange = (value) => {
-    setSelectedScene(value);
+  const setScene = (newScene) => {
+    setSelectedScene(newScene);
   };
-
-  const selectElem = (
-    <div id='simulation-selection'>
-      <p>Scene: </p>
-      <Select
-        id='simulation-select'
-        name={selectedScene.label}
-        value={selectedScene}
-        onChange={(event) => {
-          handleChange(event.target.value);
-        }}
-      >
-        {options?.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label ?? option.value}
-              </MenuItem>
-        ))}
-      </Select>
-    </div>
-  );
 
   const onSpeedChange = (newSpeed) => {
     const speedNumber = parseFloat(newSpeed);
@@ -82,11 +66,19 @@ const App = () => {
     setBenchmarkData(benchData);
   };
 
-  const reset = (newConfig = config, stopBench = false) => {
+  const reset = (newConfig = config, stopBench = false, useDefaultController = true) => {
     if (stopBench && isBenchmarking()) {
       stopBenchmark();
     }
-    resetSimulation(newConfig, onUpdate);
+
+    // TODO: check for userDefined config and merge
+    const usedConfig = { ...newConfig };
+
+    if (!useDefaultController && userDefinedController) {
+      usedConfig.robots.controllers.velocity.userDefinedFunc = userDefinedController;
+    }
+
+    resetSimulation(usedConfig, onUpdate, setDefaultControllerCode);
     onSpeedChange(newConfig.env.speed);
     setPaused(false);
     resetRenderer();
@@ -114,6 +106,26 @@ const App = () => {
 
   const initialized = simulationIsInitialized();
 
+  const selectElem = (
+    <div id='simulation-selection'>
+      <p>Scene: </p>
+      <Select
+        id='simulation-select'
+        name={selectedScene.label}
+        value={selectedScene}
+        onChange={(event) => {
+          setScene(event.target.value);
+        }}
+      >
+        {options?.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label ?? option.value}
+              </MenuItem>
+        ))}
+      </Select>
+    </div>
+  );
+
   const optionsElem = initialized ? (
     <Options
       time={time}
@@ -136,10 +148,20 @@ const App = () => {
     <Benchmark simConfig={config} benchSettings={benchSettings} reset={reset} data={benchmarkData}/>
   ) : <></>;
 
+  const controllerCodeEditor = initialized ? (
+     <CodeEditor
+      defaultCode={defaultControllerCode}
+      setController={setUserDefinedController}
+      deploy={() => reset(config, true, false)}
+      checkIfControllerIsValid={checkIfControllerIsValid}
+     />
+  ) : <></>;
+
   const tabContents = [
     { label: 'Options', content: optionsElem },
-    { label: 'Configurations', content: configurationsElem },
-    { label: 'Benchmarking', content: benchElem }
+    { label: 'Configuration', content: configurationsElem },
+    { label: 'Benchmark', content: benchElem },
+    { label: 'Edit Controller', content: controllerCodeEditor }
   ];
 
   const ui = uiEnabled ? (

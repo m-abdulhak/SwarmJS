@@ -63,7 +63,7 @@ const simConfig = {
     }
   },
   robots: {
-    count: 50,
+    count: 10,
     radius: 5,
     controllers: {
       velocity: {
@@ -132,8 +132,8 @@ const benchmarkConfig = {
 };
 
 export default {
-  title: 'BEEClust',
-  name: 'beeClust',
+  title: 'Default Scene',
+  name: 'defaultScene',
   simConfig,
   benchmarkConfig
 };
