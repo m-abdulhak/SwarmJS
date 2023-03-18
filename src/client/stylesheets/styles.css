@@ -120,6 +120,10 @@
     width: 100%;
 }
 
+.code-editor-alert-message {
+    margin: 0px;
+    padding: 0px;
+}
 
 .code-section-header {
     height: 100%;

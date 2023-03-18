@@ -150,11 +150,15 @@ const App = () => {
 
   const controllerCodeEditor = initialized ? (
      <CodeEditor
-      title='Loop Step'
-      defaultCode={defaultControllerCode}
-      onCodeValid={setUserDefinedController}
       deploy={() => reset(config, true, false)}
-      checkIfCodeIsValid={checkIfControllerIsValid}
+      sections={[
+        {
+          title: 'Loop Step',
+          defaultCode: defaultControllerCode,
+          onCodeValid: setUserDefinedController,
+          checkIfCodeIsValid: checkIfControllerIsValid
+        }
+      ]}
      />
   ) : <></>;
 
