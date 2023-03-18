@@ -28,7 +28,7 @@ import QuickActions from './components/QuickActions';
 import TabContainer from './components/Layouts/TabContainer';
 import Options from './components/Options/index';
 import Benchmark from './components/Benchmark';
-import CodeEditor from './components/CodeEditor';
+import CodeEditor from './components/Editors/CodeEditor';
 
 import exampleConfigs from '../scenes';
 
@@ -151,9 +151,9 @@ const App = () => {
   const controllerCodeEditor = initialized ? (
      <CodeEditor
       defaultCode={defaultControllerCode}
-      setController={setUserDefinedController}
+      onCodeValid={setUserDefinedController}
       deploy={() => reset(config, true, false)}
-      checkIfControllerIsValid={checkIfControllerIsValid}
+      checkIfCodeIsValid={checkIfControllerIsValid}
      />
   ) : <></>;
 

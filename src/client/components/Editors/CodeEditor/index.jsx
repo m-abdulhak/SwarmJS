@@ -22,12 +22,12 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 function CodeEditor({
   deploy,
   defaultCode,
-  setController,
-  checkIfControllerIsValid
+  onCodeValid,
+  checkIfCodeIsValid
 }) {
   const [code, setCode] = useState(null);
   const [error, setError] = useState(null);
-  const [codeValidFunc, setCodeValidFunc] = useState(true);
+  const [codeIsValid, setCodeIsValid] = useState(true);
 
   if (!code && defaultCode) {
     setCode(defaultCode);
@@ -38,43 +38,42 @@ function CodeEditor({
   };
 
   useEffect(() => {
-    let codeIsValid = false;
+    let valid = false;
     let codeError = null;
 
     try {
       const evaluatedCode = eval(code);
 
-      // if (typeof result === 'function' && typeof setControllerCode === 'function') {
       if (typeof evaluatedCode !== 'function') {
         throw new Error(`Compiled code is not a function, type: ${typeof evaluatedCode}`);
       }
 
-      if (checkIfControllerIsValid && typeof checkIfControllerIsValid === 'function') {
-        const res = checkIfControllerIsValid(code);
+      if (checkIfCodeIsValid && typeof checkIfCodeIsValid === 'function') {
+        const res = checkIfCodeIsValid(code);
 
         if (!res?.valid || res.error) {
           throw new Error(res?.error ?? 'Error validating code.');
         }
       }
 
-      codeIsValid = true;
+      valid = true;
       codeError = null;
     } catch (e) {
-      codeIsValid = false;
+      valid = false;
       codeError = e;
     }
 
-    if (codeIsValid) {
-      setController(code);
+    if (valid) {
+      onCodeValid(code);
     }
 
-    setCodeValidFunc(codeIsValid);
+    setCodeIsValid(valid);
     setError(codeError?.message);
   }, [code]);
 
   const alertElem = (
-    <Alert className="code-editor-alert" severity={ codeValidFunc ? 'success' : 'error'}>
-      { codeValidFunc ? 'Code compiled successfully.' : 'Error compiling code'}
+    <Alert className="code-editor-alert" severity={ codeIsValid ? 'success' : 'error'}>
+      { codeIsValid ? 'Code compiled successfully.' : 'Error compiling code'}
     </Alert>
   );
 
@@ -150,9 +149,9 @@ function CodeEditor({
 
 CodeEditor.propTypes = {
   defaultCode: PropTypes.string,
-  setController: PropTypes.func,
+  onCodeValid: PropTypes.func,
   deploy: PropTypes.func,
-  checkIfControllerIsValid: PropTypes.func
+  checkIfCodeIsValid: PropTypes.func
 };
 
 export default CodeEditor;
