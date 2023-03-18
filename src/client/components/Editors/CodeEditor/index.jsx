@@ -13,6 +13,7 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 
 import 'ace-builds/webpack-resolver';
 import 'ace-builds/src-noconflict/mode-javascript';
@@ -21,6 +22,7 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 
 function CodeEditor({
   deploy,
+  title,
   defaultCode,
   onCodeValid,
   checkIfCodeIsValid
@@ -123,34 +125,56 @@ function CodeEditor({
       <Grid item xs={12} md={10} lg={11}>
           {codeAlertElem}
       </Grid>
-      <Grid item xs={12} md={12}>
-        <AceEditor
-          className='code-editor'
-          name="robot-controller-code-editor"
-          placeholder="Robot Controller Code"
-          value={code ?? defaultCode}
-          onChange={(newCode) => setCode(newCode)}
-          fontSize={16}
-          mode='javascript'
-          theme='monokai'
-          highlightActiveLine={true}
-          setOptions={{
-            enableBasicAutocompletion: true,
-            enableLiveAutocompletion: true,
-            enableSnippets: true,
-            showLineNumbers: true,
-            tabSize: 2
-          }}
-        />
+      <Grid container item xs={12} md={12} lg={12} spacing={1}>
+        <Grid item xs={6} md={10} lg={10}>
+          <div className="code-section-header">
+            <Typography variant="subtitle1" gutterBottom className="code-section-header-title">
+              {title}
+            </Typography>
+          </div>
+        </Grid>
+        <Grid item xs={6} md={2} lg={2}>
+          <div className='code-editor-btn-container'>
+            <Tooltip title="Reset Code">
+              <IconButton
+                color="secondary"
+                onClick={() => resetCode()}
+                >
+                <RestartAltIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <AceEditor
+            className='code-editor'
+            name="robot-controller-code-editor"
+            placeholder="Robot Controller Code"
+            value={code ?? defaultCode}
+            onChange={(newCode) => setCode(newCode)}
+            fontSize={16}
+            mode='javascript'
+            theme='monokai'
+            highlightActiveLine={true}
+            setOptions={{
+              enableBasicAutocompletion: true,
+              enableLiveAutocompletion: true,
+              enableSnippets: true,
+              showLineNumbers: true,
+              tabSize: 2
+            }}
+          />
+        </Grid>
       </Grid>
     </Grid>
   );
 }
 
 CodeEditor.propTypes = {
+  deploy: PropTypes.func,
+  title: PropTypes.string,
   defaultCode: PropTypes.string,
   onCodeValid: PropTypes.func,
-  deploy: PropTypes.func,
   checkIfCodeIsValid: PropTypes.func
 };
 

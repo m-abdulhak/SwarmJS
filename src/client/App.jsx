@@ -150,6 +150,7 @@ const App = () => {
 
   const controllerCodeEditor = initialized ? (
      <CodeEditor
+      title='Loop Step'
       defaultCode={defaultControllerCode}
       onCodeValid={setUserDefinedController}
       deploy={() => reset(config, true, false)}
@@ -161,7 +162,7 @@ const App = () => {
     { label: 'Options', content: optionsElem },
     { label: 'Configuration', content: configurationsElem },
     { label: 'Benchmark', content: benchElem },
-    { label: 'Edit Controller', content: controllerCodeEditor }
+    { label: 'Controller', content: controllerCodeEditor }
   ];
 
   const ui = uiEnabled ? (
