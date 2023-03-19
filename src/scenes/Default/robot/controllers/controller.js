@@ -1,33 +1,45 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-eval */
-export default function controller(robot, params, userDefinedFunc) {
-  // CONSTANTS
-  const CONSTANTS = {
-    maxAngularSpeed: 0.1,
-    maxForwardSpeed: 5,
-    minNearbyNeighborsToTriggerWait: 1,
-    minTurnTime: 5,
-    maxTurnTime: 10
-  };
-
-  Object.freeze(CONSTANTS);
-
-  const ROBOT_STATE = {
+export function init(CONSTANTS, STATE) {
+  CONSTANTS.maxAngularSpeed = 0.1;
+  CONSTANTS.maxForwardSpeed = 5;
+  CONSTANTS.minNearbyNeighborsToTriggerWait = 1;
+  CONSTANTS.minTurnTime = 5;
+  CONSTANTS.maxTurnTime = 1;
+  CONSTANTS.ROBOT_STATE = {
     MOVE_FORWARD: 'MOVE_FORWARD',
     TURN: 'TURN',
     WAIT: 'WAIT'
   };
 
-  // STATE
-  const STATE = {
-    movementState: ROBOT_STATE.MOVE_FORWARD,
-    stateTimeOut: 0,
-    turnDir: 1 // 1 for clockwise, -1 for counter-clockwise
-  };
+  STATE.movementState = CONSTANTS.ROBOT_STATE.MOVE_FORWARD;
+  STATE.stateTimeOut = 0;
+  STATE.turnDir = 1; // 1 for clockwise, -1 for counter-clockwise
+}
 
-  if (userDefinedFunc) {
-    const func = eval(userDefinedFunc);
+export function controller(robot, params, onLoop, onInit) {
+  // CONSTANTS
+  const CONSTANTS = {};
+
+  // STATE
+  const STATE = {};
+
+  let initFunc = init;
+  if (onInit) {
+    const userDefinedInitFunc = eval(onInit);
+
+    if (userDefinedInitFunc && typeof userDefinedInitFunc === 'function') {
+      initFunc = userDefinedInitFunc;
+    }
+  }
+
+  initFunc(CONSTANTS, STATE);
+
+  Object.freeze(CONSTANTS);
+
+  if (onLoop) {
+    const func = eval(onLoop);
 
     if (func && typeof func === 'function') {
       return func;
@@ -62,18 +74,18 @@ export default function controller(robot, params, userDefinedFunc) {
     //
     STATE.stateTimeOut -= 1;
 
-    if (STATE.movementState === ROBOT_STATE.MOVE_FORWARD) {
+    if (STATE.movementState === CONSTANTS.ROBOT_STATE.MOVE_FORWARD) {
       if (sensors.walls.includes('forward') || sensors.walls.includes('left') || sensors.walls.includes('right')) {
         enterTurnState();
       } else if (sensors.otherRobots >= CONSTANTS.minNearbyNeighborsToTriggerWait) {
         STATE.stateTimeOut = sensors.potentialWaitTime;
-        STATE.movementState = ROBOT_STATE.WAIT;
+        STATE.movementState = CONSTANTS.ROBOT_STATE.WAIT;
       }
-    } else if (STATE.movementState === ROBOT_STATE.TURN) {
+    } else if (STATE.movementState === CONSTANTS.ROBOT_STATE.TURN) {
       if (STATE.stateTimeOut <= 0) {
-        STATE.movementState = ROBOT_STATE.MOVE_FORWARD;
+        STATE.movementState = CONSTANTS.ROBOT_STATE.MOVE_FORWARD;
       }
-    } else if (STATE.movementState === ROBOT_STATE.WAIT) {
+    } else if (STATE.movementState === CONSTANTS.ROBOT_STATE.WAIT) {
       if (STATE.stateTimeOut <= 0) {
         enterTurnState();
       }
@@ -84,12 +96,12 @@ export default function controller(robot, params, userDefinedFunc) {
     //
     let forwardSpeed = 0;
     let angularSpeed = 0;
-    if (STATE.movementState === ROBOT_STATE.MOVE_FORWARD) {
+    if (STATE.movementState === CONSTANTS.ROBOT_STATE.MOVE_FORWARD) {
       // Go full speed ahead.
       forwardSpeed = CONSTANTS.maxForwardSpeed;
-    } else if (STATE.movementState === ROBOT_STATE.TURN) {
+    } else if (STATE.movementState === CONSTANTS.ROBOT_STATE.TURN) {
       angularSpeed = STATE.turnDir * CONSTANTS.maxAngularSpeed;
-    } else if (STATE.movementState === ROBOT_STATE.WAIT) {
+    } else if (STATE.movementState === CONSTANTS.ROBOT_STATE.WAIT) {
       // Keep the default speeds of 0, 0.
     }
 
@@ -110,7 +122,7 @@ export default function controller(robot, params, userDefinedFunc) {
       } else {
         STATE.turnDir = Math.random() < 0.5 ? -1 : 1;
       }
-      STATE.movementState = ROBOT_STATE.TURN;
+      STATE.movementState = CONSTANTS.ROBOT_STATE.TURN;
     }
   };
 }

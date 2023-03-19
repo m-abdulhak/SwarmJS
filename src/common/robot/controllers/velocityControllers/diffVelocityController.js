@@ -4,10 +4,10 @@ import { angleBetweenThreePointsDeg, pointIsOnRightSideOfVector } from '../../..
 export default function diffVelocityController(
   robot,
   { angularVelocityScale = 0.001 } = {},
-  userDefinedFunc = null
+  onLoop = null
 ) {
-  if (userDefinedFunc) {
-    const func = eval(userDefinedFunc);
+  if (onLoop) {
+    const func = eval(onLoop);
 
     if (func && typeof func === 'function') {
       return func;

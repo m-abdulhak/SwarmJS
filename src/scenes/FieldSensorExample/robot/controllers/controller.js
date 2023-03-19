@@ -1,7 +1,7 @@
 /* eslint-disable no-eval */
-export default function controller(robot, params, userDefinedFunc) {
-  if (userDefinedFunc) {
-    const func = eval(userDefinedFunc);
+export default function controller(robot, params, onLoop) {
+  if (onLoop) {
+    const func = eval(onLoop);
 
     if (func && typeof func === 'function') {
       return func;

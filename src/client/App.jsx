@@ -13,7 +13,7 @@ import {
   resetSimulation,
   togglePauseSimulation,
   setSimulationSpeed,
-  checkIfControllerIsValid
+  controllerCodeIsValid
 } from '@common';
 
 import {
@@ -46,9 +46,13 @@ const App = () => {
   const [speed, setSpeed] = useState(1);
   const [paused, setPaused] = useState(false);
   const [benchmarkData, setBenchmarkData] = useState({});
-  const [defaultControllerCode, setDefaultControllerCode] = useState('');
-  const [userDefinedController, setUserDefinedController] = useState(null);
   const svgRef = useRef(null);
+
+  // User Defined Robot Velocity Controller
+  const [defaultOnLoopCode, setDefaultOnLoopCode] = useState('');
+  const [onLoopCode, setOnLoopCode] = useState(null);
+  const [defaultOnInitCode, setDefaultOnInitCode] = useState('');
+  const [onInitCode, setOnInitCode] = useState(null);
 
   const setScene = (newScene) => {
     setSelectedScene(newScene);
@@ -74,11 +78,16 @@ const App = () => {
     // TODO: check for userDefined config and merge
     const usedConfig = { ...newConfig };
 
-    if (!useDefaultController && userDefinedController) {
-      usedConfig.robots.controllers.velocity.userDefinedFunc = userDefinedController;
+    if (!useDefaultController) {
+      if (onLoopCode) {
+        usedConfig.robots.controllers.velocity.onLoop = onLoopCode;
+      }
+      if (onInitCode) {
+        usedConfig.robots.controllers.velocity.onInit = onInitCode;
+      }
     }
 
-    resetSimulation(usedConfig, onUpdate, setDefaultControllerCode);
+    resetSimulation(usedConfig, onUpdate, setDefaultOnLoopCode, setDefaultOnInitCode);
     onSpeedChange(newConfig.env.speed);
     setPaused(false);
     resetRenderer();
@@ -153,10 +162,16 @@ const App = () => {
       deploy={() => reset(config, true, false)}
       sections={[
         {
-          title: 'Loop Step',
-          defaultCode: defaultControllerCode,
-          onCodeValid: setUserDefinedController,
-          checkIfCodeIsValid: checkIfControllerIsValid
+          title: 'Initialize:',
+          defaultCode: defaultOnInitCode,
+          onCodeValid: setOnInitCode,
+          checkIfCodeIsValid: (init) => controllerCodeIsValid(onLoopCode ?? defaultOnLoopCode, init)
+        },
+        {
+          title: 'Loop:',
+          defaultCode: defaultOnLoopCode,
+          onCodeValid: setOnLoopCode,
+          checkIfCodeIsValid: (loop) => controllerCodeIsValid(loop, onInitCode ?? defaultOnInitCode)
         }
       ]}
      />

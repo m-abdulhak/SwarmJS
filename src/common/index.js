@@ -51,13 +51,24 @@ export const initializeSimulation = (config, updateCB) => {
   createSimulation(config, updateCB);
 };
 
-export const resetSimulation = (config, updateCallback, setDefaultControllerCode) => {
+export const resetSimulation = (
+  config,
+  updateCallback,
+  setDefaultOnLoopCode,
+  setDefaultOnInitCode
+) => {
   console.log('Creating Sim With Config: ', config);
-  const robotControllerConfig = config?.robots?.controllers?.velocity?.controller;
+  const velocityController = config?.robots?.controllers?.velocity?.controller;
+  const velocityControllerInit = config?.robots?.controllers?.velocity?.init;
 
-  if (robotControllerConfig && setDefaultControllerCode && typeof setDefaultControllerCode === 'function') {
-    const defaultControllerCode = parseFunctionToEditorCode(robotControllerConfig());
-    setDefaultControllerCode(defaultControllerCode);
+  if (velocityController && setDefaultOnLoopCode && typeof setDefaultOnLoopCode === 'function') {
+    const defaultOnLoopCode = parseFunctionToEditorCode(velocityController());
+    setDefaultOnLoopCode(defaultOnLoopCode);
+  }
+
+  if (velocityControllerInit && setDefaultOnInitCode && typeof setDefaultOnInitCode === 'function') {
+    const defaultOnInitCode = parseFunctionToEditorCode(velocityControllerInit);
+    setDefaultOnInitCode(defaultOnInitCode);
   }
 
   scene = new Scene(
@@ -83,14 +94,14 @@ export const resetSimulation = (config, updateCallback, setDefaultControllerCode
   };
 };
 
-export const checkIfControllerIsValid = (controllerCode) => {
+export const controllerCodeIsValid = (loopCode, initCode) => {
   if (!scene?.robots?.length) {
     return { valid: false, error: 'Could not find test robots.' };
   }
 
   // TODO: this is dangerous as tested code can curropt robot,
   // use a special scene or robot for testing ??
-  const res = scene.robots[0].checkIfControllerIsValid(controllerCode);
+  const res = scene.robots[0].controllerCodeIsValid(loopCode, initCode);
 
   return res;
 };

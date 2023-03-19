@@ -13,7 +13,8 @@ const SPEED_TYPES = {
 const getController = (robot, controllerDef) => {
   let Func = null;
   let params = {};
-  let userDefinedFunc = null;
+  let onLoop = null;
+  let onInit = null;
 
   if (controllerDef && typeof controllerDef === 'function') {
     Func = controllerDef;
@@ -23,17 +24,21 @@ const getController = (robot, controllerDef) => {
     if (controllerDef.params && typeof controllerDef.params === 'object') {
       params = controllerDef.params;
     }
-  }
 
-  if (controllerDef.userDefinedFunc) {
-    userDefinedFunc = controllerDef.userDefinedFunc;
+    if (controllerDef.onLoop) {
+      onLoop = controllerDef.onLoop;
+    }
+
+    if (controllerDef.onInit) {
+      onInit = controllerDef.onInit;
+    }
   }
 
   if (Func && typeof Func !== 'function') {
     throw new Error('Invalid controller', controllerDef);
   }
 
-  return new Func(robot, params, userDefinedFunc);
+  return new Func(robot, params, onLoop, onInit);
 };
 
 export default class Robot {
@@ -144,17 +149,23 @@ export default class Robot {
     this.sensorManager.update();
   }
 
-  checkIfControllerIsValid(controllerCode) {
+  controllerCodeIsValid(loopCode, initCode) {
     const ret = { valid: false };
-    if (!controllerCode || typeof controllerCode !== 'string') {
-      ret.error = 'Provided controller code not valid string.';
+    if (!loopCode || typeof loopCode !== 'string') {
+      ret.error = 'Provided loop code not valid string.';
+      return ret;
+    }
+
+    if (!initCode || typeof initCode !== 'string') {
+      ret.error = 'Provided init code not valid string.';
       return ret;
     }
 
     try {
       const controllerConfig = {
         ...this.controllers.velocity,
-        userDefinedFunc: controllerCode
+        onLoop: loopCode,
+        onInit: initCode
       };
       const controller = getController(this, controllerConfig);
 

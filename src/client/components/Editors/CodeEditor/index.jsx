@@ -46,7 +46,7 @@ function CodeEditor({
     </Alert>
   );
 
-  const errorMsgs = Object.entries(errors).reduce((acc, [k, v]) => [...acc, `${k}: ${v}`], []);
+  const errorMsgs = Object.entries(errors).reduce((acc, [k, v]) => [...acc, `${k}: ${v}`.replace('::', ':')], []);
   const errorElem = (
     <Alert icon={false} severity={ errorMsgs?.length ? 'error' : 'success'}>
       {!errorMsgs?.length

@@ -1,5 +1,5 @@
 /* eslint-disable no-eval */
-export default function controller(robot, params, userDefinedFunc) {
+export default function controller(robot, params, onLoop) {
   // PARAMETERS:
   const middleTau = 0.6;
   const maxAngularSpeed = 0.25;
@@ -53,8 +53,8 @@ export default function controller(robot, params, userDefinedFunc) {
     return maxAngularSpeed;
   }
 
-  if (userDefinedFunc) {
-    const func = eval(userDefinedFunc);
+  if (onLoop) {
+    const func = eval(onLoop);
 
     if (func && typeof func === 'function') {
       return func;

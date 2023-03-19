@@ -5,7 +5,14 @@ export const changeFuncCodeToArrow = (funcCode) => {
 
   let arrowCode = funcCode.trim();
   if (arrowCode.startsWith('function')) {
+    // Remove 'function'
     arrowCode = arrowCode.replace('function', '');
+
+    // Remove function name in case function is named
+    const indexOfFirstBraces = arrowCode.indexOf('(');
+    arrowCode = arrowCode.slice(indexOfFirstBraces);
+
+    // Add arrow function syntax
     arrowCode = arrowCode.replace('{', '=> {');
   }
 
