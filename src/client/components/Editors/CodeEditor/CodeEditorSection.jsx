@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable no-eval */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import AceEditor from 'react-ace';
 import IconButton from '@mui/material/IconButton';
@@ -16,66 +16,24 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 
 function CodeEditorSection({
   title,
-  defaultCode,
-  onCodeValid,
-  checkIfCodeIsValid,
-  setError,
-  setCodeIsValid
+  code,
+  setCode,
+  defaultCode
 }) {
-  const [code, setCode] = useState(null);
-
-  if (!code && defaultCode) {
-    setCode(defaultCode);
-  }
-
   const resetCode = () => {
     setCode(defaultCode);
   };
 
-  useEffect(() => {
-    let valid = false;
-    let codeError = null;
-
-    try {
-      const evaluatedCode = eval(code);
-
-      if (typeof evaluatedCode !== 'function') {
-        throw new Error(`Compiled code is not a function, type: ${typeof evaluatedCode}`);
-      }
-
-      if (checkIfCodeIsValid && typeof checkIfCodeIsValid === 'function') {
-        const res = checkIfCodeIsValid(code);
-
-        if (!res?.valid || res.error) {
-          throw new Error(res?.error ?? 'Error validating code.');
-        }
-      }
-
-      valid = true;
-      codeError = null;
-    } catch (e) {
-      valid = false;
-      codeError = e;
-    }
-
-    if (valid) {
-      onCodeValid(code);
-    }
-
-    setCodeIsValid(valid);
-    setError(codeError?.message);
-  }, [code]);
-
   return (
     <Grid container item xs={12} md={12} lg={12} spacing={1}>
-      <Grid item xs={6} md={10} lg={10}>
+      <Grid item xs={10} md={11} lg={11}>
         <div className="code-section-header">
           <Typography variant="subtitle1" gutterBottom className="code-section-header-title">
             {title ?? 'Code Editor'}
           </Typography>
         </div>
       </Grid>
-      <Grid item xs={6} md={2} lg={2}>
+      <Grid item xs={2} md={1} lg={1}>
         <div className='code-editor-btn-container'>
           <Tooltip title="Reset Code">
             <IconButton
@@ -113,11 +71,9 @@ function CodeEditorSection({
 
 CodeEditorSection.propTypes = {
   title: PropTypes.string,
-  defaultCode: PropTypes.string,
-  onCodeValid: PropTypes.func,
-  checkIfCodeIsValid: PropTypes.func,
-  setCodeIsValid: PropTypes.func,
-  setError: PropTypes.func
+  code: PropTypes.string,
+  setCode: PropTypes.func,
+  defaultCode: PropTypes.string
 };
 
 export default CodeEditorSection;
