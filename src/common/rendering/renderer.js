@@ -111,3 +111,54 @@ export function renderScene(curSvgEl, curScene, elements) {
 export const resetRenderer = () => {
   resetOnNextRender = true;
 };
+
+export const createFieldCanvas = (fieldKey, field, onLoadCallback) => {
+  const canvasElem = document.createElement('canvas');
+  canvasElem.id = `field-${fieldKey}-canvas`;
+  canvasElem.style.position = 'absolute';
+  canvasElem.style.top = 0;
+  canvasElem.style.left = 0;
+
+  if (!field.defaultBackground) {
+    canvasElem.classList.add('hidden');
+  }
+
+  const context = canvasElem.getContext('2d', { willReadFrequently: true });
+
+  const imageElem = new Image();
+  imageElem.src = field.url;
+
+  imageElem.onload = () => {
+    canvasElem.width = imageElem.width;
+    canvasElem.height = imageElem.height;
+    context.drawImage(imageElem, 0, 0);
+
+    if (onLoadCallback && typeof onLoadCallback === 'function') {
+      onLoadCallback(canvasElem, context);
+    }
+  };
+
+  return canvasElem;
+};
+
+export const changeBackgroundField = (elem) => {
+  if (!elem) {
+    return;
+  }
+
+  const children = Array.from(elem.children);
+  if (!children?.length) {
+    return;
+  }
+
+  const curBG = children.findIndex((x) => !x.classList.contains('hidden'));
+  const newBG = (curBG + 1) % children.length;
+
+  if (curBG >= 0) {
+    children[curBG].classList.add('hidden');
+  }
+
+  if (newBG >= 0) {
+    children[newBG].classList.remove('hidden');
+  }
+};

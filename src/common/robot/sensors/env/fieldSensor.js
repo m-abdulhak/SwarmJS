@@ -31,11 +31,14 @@ class FieldSensor extends Sensor {
   }
 
   sample() {
-    this.sceneDefinedSensingPoints = getSceneDefinedPoints(this.sceneDefinedSensingPointsDefinitions, this.robot.sensors);
+    this.sceneDefinedSensingPoints = getSceneDefinedPoints(
+      this.sceneDefinedSensingPointsDefinitions,
+      this.robot.sensors
+    );
 
     const res = {};
 
-    Object.entries(this.scene.fields).forEach(([fieldKey, field]) => {
+    Object.entries(this.scene.fields || {}).forEach(([fieldKey, field]) => {
       res[fieldKey] = {};
 
       Object.entries(this.sceneDefinedSensingPoints).forEach(([key, sensingPoint]) => {
@@ -49,8 +52,8 @@ class FieldSensor extends Sensor {
     });
 
     this.value = {
-        readings: res,
-        sensingPoints: this.sceneDefinedSensingPoints
+      readings: res,
+      sensingPoints: this.sceneDefinedSensingPoints
     };
   }
 }
