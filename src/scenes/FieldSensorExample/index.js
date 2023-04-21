@@ -68,10 +68,10 @@ const simConfig = {
     width: 600,
     height: 400,
     speed: 15,
-    background: mapUrl,
     fields: {
       heatMap: {
-        url: mapUrl
+        url: mapUrl,
+        defaultBackground: true
       }
     }
   },
