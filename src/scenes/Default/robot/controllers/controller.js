@@ -34,7 +34,7 @@ export function controller(robot, params, onLoop, onInit) {
     }
   }
 
-  initFunc(CONSTANTS, STATE);
+  initFunc(CONSTANTS, STATE, robot);
 
   Object.freeze(CONSTANTS);
 

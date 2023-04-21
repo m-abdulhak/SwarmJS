@@ -53,7 +53,8 @@ export default class Robot {
     envWidth,
     envHeight,
     scene,
-    misc
+    misc,
+    externalEngine = false
   ) {
     // Configs
     this.DeadLockRecovery = {
@@ -95,7 +96,8 @@ export default class Robot {
         //   this.radius * 1.2,
         //   { angle: (1.6 * Math.PI) / 2 }
         // )
-      ]
+      ],
+      isStatic: externalEngine
     });
     this.body = compoundBody;
     this.body.friction = 0;
