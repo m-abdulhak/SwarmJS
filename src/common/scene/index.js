@@ -29,29 +29,7 @@ export default class Scene {
     this.width = parseInt(envConfig.width, 10);
     this.height = parseInt(envConfig.height, 10);
     this.background = envConfig.background || null;
-    this.fields = {};
-
-    if (envConfig.fields && typeof envConfig.fields === 'object') {
-      Object.entries(envConfig.fields).forEach(([fieldKey, field]) => {
-        const canvasElem = document.createElement('canvas');
-        const context = canvasElem.getContext('2d', { willReadFrequently: true });
-
-        const imageElem = new Image();
-        imageElem.src = field.url;
-
-        imageElem.onload = () => {
-          console.info(`Image for field ${fieldKey} loaded!`);
-          canvasElem.width = imageElem.width;
-          canvasElem.height = imageElem.height;
-          context.drawImage(imageElem, 0, 0);
-        };
-
-        this.fields[fieldKey] = {
-          ...field,
-          src: context
-        };
-      });
-    }
+    this.fields = envConfig.fields;
 
     // Create Matter.js Physics Engine
     this.engine = Engine.create();

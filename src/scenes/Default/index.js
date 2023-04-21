@@ -11,6 +11,7 @@ import RobotRenderables from './robot/renderables';
 import { controller, init } from './robot/controllers/controller';
 
 import mapUrl from './map.png';
+import mapUrl2 from './map2.png';
 
 // All renderables should be registered in this list and assigned a module property
 // This is necessary to avoid imposing a unique restriction on renderable type in different modules
@@ -55,10 +56,13 @@ const simConfig = {
     width: 600,
     height: 400,
     speed: 15,
-    background: mapUrl,
     fields: {
       heatMap: {
         url: mapUrl
+      },
+      field2: {
+        url: mapUrl2,
+        defaultBackground: true
       }
     }
   },

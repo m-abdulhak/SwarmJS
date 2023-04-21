@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDrawPolygon, faSync, faCog, faPause, faClock, faStopwatch } from '@fortawesome/free-solid-svg-icons';
+import { faDrawPolygon, faImage, faSync, faCog, faPause, faClock, faStopwatch } from '@fortawesome/free-solid-svg-icons';
 import { countValidDataSets } from '@common/benchmarking/graphRenderingUtils';
 
 import {
@@ -12,6 +12,7 @@ import {
 
 const QuickActions = ({
   toggleElementEnabled,
+  changeBackground,
   setUiEnabled,
   uiEnabled,
   reset,
@@ -32,6 +33,12 @@ const QuickActions = ({
         className="quick-actions-icon"
         title="Toggle Rendering"
         onClick={() => toggleElementEnabled('All')}
+      />
+      <FontAwesomeIcon
+        icon={faImage}
+        className="quick-actions-icon"
+        title="Change Background"
+        onClick={() => changeBackground()}
       />
       <FontAwesomeIcon
         icon={faCog}
@@ -87,6 +94,7 @@ const QuickActions = ({
 
 QuickActions.propTypes = {
   toggleElementEnabled: PropTypes.func.isRequired,
+  changeBackground: PropTypes.func.isRequired,
   setUiEnabled: PropTypes.func.isRequired,
   uiEnabled: PropTypes.bool.isRequired,
   reset: PropTypes.func.isRequired,

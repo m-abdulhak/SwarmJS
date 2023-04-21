@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useRef, useEffect } from 'react';
 
 import Select from '@mui/material/Select';
@@ -21,7 +22,9 @@ import {
   uniqueRenderingElements,
   resetRenderer,
   setElementEnabled,
-  toggleElementEnabled
+  toggleElementEnabled,
+  createFieldCanvas,
+  changeBackgroundField
 } from '@common/rendering/renderer';
 
 import QuickActions from './components/QuickActions';
@@ -47,6 +50,7 @@ const App = () => {
   const [paused, setPaused] = useState(false);
   const [benchmarkData, setBenchmarkData] = useState({});
   const svgRef = useRef(null);
+  const fieldsElemRef = useRef(null);
 
   // User Defined Robot Velocity Controller
   const [defaultOnLoopCode, setDefaultOnLoopCode] = useState('');
@@ -91,6 +95,26 @@ const App = () => {
     onSpeedChange(newConfig.env.speed);
     setPaused(false);
     resetRenderer();
+
+    if (fieldsElemRef?.current) {
+      fieldsElemRef.current.innerHTML = '';
+    }
+
+    if (newConfig.env.fields && typeof newConfig.env.fields === 'object') {
+      for (const [fieldKey, field] of Object.entries(newConfig.env.fields)) {
+        if (!field.url) {
+          console.error(`Field ${fieldKey} has no url!`);
+          return;
+        }
+
+        const imageElemOnload = (canvasElem, context) => {
+          field.src = context;
+          fieldsElemRef?.current?.appendChild(canvasElem);
+        };
+
+        createFieldCanvas(fieldKey, field, imageElemOnload);
+      }
+    }
   };
 
   const onTogglePause = () => {
@@ -137,12 +161,8 @@ const App = () => {
 
   const optionsElem = initialized ? (
     <Options
-      time={time}
       speed={speed}
-      paused={paused}
-      togglePause={onTogglePause}
       setSpeed={onSpeedChange}
-      reset={reset}
       renderingElements = {uniqueRenderingElements(config.renderables)}
       setElementEnabled={setElementEnabled}
     />
@@ -204,20 +224,19 @@ const App = () => {
         toggleElementEnabled={toggleElementEnabled}
         setUiEnabled={setUiEnabled}
         uiEnabled={uiEnabled}
+        changeBackground={() => changeBackgroundField(fieldsElemRef.current)}
         reset={reset}
         onTogglePause={onTogglePause}
         time={time}
         benchmarkData={benchmarkData}
         simConfig={config}
         benchSettings={benchSettings}
-        />
-      <div style={{ width: '100%', textAlign: 'center' }}>
-        <svg
-          ref={svgRef}
-          width={config.env.width}
-          height={config.env.height}
-          style={{ border: '#bfbebe solid 3px' }}
-        />
+      />
+      <div id='env-section' style={{ width: '100%', textAlign: 'center' }}>
+        <div id='env-container' style={{ width: config.env.width, height: config.env.height }}>
+          <div id='fields-canvas-container' ref={fieldsElemRef}/>
+          <svg id='simulation-svg' ref={svgRef} width={config.env.width} height={config.env.height}/>
+        </div>
       </div>
       {ui}
     </div>

@@ -143,3 +143,27 @@
     margin: 0px 10px 0px 10px;
     overflow: hidden;
 }
+
+#env-container {
+    position: relative;
+    margin: auto;
+    border: #bfbebe solid 2px;
+}
+
+#fields-canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+#simulation-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.hidden {
+    display: none;
+}
