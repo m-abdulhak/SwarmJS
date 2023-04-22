@@ -151,6 +151,13 @@ export default class Robot {
     this.sensorManager.update();
   }
 
+  set orientation(val) {
+    if (val != null && typeof val === 'number') {
+      Body.setAngle(this.body, val);
+      this.sensorManager.update();
+    }
+  }
+
   controllerCodeIsValid(loopCode, initCode) {
     const ret = { valid: false };
     if (!loopCode || typeof loopCode !== 'string') {

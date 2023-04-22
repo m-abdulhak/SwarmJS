@@ -35,7 +35,14 @@ export default class Scene {
 
       // Add callback to store robot positions received by external engine
       this.socket.on('robot_positions', (data) => {
-        this.externalRobotPositions = data;
+        const positions = Object.entries(data).reduce((acc, [k, v]) => {
+          const strKey = `${k}`;
+          acc[strKey] = v;
+          return acc;
+        }, {});
+
+        // console.log('received robot positions', positions);
+        this.externalRobotPositions = positions;
       });
 
       // Limit updates to external engine to once every 100ms (default)
@@ -199,6 +206,10 @@ export default class Scene {
           && this.externalRobotPositions[r.id]?.y != null
         ) {
           r.position = this.externalRobotPositions[r.id] ?? r.position;
+        }
+
+        if (this.externalRobotPositions[r.id]?.angle != null) {
+          r.orientation = this.externalRobotPositions[r.id]?.angle ?? r.orientation;
         }
       }
     }

@@ -11,8 +11,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret_key'
 
 # Set cors_allowed_origins to "*" to allow all origins
-socketio = SocketIO(app, cors_allowed_origins="*") 
-# socketio = SocketIO(app, cors_allowed_origins="*", transports=['websocket']) # Set cors_allowed_origins to "*" to allow all origins
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 envWidth = 600
 envHeight = 400

@@ -45,7 +45,7 @@ const simConfig = {
     }
   },
   robots: {
-    count: 10,
+    count: 2,
     radius: 5,
     controllers: {
       waypoint: CoreControllers.waypoint.bvcWaypointController,

@@ -11,7 +11,7 @@ class OrientationSensor extends Sensor {
   }
 
   sample() {
-    const angle = this.robot.body.angle && typeof this.robot.body.angle === 'number'
+    const angle = this.robot.body.angle != null && typeof this.robot.body.angle === 'number'
       ? this.robot.body.angle : this.robot.sensors.orientation;
     this.value = normalizeAngle(angle);
   }
