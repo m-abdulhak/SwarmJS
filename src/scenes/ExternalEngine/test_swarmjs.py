@@ -7,26 +7,26 @@ import time
 
 from swarmjs_level import SwarmJSLevel
 from wow_tag import WowTag 
-level = SwarmJSLevel("IGNORED PARAMS")
 
 logging = False
 
 if __name__ == "__main__":
     print('started')
     wow_tags = [WowTag(0, 541, 260, 0), WowTag(1, 300, 182, 0)]
+    level = SwarmJSLevel("IGNORED PARAMS")
     print("Looping forever...")
 
     while True:
-        goals = level.get_goals("", wow_tags)
+        journey_dict = level.get_journey_dict("", wow_tags)
 
         if logging:
             print('*******************************************************')
-            print('New goals in main loop', goals)
+            print('New journey_dict in main loop', journey_dict)
     
         # simulate robot movement (in real case should retrieved from actual robots)
-        for robotId in goals:
+        for robotId in journey_dict:
             
-            [robotWaypointX, robotWaypointY] = goals[robotId]
+            (sameX, sameY, sameAngle, robotWaypointX, robotWaypointY) = journey_dict[robotId]
 
             robotNum = int(robotId)
             robotPosition = wow_tags[robotNum]

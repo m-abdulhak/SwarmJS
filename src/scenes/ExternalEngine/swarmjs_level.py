@@ -100,11 +100,11 @@ class SwarmJSLevel():
         start_server()
         pass
     
-    def get_goals(self, manual_movement, wow_tags):
+    def get_journey_dict(self, manual_movement, wow_tags):
         # Should return a dictionary where the keys are integer id's (the id of each tag)
         # and the values are the (goal_x, goal_y) positions.
         # Ignore 'manual_movement'.
-        self.robot_goals = {}
+        self.journey_dict = {}
         global robotPositions
         newPositions = {}
 
@@ -114,10 +114,10 @@ class SwarmJSLevel():
             strId = str(wow_tag.id)
             newPositions[strId] = { 'x': wow_tag.x, 'y': wow_tag.y, 'angle': wow_tag.angle}
             if strId in robotGoalsAndWaypoints:
-                self.robot_goals[wow_tag.id] = [robotGoalsAndWaypoints[strId]['waypoint']['x'], robotGoalsAndWaypoints[strId]['waypoint']['y']]
+                self.journey_dict[wow_tag.id] = (wow_tag.x, wow_tag.y, wow_tag.angle, robotGoalsAndWaypoints[strId]['waypoint']['x'], robotGoalsAndWaypoints[strId]['waypoint']['y'])
             else:
                 if logging:
                     print('goal for robot ', wow_tag.id, ' not found')
 
         robotPositions = newPositions
-        return self.robot_goals
+        return self.journey_dict
