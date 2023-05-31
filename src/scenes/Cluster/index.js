@@ -1,4 +1,5 @@
 import {
+  CoreActuators,
   CoreSensors,
   ExtraSensors,
   CorePositionsGenerators,
@@ -10,6 +11,10 @@ import PuckRenderables from '@common/puck/renderables';
 import RobotRenderables from './robot/renderables';
 
 import controller from './robot/controllers/controller';
+import actuatorController from './robot/controllers/actuatorController';
+
+import pucksNearGrabberSensor from './robot/sensors/pucksNearGrabberSensor';
+import closestPuckToGrabberSensor from './robot/sensors/closestPuckToGrabberSensor';
 
 const renderables = [
   { module: 'Scene', elements: SceneRenderables },
@@ -19,14 +24,24 @@ const renderables = [
 
 const usedSensors = {
   ...CoreSensors,
+  pucksNearGrabberSensor, closestPuckToGrabberSensor,
   circles: {
     ...ExtraSensors.circles,
     params: {
-      centres:
-            [
-              { type: 'Polar', name: '0', coords: { distance: 10, angle: (-0.5 * Math.PI) } },
-              { type: 'Polar', name: '0', coords: { distance: 10, angle: (0.5 * Math.PI) } }
-            ]
+      areas: [
+        {
+          name: 'left',
+          centre: { type: 'Polar', name: '0', coords: { distance: 15, angle: (- Math.PI / 4.0) } },
+          radius: 5,
+          sensedTypes: ['walls', 'robots']
+        },
+        {
+          name: 'right',
+          centre: { type: 'Polar', name: '0', coords: { distance: 15, angle: (Math.PI / 4.0) } },
+          radius: 5,
+          sensedTypes: ['walls', 'robots']
+        },
+      ]
     }
   }
 };
@@ -38,18 +53,19 @@ const simConfig = {
     speed: 15
   },
   robots: {
-    count: 50,
-    radius: 5,
+    count: 1,
+    radius: 10,
     controllers: {
+      actuators: actuatorController,
       velocity: {
         controller,
         params: { angularVelocityScale: 0.001 }
       }
     },
     sensors: [...Object.values(usedSensors)],
-    actuators: [],
+    actuators: [CoreActuators.grabber],
     // The neighbors sensor doesn't work unless the Voronoi diagram is used.
-    useVoronoiDiagram: true,
+    useVoronoiDiagram: false,
     misc: {
       // EXAMPLE: passing misc objects from config to robots (has to be under 'misc' key)
       sceneSpecificMap: 'test'
@@ -59,7 +75,7 @@ const simConfig = {
     groups: [
       {
         id: 0,
-        count: 100,
+        count: 50,
         radius: 4,
         color: 'red'
       }

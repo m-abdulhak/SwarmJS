@@ -123,8 +123,8 @@ const bodyRenderables = [
       id: { prop: 'id' }
     },
     dynamicAttrs: {
-      cx: { prop: 'sensors.position.x' },
-      cy: { prop: 'sensors.position.y' }
+      cx: { prop: 'body.position.x' },
+      cy: { prop: 'body.position.y' }
     },
     styles: {
       fill: '#FFC53A',
@@ -135,7 +135,7 @@ const bodyRenderables = [
     },
     drag: {
       prop: 'position',
-      pause: true,
+      pause: false,
       onStart: {
         styles: {
           stroke: 'green'
@@ -177,84 +177,55 @@ const bodyRenderables = [
 ];
 
 const sensorsRenderables = [
-  /*
-    {
-      type: 'Sensor',
-      svgClass: 'wall-sensor',
-      desc: 'Sensor',
-      shape: 'circle',
-      dataPoints: { sceneProp: 'robots' },
-      staticAttrs: {
-        r: {
-          prop: 'radius'
-          // modifier: (val) => val * 0.4
-        },
-        id: { prop: 'id' }
-      },
-      dynamicAttrs: {
-        fill: {
-          prop: 'sensors.walls',
-          modifier: (val) => (val.includes('left') ? 'green' : 'red')
-        },
-        cx: { prop: 'sensors.directions.left.x' },
-        cy: { prop: 'sensors.directions.left.y' }
-      },
-      styles: {
-        fill: 'none',
-        'fill-opacity': 0,
-        'stroke-width': 2,
-        'stroke-opacity': 1
-      }
-    },
-    {
-      type: 'Sensor',
-      svgClass: 'wall-sensor',
-      desc: 'Sensor',
-      shape: 'circle',
-      dataPoints: { sceneProp: 'robots' },
-      staticAttrs: {
-        r: {
-          prop: 'radius'
-          // modifier: (val) => val * 0.4
-        },
-        id: { prop: 'id' }
-      },
-      dynamicAttrs: {
-        fill: {
-          prop: 'sensors.walls',
-          modifier: (val) => (val.includes('right') ? 'green' : 'red')
-        },
-        cx: { prop: 'sensors.directions.right.x' },
-        cy: { prop: 'sensors.directions.right.y' }
-      },
-      styles: {
-        fill: 'none',
-        'fill-opacity': 0,
-        'stroke-width': 2,
-        'stroke-opacity': 1
-      }
-    },
-    */
   {
     type: 'Sensor',
     svgClass: '',
-    desc: 'Circle Sensor',
+    desc: 'Left Circle Sensor',
     shape: 'circle',
     dataPoints: { sceneProp: 'robots' },
     staticAttrs: {
       r: {
-        prop: 'radius'
+        prop: 'sensors.circles.left.radius'
       },
       id: { prop: 'id' },
       stroke: 'black'
     },
     dynamicAttrs: {
       fill: {
-        prop: 'sensors.circles.reading.pucks',
-        modifier: (val) => (val ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
+        prop: 'sensors.circles.left.reading',
+        modifier: (val) => ((val.walls || val.robots) ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
       },
-      cx: { prop: 'sensors.circles.centre.x' },
-      cy: { prop: 'sensors.circles.centre.y' }
+      cx: { prop: 'sensors.circles.left.centre.x' },
+      cy: { prop: 'sensors.circles.left.centre.y' }
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'fill-opacity': 0,
+      'stroke-width': 1,
+      'stroke-opacity': 1
+    }
+  },
+  {
+    type: 'Sensor',
+    svgClass: '',
+    desc: 'Right Circle Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'sensors.circles.right.radius'
+      },
+      id: { prop: 'id' },
+      stroke: 'black'
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.circles.right.reading',
+        modifier: (val) => ((val.walls || val.robots) ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
+      },
+      cx: { prop: 'sensors.circles.right.centre.x' },
+      cy: { prop: 'sensors.circles.right.centre.y' }
     },
     styles: {
       fill: 'none',

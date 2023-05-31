@@ -7,9 +7,9 @@ import simpleSorting from './Sorting';
 import fieldSensorExample from './FieldSensorExample';
 
 export default {
+  orbitalConstruction,
   cluster,
   defaultScene,
-  orbitalConstruction,
   beeClust,
   voronoiSorting,
   simpleSorting,
