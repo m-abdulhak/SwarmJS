@@ -234,6 +234,54 @@ const sensorsRenderables = [
       'stroke-width': 1,
       'stroke-opacity': 1
     }
+  },
+  {
+      type: 'Sensor',
+      svgClass: '',
+      desc: 'Inner Polygon Puck Sensor',
+      shape: 'polygon',
+      dataPoints: { sceneProp: 'robots' },
+      staticAttrs: {
+          stroke: 'none'
+      },
+      dynamicAttrs: {
+          fill: {
+              prop: 'sensors.polygons.inner.reading.pucks',
+              modifier: (val) => val ? `rgb(255, 0, 0, ${0.2*val}` : 'rgb(0, 0, 0, 0.1)'
+          },
+          points: { prop: 'sensors.polygons.inner.vertices' }
+      },
+      styles: {
+          fill: 'none',
+          stroke: 'black',
+          'fill-opacity': 0,
+          'stroke-width': 1,
+          'stroke-opacity': 1
+      }
+  },
+  {
+      type: 'Sensor',
+      svgClass: '',
+      desc: 'Outer Polygon Puck Sensor',
+      shape: 'polygon',
+      dataPoints: { sceneProp: 'robots' },
+      staticAttrs: {
+          stroke: 'none'
+      },
+      dynamicAttrs: {
+          fill: {
+              prop: 'sensors.polygons.outer.reading.pucks',
+              modifier: (val) => val ? `rgb(255, 0, 0, ${0.2*val}` : 'rgb(0, 0, 0, 0.1)'
+          },
+          points: { prop: 'sensors.polygons.outer.vertices' }
+      },
+      styles: {
+          fill: 'none',
+          stroke: 'black',
+          'fill-opacity': 0,
+          'stroke-width': 1,
+          'stroke-opacity': 1
+      }
   }
 ];
 

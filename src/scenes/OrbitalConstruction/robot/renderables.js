@@ -391,10 +391,10 @@ const sensorsRenderables = [
         },
         dynamicAttrs: {
             fill: {
-                prop: 'sensors.polygonPucks.left.reading',
+                prop: 'sensors.polygons.left.reading.pucks',
                 modifier: (val) => val ? `rgb(255, 0, 0, ${0.2*val}` : 'rgb(0, 0, 0, 0.1)'
             },
-            points: { prop: 'sensors.polygonPucks.left.vertices' }
+            points: { prop: 'sensors.polygons.left.vertices' }
         },
         styles: {
             fill: 'none',
@@ -415,10 +415,10 @@ const sensorsRenderables = [
         },
         dynamicAttrs: {
             fill: {
-                prop: 'sensors.polygonPucks.right.reading',
+                prop: 'sensors.polygons.right.reading.pucks',
                 modifier: (val) => val ? `rgb(255, 0, 0, ${0.2*val}` : 'rgb(0, 0, 0, 0.1)'
             },
-            points: { prop: 'sensors.polygonPucks.right.vertices' }
+            points: { prop: 'sensors.polygons.right.vertices' }
         },
         styles: {
             fill: 'none',

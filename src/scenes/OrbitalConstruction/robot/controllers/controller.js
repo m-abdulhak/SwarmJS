@@ -24,8 +24,8 @@ export default function controller(robot, params, onLoop) {
     const c = (sensors.fields.readings.heatMap.frontField)[0] / 255;
     const r = (sensors.fields.readings.heatMap.rightField)[0] / 255;
 
-    let leftPucks = sensors.polygonPucks.left.reading;
-    let rightPucks = sensors.polygonPucks.right.reading;
+    let leftPucks = sensors.polygons.left.reading.pucks;
+    let rightPucks = sensors.polygons.right.reading.pucks;
     //console.log(sensors);
 
     // let leftPucks = sensors.circlePucks.readings.leftPucks;
@@ -62,11 +62,8 @@ export default function controller(robot, params, onLoop) {
   }
 
   return (sensors) => {
-    const forwardSpeed = maxForwardSpeed;
-    const angularSpeed = getAngularSpeed(sensors);
-
-    // forwardSpeed = 0;
-    // angularSpeed = 0;
+    let forwardSpeed = maxForwardSpeed;
+    let angularSpeed = getAngularSpeed(sensors);
 
     return {
       linearVel: forwardSpeed,

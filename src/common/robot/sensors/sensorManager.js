@@ -22,7 +22,7 @@ import PuckGoalAreaSensor from './state/puckGoalAreaSensor';
 import fieldSensor from './env/fieldSensor';
 import OtherRobotsSensor from './otherRobots/otherRobotsSensor';
 import CirclesSensor from './env/circlesSensor';
-import PolygonPuckSensor from './env/PolygonPuckSensor';
+import PolygonsSensor from './env/polygonsSensor';
 
 const toposort = require('toposort');
 
@@ -55,7 +55,7 @@ const coreSensorDefinitions = [
 // Sensors that individual scenes may include, but will not generally be
 // included by all scenes.
 const extraSensorDefinitions = [
-  PolygonPuckSensor,
+  PolygonsSensor,
   CirclesSensor
 ]
 

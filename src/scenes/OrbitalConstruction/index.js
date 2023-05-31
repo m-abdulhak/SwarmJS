@@ -59,28 +59,36 @@ const usedSensors = {
       ]
     }
   },
-  polygonPucks: {
-    ...ExtraSensors.polygonPucks,
+  polygons: {
+    ...ExtraSensors.polygons,
     params: {
       // See the comments in FieldSensorExample for how to define points.
-      vertices:
-            {
-              left: [
-                { type: 'Polar', name: '0', coords: { distance: 100, angle: (-1.0 * Math.PI) / 2 } },
-                { type: 'Polar', name: '1', coords: { distance: 100, angle: (-0.75 * Math.PI) / 2 } },
-                { type: 'Polar', name: '2', coords: { distance: 100, angle: (-0.5 * Math.PI) / 2 } },
-                { type: 'Polar', name: '3', coords: { distance: 100, angle: (-0.25 * Math.PI) / 2 } },
-                { type: 'Polar', name: '4', coords: { distance: 100, angle: (0.0 * Math.PI) / 2 } },
-                { type: 'Cartesian', name: 'bottomRight', coords: { x: 0, y: 5 } }
-              ],
-              right: [
-                { type: 'Polar', name: '0', coords: { distance: 50, angle: (1.0 * Math.PI) / 2 } },
-                { type: 'Polar', name: '1', coords: { distance: 50, angle: (0.75 * Math.PI) / 2 } },
-                { type: 'Polar', name: '2', coords: { distance: 50, angle: (0.5 * Math.PI) / 2 } },
-                { type: 'Polar', name: '3', coords: { distance: 50, angle: (0.25 * Math.PI) / 2 } },
-                { type: 'Cartesian', name: 'bottomRight', coords: { x: 0, y: -5 } }
-              ]
-            }
+      regions:
+            [
+              {
+                name: 'left',
+                vertices: [
+                  { type: 'Polar', name: '0', coords: { distance: 100, angle: (-1.0 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '1', coords: { distance: 100, angle: (-0.75 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '2', coords: { distance: 100, angle: (-0.5 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '3', coords: { distance: 100, angle: (-0.25 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '4', coords: { distance: 100, angle: (0.0 * Math.PI) / 2 } },
+                  { type: 'Cartesian', name: 'bottomRight', coords: { x: 0, y: 5 } }
+                ],
+                sensedTypes: ['pucks']
+              },
+              {
+                name: 'right',
+                vertices: [
+                  { type: 'Polar', name: '0', coords: { distance: 50, angle: (1.0 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '1', coords: { distance: 50, angle: (0.75 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '2', coords: { distance: 50, angle: (0.5 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '3', coords: { distance: 50, angle: (0.25 * Math.PI) / 2 } },
+                  { type: 'Cartesian', name: 'bottomRight', coords: { x: 0, y: -5 } }
+                ],
+                sensedTypes: ['pucks']
+              }
+            ]
     }
   }
 };

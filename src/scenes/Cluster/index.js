@@ -28,7 +28,7 @@ const usedSensors = {
   circles: {
     ...ExtraSensors.circles,
     params: {
-      areas: [
+      regions: [
         {
           name: 'left',
           centre: { type: 'Polar', name: '0', coords: { distance: 15, angle: (- Math.PI / 4.0) } },
@@ -42,6 +42,34 @@ const usedSensors = {
           sensedTypes: ['walls', 'robots']
         },
       ]
+    }
+  },
+  polygons: {
+    ...ExtraSensors.polygons,
+    params: {
+      regions:
+            [
+              {
+                name: 'inner',
+                vertices: [
+                  { type: 'Cartesian', name: '0', coords: { y: -10, x: 15 } },
+                  { type: 'Cartesian', name: '1', coords: { y: -10, x: 25 } },
+                  { type: 'Cartesian', name: '2', coords: { y:  10, x: 25 } },
+                  { type: 'Cartesian', name: '3', coords: { y:  10, x: 15 } }
+                ],
+                sensedTypes: ['pucks']
+              },
+              {
+                name: 'outer',
+                vertices: [
+                  { type: 'Cartesian', name: '0', coords: { y: -20, x: 30 } },
+                  { type: 'Cartesian', name: '1', coords: { y: -20, x: 40 } },
+                  { type: 'Cartesian', name: '2', coords: { y:  20, x: 40 } },
+                  { type: 'Cartesian', name: '3', coords: { y:  20, x: 30 } }
+                ],
+                sensedTypes: ['pucks']
+              }
+            ]
     }
   }
 };

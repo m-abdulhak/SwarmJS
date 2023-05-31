@@ -11,27 +11,30 @@ const getObjEdges = (obj) => {
 };
 
 class CirclesSensor extends Sensor {
-  constructor(robot, scene, { areas = [] } = {}) {
+  constructor(robot, scene, { regions = [] } = {}) {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
     this.dependencies = [];
+    //this.dependencies = [
+    //  CoreSensors.position
+    //];
     this.value = [];
 
-    this.areas = areas;
+    this.regions = regions;
   }
 
   sample() {
-    for (const area of this.areas) {
-      this.value[area.name] = this.sampleArea(area)
+    for (const region of this.regions) {
+      this.value[region.name] = this.sampleRegion(region)
     }
   }
 
-  sampleArea(area) {
-    let centre = getSceneDefinedPoints(area.centre, this.robot.sensors).coords;
+  sampleRegion(region) {
+    let centre = getSceneDefinedPoints(region.centre, this.robot.sensors).coords;
 
     const reading = {};
 
     // Test against walls.
-    if (area.sensedTypes.includes('walls')) {
+    if (region.sensedTypes.includes('walls')) {
       reading.walls = 0;
 
       /*
@@ -41,7 +44,7 @@ class CirclesSensor extends Sensor {
         .reduce((acc, objEdges) => [...acc, ...objEdges], []);
       const wallCloseToSensingPoint = allEdges.some((edge) => {
         const dist = distanceBetweenPointAndLine(centre, edge[0], edge[1]);
-        return dist < area.radius;
+        return dist < region.radius;
       });
       if (wallCloseToSensingPoint) {
         reading.walls++;
@@ -50,28 +53,28 @@ class CirclesSensor extends Sensor {
 
       // The test above can fail when the sensing circle is outside the arena.
       // So we explicitly test for this condition.
-      if (centre.x - area.radius < 0 || centre.x + area.radius > this.scene.width ||
-          centre.y - area.radius < 0 || centre.y + area.radius > this.scene.height) {
+      if (centre.x - region.radius < 0 || centre.x + region.radius > this.scene.width ||
+          centre.y - region.radius < 0 || centre.y + region.radius > this.scene.height) {
         reading.walls++;
       }
     }
 
 
     // Test against other robots.
-    if (area.sensedTypes.includes('robots')) {
+    if (region.sensedTypes.includes('robots')) {
       reading.robots = this.scene?.robots?.filter(
-              (robot) => (robot.id != this.robot.id) && getDistance(centre, robot.body.position) - robot.radius < area.radius
+              (robot) => (robot.id != this.robot.id) && getDistance(centre, robot.body.position) - robot.radius < region.radius
             ).length;
     }
 
     // Test against pucks.
-    if (area.sensedTypes.includes('pucks')) {
+    if (region.sensedTypes.includes('pucks')) {
       reading.pucks = this.scene?.pucks?.filter(
-              (puck) => !puck.held && getDistance(centre, puck.position) - puck.radius < area.radius
+              (puck) => !puck.held && getDistance(centre, puck.position) - puck.radius < region.radius
             ).length;
     }
 
-    return { reading: reading, centre: centre, radius: area.radius };
+    return { reading: reading, centre: centre, radius: region.radius };
   }
 }
 
