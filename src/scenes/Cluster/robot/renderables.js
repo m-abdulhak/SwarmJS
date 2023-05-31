@@ -238,24 +238,23 @@ const sensorsRenderables = [
   {
     type: 'Sensor',
     svgClass: '',
-    desc: 'Other Robots',
+    desc: 'Circle Sensor',
     shape: 'circle',
     dataPoints: { sceneProp: 'robots' },
     staticAttrs: {
       r: {
-        prop: 'radius',
-        modifier: (val) => val * 2
+        prop: 'radius'
       },
       id: { prop: 'id' },
-      stroke: 'none'
+      stroke: 'black'
     },
     dynamicAttrs: {
       fill: {
-        prop: 'sensors.otherRobots',
+        prop: 'sensors.circles.reading.pucks',
         modifier: (val) => (val ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
       },
-      cx: { prop: 'sensors.directions.forward.x' },
-      cy: { prop: 'sensors.directions.forward.y' }
+      cx: { prop: 'sensors.circles.centre.x' },
+      cy: { prop: 'sensors.circles.centre.y' }
     },
     styles: {
       fill: 'none',

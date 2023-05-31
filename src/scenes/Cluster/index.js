@@ -1,5 +1,6 @@
 import {
   CoreSensors,
+  ExtraSensors,
   CorePositionsGenerators,
   CorePerformanceTrakers
 } from '@common';
@@ -18,10 +19,14 @@ const renderables = [
 
 const usedSensors = {
   ...CoreSensors,
-  walls: {
-    ...CoreSensors.walls,
+  circles: {
+    ...ExtraSensors.circles,
     params: {
-      detectionRadius: 10
+      centres:
+            [
+              { type: 'Polar', name: '0', coords: { distance: 10, angle: (-0.5 * Math.PI) } },
+              { type: 'Polar', name: '0', coords: { distance: 10, angle: (0.5 * Math.PI) } }
+            ]
     }
   }
 };
