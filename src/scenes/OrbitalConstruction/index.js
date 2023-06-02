@@ -21,10 +21,17 @@ const renderables = [
 
 const usedSensors = {
   ...CoreSensors,
-  walls: {
-    ...CoreSensors.walls,
+  circles: {
+    ...ExtraSensors.circles,
     params: {
-      detectionRadius: 10
+      regions: [
+        {
+          name: 'leftObstacle',
+          centre: { type: 'Polar', name: '0', coords: { distance: 6, angle: (- Math.PI / 4.0) } },
+          radius: 2,
+          sensedTypes: ['walls', 'robots']
+        }
+      ]
     }
   },
   fields: {
@@ -59,28 +66,36 @@ const usedSensors = {
       ]
     }
   },
-  polygonPucks: {
-    ...ExtraSensors.polygonPucks,
+  polygons: {
+    ...ExtraSensors.polygons,
     params: {
       // See the comments in FieldSensorExample for how to define points.
-      vertices:
-            {
-              left: [
-                { type: 'Polar', name: '0', coords: { distance: 100, angle: (-1.0 * Math.PI) / 2 } },
-                { type: 'Polar', name: '1', coords: { distance: 100, angle: (-0.75 * Math.PI) / 2 } },
-                { type: 'Polar', name: '2', coords: { distance: 100, angle: (-0.5 * Math.PI) / 2 } },
-                { type: 'Polar', name: '3', coords: { distance: 100, angle: (-0.25 * Math.PI) / 2 } },
-                { type: 'Polar', name: '4', coords: { distance: 100, angle: (0.0 * Math.PI) / 2 } },
-                { type: 'Cartesian', name: 'bottomRight', coords: { x: 0, y: 5 } }
-              ],
-              right: [
-                { type: 'Polar', name: '0', coords: { distance: 50, angle: (1.0 * Math.PI) / 2 } },
-                { type: 'Polar', name: '1', coords: { distance: 50, angle: (0.75 * Math.PI) / 2 } },
-                { type: 'Polar', name: '2', coords: { distance: 50, angle: (0.5 * Math.PI) / 2 } },
-                { type: 'Polar', name: '3', coords: { distance: 50, angle: (0.25 * Math.PI) / 2 } },
-                { type: 'Cartesian', name: 'bottomRight', coords: { x: 0, y: -5 } }
-              ]
-            }
+      regions:
+            [
+              {
+                name: 'left',
+                vertices: [
+                  { type: 'Polar', name: '0', coords: { distance: 100, angle: (-1.0 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '1', coords: { distance: 100, angle: (-0.75 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '2', coords: { distance: 100, angle: (-0.5 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '3', coords: { distance: 100, angle: (-0.25 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '4', coords: { distance: 100, angle: (0.0 * Math.PI) / 2 } },
+                  { type: 'Cartesian', name: 'bottomRight', coords: { x: 0, y: 5 } }
+                ],
+                sensedTypes: ['pucks']
+              },
+              {
+                name: 'right',
+                vertices: [
+                  { type: 'Polar', name: '0', coords: { distance: 50, angle: (1.0 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '1', coords: { distance: 50, angle: (0.75 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '2', coords: { distance: 50, angle: (0.5 * Math.PI) / 2 } },
+                  { type: 'Polar', name: '3', coords: { distance: 50, angle: (0.25 * Math.PI) / 2 } },
+                  { type: 'Cartesian', name: 'bottomRight', coords: { x: 0, y: -5 } }
+                ],
+                sensedTypes: ['pucks']
+              }
+            ]
     }
   }
 };
@@ -108,8 +123,7 @@ const simConfig = {
     },
     sensors: [...Object.values(usedSensors)],
     actuators: [],
-    // The neighbors sensor doesn't work unless the Voronoi diagram is used.
-    useVoronoiDiagram: true,
+    useVoronoiDiagram: false,
     misc: {
       // EXAMPLE: passing misc objects from config to robots (has to be under 'misc' key)
       sceneSpecificMap: 'test'
