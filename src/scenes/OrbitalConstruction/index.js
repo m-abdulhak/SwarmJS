@@ -21,10 +21,17 @@ const renderables = [
 
 const usedSensors = {
   ...CoreSensors,
-  walls: {
-    ...CoreSensors.walls,
+  circles: {
+    ...ExtraSensors.circles,
     params: {
-      detectionRadius: 10
+      regions: [
+        {
+          name: 'leftObstacle',
+          centre: { type: 'Polar', name: '0', coords: { distance: 6, angle: (- Math.PI / 4.0) } },
+          radius: 2,
+          sensedTypes: ['walls', 'robots']
+        }
+      ]
     }
   },
   fields: {
@@ -116,8 +123,7 @@ const simConfig = {
     },
     sensors: [...Object.values(usedSensors)],
     actuators: [],
-    // The neighbors sensor doesn't work unless the Voronoi diagram is used.
-    useVoronoiDiagram: true,
+    useVoronoiDiagram: false,
     misc: {
       // EXAMPLE: passing misc objects from config to robots (has to be under 'misc' key)
       sceneSpecificMap: 'test'

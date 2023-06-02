@@ -11,10 +11,6 @@ import PuckRenderables from '@common/puck/renderables';
 import RobotRenderables from './robot/renderables';
 
 import controller from './robot/controllers/controller';
-import actuatorController from './robot/controllers/actuatorController';
-
-import pucksNearGrabberSensor from './robot/sensors/pucksNearGrabberSensor';
-import closestPuckToGrabberSensor from './robot/sensors/closestPuckToGrabberSensor';
 
 const renderables = [
   { module: 'Scene', elements: SceneRenderables },
@@ -24,7 +20,6 @@ const renderables = [
 
 const usedSensors = {
   ...CoreSensors,
-  pucksNearGrabberSensor, closestPuckToGrabberSensor,
   circles: {
     ...ExtraSensors.circles,
     params: {
@@ -81,10 +76,9 @@ const simConfig = {
     speed: 15
   },
   robots: {
-    count: 1,
+    count: 10,
     radius: 10,
     controllers: {
-      actuators: actuatorController,
       velocity: {
         controller,
         params: { angularVelocityScale: 0.001 }

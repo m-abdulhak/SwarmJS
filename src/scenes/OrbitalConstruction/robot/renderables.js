@@ -177,260 +177,218 @@ const bodyRenderables = [
 ];
 
 const sensorsRenderables = [
-    {
-      type: 'Sensor',
-      svgClass: 'wall-sensor',
-      desc: 'Sensor',
-      shape: 'circle',
-      dataPoints: { sceneProp: 'robots' },
-      staticAttrs: {
-        r: 4,
-        id: { prop: 'id' }
+  {
+    type: 'Sensor',
+    svgClass: '',
+    desc: 'Left Obstacle Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'sensors.circles.leftObstacle.radius'
       },
-      dynamicAttrs: {
-        fill: {
-          prop: 'sensors.walls',
-          modifier: (val) => (val.includes('left') ? 'green' : 'red')
-        },
-        cx: { prop: 'sensors.directions.left.x' },
-        cy: { prop: 'sensors.directions.left.y' }
+      id: { prop: 'id' },
+      stroke: 'black'
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.circles.leftObstacle.reading',
+        modifier: (val) => ((val.walls || val.robots) ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
       },
-      styles: {
-        fill: 'none',
-        'fill-opacity': 0,
-        'stroke-width': 2,
-        'stroke-opacity': 1
-      }
+      cx: { prop: 'sensors.circles.leftObstacle.centre.x' },
+      cy: { prop: 'sensors.circles.leftObstacle.centre.y' }
     },
-    {
-      type: 'Sensor',
-      svgClass: 'wall-sensor',
-      desc: 'Sensor',
-      shape: 'circle',
-      dataPoints: { sceneProp: 'robots' },
-      staticAttrs: {
-        r: 4,
-        id: { prop: 'id' }
-      },
-      dynamicAttrs: {
-        fill: {
-          prop: 'sensors.walls',
-          modifier: (val) => (val.includes('right') ? 'green' : 'red')
-        },
-        cx: { prop: 'sensors.directions.right.x' },
-        cy: { prop: 'sensors.directions.right.y' }
-      },
-      styles: {
-        fill: 'none',
-        'fill-opacity': 0,
-        'stroke-width': 2,
-        'stroke-opacity': 1
-      }
-    },
-    {
-        type: 'Sensor',
-        svgClass: '',
-        desc: 'Other Robots',
-        shape: 'circle',
-        dataPoints: { sceneProp: 'robots' },
-        staticAttrs: {
-            r: 4,
-            id: { prop: 'id' },
-            stroke: 'none'
-        },
-        dynamicAttrs: {
-            fill: {
-                prop: 'sensors.otherRobots',
-                modifier: (val) => (val ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
-            },
-            cx: { prop: 'sensors.directions.forward.x' },
-            cy: { prop: 'sensors.directions.forward.y' }
-        },
-        styles: {
-            fill: 'none',
-            stroke: 'black',
-            'fill-opacity': 0,
-            'stroke-width': 1,
-            'stroke-opacity': 1
-        }
-    },
-    {
-        type: 'Sensor',
-        svgClass: '',
-        desc: 'Left Field Sensor',
-        shape: 'circle',
-        dataPoints: { sceneProp: 'robots' },
-        staticAttrs: {
-            r: 1,
-            id: { prop: 'id' }
-        },
-        dynamicAttrs: {
-            stroke: {
-                prop: 'sensors.fields.readings.heatMap.leftField',
-                modifier: (val) => {
-                    if (!val) {
-                        return 'black';
-                    }
-                    const res = `rgb(${255-val[0]}, ${255-val[1]}, ${255-val[2]})`;
-                    return res;
-                }
-            },
-            fill: {
-                prop: 'sensors.fields.readings.heatMap.leftField',
-                modifier: (val) => {
-                    if (!val) {
-                        return 'black';
-                    }
-                    const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
-                    return res;
-                }
-            },
-            cx: { prop: 'sensors.fields.sensingPoints.leftField.x' },
-            cy: { prop: 'sensors.fields.sensingPoints.leftField.y' }
-        },
-        styles: {
-            fill: 'none',
-            stroke: 'black',
-            'fill-opacity': 0,
-            'stroke-width': 1,
-            'stroke-opacity': 1
-        }
-    },
-    {
-        type: 'Sensor',
-        svgClass: '',
-        desc: 'Front Field Sensor',
-        shape: 'circle',
-        dataPoints: { sceneProp: 'robots' },
-        staticAttrs: {
-            r: 1,
-            id: { prop: 'id' }
-        },
-        dynamicAttrs: {
-            stroke: {
-                prop: 'sensors.fields.readings.heatMap.frontField',
-                modifier: (val) => {
-                    if (!val) {
-                        return 'black';
-                    }
-                    const res = `rgb(${255-val[0]}, ${255-val[1]}, ${255-val[2]})`;
-                    return res;
-                }
-            },
-            fill: {
-                prop: 'sensors.fields.readings.heatMap.frontField',
-                modifier: (val) => {
-                    if (!val) {
-                        return 'black';
-                    }
-                    const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
-                    return res;
-                }
-            },
-            cx: { prop: 'sensors.fields.sensingPoints.frontField.x' },
-            cy: { prop: 'sensors.fields.sensingPoints.frontField.y' }
-        },
-        styles: {
-            fill: 'none',
-            stroke: 'black',
-            'fill-opacity': 0,
-            'stroke-width': 1,
-            'stroke-opacity': 1
-        }
-    },
-    {
-        type: 'Sensor',
-        svgClass: '',
-        desc: 'Right Field Sensor',
-        shape: 'circle',
-        dataPoints: { sceneProp: 'robots' },
-        staticAttrs: {
-            r: 1,
-            id: { prop: 'id' }
-        },
-        dynamicAttrs: {
-            stroke: {
-                prop: 'sensors.fields.readings.heatMap.rightField',
-                modifier: (val) => {
-                    if (!val) {
-                        return 'black';
-                    }
-                    const res = `rgb(${255-val[0]}, ${255-val[1]}, ${255-val[2]})`;
-                    return res;
-                }
-            },
-            fill: {
-                prop: 'sensors.fields.readings.heatMap.rightField',
-                modifier: (val) => {
-                    if (!val) {
-                        return 'black';
-                    }
-                    const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
-                    return res;
-                }
-            },
-            cx: { prop: 'sensors.fields.sensingPoints.rightField.x' },
-            cy: { prop: 'sensors.fields.sensingPoints.rightField.y' }
-        },
-        styles: {
-            fill: 'none',
-            stroke: 'black',
-            'fill-opacity': 0,
-            'stroke-width': 1,
-            'stroke-opacity': 1
-        }
-    },
-    {
-        type: 'Sensor',
-        svgClass: '',
-        desc: 'Left Polygon Puck Sensor',
-        shape: 'polygon',
-        dataPoints: { sceneProp: 'robots' },
-        staticAttrs: {
-            stroke: 'none'
-        },
-        dynamicAttrs: {
-            fill: {
-                prop: 'sensors.polygons.left.reading.pucks',
-                modifier: (val) => val ? `rgb(255, 0, 0, ${0.2*val}` : 'rgb(0, 0, 0, 0.1)'
-            },
-            points: { prop: 'sensors.polygons.left.vertices' }
-        },
-        styles: {
-            fill: 'none',
-            stroke: 'black',
-            'fill-opacity': 0,
-            'stroke-width': 1,
-            'stroke-opacity': 1
-        }
-    },
-    {
-        type: 'Sensor',
-        svgClass: '',
-        desc: 'Right Polygon Puck Sensor',
-        shape: 'polygon',
-        dataPoints: { sceneProp: 'robots' },
-        staticAttrs: {
-            stroke: 'none'
-        },
-        dynamicAttrs: {
-            fill: {
-                prop: 'sensors.polygons.right.reading.pucks',
-                modifier: (val) => val ? `rgb(255, 0, 0, ${0.2*val}` : 'rgb(0, 0, 0, 0.1)'
-            },
-            points: { prop: 'sensors.polygons.right.vertices' }
-        },
-        styles: {
-            fill: 'none',
-            stroke: 'black',
-            'fill-opacity': 0,
-            'stroke-width': 1,
-            'stroke-opacity': 1
-        }
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'fill-opacity': 0,
+      'stroke-width': 1,
+      'stroke-opacity': 1
     }
+  },
+  {
+      type: 'Sensor',
+      svgClass: '',
+      desc: 'Left Field Sensor',
+      shape: 'circle',
+      dataPoints: { sceneProp: 'robots' },
+      staticAttrs: {
+          r: 1,
+          id: { prop: 'id' }
+      },
+      dynamicAttrs: {
+          stroke: {
+              prop: 'sensors.fields.readings.heatMap.leftField',
+              modifier: (val) => {
+                  if (!val) {
+                      return 'black';
+                  }
+                  const res = `rgb(${255-val[0]}, ${255-val[1]}, ${255-val[2]})`;
+                  return res;
+              }
+          },
+          fill: {
+              prop: 'sensors.fields.readings.heatMap.leftField',
+              modifier: (val) => {
+                  if (!val) {
+                      return 'black';
+                  }
+                  const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
+                  return res;
+              }
+          },
+          cx: { prop: 'sensors.fields.sensingPoints.leftField.x' },
+          cy: { prop: 'sensors.fields.sensingPoints.leftField.y' }
+      },
+      styles: {
+          fill: 'none',
+          stroke: 'black',
+          'fill-opacity': 0,
+          'stroke-width': 1,
+          'stroke-opacity': 1
+      }
+  },
+  {
+      type: 'Sensor',
+      svgClass: '',
+      desc: 'Front Field Sensor',
+      shape: 'circle',
+      dataPoints: { sceneProp: 'robots' },
+      staticAttrs: {
+          r: 1,
+          id: { prop: 'id' }
+      },
+      dynamicAttrs: {
+          stroke: {
+              prop: 'sensors.fields.readings.heatMap.frontField',
+              modifier: (val) => {
+                  if (!val) {
+                      return 'black';
+                  }
+                  const res = `rgb(${255-val[0]}, ${255-val[1]}, ${255-val[2]})`;
+                  return res;
+              }
+          },
+          fill: {
+              prop: 'sensors.fields.readings.heatMap.frontField',
+              modifier: (val) => {
+                  if (!val) {
+                      return 'black';
+                  }
+                  const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
+                  return res;
+              }
+          },
+          cx: { prop: 'sensors.fields.sensingPoints.frontField.x' },
+          cy: { prop: 'sensors.fields.sensingPoints.frontField.y' }
+      },
+      styles: {
+          fill: 'none',
+          stroke: 'black',
+          'fill-opacity': 0,
+          'stroke-width': 1,
+          'stroke-opacity': 1
+      }
+  },
+  {
+      type: 'Sensor',
+      svgClass: '',
+      desc: 'Right Field Sensor',
+      shape: 'circle',
+      dataPoints: { sceneProp: 'robots' },
+      staticAttrs: {
+          r: 1,
+          id: { prop: 'id' }
+      },
+      dynamicAttrs: {
+          stroke: {
+              prop: 'sensors.fields.readings.heatMap.rightField',
+              modifier: (val) => {
+                  if (!val) {
+                      return 'black';
+                  }
+                  const res = `rgb(${255-val[0]}, ${255-val[1]}, ${255-val[2]})`;
+                  return res;
+              }
+          },
+          fill: {
+              prop: 'sensors.fields.readings.heatMap.rightField',
+              modifier: (val) => {
+                  if (!val) {
+                      return 'black';
+                  }
+                  const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
+                  return res;
+              }
+          },
+          cx: { prop: 'sensors.fields.sensingPoints.rightField.x' },
+          cy: { prop: 'sensors.fields.sensingPoints.rightField.y' }
+      },
+      styles: {
+          fill: 'none',
+          stroke: 'black',
+          'fill-opacity': 0,
+          'stroke-width': 1,
+          'stroke-opacity': 1
+      }
+  },
+  {
+      type: 'Sensor',
+      svgClass: '',
+      desc: 'Left Polygon Puck Sensor',
+      shape: 'polygon',
+      dataPoints: { sceneProp: 'robots' },
+      staticAttrs: {
+          stroke: 'none',
+      },
+      dynamicAttrs: {
+          /*
+          stroke: {
+              prop: 'sensors.polygons.left.reading.pucks',
+              modifier: (val) => val ? `rgb(255, 0, 0, ${0.2*val}` : 'rgb(0, 0, 0, 0.1)'
+          },
+          */
+          fill: 'rgb(255, 255, 255, 0.05)',
+          points: { prop: 'sensors.polygons.left.vertices' }
+      },
+      styles: {
+          fill: 'none',
+          stroke: 'black',
+          'fill-opacity': 0,
+          'stroke-width': 1,
+          'stroke-opacity': 1
+      }
+  },
+  {
+      type: 'Sensor',
+      svgClass: '',
+      desc: 'Right Polygon Puck Sensor',
+      shape: 'polygon',
+      dataPoints: { sceneProp: 'robots' },
+      staticAttrs: {
+          stroke: 'none'
+      },
+      dynamicAttrs: {
+          /*
+          fill: {
+              prop: 'sensors.polygons.right.reading.pucks',
+              modifier: (val) => val ? `rgb(255, 0, 0, ${0.2*val}` : 'rgb(0, 0, 0, 0.1)'
+          },
+          */
+          fill: 'rgb(255, 255, 255, 0.05)',
+          points: { prop: 'sensors.polygons.right.vertices' }
+      },
+      styles: {
+          fill: 'none',
+          stroke: 'black',
+          'fill-opacity': 0,
+          'stroke-width': 1,
+          'stroke-opacity': 1
+      }
+  }
 ];
 
 export default [
-    ...sensorsRenderables,
-    ...bodyRenderables
+  ...sensorsRenderables,
+  ...bodyRenderables
 ];

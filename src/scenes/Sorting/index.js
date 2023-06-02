@@ -15,9 +15,6 @@ import RobotRenderables from './robot/renderables';
 import actuatorController from './robot/controllers/actuatorController';
 import goalContoller from './robot/controllers/goalController';
 
-import pucksNearGrabberSensor from './robot/sensors/pucksNearGrabberSensor';
-import closestPuckToGrabberSensor from './robot/sensors/closestPuckToGrabberSensor';
-
 // All renderables should be registered in this list and assigned a module property
 // This is necessary to avoid imposing a unique restriction on renderable type in different modules
 // So if both robots and pucks have 'body' type renderables, they can still be treated as separate
@@ -48,7 +45,7 @@ const simConfig = {
         params: { angularVelocityScale: 0.001 }
       }
     },
-    sensors: [...Object.values(CoreSensors), pucksNearGrabberSensor, closestPuckToGrabberSensor],
+    sensors: [...Object.values(CoreSensors)],
     actuators: [CoreActuators.grabber],
     useVoronoiDiagram: false,
     misc: {
