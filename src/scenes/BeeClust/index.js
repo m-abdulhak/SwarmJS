@@ -1,7 +1,6 @@
 import {
   CoreSensors,
-  CorePositionsGenerators,
-  CorePerformanceTrakers
+  CorePositionsGenerators
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -9,6 +8,8 @@ import SceneRenderables from '@common/scene/renderables';
 import RobotRenderables from './robot/renderables';
 
 import controller from './robot/controllers/controller';
+
+import DistanceToGoalTracker from './benchmarking/distanceToGoalTracker';
 
 import mapUrl from './map.png';
 
@@ -104,31 +105,25 @@ const simConfig = {
 const benchmarkConfig = {
   simConfigs: [
     {
-      name: '5 Robots',
+      name: '10 Robots',
       simConfig: {
-        env: {
-          speed: 50
-        },
         robots: {
-          count: 5
+          count: 10
         }
       }
     },
     {
-      name: '20 Robots',
+      name: '50 Robots',
       simConfig: {
-        env: {
-          speed: 50
+        robots: {
+          count: 50
         }
       }
     }
   ],
-  trackers: [
-    CorePerformanceTrakers.RobotToGoalDistanceTracker,
-    CorePerformanceTrakers.MinRobotRobotDistanceTracker
-  ],
+  trackers: [ DistanceToGoalTracker ],
   maxTimeStep: 20000,
-  timeStep: 1000
+  timeStep: 100
 };
 
 export default {
