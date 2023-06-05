@@ -1,5 +1,6 @@
 import {
   CoreSensors,
+  ExtraSensors,
   CorePositionsGenerators,
   CorePerformanceTrakers
 } from '@common';
@@ -28,13 +29,13 @@ const renderables = [
 const usedSensors = {
   ...CoreSensors,
   walls: {
-    ...CoreSensors.walls,
+    ...ExtraSensors.walls,
     params: {
       detectionRadius: 10
     }
   },
   fields: {
-    ...CoreSensors.fields,
+    ...ExtraSensors.fields,
     params: {
       // See the comments in FieldSensorExample for how to define points.
       points: [

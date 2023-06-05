@@ -1,5 +1,6 @@
 import {
   CoreSensors,
+  ExtraSensors,
   CorePositionsGenerators,
   CorePerformanceTrakers
 } from '@common';
@@ -27,7 +28,7 @@ const renderables = [
 const usedSensors = {
   ...CoreSensors,
   fields: {
-    ...CoreSensors.fields,
+    ...ExtraSensors.fields,
     params: {
       // We can define points relative to a robot located at (0, 0) headed along positive X axis
       // With Cartesian coordinates forward is [1, 0], back: [-1, 0], left: [0, 1], right: [0, -1]

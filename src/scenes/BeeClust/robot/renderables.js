@@ -177,64 +177,6 @@ const bodyRenderables = [
 ];
 
 const sensorsRenderables = [
-  /*
-    {
-      type: 'Sensor',
-      svgClass: 'wall-sensor',
-      desc: 'Sensor',
-      shape: 'circle',
-      dataPoints: { sceneProp: 'robots' },
-      staticAttrs: {
-        r: {
-          prop: 'radius'
-          // modifier: (val) => val * 0.4
-        },
-        id: { prop: 'id' }
-      },
-      dynamicAttrs: {
-        fill: {
-          prop: 'sensors.walls',
-          modifier: (val) => (val.includes('left') ? 'green' : 'red')
-        },
-        cx: { prop: 'sensors.directions.left.x' },
-        cy: { prop: 'sensors.directions.left.y' }
-      },
-      styles: {
-        fill: 'none',
-        'fill-opacity': 0,
-        'stroke-width': 2,
-        'stroke-opacity': 1
-      }
-    },
-    {
-      type: 'Sensor',
-      svgClass: 'wall-sensor',
-      desc: 'Sensor',
-      shape: 'circle',
-      dataPoints: { sceneProp: 'robots' },
-      staticAttrs: {
-        r: {
-          prop: 'radius'
-          // modifier: (val) => val * 0.4
-        },
-        id: { prop: 'id' }
-      },
-      dynamicAttrs: {
-        fill: {
-          prop: 'sensors.walls',
-          modifier: (val) => (val.includes('right') ? 'green' : 'red')
-        },
-        cx: { prop: 'sensors.directions.right.x' },
-        cy: { prop: 'sensors.directions.right.y' }
-      },
-      styles: {
-        fill: 'none',
-        'fill-opacity': 0,
-        'stroke-width': 2,
-        'stroke-opacity': 1
-      }
-    },
-    */
   {
     type: 'Sensor',
     svgClass: '',
@@ -283,24 +225,81 @@ const sensorsRenderables = [
   {
     type: 'Sensor',
     svgClass: '',
-    desc: 'Other Robots',
+    desc: 'Ahead Circle Sensor',
     shape: 'circle',
     dataPoints: { sceneProp: 'robots' },
     staticAttrs: {
       r: {
-        prop: 'radius',
-        modifier: (val) => val * 2
+        prop: 'sensors.circles.ahead.radius'
       },
       id: { prop: 'id' },
-      stroke: 'none'
+      stroke: 'black'
     },
     dynamicAttrs: {
       fill: {
-        prop: 'sensors.otherRobots',
-        modifier: (val) => (val ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
+        prop: 'sensors.circles.ahead.reading',
+        modifier: (val) => ((val.robots) ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
       },
-      cx: { prop: 'sensors.directions.forward.x' },
-      cy: { prop: 'sensors.directions.forward.y' }
+      cx: { prop: 'sensors.circles.ahead.centre.x' },
+      cy: { prop: 'sensors.circles.ahead.centre.y' }
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'fill-opacity': 0,
+      'stroke-width': 1,
+      'stroke-opacity': 1
+    }
+  },
+  {
+    type: 'Sensor',
+    svgClass: '',
+    desc: 'Left Circle Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'sensors.circles.left.radius'
+      },
+      id: { prop: 'id' },
+      stroke: 'black'
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.circles.left.reading',
+        modifier: (val) => ((val.walls) ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
+      },
+      cx: { prop: 'sensors.circles.left.centre.x' },
+      cy: { prop: 'sensors.circles.left.centre.y' }
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'fill-opacity': 0,
+      'stroke-width': 1,
+      'stroke-opacity': 1
+    }
+  },
+  {
+    type: 'Sensor',
+    svgClass: '',
+    desc: 'Right Circle Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'sensors.circles.right.radius'
+      },
+      id: { prop: 'id' },
+      stroke: 'black'
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.circles.right.reading',
+        modifier: (val) => ((val.walls) ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
+      },
+      cx: { prop: 'sensors.circles.right.centre.x' },
+      cy: { prop: 'sensors.circles.right.centre.y' }
     },
     styles: {
       fill: 'none',
@@ -326,13 +325,9 @@ const sensorsRenderables = [
       x: { prop: 'sensors.directions.right.x' },
       y: { prop: 'sensors.directions.right.y' },
       text: {
-        prop: 'sensors.fields.readings.heatMap.forward',
+        prop: 'sensors.potentialWaitTime',
         modifier: (val) => {
-          if (!val) {
-            return 'black';
-          }
-          const res = val[0]
-          return res;
+          return val;
         }
       }
     },

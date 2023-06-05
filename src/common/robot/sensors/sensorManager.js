@@ -19,8 +19,7 @@ import ReachedGoalSensor from './state/reachedGoalSensor';
 import ReachedWaypointSensor from './state/reachedWaypointSensor';
 import WallSensor from './env/wallSensor';
 import PuckGoalAreaSensor from './state/puckGoalAreaSensor';
-import fieldSensor from './env/fieldSensor';
-import OtherRobotsSensor from './otherRobots/otherRobotsSensor';
+import FieldSensor from './env/fieldSensor';
 import CirclesSensor from './env/circlesSensor';
 import PolygonsSensor from './env/polygonsSensor';
 import ClosestPuckToGrabber from './env/closestPuckToGrabberSensor';
@@ -34,14 +33,19 @@ export const sensorSamplingTypes = {
 };
 
 const coreSensorDefinitions = [
+  PrevPositionSensor,
+  PositionSensor,
+  HeadingSensor,
+  DirectionsSensor,
+  OrientationSensor
+];
+
+// Sensors that individual scenes may include, but will not generally be
+// included by all scenes.
+const extraSensorDefinitions = [
   EnvironmentBoundsSensor,
   WallSensor,
   PuckGoalAreaSensor,
-  PositionSensor,
-  PrevPositionSensor,
-  OrientationSensor,
-  HeadingSensor,
-  DirectionsSensor,
   NearbyPucksSensor,
   NearbyObstaclesSensor,
   ClosestObstaclePointSensor,
@@ -50,15 +54,9 @@ const coreSensorDefinitions = [
   BufferedVoronoiCellSensor,
   ReachedGoalSensor,
   ReachedWaypointSensor,
-  fieldSensor,
-  OtherRobotsSensor,
   ClosestPuckToGrabber,
-  PucksNearGrabberSensor
-];
-
-// Sensors that individual scenes may include, but will not generally be
-// included by all scenes.
-const extraSensorDefinitions = [
+  PucksNearGrabberSensor,
+  FieldSensor,
   PolygonsSensor,
   CirclesSensor
 ]

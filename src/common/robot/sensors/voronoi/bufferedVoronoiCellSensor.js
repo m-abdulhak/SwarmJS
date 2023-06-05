@@ -1,7 +1,7 @@
 import Offset from 'polygon-offset';
 
 import Sensor from '../sensor';
-import { sensorSamplingTypes, CoreSensors } from '../sensorManager';
+import { sensorSamplingTypes, CoreSensors, ExtraSensors } from '../sensorManager';
 
 const name = 'BVC';
 
@@ -26,7 +26,7 @@ class BufferedVoronoiCellSensor extends Sensor {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
     this.dependencies = [
       CoreSensors.position,
-      CoreSensors.obstaclesAwareVoronoiCell
+      ExtraSensors.obstaclesAwareVoronoiCell
     ];
     this.value = [];
   }
