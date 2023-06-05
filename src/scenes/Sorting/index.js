@@ -1,6 +1,7 @@
 import {
   CoreActuators,
   CoreSensors,
+  ExtraSensors,
   CorePositionsGenerators,
   CorePerformanceTrakers,
   CoreControllers
@@ -45,7 +46,7 @@ const simConfig = {
         params: { angularVelocityScale: 0.001 }
       }
     },
-    sensors: [...Object.values(CoreSensors)],
+    sensors: [...Object.values(CoreSensors), ...Object.values(ExtraSensors)],
     actuators: [CoreActuators.grabber],
     useVoronoiDiagram: false,
     misc: {

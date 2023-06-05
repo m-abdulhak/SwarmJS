@@ -35,7 +35,7 @@ const usedSensors = {
     }
   },
   fields: {
-    ...CoreSensors.fields,
+    ...ExtraSensors.fields,
     params: {
       // See the comments in FieldSensorExample for how to define points.
       points: [

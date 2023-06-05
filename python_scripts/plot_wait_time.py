@@ -6,9 +6,9 @@ robot-like ants and ant-like robots" by Deneubourg et al, 1990.
 import numpy as np
 import matplotlib.pyplot as plt
 
-w_max = 50
-x_start = 0.4
-thetas = [i/100 for i in range(10)]
+w_max = 100 
+x_start = 0.5
+thetas = [i for i in np.arange(0, 0.01, 0.001)]
 
 # Scaled Temperature
 x = np.linspace(x_start, 1)

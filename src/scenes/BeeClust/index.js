@@ -1,5 +1,6 @@
 import {
   CoreSensors,
+  ExtraSensors,
   CorePositionsGenerators
 } from '@common';
 
@@ -27,14 +28,33 @@ const renderables = [
 
 const usedSensors = {
   ...CoreSensors,
-  walls: {
-    ...CoreSensors.walls,
+  circles: {
+    ...ExtraSensors.circles,
     params: {
-      detectionRadius: 10
+      regions: [
+        {
+          name: 'ahead',
+          centre: { type: 'Polar', name: '0', coords: { distance: 12, angle: 0 } },
+          radius: 6,
+          sensedTypes: ['robots']
+        },
+        {
+          name: 'left',
+          centre: { type: 'Polar', name: '0', coords: { distance: 8, angle: (- Math.PI / 4.0) } },
+          radius: 3,
+          sensedTypes: ['walls']
+        },
+        {
+          name: 'right',
+          centre: { type: 'Polar', name: '0', coords: { distance: 8, angle: (Math.PI / 4.0) } },
+          radius: 3,
+          sensedTypes: ['walls']
+        },
+      ]
     }
   },
   fields: {
-    ...CoreSensors.fields,
+    ...ExtraSensors.fields,
     params: {
       // See the comments in FieldSensorExample for how to define points.
       points: [
@@ -105,18 +125,28 @@ const simConfig = {
 const benchmarkConfig = {
   simConfigs: [
     {
-      name: '10 Robots',
+      name: 'theta = 0.001',
       simConfig: {
         robots: {
-          count: 10
+          controllers: {
+            velocity: {
+              controller,
+              params: { theta: 0.001 }
+            }
+          }
         }
       }
     },
     {
-      name: '50 Robots',
+      name: 'theta = 0.01',
       simConfig: {
         robots: {
-          count: 50
+          controllers: {
+            velocity: {
+              controller,
+              params: { theta: 0.01 }
+            }
+          }
         }
       }
     }

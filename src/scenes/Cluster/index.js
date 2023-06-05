@@ -20,6 +20,9 @@ const renderables = [
 
 const usedSensors = {
   ...CoreSensors,
+  nearbyPucks: { ...ExtraSensors.nearbyPucks },
+  closestPuckToGrabber: { ...ExtraSensors.closestPuckToGrabber },
+  pucksNearGrabber: { ...ExtraSensors.pucksNearGrabber },
   circles: {
     ...ExtraSensors.circles,
     params: {
