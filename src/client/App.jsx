@@ -14,6 +14,7 @@ import {
   resetSimulation,
   togglePauseSimulation,
   setSimulationSpeed,
+  setSimulationRenderSkip,
   controllerCodeIsValid
 } from '@common';
 
@@ -47,6 +48,7 @@ const App = () => {
   const [uiEnabled, setUiEnabled] = useState(true);
   const [time, setTime] = useState(0);
   const [speed, setSpeed] = useState(1);
+  const [renderSkip, setRenderSkip] = useState(1);
   const [paused, setPaused] = useState(false);
   const [benchmarkData, setBenchmarkData] = useState({});
   const svgRef = useRef(null);
@@ -67,6 +69,13 @@ const App = () => {
     setSpeed(speedNumber);
     setSimulationSpeed(speedNumber);
   };
+
+  const onRenderSkipChange = (newRS) => {
+    const rs = parseInt(newRS);
+    setRenderSkip(rs);
+    setSimulationRenderSkip(rs);
+  };
+
 
   const onUpdate = (newTime, scene, benchData, renderables) => {
     setTime(newTime);
@@ -93,6 +102,7 @@ const App = () => {
 
     resetSimulation(usedConfig, onUpdate, setDefaultOnLoopCode, setDefaultOnInitCode);
     onSpeedChange(newConfig.env.speed);
+    onRenderSkipChange(newConfig.env.renderSkip);
     setPaused(false);
     resetRenderer();
 
@@ -163,6 +173,8 @@ const App = () => {
     <Options
       speed={speed}
       setSpeed={onSpeedChange}
+      renderSkip={renderSkip}
+      setRenderSkip={onRenderSkipChange}
       renderingElements = {uniqueRenderingElements(config.renderables)}
       setElementEnabled={setElementEnabled}
     />

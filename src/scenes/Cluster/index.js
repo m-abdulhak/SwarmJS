@@ -76,7 +76,8 @@ const simConfig = {
   env: {
     width: 600,
     height: 400,
-    speed: 15
+    speed: 15,
+    renderSkip: 1,
   },
   robots: {
     count: 10,

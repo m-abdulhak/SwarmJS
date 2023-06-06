@@ -9,9 +9,6 @@ import {
   benchmarkingActive
 } from './benchmarking/benchmark';
 
-// TODO: Connect this to a slider and/or config.
-const renderSkip = 10;
-
 // Global Map Memory
 const gMaps = [];
 
@@ -91,7 +88,7 @@ export const resetSimulation = (
   renderScene = () => {
     if (!scene.paused) {
 
-      for (let i=0; i<renderSkip; i++) {
+      for (let i=0; i<scene.renderSkip; i++) {
         scene.update();
         updateBench(scene, scene.timeInstance);
       }
@@ -131,6 +128,8 @@ export const isBenchmarking = () => benchmarkingActive();
 export const togglePauseSimulation = () => scene.togglePause();
 
 export const setSimulationSpeed = (speed) => scene.setSpeed(speed);
+
+export const setSimulationRenderSkip = (rs) => scene.setRenderSkip(rs);
 
 export { AvailableActuators as CoreActuators } from './robot/actuators/actuatorsManager';
 export { CoreSensors } from './robot/sensors/sensorManager';

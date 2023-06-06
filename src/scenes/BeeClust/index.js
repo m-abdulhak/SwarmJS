@@ -76,6 +76,7 @@ const simConfig = {
     width: 600,
     height: 400,
     speed: 15,
+    renderSkip: 1,
     background: mapUrl,
     fields: {
       heatMap: {
