@@ -71,6 +71,10 @@ export const resetSimulation = (
     setDefaultOnInitCode(defaultOnInitCode);
   }
 
+  // THE CODE BELOW IS ALMOST IDENTICAL TO createSimulation.  YET IF WE INSERT
+  // THE FOLLOWING INSTEAD:
+  //     createSimulation(config, updateCallback);
+  // AN ISSUE ARISES.
   scene = new Scene(
     config.env,
     config.robots,
