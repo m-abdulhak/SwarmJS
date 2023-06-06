@@ -9,6 +9,9 @@ import {
   benchmarkingActive
 } from './benchmarking/benchmark';
 
+// TODO: Connect this to a slider and/or config.
+const renderSkip = 10;
+
 // Global Map Memory
 const gMaps = [];
 
@@ -87,8 +90,12 @@ export const resetSimulation = (
 
   renderScene = () => {
     if (!scene.paused) {
-      scene.update();
-      updateBench(scene, scene.timeInstance);
+
+      for (let i=0; i<renderSkip; i++) {
+        scene.update();
+        updateBench(scene, scene.timeInstance);
+      }
+
       if (updateCallback && typeof updateCallback === 'function') {
         const benchData = getBenchData();
         updateCallback(scene.timeInstance, scene, benchData, config.renderables);
