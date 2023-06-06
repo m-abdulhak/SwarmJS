@@ -47,7 +47,7 @@ export const initializeSimulation = (config, updateCB) => {
   if (scene) {
     return;
   }
-  console.log('Creating Sim With Config: ', config);
+  console.log('Initializing Sim With Config: ', config);
   createSimulation(config, updateCB);
 };
 
@@ -57,7 +57,7 @@ export const resetSimulation = (
   setDefaultOnLoopCode,
   setDefaultOnInitCode
 ) => {
-  console.log('Creating Sim With Config: ', config);
+  console.log('Resetting Sim With Config: ', config);
   const velocityController = config?.robots?.controllers?.velocity?.controller;
   const velocityControllerInit = config?.robots?.controllers?.velocity?.init;
 

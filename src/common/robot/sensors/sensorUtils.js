@@ -53,3 +53,16 @@ export function getSceneDefinedPointsAsArray(pointDefinitions, sensors) {
     }
     return outputArray;
 }
+
+export function sampleFieldAtPoint(context, p) {
+  if (!context?.getImageData || typeof context.getImageData !== 'function') {
+    return null;
+  }
+
+  if (p.x < 0 || p.y < 0 || p.x >= context.canvas.width || p.y >= context.canvas.width) {
+    return [0, 0, 0, 0];
+  }
+
+  const imageVal = context.getImageData(p.x, p.y, 1, 1);
+  return imageVal.data;
+};

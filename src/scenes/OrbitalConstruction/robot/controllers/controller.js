@@ -1,6 +1,10 @@
 /* eslint-disable no-eval */
 export default function controller(robot, params, onLoop) {
   // PARAMETERS:
+  //
+  // PASSING ALONG A PARAMETER THROUGH 'params' IS CURRENTLY BROKEN.
+  //
+  //const middleTau = params.tau;
   const middleTau = 0.6;
   const maxAngularSpeed = 0.015;
   const maxForwardSpeed = 0.2;
