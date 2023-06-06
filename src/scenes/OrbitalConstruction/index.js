@@ -1,8 +1,7 @@
 import {
   CoreSensors,
   ExtraSensors,
-  CorePositionsGenerators,
-  CorePerformanceTrakers
+  CorePositionsGenerators
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -11,7 +10,14 @@ import RobotRenderables from './robot/renderables';
 
 import controller from './robot/controllers/controller';
 
+// import PuckFieldValueTracker from './benchmarking/puckFieldValueTracker';
+import PuckFieldValueTracker from './benchmarking/puckFieldValueTracker';
+
 import mapUrl from '../../../python_scripts/scalar_field.png';
+
+// This constant defines the contour line of the scalar field around which the
+// robots will build.
+const tau = 0.6;
 
 const renderables = [
   { module: 'Scene', elements: SceneRenderables },
@@ -113,12 +119,18 @@ const simConfig = {
     }
   },
   robots: {
-    count: 30,
+    count: 10,
     radius: 4,
     controllers: {
       velocity: {
-        controller,
-        params: { angularVelocityScale: 0.001 }
+        controller
+        /*,
+        
+        WOULD LIKE TO PASS ALONG TAU AS A PARAMETER HERE BUT PASSING PARAMETERS
+        TO A VELOCITY CONTROLLER SEEMS TO HAVE BROKEN.
+
+        params: { tau: tau }
+        */
       }
     },
     sensors: [...Object.values(usedSensors)],
@@ -150,29 +162,23 @@ const benchmarkConfig = {
     {
       name: '5 Robots',
       simConfig: {
-        env: {
-          speed: 50
-        },
         robots: {
           count: 5
         }
       }
     },
     {
-      name: '20 Robots',
+      name: '30 Robots',
       simConfig: {
-        env: {
-          speed: 50
+        robots: {
+          count: 30
         }
       }
     }
   ],
-  trackers: [
-    CorePerformanceTrakers.RobotToGoalDistanceTracker,
-    CorePerformanceTrakers.MinRobotRobotDistanceTracker
-  ],
+  trackers: [ new PuckFieldValueTracker(tau) ],
   maxTimeStep: 20000,
-  timeStep: 1000
+  timeStep: 100
 };
 
 export default {

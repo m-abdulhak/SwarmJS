@@ -7,11 +7,11 @@ import simpleSorting from './Sorting';
 import fieldSensorExample from './FieldSensorExample';
 
 export default {
-  simpleSorting,
-  beeClust,
   orbitalConstruction,
+  beeClust,
   cluster,
   defaultScene,
-  voronoiSorting,
-  fieldSensorExample
+  fieldSensorExample,
+  simpleSorting,
+  voronoiSorting
 };
