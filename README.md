@@ -24,9 +24,10 @@ cd SwarmJS
 npm install
 npm run dev
 ```
-The `App` component provides the entry point of the simulator, two parameters should be passed:
+The `App` component provides the entry point of the simulator, three parameters should be passed:
 - `config` defines the simulation configuration
 - `benchSettings` defines the benchmarking configurations 
+- `description` provides an HTML description to be displayed
 
 Two [example configurations](src/swarmjs-core/exampleConfigs) are provided and can be used to start new simulations:
 ```

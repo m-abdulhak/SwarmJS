@@ -146,9 +146,16 @@ const benchmarkConfig = {
   timeStep: 1000
 };
 
+const description = {
+  html: `<p>A demo scene.  The index.js file that underlies this scene has more comments than other scenes.  So this scene serves the purpose of demonstration but also as a template for your own scene.</p>
+  `
+};
+
+
 export default {
-  title: 'Field Sensor Example',
-  name: 'fieldSensorExample',
+  title: 'Demo',
+  name: 'demo',
   simConfig,
-  benchmarkConfig
+  benchmarkConfig,
+  description
 };

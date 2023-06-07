@@ -6,14 +6,14 @@ import {
 
 import SceneRenderables from '@common/scene/renderables';
 import PuckRenderables from '@common/puck/renderables';
-import RobotRenderables from './robot/renderables';
+import LocalRenderables from './robot/renderables';
 
 import controller from './robot/controllers/controller';
 
 // import PuckFieldValueTracker from './benchmarking/puckFieldValueTracker';
 import PuckFieldValueTracker from './benchmarking/puckFieldValueTracker';
 
-import mapUrl from '../../../python_scripts/scalar_field.png';
+import mapUrl from './scalar_field.png';
 
 // This constant defines the contour line of the scalar field around which the
 // robots will build.
@@ -22,7 +22,7 @@ const tau = 0.6;
 const renderables = [
   { module: 'Scene', elements: SceneRenderables },
   { module: 'Puck', elements: PuckRenderables },
-  { module: 'Robot', elements: [...RobotRenderables] }
+  { module: 'Local', elements: [...LocalRenderables] }
 ];
 
 const usedSensors = {
@@ -182,9 +182,27 @@ const benchmarkConfig = {
   timeStep: 100
 };
 
+const description = {
+  html: `<p>An implementation of the <b>Orbital Construction</b> algorithm which uses a scalar field to guide the construction of an enclosure.</p>
+
+  <p>The scalar field is just a grayscale image.  A parameter <b>tau</b> defines a contour line of the scalar field.  In this case, the contour line is a circle and <b>tau = 0.6</b> defines that circle's radius.</p>
+
+  <p>The <b style="color:cyan;">cyan robots</b> orbit the periphery, always trying to align themselves so that scalar field increases to their right.  They also try to reach the desired circle.  However, if they see a puck in their left sensor area, they will deviate to nudge it inwards.</p>
+
+  <p>The <b style="color:yellow;">yellow robots</b> operate similarly, except they react to pucks in their right sensor area and deviate to nudge them outwards.</p>
+
+  <p>
+  <a href=https://ieeexplore.ieee.org/document/8599547 target=_blank>
+  Vardy, Andrew. "Orbital construction: Swarms of simple robots building enclosures." 2018 IEEE 3rd International Workshops on Foundations and Applications of Self* Systems (FAS* W). IEEE, 2018.
+  </a>
+  </p>
+  `
+};
+
 export default {
   title: 'Orbital Construction',
   name: 'orbitalConstruction',
   simConfig,
-  benchmarkConfig
+  benchmarkConfig,
+  description
 };

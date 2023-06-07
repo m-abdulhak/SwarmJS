@@ -143,9 +143,16 @@ const benchmarkConfig = {
   timeStep: 1000
 };
 
+const description = {
+  html: `<p>An example of self-organized clustering.  Each robot can sense pucks in two sensor regions (inner and outer) and choose to pick-up or deposit pucks depending on whether they are in a low-density or high-density region (i.e. there are few pucks, or many pucks).</p>
+  </p>
+  `
+};
+
 export default {
   title: 'Object Clustering',
   name: 'cluster',
   simConfig,
-  benchmarkConfig
+  benchmarkConfig,
+  description
 };

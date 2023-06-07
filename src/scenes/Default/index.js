@@ -138,9 +138,16 @@ const benchmarkConfig = {
   timeStep: 1000
 };
 
+const description = {
+  html: `<p>ARE WE KEEPING THIS SCENE OR ROLLING IT INTO DEMO???</p>
+  `
+};
+
+
 export default {
   title: 'Default Scene',
   name: 'defaultScene',
   simConfig,
-  benchmarkConfig
+  benchmarkConfig,
+  description
 };

@@ -72,6 +72,7 @@ export default class Robot {
     this.envWidth = envWidth;
     this.envHeight = envHeight;
     this.scene = scene;
+    this.color = 'yellow';
     this.engine = this.scene.engine;
     this.world = this.scene.world;
 
