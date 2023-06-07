@@ -12,6 +12,13 @@ export default function controller(robot, params, onLoop) {
   // We'll define 25% of the robots as innies (pretty arbitrary)
   const innie = Math.random() < 0.25;
   const tau = innie ? middleTau + 0.05 : middleTau - 0.05;
+  if (robot) {
+    if (innie) {
+      robot.color = 'yellow';
+    } else {
+      robot.color = 'cyan';
+    }
+  }
 
   if (onLoop) {
     const func = eval(onLoop);

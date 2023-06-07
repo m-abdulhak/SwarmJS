@@ -124,9 +124,18 @@ const benchmarkConfig = {
   timeStep: 1000
 };
 
+const description = {
+  html: `<p>Object sorting using a very straightforward strategy.  Move forward, turning only to avoid a wall.  If not carrying a puck and one is encountered, pick it up.  If the robot happens to reach the puck's goal, drop it.</p>
+
+  <p>This is not a particularly effective algorithm, but rather exists for benchmarking or comparison with other approaches such as <b>Voronoi Sorting</b>.</p>
+  `
+};
+
+
 export default {
   title: 'Simple Sorting',
   name: 'simpleSorting',
   simConfig,
-  benchmarkConfig
+  benchmarkConfig,
+  description
 };
