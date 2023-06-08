@@ -7,11 +7,11 @@ import simpleSorting from './Sorting';
 import demo from './Demo';
 
 export default {
+  demo,
   orbitalConstruction,
   beeClust,
   cluster,
   defaultScene,
-  demo,
   simpleSorting,
   voronoiSorting
 };

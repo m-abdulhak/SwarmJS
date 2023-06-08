@@ -28,9 +28,9 @@ export default function controller(robot, params, onLoop) {
     }
   }
 
-  return (sensors) => {
+  return (sensors, actuators) => {
 
-    const grabbedPuck = robot.actuators.grabber.getState();
+    const grabbedPuck = actuators.grabber.getState();
 
     //
     // State transitions...
