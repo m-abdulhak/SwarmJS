@@ -37,25 +37,17 @@ const usedSensors = {
       points: [
         {
           type: 'Cartesian',
-          name: 'forward',
-          coords: {
-            x: 10,
-            y: 0
-          }
-        },
-        {
-          type: 'Cartesian',
           name: 'left',
           coords: {
             x: 0,
-            y: 10
+            y: 30
           }
         },
         {
           type: 'Polar',
           name: 'right45',
           coords: {
-            distance: 10,
+            distance: 30,
             angle: Math.PI / 4.0
           }
         }
@@ -78,8 +70,8 @@ const simConfig = {
     }
   },
   robots: {
-    count: 1,
-    radius: 5,
+    count: 3,
+    radius: 15,
     controllers: {
       velocity: {
         controller,
