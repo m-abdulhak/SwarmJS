@@ -1,4 +1,4 @@
-import { Body, World, Bodies } from 'matter-js';
+import { Body, World, Bodies, Composite, Constraint } from 'matter-js';
 
 import { getDistance } from '../utils/geometry';
 
@@ -78,32 +78,56 @@ export default class Robot {
 
     // Add scene specific misc values to robots
     if (misc && typeof misc === 'object' && Object.keys(misc).length > 0) {
-      Object.entries(misc).forEach(([miscKey, miscVal]) => { this[miscKey] = miscVal; });
+      Object.entries(misc).forEach(([miscKey, miscVal]) => {
+        this[miscKey] = miscVal;
+      });
     }
 
     // Create Matter.js body and attach it to world
+    let parts = [ Bodies.circle(position.x, position.y, this.radius) ]
     const compoundBody = Body.create({
-      parts: [
-        Bodies.circle(position.x, position.y, this.radius)
-        // If you want to add more parts to the robot body, add them here.
-        // Make sure to also change renderabes to render all parts of the robot.
-        // Example of compound body:
-        // ,
-        // Bodies.polygon(
-        //   position.x + this.radius / 10 + this.radius / 2,
-        //   position.y - (2 * this.radius) / 5,
-        //   3,
-        //   this.radius * 1.2,
-        //   { angle: (1.6 * Math.PI) / 2 }
-        // )
-      ]
+      parts: parts
     });
     this.body = compoundBody;
+
+    if (this.tail) {
+
+      this.tailBody = Bodies.rectangle(
+         position.x - 2 * this.radius,
+         position.y,
+         this.radius * 2,
+         this.radius / 5
+      );
+
+      var revoluteConstraint = Constraint.create({
+          bodyA: this.body,
+          bodyB: this.tailBody,
+          length: 2,
+          stiffness: 0.9,
+          damping: 0,
+          pointA: {x:-(this.radius + 5), y:0},
+          pointB: {x:this.radius, y:0}
+      });
+
+      var straighteningConstraint = Constraint.create({
+          bodyA: this.body,
+          bodyB: this.tailBody,
+          length: 0,
+          stiffness: 0.1,
+          damping: 0,
+          pointA: {x:-3 * this.radius - 5, y:0},
+          pointB: {x:- this.radius, y:0}
+      });
+
+      Composite.add(this.world, [this.body, this.tailBody, revoluteConstraint]);
+      Composite.add(this.world, [this.body, this.tailBody, straighteningConstraint]);
+    }
+
     this.body.friction = 0;
     this.body.frictionAir = 0;
     this.body.frictionStatic = 0;
     this.body.restitution = 0;
-    this.body.angle = Math.random() * 2 * Math.PI; // Randomize orientations
+    Body.setAngle(this.body, Math.random() * 2 * Math.PI); // Randomize orientations
     World.add(this.world, this.body);
     Body.setAngularVelocity(this.body, 1);
     this.engine.velocityIterations = 10;

@@ -5,8 +5,10 @@ import beeClust from './BeeClust';
 import voronoiSorting from './VoronoiSorting';
 import simpleSorting from './Sorting';
 import demo from './Demo';
+import labyrinth from './Labyrinth';
 
 export default {
+  labyrinth,
   demo,
   orbitalConstruction,
   beeClust,
