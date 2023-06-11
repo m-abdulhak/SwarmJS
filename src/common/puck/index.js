@@ -24,11 +24,12 @@ export default class Puck {
     this.body.frictionAir = 1;
     // this.body.frictionStatic = 0;
     // this.body.restitution = 0;
-    // this.body.collisionFilter = {
-    //   group: -1,
-    //   category: 1,
-    //   mask: 1,
-    // };
+
+    this.body.collisionFilter = {
+       group: 0,
+       category: 0x0002,
+       mask: 0x0001 | 0x0002,
+    };
     World.add(this.world, this.body);
 
     // Initialize velocity according to movement goal

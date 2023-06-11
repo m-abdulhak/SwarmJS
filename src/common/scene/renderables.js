@@ -14,7 +14,7 @@ export default [
       height: { prop: 'height' }
     },
     styles: {
-      fill: '#000000'
+      fill: '#444444'
     }
   },
   {
@@ -31,7 +31,7 @@ export default [
       r: { prop: 'radius' }
     },
     styles: {
-      fill: '#000000'
+      fill: '#444444'
     }
   }
 ];

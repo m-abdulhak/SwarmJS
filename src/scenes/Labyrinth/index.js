@@ -159,7 +159,19 @@ const simConfig = {
     ],
     useGlobalPuckMaps: false
   },
-  objects: [],
+  objects: [
+    {
+      type: 'rectangle',
+      center: { x: 512, y: 203 },
+      width: 30,
+      height: 405
+    },
+    {
+      type: 'circle',
+      center: { x: 512, y: 405 },
+      radius: 15
+    }
+  ],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
   renderables
 };

@@ -41,11 +41,11 @@ export default class StaticRectangle {
       { isStatic: true }
     );
 
-    // this.body.collisionFilter = {
-    //   group: 1,
-    //   category: 1,
-    //   mask: 1,
-    // };
+    this.body.collisionFilter = {
+       group: 0,
+       category: 0x0001,
+       mask: 0x0001 | 0x0002,
+    };
 
     if (shouldAddToWorld) {
       this.addToWorld();

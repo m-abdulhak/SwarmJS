@@ -88,46 +88,65 @@ export default class Robot {
     const compoundBody = Body.create({
       parts: parts
     });
+
+    // We'll set the main body to category 1.
+    parts[0].collisionFilter.group = 0;
+    parts[0].collisionFilter.category = 0x0001;
+    parts[0].collisionFilter.mask = 0x0001 | 0x0002;
+
     this.body = compoundBody;
 
     if (this.tail) {
+      let tailLength = 2.7*this.radius;
 
-      this.tailBody = Bodies.rectangle(
-         position.x - 2 * this.radius,
+      this.tailBody = Bodies.trapezoid(
+         position.x - this.radius - tailLength/2.0,
          position.y,
-         this.radius * 2,
-         this.radius / 5
+         tailLength,
+         this.radius / 5,
+         0
       );
+      //Body.setAngle(this.tailBody, 0);
 
       var revoluteConstraint = Constraint.create({
-          bodyA: this.body,
-          bodyB: this.tailBody,
-          length: 2,
-          stiffness: 0.9,
-          damping: 0,
-          pointA: {x:-(this.radius + 5), y:0},
-          pointB: {x:this.radius, y:0}
+        bodyA: this.body,
+        bodyB: this.tailBody,
+        length: 0,
+        stiffness: 0.9,
+        damping: 1.0,
+        pointA: {x:-this.radius, y:0},
+        pointB: {x:tailLength/2.0, y:0}
       });
 
       var straighteningConstraint = Constraint.create({
-          bodyA: this.body,
-          bodyB: this.tailBody,
-          length: 0,
-          stiffness: 0.1,
-          damping: 0,
-          pointA: {x:-3 * this.radius - 5, y:0},
-          pointB: {x:- this.radius, y:0}
+        bodyA: this.body,
+        bodyB: this.tailBody,
+        length: 0,
+        stiffness: 0.9,
+        damping: 1.0,
+        pointA: {x:-this.radius-tailLength, y:0},
+        pointB: {x:-tailLength/2.0, y:0}
       });
 
       Composite.add(this.world, [this.body, this.tailBody, revoluteConstraint]);
-      Composite.add(this.world, [this.body, this.tailBody, straighteningConstraint]);
+      //Composite.add(this.world, [this.body, this.tailBody, straighteningConstraint]);
+
+      // Tails belong to category 4, which should only collide with pucks,
+      // category 2.  Everything else is in category 1, which collides with each
+      // other and with pucks.
+      this.tailBody.collisionFilter.group = 0; // Group is set to 0 so that we use category/mask for collision filtering.
+      this.tailBody.collisionFilter.category = 0x0004;
+      this.tailBody.collisionFilter.mask = 0x0002;
     }
 
     this.body.friction = 0;
     this.body.frictionAir = 0;
     this.body.frictionStatic = 0;
     this.body.restitution = 0;
-    Body.setAngle(this.body, Math.random() * 2 * Math.PI); // Randomize orientations
+
+    //Body.setAngle(this.body, Math.random() * 2 * Math.PI); // Randomize orientations
+    Body.setAngle(this.body, 0);
+
     World.add(this.world, this.body);
     Body.setAngularVelocity(this.body, 1);
     this.engine.velocityIterations = 10;
