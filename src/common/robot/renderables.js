@@ -127,7 +127,7 @@ const bodyRenderables = [
       cy: { prop: 'sensors.position.y' }
     },
     styles: {
-      fill: '#FFC53A',
+      fill: { prop: 'color' },
       stroke: 'black',
       'stroke-width': 1,
       'stroke-opacity': 1,

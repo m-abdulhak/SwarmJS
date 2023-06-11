@@ -1,5 +1,5 @@
 import Sensor from '../sensor';
-import { sensorSamplingTypes, CoreSensors } from '../sensorManager';
+import { sensorSamplingTypes, CoreSensors, ExtraSensors } from '../sensorManager';
 
 const name = 'closestObstaclePoint';
 
@@ -8,7 +8,7 @@ class ClosestObstaclePointSensor extends Sensor {
     super(robot, scene, name, sensorSamplingTypes.onUpdate);
     this.dependencies = [
       CoreSensors.position,
-      CoreSensors.nearbyObstacles
+      ExtraSensors.nearbyObstacles
     ];
     this.value = [];
   }

@@ -47,7 +47,7 @@ export const initializeSimulation = (config, updateCB) => {
   if (scene) {
     return;
   }
-  console.log('Creating Sim With Config: ', config);
+  console.log('Initializing Sim With Config: ', config);
   createSimulation(config, updateCB);
 };
 
@@ -57,7 +57,7 @@ export const resetSimulation = (
   setDefaultOnLoopCode,
   setDefaultOnInitCode
 ) => {
-  console.log('Creating Sim With Config: ', config);
+  console.log('Resetting Sim With Config: ', config);
   const velocityController = config?.robots?.controllers?.velocity?.controller;
   const velocityControllerInit = config?.robots?.controllers?.velocity?.init;
 
@@ -71,6 +71,10 @@ export const resetSimulation = (
     setDefaultOnInitCode(defaultOnInitCode);
   }
 
+  // THE CODE BELOW IS ALMOST IDENTICAL TO createSimulation.  YET IF WE INSERT
+  // THE FOLLOWING INSTEAD:
+  //     createSimulation(config, updateCallback);
+  // AN ISSUE ARISES.
   scene = new Scene(
     config.env,
     config.robots,
@@ -83,8 +87,12 @@ export const resetSimulation = (
 
   renderScene = () => {
     if (!scene.paused) {
-      scene.update();
-      updateBench(scene, scene.timeInstance);
+
+      for (let i=0; i<scene.renderSkip; i++) {
+        scene.update();
+        updateBench(scene, scene.timeInstance);
+      }
+
       if (updateCallback && typeof updateCallback === 'function') {
         const benchData = getBenchData();
         updateCallback(scene.timeInstance, scene, benchData, config.renderables);
@@ -120,6 +128,8 @@ export const isBenchmarking = () => benchmarkingActive();
 export const togglePauseSimulation = () => scene.togglePause();
 
 export const setSimulationSpeed = (speed) => scene.setSpeed(speed);
+
+export const setSimulationRenderSkip = (rs) => scene.setRenderSkip(rs);
 
 export { AvailableActuators as CoreActuators } from './robot/actuators/actuatorsManager';
 export { CoreSensors } from './robot/sensors/sensorManager';

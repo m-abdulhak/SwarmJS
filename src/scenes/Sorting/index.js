@@ -1,6 +1,7 @@
 import {
   CoreActuators,
   CoreSensors,
+  ExtraSensors,
   CorePositionsGenerators,
   CorePerformanceTrakers,
   CoreControllers
@@ -14,9 +15,6 @@ import RobotRenderables from './robot/renderables';
 
 import actuatorController from './robot/controllers/actuatorController';
 import goalContoller from './robot/controllers/goalController';
-
-import pucksNearGrabberSensor from './robot/sensors/pucksNearGrabberSensor';
-import closestPuckToGrabberSensor from './robot/sensors/closestPuckToGrabberSensor';
 
 // All renderables should be registered in this list and assigned a module property
 // This is necessary to avoid imposing a unique restriction on renderable type in different modules
@@ -35,7 +33,8 @@ const simConfig = {
   env: {
     width: 800,
     height: 500,
-    speed: 15
+    speed: 15,
+    renderSkip: 1
   },
   robots: {
     count: 10,
@@ -48,7 +47,7 @@ const simConfig = {
         params: { angularVelocityScale: 0.001 }
       }
     },
-    sensors: [...Object.values(CoreSensors), pucksNearGrabberSensor, closestPuckToGrabberSensor],
+    sensors: [...Object.values(CoreSensors), ...Object.values(ExtraSensors)],
     actuators: [CoreActuators.grabber],
     useVoronoiDiagram: false,
     misc: {
@@ -82,18 +81,6 @@ const simConfig = {
   renderables
 };
 
-// Define benchmark configurations:
-// - timeStep: minimum reported time step, will be used as the time unit in the graphs
-// - maxTimeStep: length of each simulation run
-// - trackers: list of objects that provide a function to calculate a performance metric at
-//        each simulation update along with functions for readucing and aggregating values.
-//        Tracker (@common/benchmarking/performanceTrackers/tracker) can be used as a
-//        reference and extended as it provides most of the needed functionalities.
-//        Each tracker will result in a graph in the performance graphs tab
-// - simConfigs: list of simulation configurations that will be compared against each others
-//        across multiple runs using the performance metrics provided by the trackers.
-//        - name: a unique name that will be used to reference this config in the graphs legends
-//        - simConfig: all the changes from main config that will be applied to this simulation
 const benchmarkConfig = {
   simConfigs: [
     {
@@ -125,9 +112,18 @@ const benchmarkConfig = {
   timeStep: 1000
 };
 
+const description = {
+  html: `<p>Object sorting using a very straightforward strategy.  Move forward, turning only to avoid a wall.  If not carrying a puck and one is encountered, pick it up.  If the robot happens to reach the puck's goal, drop it.</p>
+
+  <p>This is not a particularly effective algorithm, but rather exists for benchmarking or comparison with other approaches such as <b>Voronoi Sorting</b>.</p>
+  `
+};
+
+
 export default {
   title: 'Simple Sorting',
   name: 'simpleSorting',
   simConfig,
-  benchmarkConfig
+  benchmarkConfig,
+  description
 };

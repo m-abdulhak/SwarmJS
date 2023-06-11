@@ -190,12 +190,21 @@ export default class Scene {
       this.robots.forEach((r) => { r.velocityScale = scale; });
     };
 
+    this.setRenderSkip = (rs) => {
+      if (!rs || typeof rs !== 'number') {
+        return;
+      }
+      this.renderSkip = rs;
+    };
+
     this.togglePause.bind(this);
     this.pause.bind(this);
     this.unpause.bind(this);
     this.setSpeed.bind(this);
+    this.setRenderSkip.bind(this);
 
     this.setSpeed(envConfig.speed);
+    this.setRenderSkip(envConfig.renderSkip);
   }
 
   update() {

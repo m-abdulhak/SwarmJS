@@ -14,6 +14,7 @@ import {
   resetSimulation,
   togglePauseSimulation,
   setSimulationSpeed,
+  setSimulationRenderSkip,
   controllerCodeIsValid
 } from '@common';
 
@@ -44,9 +45,11 @@ const App = () => {
   const [selectedScene, setSelectedScene] = useState(options[0].value);
   const [config, setConfig] = useState(exampleConfigs[selectedScene].simConfig);
   const [benchSettings, setBenchSettings] = useState(exampleConfigs[selectedScene].benchmarkConfig);
+  const [description, setDescription] = useState(exampleConfigs[selectedScene].description);
   const [uiEnabled, setUiEnabled] = useState(true);
   const [time, setTime] = useState(0);
   const [speed, setSpeed] = useState(1);
+  const [renderSkip, setRenderSkip] = useState(1);
   const [paused, setPaused] = useState(false);
   const [benchmarkData, setBenchmarkData] = useState({});
   const svgRef = useRef(null);
@@ -67,6 +70,13 @@ const App = () => {
     setSpeed(speedNumber);
     setSimulationSpeed(speedNumber);
   };
+
+  const onRenderSkipChange = (newRS) => {
+    const rs = parseInt(newRS);
+    setRenderSkip(rs);
+    setSimulationRenderSkip(rs);
+  };
+
 
   const onUpdate = (newTime, scene, benchData, renderables) => {
     setTime(newTime);
@@ -93,6 +103,7 @@ const App = () => {
 
     resetSimulation(usedConfig, onUpdate, setDefaultOnLoopCode, setDefaultOnInitCode);
     onSpeedChange(newConfig.env.speed);
+    onRenderSkipChange(newConfig.env.renderSkip);
     setPaused(false);
     resetRenderer();
 
@@ -131,6 +142,7 @@ const App = () => {
   useEffect(() => {
     setConfig(exampleConfigs[selectedScene].simConfig);
     setBenchSettings(exampleConfigs[selectedScene].benchmarkConfig);
+    setDescription(exampleConfigs[selectedScene].description);
   }, [selectedScene]);
 
   useEffect(() => {
@@ -163,6 +175,8 @@ const App = () => {
     <Options
       speed={speed}
       setSpeed={onSpeedChange}
+      renderSkip={renderSkip}
+      setRenderSkip={onRenderSkipChange}
       renderingElements = {uniqueRenderingElements(config.renderables)}
       setElementEnabled={setElementEnabled}
     />
@@ -232,10 +246,13 @@ const App = () => {
         simConfig={config}
         benchSettings={benchSettings}
       />
-      <div id='env-section' style={{ width: '100%', textAlign: 'center' }}>
-        <div id='env-container' style={{ width: config.env.width, height: config.env.height }}>
+      <div id='env-section' style={{ width: '100%', textAlign: 'center', display: 'flex' }}>
+        <div id='env-container' style={{ width: config.env.width, height: config.env.height, flex: '0 0 auto'}}>
           <div id='fields-canvas-container' ref={fieldsElemRef}/>
           <svg id='simulation-svg' ref={svgRef} width={config.env.width} height={config.env.height}/>
+        </div>
+        <div className='description' style={{ width: '100%', textAlign: 'left', margin: '1%'}}>
+          <div dangerouslySetInnerHTML={{ __html: description.html }} />
         </div>
       </div>
       {ui}

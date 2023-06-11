@@ -1,5 +1,6 @@
 import {
   CoreSensors,
+  ExtraSensors,
   CorePositionsGenerators,
   CorePerformanceTrakers
 } from '@common';
@@ -28,13 +29,13 @@ const renderables = [
 const usedSensors = {
   ...CoreSensors,
   walls: {
-    ...CoreSensors.walls,
+    ...ExtraSensors.walls,
     params: {
       detectionRadius: 10
     }
   },
   fields: {
-    ...CoreSensors.fields,
+    ...ExtraSensors.fields,
     params: {
       // See the comments in FieldSensorExample for how to define points.
       points: [
@@ -56,6 +57,7 @@ const simConfig = {
     width: 600,
     height: 400,
     speed: 15,
+    renderSkip: 1,
     fields: {
       heatMap: {
         url: mapUrl
@@ -136,9 +138,16 @@ const benchmarkConfig = {
   timeStep: 1000
 };
 
+const description = {
+  html: `<p>ARE WE KEEPING THIS SCENE OR ROLLING IT INTO DEMO???</p>
+  `
+};
+
+
 export default {
   title: 'Default Scene',
   name: 'defaultScene',
   simConfig,
-  benchmarkConfig
+  benchmarkConfig,
+  description
 };

@@ -1,22 +1,9 @@
 /* eslint-disable no-console */
 import Sensor from '../sensor';
 import { sensorSamplingTypes, CoreSensors } from '../sensorManager';
-import { getSceneDefinedPointDefinitions, getSceneDefinedPoints } from '../sensorUtils';
+import { getSceneDefinedPointDefinitions, getSceneDefinedPoints, sampleFieldAtPoint } from '../sensorUtils';
 
 const name = 'fields';
-
-const sampleFieldAtPoint = (context, p) => {
-  if (!context?.getImageData || typeof context.getImageData !== 'function') {
-    return null;
-  }
-
-  if (p.x < 0 || p.y < 0 || p.x >= context.canvas.width || p.y >= context.canvas.width) {
-    return [0, 0, 0, 0];
-  }
-
-  const imageVal = context.getImageData(p.x, p.y, 1, 1);
-  return imageVal.data;
-};
 
 class FieldSensor extends Sensor {
   constructor(robot, scene, { points = [] } = {}) {

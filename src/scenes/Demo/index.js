@@ -1,5 +1,6 @@
 import {
   CoreSensors,
+  ExtraSensors,
   CorePositionsGenerators,
   CorePerformanceTrakers
 } from '@common';
@@ -27,7 +28,7 @@ const renderables = [
 const usedSensors = {
   ...CoreSensors,
   fields: {
-    ...CoreSensors.fields,
+    ...ExtraSensors.fields,
     params: {
       // We can define points relative to a robot located at (0, 0) headed along positive X axis
       // With Cartesian coordinates forward is [1, 0], back: [-1, 0], left: [0, 1], right: [0, -1]
@@ -36,25 +37,17 @@ const usedSensors = {
       points: [
         {
           type: 'Cartesian',
-          name: 'forward',
-          coords: {
-            x: 10,
-            y: 0
-          }
-        },
-        {
-          type: 'Cartesian',
           name: 'left',
           coords: {
             x: 0,
-            y: 10
+            y: 30
           }
         },
         {
           type: 'Polar',
           name: 'right45',
           coords: {
-            distance: 10,
+            distance: 30,
             angle: Math.PI / 4.0
           }
         }
@@ -68,6 +61,7 @@ const simConfig = {
     width: 600,
     height: 400,
     speed: 15,
+    renderSkip: 1,
     fields: {
       heatMap: {
         url: mapUrl,
@@ -76,8 +70,8 @@ const simConfig = {
     }
   },
   robots: {
-    count: 1,
-    radius: 5,
+    count: 3,
+    radius: 15,
     controllers: {
       velocity: {
         controller,
@@ -144,9 +138,16 @@ const benchmarkConfig = {
   timeStep: 1000
 };
 
+const description = {
+  html: `<p>A demo scene.  The index.js file that underlies this scene has more comments than other scenes.  So this scene serves the purpose of demonstration but also as a template for your own scene.</p>
+  `
+};
+
+
 export default {
-  title: 'Field Sensor Example',
-  name: 'fieldSensorExample',
+  title: 'Demo',
+  name: 'demo',
   simConfig,
-  benchmarkConfig
+  benchmarkConfig,
+  description
 };
