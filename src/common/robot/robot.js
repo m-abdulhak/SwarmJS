@@ -53,7 +53,8 @@ export default class Robot {
     envWidth,
     envHeight,
     scene,
-    misc
+    misc,
+    externalEngine = false
   ) {
     // Configs
     this.DeadLockRecovery = {
@@ -96,7 +97,8 @@ export default class Robot {
         //   this.radius * 1.2,
         //   { angle: (1.6 * Math.PI) / 2 }
         // )
-      ]
+      ],
+      isStatic: externalEngine
     });
     this.body = compoundBody;
     this.body.friction = 0;
@@ -148,6 +150,13 @@ export default class Robot {
   set position(val) {
     Body.set(this.body, 'position', { x: val.x, y: val.y });
     this.sensorManager.update();
+  }
+
+  set orientation(val) {
+    if (val != null && typeof val === 'number') {
+      Body.setAngle(this.body, val);
+      this.sensorManager.update();
+    }
   }
 
   controllerCodeIsValid(loopCode, initCode) {

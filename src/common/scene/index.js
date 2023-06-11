@@ -9,6 +9,9 @@ import Puck from '../puck';
 import generateStaticObject from '../staticObjects/staticObjectFactory';
 import { mapSceneToArr, getPucksGoalMap } from '../distanceTransform/globalPlanning';
 import { getEnvBoundaryObjects } from '../utils/matter';
+import Socket from '../utils/socket';
+
+const defaultExtEngineUpdateInterval = 100;
 
 export default class Scene {
   constructor(
@@ -20,6 +23,33 @@ export default class Scene {
     positionsGenerator,
     gMaps
   ) {
+    Window.Scene = this;
+
+    if (envConfig?.externalEngine?.url) {
+      this.externalEngine = true;
+      this.socket = new Socket(envConfig?.externalEngine?.url);
+      this.socket.connect();
+      this.socket.ping();
+
+      this.externalRobotPositions = {};
+
+      // Add callback to store robot positions received by external engine
+      this.socket.on('robot_positions', (data) => {
+        const positions = Object.entries(data).reduce((acc, [k, v]) => {
+          const strKey = `${k}`;
+          acc[strKey] = v;
+          return acc;
+        }, {});
+
+        // console.log('received robot positions', positions);
+        this.externalRobotPositions = positions;
+      });
+
+      // Limit updates to external engine to once every 100ms (default)
+      this.externalEngineUpdateInterval = envConfig?.externalEngine?.updateInterval ?? defaultExtEngineUpdateInterval;
+      this.lastExternalEngineUpdate = 0;
+    }
+
     this.numOfRobots = robotsConfig.count;
     this.robotRadius = robotsConfig.radius;
     this.useVoronoi = robotsConfig.useVoronoiDiagram;
@@ -178,6 +208,21 @@ export default class Scene {
   }
 
   update() {
+    if (this.externalEngine && this.externalRobotPositions) {
+      for (const r of this.robots) {
+        if (
+          this.externalRobotPositions[r.id]?.x != null
+          && this.externalRobotPositions[r.id]?.y != null
+        ) {
+          r.position = this.externalRobotPositions[r.id] ?? r.position;
+        }
+
+        if (this.externalRobotPositions[r.id]?.angle != null) {
+          r.orientation = this.externalRobotPositions[r.id]?.angle ?? r.orientation;
+        }
+      }
+    }
+
     Engine.update(this.engine, this.timeDelta);
 
     if (this.useVoronoi) {
@@ -188,6 +233,25 @@ export default class Scene {
 
     this.robots.forEach((r) => r.timeStep());
     this.pucks.forEach((p) => p.timeStep());
+
+    if (this.externalEngine) {
+      const goalsMsg = {};
+
+      for (const r of this.robots) {
+        goalsMsg[r.id] = {
+          goal: r.goal,
+          waypoint: r.waypoint
+        };
+      }
+
+      const now = Date.now();
+      const shouldUpdateGoals = !this.externalEngineUpdateInterval
+        || now - this.lastExternalEngineUpdate >= this.externalEngineUpdateInterval;
+      if (shouldUpdateGoals) {
+        this.socket.emit('set_goals', goalsMsg);
+        this.lastExternalEngineUpdate = now;
+      }
+    }
 
     this.timeInstance = this.engine.timing.timestamp;
 
@@ -228,7 +292,8 @@ export default class Scene {
         envWidth,
         envHeight,
         this,
-        misc
+        misc,
+        this.externalEngine
       ));
   }
 
