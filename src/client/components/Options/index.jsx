@@ -1,21 +1,22 @@
 import React from 'react';
 import propTypes from 'prop-types';
 
-import SpeedSlider from './SpeedSlider';
-import RenderSkipSlider from './RenderSkipSlider';
+import TitledSlider from '../Inputs/TitledSlider';
 import RenderingSettings from './RenderingSettings';
 
 const Options = ({
-  speed,
-  setSpeed,
   renderSkip,
   setRenderSkip,
   renderingElements,
   setElementEnabled
 }) => (
   <>
-    <SpeedSlider speed={speed} setSpeed={setSpeed} />
-    <RenderSkipSlider renderSkip={renderSkip} setRenderSkip={setRenderSkip} />
+    <TitledSlider
+      title='Render Skip'
+      value={renderSkip}
+      setValue={setRenderSkip}
+      tooltTip='Number of simulation steps to run between frames, speeds up simulation but can cause app lag.'
+    />
     <RenderingSettings
       renderingElements={renderingElements}
       setElementEnabled={setElementEnabled}
@@ -24,8 +25,6 @@ const Options = ({
 );
 
 Options.propTypes = {
-  speed: propTypes.number.isRequired,
-  setSpeed: propTypes.func.isRequired,
   renderSkip: propTypes.number.isRequired,
   setRenderSkip: propTypes.func.isRequired,
   renderingElements: propTypes.array.isRequired,

@@ -68,7 +68,6 @@ const simConfig = {
   env: {
     width: 600,
     height: 400,
-    speed: 15,
     renderSkip: 1,
     background: mapUrl,
     fields: {
@@ -80,6 +79,9 @@ const simConfig = {
   robots: {
     count: 50,
     radius: 5,
+    params: {
+      velocityScale: 15
+    },
     controllers: {
       velocity: {
         controller,
@@ -109,6 +111,9 @@ const benchmarkConfig = {
     {
       name: 'theta = 0.001',
       simConfig: {
+        env: {
+          renderSkip: 50
+        },
         robots: {
           controllers: {
             velocity: {
@@ -122,6 +127,9 @@ const benchmarkConfig = {
     {
       name: 'theta = 0.01',
       simConfig: {
+        env: {
+          renderSkip: 50
+        },
         robots: {
           controllers: {
             velocity: {
@@ -133,7 +141,7 @@ const benchmarkConfig = {
       }
     }
   ],
-  trackers: [ DistanceToGoalTracker ],
+  trackers: [DistanceToGoalTracker],
   maxTimeStep: 20000,
   timeStep: 100
 };

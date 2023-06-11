@@ -13,7 +13,7 @@ import {
   simulationIsInitialized,
   resetSimulation,
   togglePauseSimulation,
-  setSimulationSpeed,
+  setRobotParams as sceneSetRobotParams,
   setSimulationRenderSkip,
   controllerCodeIsValid
 } from '@common';
@@ -33,6 +33,7 @@ import TabContainer from './components/Layouts/TabContainer';
 import Options from './components/Options/index';
 import Benchmark from './components/Benchmark';
 import CodeEditor from './components/Editors/CodeEditor';
+import TitledSlider from './components/Inputs/TitledSlider';
 
 import exampleConfigs from '../scenes';
 
@@ -48,7 +49,7 @@ const App = () => {
   const [description, setDescription] = useState(exampleConfigs[selectedScene].description);
   const [uiEnabled, setUiEnabled] = useState(true);
   const [time, setTime] = useState(0);
-  const [speed, setSpeed] = useState(1);
+  const [robotParams, setRobotParams] = useState({ velocityScale: 1 });
   const [renderSkip, setRenderSkip] = useState(1);
   const [paused, setPaused] = useState(false);
   const [benchmarkData, setBenchmarkData] = useState({});
@@ -65,10 +66,10 @@ const App = () => {
     setSelectedScene(newScene);
   };
 
-  const onSpeedChange = (newSpeed) => {
-    const speedNumber = parseFloat(newSpeed);
-    setSpeed(speedNumber);
-    setSimulationSpeed(speedNumber);
+  const onRobotParamsChange = ({ velocityScale }) => {
+    const v = parseFloat(velocityScale);
+    setRobotParams((oldParams) => ({ ...oldParams, velocityScale: v }));
+    sceneSetRobotParams(v);
   };
 
   const onRenderSkipChange = (newRS) => {
@@ -76,7 +77,6 @@ const App = () => {
     setRenderSkip(rs);
     setSimulationRenderSkip(rs);
   };
-
 
   const onUpdate = (newTime, scene, benchData, renderables) => {
     setTime(newTime);
@@ -102,7 +102,7 @@ const App = () => {
     }
 
     resetSimulation(usedConfig, onUpdate, setDefaultOnLoopCode, setDefaultOnInitCode);
-    onSpeedChange(newConfig.env.speed);
+    onRobotParamsChange({ velocityScale: newConfig.robots.params.velocityScale });
     onRenderSkipChange(newConfig.env.renderSkip);
     setPaused(false);
     resetRenderer();
@@ -173,8 +173,6 @@ const App = () => {
 
   const optionsElem = initialized ? (
     <Options
-      speed={speed}
-      setSpeed={onSpeedChange}
       renderSkip={renderSkip}
       setRenderSkip={onRenderSkipChange}
       renderingElements = {uniqueRenderingElements(config.renderables)}
@@ -184,7 +182,15 @@ const App = () => {
 
   // TODO: Add a TreeView component to set Simulation and Benchmarking options
   const configurationsElem = (
-    <p> TODO: Tree View UI for Changing Simulation and Benchmarking Configuration </p>
+    <>
+      <TitledSlider
+        title='Velocity'
+        value={robotParams.velocityScale}
+        setValue={(newV) => onRobotParamsChange({ velocityScale: newV })}
+        tooltTip='Controls robots velocity, only works when supported in robot controller.'
+      />
+      <p> TODO: Change other runtime parameters, simulation configuration, and benchmarking configuration.</p>
+    </>
   );
 
   const benchElem = initialized ? (
@@ -246,14 +252,14 @@ const App = () => {
         simConfig={config}
         benchSettings={benchSettings}
       />
-      <div id='env-section' style={{ width: '100%', textAlign: 'center', display: 'flex' }}>
-        <div id='env-container' style={{ width: config.env.width, height: config.env.height, flex: '0 0 auto'}}>
-          <div id='fields-canvas-container' ref={fieldsElemRef}/>
-          <svg id='simulation-svg' ref={svgRef} width={config.env.width} height={config.env.height}/>
+      <div id="main-section">
+        <div id='env-section'>
+          <div id='env-container' style={{ width: config.env.width, height: config.env.height }}>
+            <div id='fields-canvas-container' ref={fieldsElemRef}/>
+            <svg id='simulation-svg' ref={svgRef} width={config.env.width} height={config.env.height}/>
+          </div>
         </div>
-        <div className='description' style={{ width: '100%', textAlign: 'left', margin: '1%'}}>
-          <div dangerouslySetInnerHTML={{ __html: description.html }} />
-        </div>
+        <div id='scene-description' dangerouslySetInnerHTML={{ __html: description.html }} />
       </div>
       {ui}
     </div>

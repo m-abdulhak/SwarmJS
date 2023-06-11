@@ -23,12 +23,14 @@ const simConfig = {
   env: {
     width: 800,
     height: 500,
-    speed: 15,
     renderSkip: 1
   },
   robots: {
     count: 20,
     radius: 7,
+    params: {
+      velocityScale: 15
+    },
     controllers: {
       goal: {
         controller: goalController,
@@ -117,10 +119,13 @@ const benchmarkConfig = {
       name: '5 Robots',
       simConfig: {
         env: {
-          speed: 50
+          renderSkip: 50
         },
         robots: {
-          count: 5
+          count: 5,
+          params: {
+            velocityScale: 50
+          }
         }
       }
     },
@@ -128,7 +133,12 @@ const benchmarkConfig = {
       name: '20 Robots',
       simConfig: {
         env: {
-          speed: 50
+          renderSkip: 50
+        },
+        robots: {
+          params: {
+            velocityScale: 50
+          }
         }
       }
     }

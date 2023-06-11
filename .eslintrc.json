@@ -22,6 +22,7 @@
         "ecmaVersion": 2020
     },
     "rules": {
+        "radix": "off",
         "max-len": ["error", { "code": 120 }],
         "linebreak-style": "off",
         "strict": 0,

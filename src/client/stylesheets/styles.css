@@ -144,10 +144,40 @@
     overflow: hidden;
 }
 
+#main-section {
+    width: 100%;
+    text-align: center;
+    display: flex;
+}
+
 #env-container {
     position: relative;
-    margin: auto;
-    border: #bfbebe solid 2px;
+    margin: 10px auto;
+    border: #bfbebe solid 1px;
+}
+
+@media (max-width: 1024px) {
+    #main-section {
+        flex-direction: column;    
+    }
+}
+
+#scene-description {
+    width: 100%;
+    max-width: 95%;
+    margin: 10px;
+    padding: 10px;
+    border: #bfbebe solid 1px;
+    text-align: left;
+    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 1.6;
+    letter-spacing: 0.0075em;
+}
+
+#scene-description :first-child {
+    margin-top: 0px;
 }
 
 #fields-canvas-container {

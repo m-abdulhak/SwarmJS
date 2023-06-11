@@ -1,5 +1,5 @@
 import cluster from './Cluster';
-import defaultScene from './Default';
+import fieldManipulation from './Fields';
 // import ExternalEngine from './ExternalEngine';
 import orbitalConstruction from './OrbitalConstruction';
 import beeClust from './BeeClust';
@@ -13,7 +13,7 @@ export default {
   orbitalConstruction,
   beeClust,
   cluster,
-  defaultScene,
+  fieldManipulation,
   simpleSorting,
   voronoiSorting
 };
