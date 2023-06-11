@@ -183,11 +183,11 @@ export default class Scene {
       this.paused = false;
     };
 
-    this.setSpeed = (scale) => {
-      if (!scale || typeof scale !== 'number' || scale <= 0) {
+    this.setRobotParams = ({ velocityScale }) => {
+      if (!velocityScale || typeof velocityScale !== 'number' || velocityScale <= 0) {
         return;
       }
-      this.robots.forEach((r) => { r.velocityScale = scale; });
+      this.robots.forEach((r) => { r.velocityScale = velocityScale; });
     };
 
     this.setRenderSkip = (rs) => {
@@ -200,10 +200,10 @@ export default class Scene {
     this.togglePause.bind(this);
     this.pause.bind(this);
     this.unpause.bind(this);
-    this.setSpeed.bind(this);
+    this.setRobotParams.bind(this);
     this.setRenderSkip.bind(this);
 
-    this.setSpeed(envConfig.speed);
+    this.setRobotParams({ velocityScale: robotsConfig.params.velocityScale });
     this.setRenderSkip(envConfig.renderSkip);
   }
 

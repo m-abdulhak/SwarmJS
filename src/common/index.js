@@ -127,7 +127,7 @@ export const isBenchmarking = () => benchmarkingActive();
 
 export const togglePauseSimulation = () => scene.togglePause();
 
-export const setSimulationSpeed = (speed) => scene.setSpeed(speed);
+export const setRobotParams = (velocityScale) => scene.setRobotParams({ velocityScale });
 
 export const setSimulationRenderSkip = (rs) => scene.setRenderSkip(rs);
 

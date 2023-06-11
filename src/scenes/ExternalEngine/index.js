@@ -38,7 +38,6 @@ const simConfig = {
   env: {
     width: 600,
     height: 400,
-    speed: 15,
     externalEngine: {
       url: 'ws://localhost:5000',
       updateInterval: 100
@@ -47,6 +46,9 @@ const simConfig = {
   robots: {
     count: 2,
     radius: 5,
+    params: {
+      velocityScale: 15
+    },
     controllers: {
       waypoint: CoreControllers.waypoint.bvcWaypointController,
       velocity: {
@@ -91,10 +93,13 @@ const benchmarkConfig = {
       name: '5 Robots',
       simConfig: {
         env: {
-          speed: 50
+          renderSkip: 50
         },
         robots: {
-          count: 5
+          count: 5,
+          params: {
+            velocityScale: 50
+          }
         }
       }
     },
@@ -102,7 +107,12 @@ const benchmarkConfig = {
       name: '20 Robots',
       simConfig: {
         env: {
-          speed: 50
+          renderSkip: 50
+        },
+        robots: {
+          params: {
+            velocityScale: 50
+          }
         }
       }
     }
