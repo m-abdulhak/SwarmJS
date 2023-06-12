@@ -1,6 +1,6 @@
 import { Body, World, Bodies, Composite, Constraint } from 'matter-js';
 
-import { getDistance } from '../utils/geometry';
+import { getDistance, getSmallestSignedAngularDifference } from '../utils/geometry';
 
 import SensorManager from './sensors/sensorManager';
 import ActuatorManager from './actuators/actuatorsManager';
@@ -89,20 +89,20 @@ export default class Robot {
       parts: parts
     });
 
-    // We'll set the main body to category 1.
-    parts[0].collisionFilter.group = 0;
-    parts[0].collisionFilter.category = 0x0001;
-    parts[0].collisionFilter.mask = 0x0001 | 0x0002;
-
     this.body = compoundBody;
 
+    // We'll set the main body to category 1.
+    this.body.collisionFilter.group = 0;
+    this.body.collisionFilter.category = 0x0001;
+    this.body.collisionFilter.mask = 0x0001 | 0x0002;
+
     if (this.tail) {
-      let tailLength = 2.7*this.radius;
+      this.tailLength = 2.7*this.radius;
 
       this.tailBody = Bodies.trapezoid(
-         position.x - this.radius - tailLength/2.0,
+         position.x - this.radius - this.tailLength/2.0,
          position.y,
-         tailLength,
+         this.tailLength,
          this.radius / 5,
          0
       );
@@ -115,21 +115,10 @@ export default class Robot {
         stiffness: 0.9,
         damping: 1.0,
         pointA: {x:-this.radius, y:0},
-        pointB: {x:tailLength/2.0, y:0}
-      });
-
-      var straighteningConstraint = Constraint.create({
-        bodyA: this.body,
-        bodyB: this.tailBody,
-        length: 0,
-        stiffness: 0.05,
-        damping: 1.0,
-        pointA: {x:-this.radius-tailLength, y:0},
-        pointB: {x:-tailLength/2.0, y:0}
+        pointB: {x:this.tailLength/2.0, y:0}
       });
 
       Composite.add(this.world, [this.body, this.tailBody, revoluteConstraint]);
-      Composite.add(this.world, [this.body, this.tailBody, straighteningConstraint]);
 
       // Tails belong to category 4, which should only collide with pucks,
       // category 2.  Everything else is in category 1, which collides with each
@@ -264,6 +253,34 @@ export default class Robot {
     if (this.actuate && typeof this.actuate === 'function') {
       this.actuate(this.sensors, this.actuators, this.goal, newWaypoint);
     }
+
+    /* AN ACTIVE TAIL STRAIGHTENING FORCE.  THIS WORKS BUT SEEMS TO YIELD
+       UNSTABLE BEHAVIOUR.  FALLING OUT OF LOVE WITH Matter.js.
+    if (this.tailBody) {
+      // Parameters:
+      const TAIL_CORRECTION_FACTOR = 0.001;
+      const MAX_TAIL_CORRECTION_FORCE = 0.01;
+
+      let deltaAngle = getSmallestSignedAngularDifference(this.body.angle, this.tailBody.angle);
+      let magnitude = TAIL_CORRECTION_FACTOR * deltaAngle;
+      if (magnitude > MAX_TAIL_CORRECTION_FORCE) {
+        magnitude = MAX_TAIL_CORRECTION_FORCE;
+      } else if (magnitude < -MAX_TAIL_CORRECTION_FORCE) {
+        magnitude = -MAX_TAIL_CORRECTION_FORCE;
+      }
+      let forceVector = {
+        x: magnitude * Math.cos(this.tailBody.angle + Math.PI/2),
+        y: magnitude * Math.sin(this.tailBody.angle + Math.PI/2)
+      };
+
+      let position = {
+        x: this.tailBody.position.x + 0.5 * this.tailLength * Math.cos(this.tailBody.angle),
+        y: this.tailBody.position.y + 0.5 * this.tailLength * Math.sin(this.tailBody.angle)
+      };
+
+      Body.applyForce(this.tailBody, position, forceVector);
+    }
+    */
   }
 
   setVelocities({ linearVel, angularVel }) {

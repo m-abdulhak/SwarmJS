@@ -36,8 +36,8 @@ export default function controller(robot, params, onLoop) {
     command.linearVel = maxForwardSpeed * robot.velocityScale;
     command.angularVel = angularSpeed * robot.velocityScale;
 
-    command.linearVel = 0;
-    command.angularVel = 0;
+    //command.linearVel = 0;
+    //command.angularVel = 0;
     return command;
   };
 }

@@ -28,7 +28,7 @@ export default class Puck {
     this.body.collisionFilter = {
        group: 0,
        category: 0x0002,
-       mask: 0x0001 | 0x0002,
+       mask: 0x0001 | 0x0002 | 0x0004,
     };
     World.add(this.world, this.body);
 
