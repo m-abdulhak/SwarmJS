@@ -122,14 +122,14 @@ export default class Robot {
         bodyA: this.body,
         bodyB: this.tailBody,
         length: 0,
-        stiffness: 0.9,
+        stiffness: 0.05,
         damping: 1.0,
         pointA: {x:-this.radius-tailLength, y:0},
         pointB: {x:-tailLength/2.0, y:0}
       });
 
       Composite.add(this.world, [this.body, this.tailBody, revoluteConstraint]);
-      //Composite.add(this.world, [this.body, this.tailBody, straighteningConstraint]);
+      Composite.add(this.world, [this.body, this.tailBody, straighteningConstraint]);
 
       // Tails belong to category 4, which should only collide with pucks,
       // category 2.  Everything else is in category 1, which collides with each
