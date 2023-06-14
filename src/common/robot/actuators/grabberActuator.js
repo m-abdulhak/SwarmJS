@@ -23,7 +23,7 @@ class GrabberActuator extends Actuator {
     const relativeAttachmentPoint = { x: this.robot.radius + puck.radius, y: 0 };
     const attachmentPoint = Vector.rotate(relativeAttachmentPoint, this.robot.body.angle);
 
-    // Set the state to the grapped puck
+    // Set the state to the grabbed puck
     this.state = puck;
 
     // Create a constraint between the robot and the puck, and add it to the world

@@ -46,8 +46,20 @@ export function controller(robot, params, onLoop, onInit) {
     }
   }
 
-  return (sensors) => {
+  return (sensors, actuators) => {
     sensors.potentialWaitTime = 0; // Putting this in 'sensors' to be visualized in renderables.js.
+
+    for (const f of (Object.values(robot.scene.fields || {}))) {
+      actuators.field.activate(
+        f,
+        [
+          [[255, 0, 255, 255], [255, 0, 255, 255], [255, 0, 255, 255]],
+          [[255, 0, 255, 255], [255, 0, 255, 255], [255, 0, 255, 255]],
+          [[255, 0, 255, 255], [255, 0, 255, 255], [255, 0, 255, 255]]
+        ],
+        robot.sensors.position
+      );
+    }
 
     const sensorReading = sensors.fields.readings.heatMap.forward;
     if (sensorReading) {

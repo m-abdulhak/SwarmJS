@@ -32,6 +32,7 @@
     "polygon-offset": "^0.3.1",
     "prop-types": "^15.7.2",
     "split-polygon": "^1.0.0",
+    "stackblur-canvas": "^2.6.0",
     "toposort": "^2.0.2"
   }
 }
