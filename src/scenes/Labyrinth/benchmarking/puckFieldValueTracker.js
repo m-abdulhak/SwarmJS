@@ -1,5 +1,5 @@
 import Tracker from '@common/benchmarking/performanceTrackers/tracker';
-import { sampleFieldAtPoint } from '@common/robot/sensors/sensorUtils';
+import { sampleFieldAtPoint } from '@common/utils/canvasUtils';
 
 class PuckFieldValueTracker extends Tracker {
   constructor(ideal_tau) {
