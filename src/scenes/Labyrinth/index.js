@@ -109,7 +109,6 @@ const simConfig = {
   env: {
     width: 1024,
     height: 540,
-    speed: 15,
     renderSkip: 3,
     fields: {
       heatMap: {
@@ -125,6 +124,9 @@ const simConfig = {
   robots: {
     count: 10,
     radius: 16,
+    params: {
+      velocityScale: 15
+    },
     controllers: {
       velocity: {
         controller

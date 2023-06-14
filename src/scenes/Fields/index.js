@@ -71,7 +71,7 @@ const simConfig = {
     effects: [
       {
         func: fieldDiffusion,
-        framesBetweenRuns: 10
+        framesBetweenRuns: 2
       }
     ]
   },
