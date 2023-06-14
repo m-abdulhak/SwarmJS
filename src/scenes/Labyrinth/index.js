@@ -12,33 +12,33 @@ import controller from './robot/controllers/controller';
 
 import PuckFieldValueTracker from './benchmarking/puckFieldValueTracker';
 
-import mapUrl from './labyrinth.png';
+import labyrinthUrl from './labyrinth.png';
+import travelTimeUrl from './travel_time_0.png';
+//import mapUrl from './black.png';
 
-// This constant defines the contour line of the scalar field around which the
-// robots will build.
-const tau = 0.6;
+const nSensorRegions = 8;
 
 const renderables = [
   { module: 'Scene', elements: SceneRenderables },
   { module: 'Puck', elements: PuckRenderables },
-  { module: 'Local', elements: [...LocalRenderables] }
+  { module: 'Robot', elements: [...LocalRenderables] }
 ];
+
+let circleSensorRegions = [];
+let deltaAngle = 2*Math.PI / nSensorRegions;
+
+for (let i=0; i<nSensorRegions; ++i) {
+  let angle = i * deltaAngle;
+  circleSensorRegions.push({
+      name: `index${i}`,
+      centre: { type: 'Polar', name: '0', coords: { distance: 20, angle: angle } },
+      radius: 4,
+      sensedTypes: ['pucks']
+    });
+}
 
 const usedSensors = {
   ...CoreSensors,
-  circles: {
-    ...ExtraSensors.circles,
-    params: {
-      regions: [
-        {
-          name: 'leftObstacle',
-          centre: { type: 'Polar', name: '0', coords: { distance: 6, angle: (- Math.PI / 4.0) } },
-          radius: 2,
-          sensedTypes: ['walls', 'robots']
-        }
-      ]
-    }
-  },
   fields: {
     ...ExtraSensors.fields,
     params: {
@@ -48,32 +48,32 @@ const usedSensors = {
           type: 'Cartesian',
           name: 'left',
           coords: {
-            x: 20,
-            y: 6
+            x: 5,
+            y: 4
           }
         },
         {
           type: 'Cartesian',
-          name: 'centreLeft',
+          name: 'centre',
           coords: {
-            x: 20,
-            y: 2
-          }
-        },
-        {
-          type: 'Cartesian',
-          name: 'centreRight',
-          coords: {
-            x: 20,
-            y: -2
+            x: 5,
+            y: 0 
           }
         },
         {
           type: 'Cartesian',
           name: 'right',
           coords: {
-            x: 20,
-            y: -6
+            x: 5,
+            y: -4
+          }
+        },
+        {
+          type: 'Cartesian',
+          name: 'edge',
+          coords: {
+            x: 0,
+            y: -14 
           }
         }
       ]
@@ -82,33 +82,25 @@ const usedSensors = {
   polygons: {
     ...ExtraSensors.polygons,
     params: {
-      // See the comments in FieldSensorExample for how to define points.
       regions:
             [
               {
-                name: 'left',
+                name: 'ahead',
                 vertices: [
-                  { type: 'Polar', name: '0', coords: { distance: 100, angle: (-1.0 * Math.PI) / 2 } },
-                  { type: 'Polar', name: '1', coords: { distance: 100, angle: (-0.75 * Math.PI) / 2 } },
-                  { type: 'Polar', name: '2', coords: { distance: 100, angle: (-0.5 * Math.PI) / 2 } },
-                  { type: 'Polar', name: '3', coords: { distance: 100, angle: (-0.25 * Math.PI) / 2 } },
-                  { type: 'Polar', name: '4', coords: { distance: 100, angle: (0.0 * Math.PI) / 2 } },
-                  { type: 'Cartesian', name: 'bottomRight', coords: { x: 0, y: 5 } }
+                  { type: 'Cartesian', name: '0', coords: { y: -10, x: 20 } },
+                  { type: 'Cartesian', name: '1', coords: { y: -10, x: 30 } },
+                  { type: 'Cartesian', name: '2', coords: { y:  10, x: 30 } },
+                  { type: 'Cartesian', name: '3', coords: { y:  10, x: 20 } }
                 ],
-                sensedTypes: ['pucks']
-              },
-              {
-                name: 'right',
-                vertices: [
-                  { type: 'Polar', name: '0', coords: { distance: 50, angle: (1.0 * Math.PI) / 2 } },
-                  { type: 'Polar', name: '1', coords: { distance: 50, angle: (0.75 * Math.PI) / 2 } },
-                  { type: 'Polar', name: '2', coords: { distance: 50, angle: (0.5 * Math.PI) / 2 } },
-                  { type: 'Polar', name: '3', coords: { distance: 50, angle: (0.25 * Math.PI) / 2 } },
-                  { type: 'Cartesian', name: 'bottomRight', coords: { x: 0, y: -5 } }
-                ],
-                sensedTypes: ['pucks']
+                sensedTypes: ['robots']
               }
             ]
+    }
+  },
+  circles: {
+    ...ExtraSensors.circles,
+    params: {
+      regions: circleSensorRegions
     }
   }
 };
@@ -118,34 +110,32 @@ const simConfig = {
     width: 1024,
     height: 540,
     speed: 15,
-    renderSkip: 1,
+    renderSkip: 3,
     fields: {
       heatMap: {
-        url: mapUrl,
+        url: labyrinthUrl,
         defaultBackground: true
+      },
+      travelTime: {
+        url: travelTimeUrl,
+        defaultBackground: false
       }
     }
   },
   robots: {
-    count: 1,
-    radius: 18,
+    count: 10,
+    radius: 16,
     controllers: {
       velocity: {
         controller
-        /*,
-        
-        WOULD LIKE TO PASS ALONG TAU AS A PARAMETER HERE BUT PASSING PARAMETERS
-        TO A VELOCITY CONTROLLER SEEMS TO HAVE BROKEN.
-
-        params: { tau: tau }
-        */
       }
     },
     sensors: [...Object.values(usedSensors)],
     actuators: [],
     useVoronoiDiagram: false,
     misc: {
-      tail: true
+      tail: true,
+      tailSlope: -1.5
     }
   },
   pucks: {
@@ -153,8 +143,8 @@ const simConfig = {
       {
         id: 0,
         count: 100,
-        radius: 8,
-        color: 'red'
+        radius: 5,
+        color: 'chartreuse'
       }
     ],
     useGlobalPuckMaps: false
@@ -179,39 +169,39 @@ const simConfig = {
 const benchmarkConfig = {
   simConfigs: [
     {
-      name: '5 Robots',
+      name: 'Tail Slope -1.5',
       simConfig: {
         robots: {
-          count: 5
+          misc: {
+            tail: true,
+            tailSlope: -1.5
+          }
         }
       }
     },
     {
-      name: '30 Robots',
+      name: 'Tail Slope 1.5',
       simConfig: {
         robots: {
-          count: 30
+          misc: {
+            tail: true,
+            tailSlope: 1.5
+          }
         }
       }
     }
   ],
-  trackers: [ new PuckFieldValueTracker(tau) ],
-  maxTimeStep: 20000,
+  trackers: [ new PuckFieldValueTracker(0) ],
+  maxTimeStep: 50000,
   timeStep: 100
 };
 
 const description = {
-  html: `<p>An implementation of the <b>Orbital Construction</b> algorithm which uses a scalar field to guide the construction of an enclosure.</p>
-
-  <p>The scalar field is just a grayscale image.  A parameter <b>tau</b> defines a contour line of the scalar field.  In this case, the contour line is a circle and <b>tau = 0.6</b> defines that circle's radius.</p>
-
-  <p>The <b style="color:cyan;">cyan robots</b> orbit the periphery, always trying to align themselves so that scalar field increases to their right.  They also try to reach the desired circle.  However, if they see a puck in their left sensor area, they will deviate to nudge it inwards.</p>
-
-  <p>The <b style="color:yellow;">yellow robots</b> operate similarly, except they react to pucks in their right sensor area and deviate to nudge them outwards.</p>
+  html: `<p>A planar construction algorithm where the robots are constrained to operate within a labyrinth.  The labyrinth encodes the direction in which objects should be pushed so that they are moved around the grey obstacle and join in the formation of the L shape on the left.</p>
 
   <p>
-  <a href=https://ieeexplore.ieee.org/document/8599547 target=_blank>
-  Vardy, Andrew. "Orbital construction: Swarms of simple robots building enclosures." 2018 IEEE 3rd International Workshops on Foundations and Applications of Self* Systems (FAS* W). IEEE, 2018.
+  <a href=https://link.springer.com/article/10.1007/s10015-022-00849-5 target=_blank>
+  Vardy, Andrew. "The swarm within the labyrinth: planar construction by a robot swarm." Artificial Life and Robotics 28, (2023): 117-126.
   </a>
   </p>
   `

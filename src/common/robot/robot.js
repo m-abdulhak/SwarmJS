@@ -85,56 +85,33 @@ export default class Robot {
 
     // Create Matter.js body and attach it to world
     let parts = [ Bodies.circle(position.x, position.y, this.radius) ]
+
+    if (this.tail) {
+      this.tailLength = 1.0*this.radius;
+
+      this.tailBody = Bodies.trapezoid(
+         position.x,
+         position.y - this.radius - this.tailLength/2.0,
+         this.radius / 5,
+         this.tailLength,
+         -this.tailSlope
+      );
+      Body.rotate(this.tailBody, -Math.PI/2.0, {x: position.x, y: position.y} );
+      Body.setDensity(this.tailBody, 0.00001);
+      parts.push(this.tailBody)
+    }
+
     const compoundBody = Body.create({
       parts: parts
     });
-
     this.body = compoundBody;
-
-    // We'll set the main body to category 1.
-    this.body.collisionFilter.group = 0;
-    this.body.collisionFilter.category = 0x0001;
-    this.body.collisionFilter.mask = 0x0001 | 0x0002;
-
-    if (this.tail) {
-      this.tailLength = 2.7*this.radius;
-
-      this.tailBody = Bodies.trapezoid(
-         position.x - this.radius - this.tailLength/2.0,
-         position.y,
-         this.tailLength,
-         this.radius / 5,
-         0
-      );
-      //Body.setAngle(this.tailBody, 0);
-
-      var revoluteConstraint = Constraint.create({
-        bodyA: this.body,
-        bodyB: this.tailBody,
-        length: 0,
-        stiffness: 0.9,
-        damping: 1.0,
-        pointA: {x:-this.radius, y:0},
-        pointB: {x:this.tailLength/2.0, y:0}
-      });
-
-      Composite.add(this.world, [this.body, this.tailBody, revoluteConstraint]);
-
-      // Tails belong to category 4, which should only collide with pucks,
-      // category 2.  Everything else is in category 1, which collides with each
-      // other and with pucks.
-      this.tailBody.collisionFilter.group = 0; // Group is set to 0 so that we use category/mask for collision filtering.
-      this.tailBody.collisionFilter.category = 0x0004;
-      this.tailBody.collisionFilter.mask = 0x0002;
-    }
 
     this.body.friction = 0;
     this.body.frictionAir = 0;
     this.body.frictionStatic = 0;
     this.body.restitution = 0;
 
-    //Body.setAngle(this.body, Math.random() * 2 * Math.PI); // Randomize orientations
-    Body.setAngle(this.body, 0);
+    Body.setAngle(this.body, Math.random() * 2 * Math.PI); // Randomize orientations
 
     World.add(this.world, this.body);
     Body.setAngularVelocity(this.body, 1);
@@ -253,34 +230,6 @@ export default class Robot {
     if (this.actuate && typeof this.actuate === 'function') {
       this.actuate(this.sensors, this.actuators, this.goal, newWaypoint);
     }
-
-    /* AN ACTIVE TAIL STRAIGHTENING FORCE.  THIS WORKS BUT SEEMS TO YIELD
-       UNSTABLE BEHAVIOUR.  FALLING OUT OF LOVE WITH Matter.js.
-    if (this.tailBody) {
-      // Parameters:
-      const TAIL_CORRECTION_FACTOR = 0.001;
-      const MAX_TAIL_CORRECTION_FORCE = 0.01;
-
-      let deltaAngle = getSmallestSignedAngularDifference(this.body.angle, this.tailBody.angle);
-      let magnitude = TAIL_CORRECTION_FACTOR * deltaAngle;
-      if (magnitude > MAX_TAIL_CORRECTION_FORCE) {
-        magnitude = MAX_TAIL_CORRECTION_FORCE;
-      } else if (magnitude < -MAX_TAIL_CORRECTION_FORCE) {
-        magnitude = -MAX_TAIL_CORRECTION_FORCE;
-      }
-      let forceVector = {
-        x: magnitude * Math.cos(this.tailBody.angle + Math.PI/2),
-        y: magnitude * Math.sin(this.tailBody.angle + Math.PI/2)
-      };
-
-      let position = {
-        x: this.tailBody.position.x + 0.5 * this.tailLength * Math.cos(this.tailBody.angle),
-        y: this.tailBody.position.y + 0.5 * this.tailLength * Math.sin(this.tailBody.angle)
-      };
-
-      Body.applyForce(this.tailBody, position, forceVector);
-    }
-    */
   }
 
   setVelocities({ linearVel, angularVel }) {

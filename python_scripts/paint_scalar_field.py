@@ -26,8 +26,8 @@ max_value = 255
 
 #width = 800
 #height = 600
-width = 600
-height = 400
+width = 1024
+height = 540
 
 cell_radius = 0#1#10
 cell_width = cell_radius * 2 + 1
@@ -103,7 +103,7 @@ image = np.zeros((height, width, 1), np.uint8)
 #paint(image, value_function_top, application_function_direct)
 #paint(image, value_function_top, application_function_probability)
 #paint(image, value_function_centre, application_function_probability)
-paint(image, value_function_centre, application_function_direct)
+#paint(image, value_function_centre, application_function_direct)
 #paint(image, value_function_segment, application_function_direct)
 
 print("Writing {}".format(filename))

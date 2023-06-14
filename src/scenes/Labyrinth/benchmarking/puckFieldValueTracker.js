@@ -16,7 +16,7 @@ class PuckFieldValueTracker extends Tracker {
 
       scene.pucks.forEach((p) => {
         let point = {x: Math.round(p.position.x), y: Math.round(p.position.y)};
-        const fieldValue = sampleFieldAtPoint(scene.fields.heatMap.src, point)[0] / 255.0;
+        const fieldValue = sampleFieldAtPoint(scene.fields.travelTime.src, point)[0] / 255.0;
         ssd += (fieldValue - ideal_tau) ** 2;
       });
 

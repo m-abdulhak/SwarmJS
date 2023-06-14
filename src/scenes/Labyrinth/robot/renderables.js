@@ -70,10 +70,8 @@ const bodyRenderables = [
             stroke: 'none'
         },
         dynamicAttrs: {
-            fill: 'rgb(0, 255, 0, 1.0)',
             points: { prop: 'tailBody.vertices',
               modifier: (vertices) => {
-                console.log(vertices);
                 var outputArray = [];
                 for (const [key, point] of Object.entries(vertices)) {
                   outputArray.push([point.x, point.y])
@@ -83,47 +81,42 @@ const bodyRenderables = [
           }
         },
         styles: {
-            fill: 'none',
+            fill: { prop: 'color' },
             stroke: 'black',
             'fill-opacity': 0,
             'stroke-width': 1,
             'stroke-opacity': 1
         }
-    }
+    },
+    {
+        type: 'Push Direction',
+        svgClass: '',
+        desc: 'Relative Goal Heading',
+        dataPoints: { sceneProp: 'robots' },
+        shape: 'path',
+        staticAttrs: {
+            id: { prop: 'id' }
+        },
+        dynamicAttrs: {
+            points: [
+                { prop: 'sensors.position' },
+                { prop: 'sensors.goalVis',
+                  modifier: (goal) => (goal ? goal : sensors.position) }
+            ]
+        },
+        styles: {
+            fill: 'none',
+            stroke: 'pink',
+            'stroke-width': 4,
+            'stroke-opacity': 1,
+            'fill-opacity': 1
+        }
+    },
 ];
 
 const sensorsRenderables = [
   {
-    type: 'Sensor',
-    svgClass: '',
-    desc: 'Left Obstacle Sensor',
-    shape: 'circle',
-    dataPoints: { sceneProp: 'robots' },
-    staticAttrs: {
-      r: {
-        prop: 'sensors.circles.leftObstacle.radius'
-      },
-      id: { prop: 'id' },
-      stroke: 'black'
-    },
-    dynamicAttrs: {
-      fill: {
-        prop: 'sensors.circles.leftObstacle.reading',
-        modifier: (val) => ((val.walls || val.robots) ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
-      },
-      cx: { prop: 'sensors.circles.leftObstacle.centre.x' },
-      cy: { prop: 'sensors.circles.leftObstacle.centre.y' }
-    },
-    styles: {
-      fill: 'none',
-      stroke: 'black',
-      'fill-opacity': 0,
-      'stroke-width': 1,
-      'stroke-opacity': 1
-    }
-  },
-  {
-      type: 'Sensor',
+      type: 'Field Sensors',
       svgClass: '',
       desc: 'Left Field Sensor',
       shape: 'circle',
@@ -147,9 +140,9 @@ const sensorsRenderables = [
       }
   },
   {
-      type: 'Sensor',
+      type: 'Field Sensors',
       svgClass: '',
-      desc: 'Centre Left Field Sensor',
+      desc: 'Centre Field Sensor',
       shape: 'circle',
       dataPoints: { sceneProp: 'robots' },
       staticAttrs: {
@@ -159,8 +152,8 @@ const sensorsRenderables = [
       dynamicAttrs: {
           stroke: 'none',
           fill: 'purple',
-          cx: { prop: 'sensors.fields.sensingPoints.centreLeft.x' },
-          cy: { prop: 'sensors.fields.sensingPoints.centreLeft.y' }
+          cx: { prop: 'sensors.fields.sensingPoints.centre.x' },
+          cy: { prop: 'sensors.fields.sensingPoints.centre.y' }
       },
       styles: {
           fill: 'none',
@@ -171,31 +164,7 @@ const sensorsRenderables = [
       }
   },
   {
-      type: 'Sensor',
-      svgClass: '',
-      desc: 'Centre Right Field Sensor',
-      shape: 'circle',
-      dataPoints: { sceneProp: 'robots' },
-      staticAttrs: {
-          r: 2,
-          id: { prop: 'id' }
-      },
-      dynamicAttrs: {
-          stroke: 'none',
-          fill: 'purple',
-          cx: { prop: 'sensors.fields.sensingPoints.centreRight.x' },
-          cy: { prop: 'sensors.fields.sensingPoints.centreRight.y' }
-      },
-      styles: {
-          fill: 'none',
-          stroke: 'black',
-          'fill-opacity': 0,
-          'stroke-width': 1,
-          'stroke-opacity': 1
-      }
-  },
-  {
-      type: 'Sensor',
+      type: 'Field Sensors',
       svgClass: '',
       desc: 'Right Field Sensor',
       shape: 'circle',
@@ -219,23 +188,20 @@ const sensorsRenderables = [
       }
   },
   {
-      type: 'Sensor',
+      type: 'Field Sensors',
       svgClass: '',
-      desc: 'Left Polygon Puck Sensor',
-      shape: 'polygon',
+      desc: 'Edge Field Sensor',
+      shape: 'circle',
       dataPoints: { sceneProp: 'robots' },
       staticAttrs: {
-          stroke: 'none',
+          r: 2,
+          id: { prop: 'id' }
       },
       dynamicAttrs: {
-          /*
-          stroke: {
-              prop: 'sensors.polygons.left.reading.pucks',
-              modifier: (val) => val ? `rgb(255, 0, 0, ${0.2*val}` : 'rgb(0, 0, 0, 0.1)'
-          },
-          */
-          fill: 'rgb(255, 255, 255, 0.05)',
-          points: { prop: 'sensors.polygons.left.vertices' }
+          stroke: 'none',
+          fill: 'pink',
+          cx: { prop: 'sensors.fields.sensingPoints.edge.x' },
+          cy: { prop: 'sensors.fields.sensingPoints.edge.y' }
       },
       styles: {
           fill: 'none',
@@ -246,35 +212,106 @@ const sensorsRenderables = [
       }
   },
   {
-      type: 'Sensor',
+      type: 'Other Robots Sensor',
       svgClass: '',
-      desc: 'Right Polygon Puck Sensor',
+      desc: 'Robot Ahead Sensor',
       shape: 'polygon',
       dataPoints: { sceneProp: 'robots' },
       staticAttrs: {
-          stroke: 'none'
+          stroke: 'none',
       },
       dynamicAttrs: {
-          /*
-          fill: {
-              prop: 'sensors.polygons.right.reading.pucks',
-              modifier: (val) => val ? `rgb(255, 0, 0, ${0.2*val}` : 'rgb(0, 0, 0, 0.1)'
+          stroke: {
+              prop: 'sensors.polygons.ahead.reading.robots',
+              modifier: (val) => val ? `white` : 'none'
           },
-          */
-          fill: 'rgb(255, 255, 255, 0.05)',
-          points: { prop: 'sensors.polygons.right.vertices' }
+          fill: 'rgb(255, 255, 0, 0.25)',
+          points: { prop: 'sensors.polygons.ahead.vertices' }
       },
       styles: {
           fill: 'none',
           stroke: 'black',
           'fill-opacity': 0,
-          'stroke-width': 1,
+          'stroke-width': 2,
           'stroke-opacity': 1
       }
+  },
+  {
+    type: 'State',
+    svgClass: 'robot-number-text',
+    desc: 'State',
+    shape: 'text',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      text: {
+        prop: 'id'
+      },
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      x: { prop: 'sensors.position.x' },
+      y: { prop: 'sensors.position.y', modifier: val => val + 30 },
+      text: {
+        prop: 'sensors.state',
+        modifier: (val) => {
+          return val;
+        }
+      }
+    },
+    styles: {
+      'text-anchor': 'middle',
+      'font-size': 12,
+      fill: 'white',
+      stroke: 'none',
+      'stroke-width': 1
+    }
   }
 ];
 
+const nSensorRegions = 8;
+let circleSensors = [];
+
+for (let i=0; i<nSensorRegions; ++i) {
+  circleSensors.push({
+    type: 'Puck Sensors',
+    svgClass: '',
+    desc: `${i} Circle Sensor`,
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: `sensors.circles.index${i}.radius`
+      },
+      id: { prop: 'id' },
+      stroke: 'black'
+    },
+    dynamicAttrs: {
+      fill: 'rgba(127,255,127,0.25)',
+      stroke: {
+        prop: `sensors.circles.index${i}.reading`,
+        modifier: function(val) {
+          if (val.pucks > 0) {
+            return 'white';
+          } else {
+            return 'none';
+          }
+        }
+      },
+      cx: { prop: `sensors.circles.index${i}.centre.x` },
+      cy: { prop: `sensors.circles.index${i}.centre.y` }
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'none',
+      'fill-opacity': 0,
+      'stroke-width': 2,
+      'stroke-opacity': 1
+    }
+  });
+}
+
 export default [
   ...bodyRenderables,
-  ...sensorsRenderables
+  ...sensorsRenderables,
+  ...circleSensors
 ];
