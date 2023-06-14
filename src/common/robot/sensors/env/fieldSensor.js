@@ -1,7 +1,8 @@
 /* eslint-disable no-console */
 import Sensor from '../sensor';
 import { sensorSamplingTypes, CoreSensors } from '../sensorManager';
-import { getSceneDefinedPointDefinitions, getSceneDefinedPoints, sampleFieldAtPoint } from '../sensorUtils';
+import { getSceneDefinedPointDefinitions, getSceneDefinedPoints } from '../sensorUtils';
+import { sampleFieldAtPoint } from '../../../utils/canvasUtils';
 
 const name = 'fields';
 
@@ -29,11 +30,11 @@ class FieldSensor extends Sensor {
       res[fieldKey] = {};
 
       Object.entries(this.sceneDefinedSensingPoints).forEach(([key, sensingPoint]) => {
-        if (!field.src) {
+        if (!field.context) {
           res[fieldKey][key] = null;
           return;
         }
-        const fieldValue = sampleFieldAtPoint(field.src, sensingPoint);
+        const fieldValue = sampleFieldAtPoint(field.context, sensingPoint);
         res[fieldKey][key] = fieldValue;
       });
     });

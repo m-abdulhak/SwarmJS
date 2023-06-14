@@ -119,7 +119,8 @@ const App = () => {
         }
 
         const imageElemOnload = (canvasElem, context) => {
-          field.src = context;
+          field.canvasElem = canvasElem;
+          field.context = context;
           fieldsElemRef?.current?.appendChild(canvasElem);
         };
 

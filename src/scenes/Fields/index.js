@@ -1,4 +1,5 @@
 import {
+  CoreActuators,
   CoreSensors,
   ExtraSensors,
   CorePositionsGenerators,
@@ -10,6 +11,7 @@ import SceneRenderables from '@common/scene/renderables';
 import RobotRenderables from './robot/renderables';
 
 import { controller, init } from './robot/controllers/controller';
+import fieldDiffusion from './scene/fieldsDiffusion';
 
 import mapUrl from './map.png';
 import mapUrl2 from './map2.png';
@@ -65,7 +67,13 @@ const simConfig = {
         url: mapUrl2,
         defaultBackground: true
       }
-    }
+    },
+    effects: [
+      {
+        func: fieldDiffusion,
+        framesBetweenRuns: 10
+      }
+    ]
   },
   robots: {
     count: 10,
@@ -81,7 +89,7 @@ const simConfig = {
       }
     },
     sensors: [...Object.values(usedSensors)],
-    actuators: [],
+    actuators: [CoreActuators.field],
     // The neighbors sensor doesn't work unless the Voronoi diagram is used.
     useVoronoiDiagram: true,
     misc: {

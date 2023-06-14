@@ -150,6 +150,17 @@ export default class Scene {
       }
     }
 
+    // Initializing the scene effects
+    this.effects = envConfig.effects ?? [];
+    if (this.effects?.length) {
+      for (const effConfig of this.effects) {
+        effConfig.framesSinceLastRun = 0;
+        if (effConfig.framesBetweenRuns == null) {
+          effConfig.framesBetweenRuns = 10;
+        }
+      }
+    }
+
     // drawMap(document.getElementById('mapCanvas'), this.distanceTransformMap, true);
     // drawMap(document.getElementById('mapCanvas'), this.puckMaps[2], this.puckMapScale, true);
 
@@ -233,6 +244,18 @@ export default class Scene {
 
     this.robots.forEach((r) => r.timeStep());
     this.pucks.forEach((p) => p.timeStep());
+
+    for (const effConfig of this.effects || []) {
+      if (effConfig.framesSinceLastRun >= effConfig.framesBetweenRuns) {
+        effConfig.framesSinceLastRun = 0;
+
+        if (effConfig.func && typeof effConfig.func === 'function') {
+          effConfig.func(this);
+        }
+      } else {
+        effConfig.framesSinceLastRun += 1;
+      }
+    }
 
     if (this.externalEngine) {
       const goalsMsg = {};

@@ -87,8 +87,7 @@ export const resetSimulation = (
 
   renderScene = () => {
     if (!scene.paused) {
-
-      for (let i=0; i<scene.renderSkip; i++) {
+      for (let i = 0; i < scene.renderSkip; i += 1) {
         scene.update();
         updateBench(scene, scene.timeInstance);
       }

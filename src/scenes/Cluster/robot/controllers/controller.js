@@ -13,7 +13,7 @@ export default function controller(robot, params, onLoop) {
 
   let state = ROBOT_STATE.MOVE_FORWARD;
   let stateTimeOut = 0;
-  let turnDir = 1; // 1 for clockwise, -1 for counter-clockwise
+  const turnDir = 1; // 1 for clockwise, -1 for counter-clockwise
 
   function enterTurnState(sensors, newTurnDir) {
     stateTimeOut = minTurnTime + (maxTurnTime - minTurnTime) * Math.random();
@@ -29,7 +29,6 @@ export default function controller(robot, params, onLoop) {
   }
 
   return (sensors, actuators) => {
-
     const grabbedPuck = actuators.grabber.getState();
 
     //
@@ -37,12 +36,14 @@ export default function controller(robot, params, onLoop) {
     //
     stateTimeOut -= 1;
 
-    if (state == ROBOT_STATE.MOVE_FORWARD) {
+    if (state === ROBOT_STATE.MOVE_FORWARD) {
       if (sensors.circles.left.reading.walls > 0 || sensors.circles.left.reading.robots > 0) {
         enterTurnState(sensors, 1);
       } else if (sensors.circles.right.reading.walls > 0 || sensors.circles.right.reading.robots > 0) {
         enterTurnState(sensors, -1);
-      } else if (!grabbedPuck && sensors.polygons.inner.reading.pucks == 1 && sensors.polygons.outer.reading.pucks == 0) {
+      } else if (
+        !grabbedPuck && sensors.polygons.inner.reading.pucks === 1 && sensors.polygons.outer.reading.pucks == 0
+      ) {
         robot.actuators.grabber.activate();
         // No need to change state.
       } else if (!grabbedPuck && sensors.polygons.inner.reading.pucks > 0 && sensors.polygons.outer.reading.pucks > 0) {
@@ -52,8 +53,7 @@ export default function controller(robot, params, onLoop) {
         robot.actuators.grabber.deactivate();
         enterTurnState(sensors, Math.random() < 0.5 ? -1 : 1);
       }
-
-    } else if (state == ROBOT_STATE.TURN) {
+    } else if (state === ROBOT_STATE.TURN) {
       if (stateTimeOut <= 0) {
         state = ROBOT_STATE.MOVE_FORWARD;
       }
