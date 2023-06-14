@@ -21,13 +21,15 @@ export default class Puck {
     // Create Matter.js body and attach it to world
     this.body = Bodies.circle(position.x, position.y, this.radius);
     // this.body.friction = 0;
-    this.body.frictionAir = 1;
+    this.body.frictionAir = 0.5;
     // this.body.frictionStatic = 0;
     // this.body.restitution = 0;
+    //Body.setDensity(this.body, 0.001);
+
     // this.body.collisionFilter = {
-    //   group: -1,
-    //   category: 1,
-    //   mask: 1,
+    //    group: 0,
+    //    category: 0x0002,
+    //    mask: 0x0001 | 0x0002 | 0x0004,
     // };
     World.add(this.world, this.body);
 

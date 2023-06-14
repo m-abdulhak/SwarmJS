@@ -12,6 +12,35 @@ export function normalizeAngle(angle) {
   return angle % (2 * Math.PI);
 }
 
+export function normalizeAnglePlusMinusPi(a) {
+  // BAD: These loops should be replaced.
+  while (a > Math.PI) {
+    a -= 2 * Math.PI;
+  }
+  while (a <= -Math.PI) {
+    a += 2 * Math.PI;
+  }
+  return a;
+}
+
+export function getAngularDifference(angleA, angleB) {
+    angleA = normalizeAnglePlusMinusPi(angleA);
+    angleB = normalizeAnglePlusMinusPi(angleB);
+    let error = Math.abs(angleA - angleB);
+    if (error > Math.PI) {
+        error -= Math.PI * 2;
+        error = Math.abs(error);
+    }
+    return error;
+}
+
+export function getSmallestSignedAngularDifference(a, b) {
+    /* Return angle between the two given angles with the smallest absolute
+       value.  Meanwhile, the value returned will have a sign. */
+    // From: https://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
+    return Math.atan2(Math.sin(a-b), Math.cos(a-b))
+}
+
 /*
 * Calculates the angle ABC (in radians)
 *
