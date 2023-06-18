@@ -14,7 +14,7 @@ import PuckFieldValueTracker from './benchmarking/puckFieldValueTracker';
 
 import labyrinthUrl from './labyrinth.png';
 import travelTimeUrl from './travel_time_0.png';
-//import mapUrl from './black.png';
+// import mapUrl from './black.png';
 
 const nSensorRegions = 8;
 
@@ -24,17 +24,18 @@ const renderables = [
   { module: 'Robot', elements: [...LocalRenderables] }
 ];
 
-let circleSensorRegions = [];
-let deltaAngle = 2*Math.PI / nSensorRegions;
+const circleSensorRegions = [];
+const deltaAngle = (2 * Math.PI) / nSensorRegions;
 
-for (let i=0; i<nSensorRegions; ++i) {
-  let angle = i * deltaAngle;
+// eslint-disable-next-line no-plusplus
+for (let i = 0; i < nSensorRegions; ++i) {
+  const angle = i * deltaAngle;
   circleSensorRegions.push({
-      name: `index${i}`,
-      centre: { type: 'Polar', name: '0', coords: { distance: 20, angle: angle } },
-      radius: 4,
-      sensedTypes: ['pucks']
-    });
+    name: `index${i}`,
+    centre: { type: 'Polar', name: '0', coords: { distance: 20, angle } },
+    radius: 4,
+    sensedTypes: ['pucks']
+  });
 }
 
 const usedSensors = {
@@ -57,7 +58,7 @@ const usedSensors = {
           name: 'centre',
           coords: {
             x: 5,
-            y: 0 
+            y: 0
           }
         },
         {
@@ -73,7 +74,7 @@ const usedSensors = {
           name: 'edge',
           coords: {
             x: 0,
-            y: -14 
+            y: -14
           }
         }
       ]
@@ -89,8 +90,8 @@ const usedSensors = {
                 vertices: [
                   { type: 'Cartesian', name: '0', coords: { y: -10, x: 20 } },
                   { type: 'Cartesian', name: '1', coords: { y: -10, x: 30 } },
-                  { type: 'Cartesian', name: '2', coords: { y:  10, x: 30 } },
-                  { type: 'Cartesian', name: '3', coords: { y:  10, x: 20 } }
+                  { type: 'Cartesian', name: '2', coords: { y: 10, x: 30 } },
+                  { type: 'Cartesian', name: '3', coords: { y: 10, x: 20 } }
                 ],
                 sensedTypes: ['robots']
               }
@@ -109,15 +110,17 @@ const simConfig = {
   env: {
     width: 1024,
     height: 540,
-    renderSkip: 3,
+    renderSkip: 5,
     fields: {
       heatMap: {
         url: labyrinthUrl,
-        defaultBackground: true
+        defaultBackground: true,
+        title: 'Heat Map'
       },
       travelTime: {
         url: travelTimeUrl,
-        defaultBackground: false
+        defaultBackground: false,
+        title: 'Travel Time'
       }
     }
   },
@@ -173,6 +176,9 @@ const benchmarkConfig = {
     {
       name: 'Tail Slope -1.5',
       simConfig: {
+        env: {
+          renderSkip: 50
+        },
         robots: {
           misc: {
             tail: true,
@@ -184,6 +190,9 @@ const benchmarkConfig = {
     {
       name: 'Tail Slope 1.5',
       simConfig: {
+        env: {
+          renderSkip: 50
+        },
         robots: {
           misc: {
             tail: true,
@@ -193,7 +202,7 @@ const benchmarkConfig = {
       }
     }
   ],
-  trackers: [ new PuckFieldValueTracker(0) ],
+  trackers: [new PuckFieldValueTracker(0)],
   maxTimeStep: 50000,
   timeStep: 100
 };

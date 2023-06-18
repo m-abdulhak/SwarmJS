@@ -61,11 +61,13 @@ const simConfig = {
     renderSkip: 1,
     fields: {
       heatMap: {
-        url: mapUrl
+        url: mapUrl,
+        title: 'Heat Map'
       },
       field2: {
         url: mapUrl2,
-        defaultBackground: true
+        defaultBackground: true,
+        title: 'Field 2'
       }
     },
     effects: [

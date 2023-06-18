@@ -72,7 +72,8 @@ const simConfig = {
     background: mapUrl,
     fields: {
       heatMap: {
-        url: mapUrl
+        url: mapUrl,
+        title: 'Heat Map'
       }
     }
   },

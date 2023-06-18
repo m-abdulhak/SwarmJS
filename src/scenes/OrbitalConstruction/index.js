@@ -114,7 +114,8 @@ const simConfig = {
     fields: {
       heatMap: {
         url: mapUrl,
-        defaultBackground: true
+        defaultBackground: true,
+        title: 'Heat Map'
       }
     }
   },

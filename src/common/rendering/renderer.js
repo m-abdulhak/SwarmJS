@@ -45,6 +45,8 @@ export const toggleElementEnabled = (element) => {
   setElementEnabled(element, !curState);
 };
 
+export const isElementEnabled = (element) => activeElements.includes(element);
+
 export function initialize(svg, scene, renderables) {
   if (svg) {
     svg.selectAll('*').remove();
@@ -112,9 +114,11 @@ export const resetRenderer = () => {
   resetOnNextRender = true;
 };
 
-export const createFieldCanvas = (fieldKey, field, onLoadCallback) => {
+const getCanvasIdForField = (fieldTitle) => `field-${fieldTitle.split(' ').join('-').toLowerCase()}-canvas`;
+
+export const createFieldCanvas = (field, onLoadCallback) => {
   const canvasElem = document.createElement('canvas');
-  canvasElem.id = `field-${fieldKey}-canvas`;
+  canvasElem.id = getCanvasIdForField(field.title);
   canvasElem.style.position = 'absolute';
   canvasElem.style.top = 0;
   canvasElem.style.left = 0;
@@ -141,7 +145,7 @@ export const createFieldCanvas = (fieldKey, field, onLoadCallback) => {
   return canvasElem;
 };
 
-export const changeBackgroundField = (elem) => {
+export const changeBackgroundField = (elem, fieldTitle) => {
   if (!elem) {
     return;
   }
@@ -152,7 +156,15 @@ export const changeBackgroundField = (elem) => {
   }
 
   const curBG = children.findIndex((x) => !x.classList.contains('hidden'));
-  const newBG = (curBG + 1) % children.length;
+
+  let newBG;
+  if (fieldTitle != null) {
+    newBG = children.findIndex((x) => x.id === getCanvasIdForField(fieldTitle));
+  }
+
+  if (!newBG) {
+    newBG = (curBG + 1) % children.length;
+  }
 
   if (curBG >= 0) {
     children[curBG].classList.add('hidden');
