@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable no-eval */
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import AceEditor from 'react-ace';
 import IconButton from '@mui/material/IconButton';
@@ -18,11 +18,25 @@ function CodeEditorSection({
   title,
   code,
   setCode,
-  defaultCode
+  defaultCode,
+  getDefaultCode,
+  foldAll
 }) {
+  const editorRef = useRef(null);
+
   const resetCode = () => {
-    setCode(defaultCode);
+    if (getDefaultCode && typeof getDefaultCode === 'function') {
+      setCode(getDefaultCode());
+    } else {
+      setCode(defaultCode);
+    }
   };
+
+  useEffect(() => {
+    if (foldAll) {
+      editorRef.current.editor.session.foldAll(1, editorRef.current.editor.session.doc.getAllLines().length);
+    }
+  }, [code]);
 
   return (
     <Grid container item xs={12} md={12} lg={12} spacing={1}>
@@ -35,7 +49,7 @@ function CodeEditorSection({
       </Grid>
       <Grid item xs={2} md={1} lg={1}>
         <div className='code-editor-btn-container'>
-          <Tooltip title="Reset Code">
+          <Tooltip title="Reset">
             <IconButton
               color="secondary"
               onClick={() => resetCode()}
@@ -47,10 +61,9 @@ function CodeEditorSection({
       </Grid>
       <Grid item xs={12} md={12}>
         <AceEditor
+          ref={editorRef}
           className='code-editor'
-          name="robot-controller-code-editor"
-          placeholder="Robot Controller Code"
-          value={code ?? defaultCode}
+          value={code || defaultCode}
           onChange={(newCode) => setCode(newCode)}
           fontSize={16}
           mode='javascript'
@@ -73,7 +86,9 @@ CodeEditorSection.propTypes = {
   title: PropTypes.string,
   code: PropTypes.string,
   setCode: PropTypes.func,
-  defaultCode: PropTypes.string
+  defaultCode: PropTypes.string,
+  getDefaultCode: PropTypes.func,
+  foldAll: PropTypes.bool
 };
 
 export default CodeEditorSection;

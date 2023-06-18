@@ -14,6 +14,8 @@ const Options = ({
     <TitledSlider
       title='Render Skip'
       value={renderSkip}
+      minValue={1}
+      maxValue={100}
       setValue={setRenderSkip}
       tooltTip='Number of simulation steps to run between frames, speeds up simulation but can cause app lag.'
     />

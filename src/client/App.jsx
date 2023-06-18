@@ -23,7 +23,7 @@ import {
   uniqueRenderingElements,
   resetRenderer,
   setElementEnabled,
-  toggleElementEnabled,
+  isElementEnabled,
   createFieldCanvas,
   changeBackgroundField
 } from '@common/rendering/renderer';
@@ -33,21 +33,26 @@ import TabContainer from './components/Layouts/TabContainer';
 import Options from './components/Options/index';
 import Benchmark from './components/Benchmark';
 import CodeEditor from './components/Editors/CodeEditor';
+import DebugPanel from './components/Debug';
 import TitledSlider from './components/Inputs/TitledSlider';
+import CodeEditorSection from './components/Editors/CodeEditor/CodeEditorSection';
 
 import exampleConfigs from '../scenes';
 
+import { getSceneFromUrlQuery } from './utils';
+
 const options = Object.values(exampleConfigs).map((v) => ({
-  label: v.title, value: v.name
+  label: v.title,
+  value: v.name
 }));
 
 const App = () => {
   const [loading, setLoading] = useState(true);
-  const [selectedScene, setSelectedScene] = useState(options[0].value);
+  const [selectedScene, setSelectedScene] = useState(getSceneFromUrlQuery(options));
   const [config, setConfig] = useState(exampleConfigs[selectedScene].simConfig);
   const [benchSettings, setBenchSettings] = useState(exampleConfigs[selectedScene].benchmarkConfig);
   const [description, setDescription] = useState(exampleConfigs[selectedScene].description);
-  const [uiEnabled, setUiEnabled] = useState(true);
+  const [uiEnabled, setUiEnabled] = useState(false);
   const [time, setTime] = useState(0);
   const [robotParams, setRobotParams] = useState({ velocityScale: 1 });
   const [renderSkip, setRenderSkip] = useState(1);
@@ -55,6 +60,11 @@ const App = () => {
   const [benchmarkData, setBenchmarkData] = useState({});
   const svgRef = useRef(null);
   const fieldsElemRef = useRef(null);
+
+  const availableFieldTitles = Object.values(exampleConfigs[selectedScene]?.simConfig?.env?.fields || {})
+    .map((field) => field.title);
+
+  const [selectedBackgroundField, setSelectedBackgroundField] = useState(availableFieldTitles?.[0] ?? null);
 
   // User Defined Robot Velocity Controller
   const [defaultOnLoopCode, setDefaultOnLoopCode] = useState('');
@@ -102,7 +112,7 @@ const App = () => {
     }
 
     resetSimulation(usedConfig, onUpdate, setDefaultOnLoopCode, setDefaultOnInitCode);
-    onRobotParamsChange({ velocityScale: newConfig.robots.params.velocityScale });
+    onRobotParamsChange({ velocityScale: newConfig?.robots?.params?.velocityScale || 1 });
     onRenderSkipChange(newConfig.env.renderSkip);
     setPaused(false);
     resetRenderer();
@@ -111,11 +121,19 @@ const App = () => {
       fieldsElemRef.current.innerHTML = '';
     }
 
-    if (newConfig.env.fields && typeof newConfig.env.fields === 'object') {
+    if (
+      newConfig.env.fields
+      && typeof newConfig.env.fields === 'object'
+      && Object.keys(newConfig.env.fields).length > 0
+    ) {
       for (const [fieldKey, field] of Object.entries(newConfig.env.fields)) {
         if (!field.url) {
           console.error(`Field ${fieldKey} has no url!`);
           return;
+        }
+
+        if (!field.title) {
+          field.title = fieldKey;
         }
 
         const imageElemOnload = (canvasElem, context) => {
@@ -124,9 +142,11 @@ const App = () => {
           fieldsElemRef?.current?.appendChild(canvasElem);
         };
 
-        createFieldCanvas(fieldKey, field, imageElemOnload);
+        createFieldCanvas(field, imageElemOnload);
       }
     }
+
+    setSelectedBackgroundField(Object.values(newConfig?.env?.fields || {})?.[0]?.title ?? null);
   };
 
   const onTogglePause = () => {
@@ -153,10 +173,10 @@ const App = () => {
   const initialized = simulationIsInitialized();
 
   const selectElem = (
-    <div id='simulation-selection'>
+    <div id='scene-selection'>
       <p>Scene: </p>
       <Select
-        id='simulation-select'
+        id='scene-select'
         name={selectedScene.label}
         value={selectedScene}
         onChange={(event) => {
@@ -190,7 +210,14 @@ const App = () => {
         setValue={(newV) => onRobotParamsChange({ velocityScale: newV })}
         tooltTip='Controls robots velocity, only works when supported in robot controller.'
       />
-      <p> TODO: Change other runtime parameters, simulation configuration, and benchmarking configuration.</p>
+      <CodeEditorSection
+        title='Scene Configuration'
+        code={JSON.stringify(config, null, 2)}
+        setCode={() => {
+          // TODO: update current configuration
+        }}
+      />
+      {/* <p> TODO: Change other runtime parameters, simulation configuration, and benchmarking configuration.</p> */}
     </>
   );
 
@@ -222,7 +249,16 @@ const App = () => {
     { label: 'Options', content: optionsElem },
     { label: 'Configuration', content: configurationsElem },
     { label: 'Benchmark', content: benchElem },
-    { label: 'Controller', content: controllerCodeEditor }
+    { label: 'Controller', content: controllerCodeEditor },
+    {
+      label: 'Debug',
+      content: (
+        <DebugPanel
+          title='Scene State'
+          getSceneState={() => window.scene}
+        />
+      )
+    }
   ];
 
   const ui = uiEnabled ? (
@@ -242,12 +278,22 @@ const App = () => {
     <div style={{ width: '100%' }}>
       {selectElem}
       <QuickActions
-        toggleElementEnabled={toggleElementEnabled}
+        setElementEnabled={setElementEnabled}
+        isElementEnabled={isElementEnabled}
+        renderSkip={renderSkip}
+        setRenderSkip={onRenderSkipChange}
         setUiEnabled={setUiEnabled}
         uiEnabled={uiEnabled}
-        changeBackground={() => changeBackgroundField(fieldsElemRef.current)}
+        changeBackground={(fieldTitle) => {
+          setSelectedBackgroundField(fieldTitle);
+          changeBackgroundField(fieldsElemRef.current, fieldTitle);
+        }}
+        setSelectedBackgroundField={setSelectedBackgroundField}
+        availableFields={availableFieldTitles}
+        selectedBackgroundField={selectedBackgroundField}
         reset={reset}
         onTogglePause={onTogglePause}
+        paused={paused}
         time={time}
         benchmarkData={benchmarkData}
         simConfig={config}
