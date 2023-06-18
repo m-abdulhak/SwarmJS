@@ -85,6 +85,12 @@ export const resetSimulation = (
     gMaps
   );
 
+  // Make scene globally available if running in browser.
+  // This is useful for debugging.
+  if (window) {
+    window.scene = scene;
+  }
+
   renderScene = () => {
     if (!scene.paused) {
       for (let i = 0; i < scene.renderSkip; i += 1) {

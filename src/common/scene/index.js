@@ -214,7 +214,7 @@ export default class Scene {
     this.setRobotParams.bind(this);
     this.setRenderSkip.bind(this);
 
-    this.setRobotParams({ velocityScale: robotsConfig.params.velocityScale });
+    this.setRobotParams({ velocityScale: robotsConfig?.params?.velocityScale || 1 });
     this.setRenderSkip(envConfig.renderSkip);
   }
 

@@ -15,7 +15,7 @@ import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 
 import CodeEditorSection from './CodeEditorSection';
-import downLoadTextAsFile from '../../../utils/download';
+import { downLoadTextAsFile } from '../../../utils';
 
 import 'ace-builds/webpack-resolver';
 import 'ace-builds/src-noconflict/mode-javascript';
