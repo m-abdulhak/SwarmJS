@@ -1,6 +1,6 @@
 import { Body, World, Bodies, Composite, Constraint } from 'matter-js';
 
-import { getDistance, getSmallestSignedAngularDifference } from '../utils/geometry';
+import { getDistance } from '../utils/geometry';
 
 import SensorManager from './sensors/sensorManager';
 import ActuatorManager from './actuators/actuatorsManager';
@@ -29,8 +29,8 @@ const getController = (robot, controllerDef) => {
       onLoop = controllerDef.onLoop;
     }
 
-    if (controllerDef.onInit) {
-      onInit = controllerDef.onInit;
+    if (controllerDef.init) {
+      onInit = controllerDef.init;
     }
   }
 

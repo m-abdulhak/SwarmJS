@@ -200,6 +200,9 @@
     font-size: 1rem;
     line-height: 1.6;
     letter-spacing: 0.0075em;
+    -webkit-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.25) inset;
+    -moz-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.25) inset;
+    box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.25) inset;
 }
 
 #scene-description :first-child {

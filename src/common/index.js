@@ -67,7 +67,12 @@ export const resetSimulation = (
   }
 
   if (velocityControllerInit && setDefaultOnInitCode && typeof setDefaultOnInitCode === 'function') {
-    const defaultOnInitCode = parseFunctionToEditorCode(velocityControllerInit);
+    let defaultOnInitCode = velocityControllerInit;
+
+    if (typeof defaultOnInitCode === 'function') {
+      defaultOnInitCode = parseFunctionToEditorCode(velocityControllerInit);
+    }
+
     setDefaultOnInitCode(defaultOnInitCode);
   }
 

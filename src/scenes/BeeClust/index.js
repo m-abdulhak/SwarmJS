@@ -8,7 +8,7 @@ import SceneRenderables from '@common/scene/renderables';
 
 import RobotRenderables from './robot/renderables';
 
-import controller from './robot/controllers/controller';
+import { init, controller } from './robot/controllers/controller';
 
 import DistanceToGoalTracker from './benchmarking/distanceToGoalTracker';
 
@@ -85,6 +85,7 @@ const simConfig = {
     },
     controllers: {
       velocity: {
+        init,
         controller,
         params: { angularVelocityScale: 0.001 }
       }

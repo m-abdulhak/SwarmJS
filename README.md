@@ -148,3 +148,5 @@ Any property can be one of the following:
 - add info about adding background image to scenes 
 - add info about fields and field sensor
 - add info about user-defined controller 
+- add info about external connection
+- add info about render skip and disable rendering

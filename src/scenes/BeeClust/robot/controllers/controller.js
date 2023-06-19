@@ -1,35 +1,62 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable default-param-last */
 /* eslint-disable no-eval */
-export default function controller(robot, { theta = 0.1 } = {}, onLoop) {
-  // PARAMETERS:
-  const maxAngularSpeed = 0.1;
-  const maxForwardSpeed = 5;
-  const minNearbyNeighborsToTriggerWait = 1;
-  const minTurnTime = 5;
-  const maxTurnTime = 10;
-  const maxWaitTime = 100;
-  const tempShift = 0.75;
 
-  const ROBOT_STATE = {
+export function init(CONST, VAR, FUNC, robot) {
+  // PARAMETERS:
+  CONST.maxAngularSpeed = 0.1;
+  CONST.maxForwardSpeed = 5;
+  CONST.minNearbyNeighborsToTriggerWait = 1;
+  CONST.minTurnTime = 5;
+  CONST.maxTurnTime = 10;
+  CONST.maxWaitTime = 100;
+  CONST.tempShift = 0.75;
+
+  CONST.ROBOT_STATE = {
     MOVE_FORWARD: 'MOVE_FORWARD',
     TURN: 'TURN',
     WAIT: 'WAIT'
   };
 
-  let state = ROBOT_STATE.MOVE_FORWARD;
-  let stateTimeOut = 0;
-  let turnDir = 1; // 1 for clockwise, -1 for counter-clockwise
+  VAR.state = CONST.ROBOT_STATE.MOVE_FORWARD;
+  VAR.timeOut = 0;
+  VAR.turnDir = 1; // 1 for clockwise, -1 for counter-clockwise
 
-  function enterTurnState(sensors) {
-    stateTimeOut = minTurnTime + (maxTurnTime - minTurnTime) * Math.random();
+  FUNC.enterTurnState = (sensors) => {
+    VAR.timeOut = CONST.minTurnTime + (CONST.maxTurnTime - CONST.minTurnTime) * Math.random();
     if (sensors.circles.left.reading.walls > 0) {
-      turnDir = 1;
+      VAR.turnDir = 1;
     } else if (sensors.circles.right.reading.walls > 0) {
-      turnDir = -1;
+      VAR.turnDir = -1;
     } else {
-      turnDir = Math.random() < 0.5 ? -1 : 1;
+      VAR.turnDir = Math.random() < 0.5 ? -1 : 1;
     }
-    state = ROBOT_STATE.TURN;
+    VAR.state = CONST.ROBOT_STATE.TURN;
+  };
+}
+
+export function controller(robot, { theta = 0.1 } = {}, onLoop, onInit) {
+  // Object that contains constants
+  const CONST = {};
+
+  // Object that contains variables
+  const VAR = {};
+
+  // Object that contains functions
+  const FUNC = {};
+
+  let initFunc = () => {};
+  if (onInit) {
+    const userDefinedInitFunc = eval(onInit);
+
+    if (userDefinedInitFunc && typeof userDefinedInitFunc === 'function') {
+      initFunc = userDefinedInitFunc;
+    }
   }
+
+  initFunc(CONST, VAR, FUNC, robot);
+
+  Object.freeze(CONST);
 
   if (onLoop) {
     const func = eval(onLoop);
@@ -43,8 +70,6 @@ export default function controller(robot, { theta = 0.1 } = {}, onLoop) {
     // Putting this in 'sensors' to be visualized in renderables.js.
     sensors.potentialWaitTime = 0;
 
-    console.log(sensors);
-
     const sensorReading = sensors.fields.readings.heatMap.forward;
     if (sensorReading) {
       const temperatureScaled = sensorReading[0] / 256;
@@ -55,46 +80,52 @@ export default function controller(robot, { theta = 0.1 } = {}, onLoop) {
 
       // The following shifts the wait-time function to the right, making
       // it 0 for all values below tempShift.
-      if (temperatureScaled < tempShift) {
+      if (temperatureScaled < CONST.tempShift) {
         sensors.potentialWaitTime = 0;
       } else {
-        sensors.potentialWaitTime = Math.ceil(maxWaitTime * (temperatureScaled - tempShift) ** 2 / ((temperatureScaled - tempShift) ** 2 + theta));
+        sensors.potentialWaitTime = Math.ceil(
+          (CONST.maxWaitTime * (temperatureScaled - CONST.tempShift) ** 2)
+          / ((temperatureScaled - CONST.tempShift) ** 2 + theta)
+        );
       }
     }
 
     //
     // State transitions...
     //
-    stateTimeOut -= 1;
+    VAR.timeOut -= 1;
 
-    if (state == ROBOT_STATE.MOVE_FORWARD) {
+    if (VAR.state === CONST.ROBOT_STATE.MOVE_FORWARD) {
       if (sensors.circles.left.reading.walls > 0 || sensors.circles.right.reading.walls > 0) {
-        enterTurnState(sensors);
-      } else if (sensors.circles.ahead.reading.robots >= minNearbyNeighborsToTriggerWait && sensors.potentialWaitTime > 0) {
-        stateTimeOut = sensors.potentialWaitTime;
-        state = ROBOT_STATE.WAIT;
+        FUNC.enterTurnState(sensors);
+      } else if (
+        sensors.circles.ahead.reading.robots >= CONST.minNearbyNeighborsToTriggerWait
+        && sensors.potentialWaitTime > 0
+      ) {
+        VAR.timeOut = sensors.potentialWaitTime;
+        VAR.state = CONST.ROBOT_STATE.WAIT;
       }
-    } else if (state == ROBOT_STATE.TURN) {
-      if (stateTimeOut <= 0) {
-        state = ROBOT_STATE.MOVE_FORWARD;
+    } else if (VAR.state === CONST.ROBOT_STATE.TURN) {
+      if (VAR.timeOut <= 0) {
+        VAR.state = CONST.ROBOT_STATE.MOVE_FORWARD;
       }
-    } else if (state == ROBOT_STATE.WAIT) {
-      if (stateTimeOut <= 0) {
-        enterTurnState(sensors);
+    } else if (VAR.state === CONST.ROBOT_STATE.WAIT) {
+      if (VAR.timeOut <= 0) {
+        FUNC.enterTurnState(sensors);
       }
     }
 
     //
-    // Actions based on current state
+    // Actions based on current VAR.state
     //
     let forwardSpeed = 0;
     let angularSpeed = 0;
-    if (state === ROBOT_STATE.MOVE_FORWARD) {
+    if (VAR.state === CONST.ROBOT_STATE.MOVE_FORWARD) {
       // Go full speed ahead.
-      forwardSpeed = maxForwardSpeed;
-    } else if (state === ROBOT_STATE.TURN) {
-      angularSpeed = turnDir * maxAngularSpeed;
-    } else if (state === ROBOT_STATE.WAIT) {
+      forwardSpeed = CONST.maxForwardSpeed;
+    } else if (VAR.state === CONST.ROBOT_STATE.TURN) {
+      angularSpeed = VAR.turnDir * CONST.maxAngularSpeed;
+    } else if (VAR.state === CONST.ROBOT_STATE.WAIT) {
       // Keep the default speeds of 0, 0.
     }
 

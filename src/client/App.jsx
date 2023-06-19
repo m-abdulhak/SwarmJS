@@ -107,7 +107,7 @@ const App = () => {
         usedConfig.robots.controllers.velocity.onLoop = onLoopCode;
       }
       if (onInitCode) {
-        usedConfig.robots.controllers.velocity.onInit = onInitCode;
+        usedConfig.robots.controllers.velocity.init = onInitCode;
       }
     }
 
@@ -201,7 +201,6 @@ const App = () => {
     />
   ) : <></>;
 
-  // TODO: Add a TreeView component to set Simulation and Benchmarking options
   const configurationsElem = (
     <>
       <TitledSlider
@@ -216,6 +215,7 @@ const App = () => {
         setCode={() => {
           // TODO: update current configuration
         }}
+        foldAll
       />
       {/* <p> TODO: Change other runtime parameters, simulation configuration, and benchmarking configuration.</p> */}
     </>
