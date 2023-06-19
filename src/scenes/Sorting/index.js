@@ -47,7 +47,8 @@ const simConfig = {
       velocity: {
         controller: CoreControllers.velocity.diffVelocityController,
         params: { angularVelocityScale: 0.001 }
-      }
+      },
+      supportsUserDefinedControllers: false
     },
     sensors: [...Object.values(CoreSensors), ...Object.values(ExtraSensors)],
     actuators: [CoreActuators.grabber],

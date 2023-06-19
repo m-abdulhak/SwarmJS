@@ -54,21 +54,24 @@ export const initializeSimulation = (config, updateCB) => {
 export const resetSimulation = (
   config,
   updateCallback,
-  setDefaultOnLoopCode,
-  setDefaultOnInitCode
+  updateControllerCode
 ) => {
   console.log('Resetting Sim With Config: ', config);
   const velocityController = config?.robots?.controllers?.velocity?.controller;
   const velocityControllerInit = config?.robots?.controllers?.velocity?.init;
 
-  if (velocityController && setDefaultOnLoopCode && typeof setDefaultOnLoopCode === 'function') {
-    const defaultOnLoopCode = parseFunctionToEditorCode(velocityController());
-    setDefaultOnLoopCode(defaultOnLoopCode);
+  let defaultOnInitCode = velocityControllerInit;
+  if (defaultOnInitCode && typeof defaultOnInitCode === 'function') {
+    defaultOnInitCode = parseFunctionToEditorCode(defaultOnInitCode);
   }
 
-  if (velocityControllerInit && setDefaultOnInitCode && typeof setDefaultOnInitCode === 'function') {
-    const defaultOnInitCode = parseFunctionToEditorCode(velocityControllerInit);
-    setDefaultOnInitCode(defaultOnInitCode);
+  let defaultOnLoopCode;
+  if (velocityController && typeof velocityController === 'function') {
+    defaultOnLoopCode = parseFunctionToEditorCode(velocityController());
+  }
+
+  if (updateControllerCode && typeof updateControllerCode === 'function') {
+    updateControllerCode(defaultOnInitCode, defaultOnLoopCode);
   }
 
   // THE CODE BELOW IS ALMOST IDENTICAL TO createSimulation.  YET IF WE INSERT

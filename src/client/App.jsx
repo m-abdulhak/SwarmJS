@@ -67,10 +67,14 @@ const App = () => {
   const [selectedBackgroundField, setSelectedBackgroundField] = useState(availableFieldTitles?.[0] ?? null);
 
   // User Defined Robot Velocity Controller
-  const [defaultOnLoopCode, setDefaultOnLoopCode] = useState('');
-  const [onLoopCode, setOnLoopCode] = useState(null);
-  const [defaultOnInitCode, setDefaultOnInitCode] = useState('');
-  const [onInitCode, setOnInitCode] = useState(null);
+  const [controlerCode, setControlerCode] = useState(
+    {
+      defaultOnLoopCode: '',
+      onLoopCode: null,
+      defaultOnInitCode: '',
+      onInitCode: null
+    }
+  );
 
   const setScene = (newScene) => {
     setSelectedScene(newScene);
@@ -103,15 +107,32 @@ const App = () => {
     const usedConfig = { ...newConfig };
 
     if (!useDefaultController) {
-      if (onLoopCode) {
-        usedConfig.robots.controllers.velocity.onLoop = onLoopCode;
+      if (controlerCode.onLoopCode) {
+        usedConfig.robots.controllers.velocity.onLoop = controlerCode.onLoopCode;
       }
-      if (onInitCode) {
-        usedConfig.robots.controllers.velocity.onInit = onInitCode;
+      if (controlerCode.onInitCode) {
+        usedConfig.robots.controllers.velocity.init = controlerCode.onInitCode;
       }
     }
 
-    resetSimulation(usedConfig, onUpdate, setDefaultOnLoopCode, setDefaultOnInitCode);
+    const updateDefaultControlerCode = (init, loop) => setControlerCode(() => {
+      const newControlerCode = {
+        defaultOnLoopCode: '',
+        onLoopCode: null,
+        defaultOnInitCode: '',
+        onInitCode: null
+      };
+
+      if (init) {
+        newControlerCode.defaultOnInitCode = init;
+      }
+      if (loop) {
+        newControlerCode.defaultOnLoopCode = loop;
+      }
+      return newControlerCode;
+    });
+
+    resetSimulation(usedConfig, onUpdate, updateDefaultControlerCode);
     onRobotParamsChange({ velocityScale: newConfig?.robots?.params?.velocityScale || 1 });
     onRenderSkipChange(newConfig.env.renderSkip);
     setPaused(false);
@@ -201,7 +222,6 @@ const App = () => {
     />
   ) : <></>;
 
-  // TODO: Add a TreeView component to set Simulation and Benchmarking options
   const configurationsElem = (
     <>
       <TitledSlider
@@ -216,6 +236,7 @@ const App = () => {
         setCode={() => {
           // TODO: update current configuration
         }}
+        foldAll
       />
       {/* <p> TODO: Change other runtime parameters, simulation configuration, and benchmarking configuration.</p> */}
     </>
@@ -225,25 +246,34 @@ const App = () => {
     <Benchmark simConfig={config} benchSettings={benchSettings} reset={reset} data={benchmarkData}/>
   ) : <></>;
 
-  const controllerCodeEditor = initialized ? (
+  const controllerCodeEditor = initialized && config?.robots?.controllers?.supportsUserDefinedControllers !== false ? (
      <CodeEditor
+      key={controlerCode.defaultOnInitCode}
       deploy={() => reset(config, true, false)}
       sections={[
         {
           title: 'Initialize:',
-          defaultCode: defaultOnInitCode,
-          onCodeValid: setOnInitCode,
-          checkIfCodeIsValid: (init) => controllerCodeIsValid(onLoopCode ?? defaultOnLoopCode, init)
+          defaultCode: controlerCode.defaultOnInitCode,
+          onCodeValid: (onInitCode) => setControlerCode((old) => ({ ...old, onInitCode })),
+          checkIfCodeIsValid: (init) => controllerCodeIsValid(
+            controlerCode.onLoopCode ?? controlerCode.defaultOnLoopCode,
+            init
+          )
         },
         {
           title: 'Loop:',
-          defaultCode: defaultOnLoopCode,
-          onCodeValid: setOnLoopCode,
-          checkIfCodeIsValid: (loop) => controllerCodeIsValid(loop, onInitCode ?? defaultOnInitCode)
+          defaultCode: controlerCode.defaultOnLoopCode,
+          onCodeValid: (onLoopCode) => setControlerCode((old) => ({ ...old, onLoopCode })),
+          checkIfCodeIsValid: (loop) => controllerCodeIsValid(
+            loop,
+            controlerCode.onInitCode ?? controlerCode.defaultOnInitCode
+          )
         }
       ]}
      />
-  ) : <></>;
+  ) : (
+    <p>This scene does not support user defined controllers.</p>
+  );
 
   const tabContents = [
     { label: 'Options', content: optionsElem },

@@ -1,6 +1,6 @@
 import { Body, World, Bodies, Composite, Constraint } from 'matter-js';
 
-import { getDistance, getSmallestSignedAngularDifference } from '../utils/geometry';
+import { getDistance } from '../utils/geometry';
 
 import SensorManager from './sensors/sensorManager';
 import ActuatorManager from './actuators/actuatorsManager';
@@ -29,8 +29,8 @@ const getController = (robot, controllerDef) => {
       onLoop = controllerDef.onLoop;
     }
 
-    if (controllerDef.onInit) {
-      onInit = controllerDef.onInit;
+    if (controllerDef.init) {
+      onInit = controllerDef.init;
     }
   }
 
@@ -85,26 +85,24 @@ export default class Robot {
     }
 
     // Create Matter.js body and attach it to world
-    let parts = [ Bodies.circle(position.x, position.y, this.radius) ]
+    const parts = [Bodies.circle(position.x, position.y, this.radius)];
 
     if (this.tail) {
-      this.tailLength = 1.0*this.radius;
+      this.tailLength = 1.0 * this.radius;
 
       this.tailBody = Bodies.trapezoid(
-         position.x,
-         position.y - this.radius - this.tailLength/2.0,
-         this.radius / 5,
-         this.tailLength,
-         -this.tailSlope
+        position.x,
+        position.y - this.radius - this.tailLength / 2.0,
+        this.radius / 5,
+        this.tailLength,
+        -this.tailSlope
       );
-      Body.rotate(this.tailBody, -Math.PI/2.0, {x: position.x, y: position.y} );
+      Body.rotate(this.tailBody, -Math.PI / 2.0, { x: position.x, y: position.y });
       Body.setDensity(this.tailBody, 0.00001);
-      parts.push(this.tailBody)
+      parts.push(this.tailBody);
     }
 
-    const compoundBody = Body.create({
-      parts: parts
-    });
+    const compoundBody = Body.create({ parts });
     this.body = compoundBody;
 
     this.body.friction = 0;
@@ -183,7 +181,7 @@ export default class Robot {
       const controllerConfig = {
         ...this.controllers.velocity,
         onLoop: loopCode,
-        onInit: initCode
+        init: initCode
       };
       const controller = getController(this, controllerConfig);
 

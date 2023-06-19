@@ -8,7 +8,7 @@ import SceneRenderables from '@common/scene/renderables';
 
 import RobotRenderables from './robot/renderables';
 
-import controller from './robot/controllers/controller';
+import { init, controller } from './robot/controllers/controller';
 
 import DistanceToGoalTracker from './benchmarking/distanceToGoalTracker';
 
@@ -33,7 +33,7 @@ const usedSensors = {
         },
         {
           name: 'left',
-          centre: { type: 'Polar', name: '0', coords: { distance: 8, angle: (- Math.PI / 4.0) } },
+          centre: { type: 'Polar', name: '0', coords: { distance: 8, angle: (-Math.PI / 4.0) } },
           radius: 3,
           sensedTypes: ['walls']
         },
@@ -42,7 +42,7 @@ const usedSensors = {
           centre: { type: 'Polar', name: '0', coords: { distance: 8, angle: (Math.PI / 4.0) } },
           radius: 3,
           sensedTypes: ['walls']
-        },
+        }
       ]
     }
   },
@@ -85,6 +85,7 @@ const simConfig = {
     },
     controllers: {
       velocity: {
+        init,
         controller,
         params: { angularVelocityScale: 0.001 }
       }

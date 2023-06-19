@@ -1,12 +1,8 @@
+/* eslint-disable default-param-last */
 /* eslint-disable no-eval */
 import { angleBetweenThreePointsDeg, pointIsOnRightSideOfVector } from '../../../utils/geometry';
 
-export default function diffVelocityController(
-  robot,
-  { angularVelocityScale = 0.001 } = {},
-  onLoop = null,
-  onInit = null
-) {
+export default function diffVelocityController(robot, { angularVelocityScale = 0.001 } = {}, onLoop, onInit) {
   // CONSTANTS
   const CONSTANTS = {};
 
