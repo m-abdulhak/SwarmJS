@@ -10,7 +10,7 @@ import SceneRenderables from '@common/scene/renderables';
 import PuckRenderables from '@common/puck/renderables';
 import RobotRenderables from './robot/renderables';
 
-import controller from './robot/controllers/controller';
+import { init, controller } from './robot/controllers/controller';
 
 const renderables = [
   { module: 'Scene', elements: SceneRenderables },
@@ -86,6 +86,7 @@ const simConfig = {
     },
     controllers: {
       velocity: {
+        init,
         controller,
         params: { angularVelocityScale: 0.001 }
       }

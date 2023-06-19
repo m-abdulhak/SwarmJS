@@ -1,24 +1,50 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-eval */
-export default function controller(robot, params, onLoop) {
-  // PARAMETERS:
-  const maxAngularSpeed = 0.005;
-  const maxForwardSpeed = 0.15;
-  const minTurnTime = 5;
-  const maxTurnTime = 10;
 
-  const ROBOT_STATE = {
+export function init(CONST, VAR, FUNC, robot) {
+  // PARAMETERS:
+  CONST.maxAngularSpeed = 0.005;
+  CONST.maxForwardSpeed = 0.15;
+  CONST.minTurnTime = 5;
+  CONST.maxTurnTime = 10;
+  CONST.turnDir = 1; // 1 for clockwise, -1 for counter-clockwise
+
+  CONST.ROBOT_STATE = {
     MOVE_FORWARD: 'MOVE_FORWARD',
     TURN: 'TURN'
   };
 
-  let state = ROBOT_STATE.MOVE_FORWARD;
-  let stateTimeOut = 0;
-  const turnDir = 1; // 1 for clockwise, -1 for counter-clockwise
+  VAR.state = CONST.ROBOT_STATE.MOVE_FORWARD;
+  VAR.stateTimeOut = 0;
 
-  function enterTurnState(sensors, newTurnDir) {
-    stateTimeOut = minTurnTime + (maxTurnTime - minTurnTime) * Math.random();
-    state = ROBOT_STATE.TURN;
+  FUNC.enterTurnState = (sensors, newTurnDir) => {
+    VAR.stateTimeOut = CONST.minTurnTime + (CONST.maxTurnTime - CONST.minTurnTime) * Math.random();
+    VAR.state = CONST.ROBOT_STATE.TURN;
+  };
+}
+
+export function controller(robot, params, onLoop, onInit) {
+  // Object that contains constants
+  const CONST = {};
+
+  // Object that contains variables
+  const VAR = {};
+
+  // Object that contains functions
+  const FUNC = {};
+
+  let initFunc = () => {};
+  if (onInit) {
+    const userDefinedInitFunc = eval(onInit);
+
+    if (userDefinedInitFunc && typeof userDefinedInitFunc === 'function') {
+      initFunc = userDefinedInitFunc;
+    }
   }
+
+  initFunc(CONST, VAR, FUNC, robot);
+
+  Object.freeze(CONST);
 
   if (onLoop) {
     const func = eval(onLoop);
@@ -31,16 +57,13 @@ export default function controller(robot, params, onLoop) {
   return (sensors, actuators) => {
     const grabbedPuck = actuators.grabber.getState();
 
-    //
-    // State transitions...
-    //
-    stateTimeOut -= 1;
+    VAR.stateTimeOut -= 1;
 
-    if (state === ROBOT_STATE.MOVE_FORWARD) {
+    if (VAR.state === CONST.ROBOT_STATE.MOVE_FORWARD) {
       if (sensors.circles.left.reading.walls > 0 || sensors.circles.left.reading.robots > 0) {
-        enterTurnState(sensors, 1);
+        FUNC.enterTurnState(sensors, 1);
       } else if (sensors.circles.right.reading.walls > 0 || sensors.circles.right.reading.robots > 0) {
-        enterTurnState(sensors, -1);
+        FUNC.enterTurnState(sensors, -1);
       } else if (
         !grabbedPuck && sensors.polygons.inner.reading.pucks === 1 && sensors.polygons.outer.reading.pucks == 0
       ) {
@@ -48,14 +71,14 @@ export default function controller(robot, params, onLoop) {
         // No need to change state.
       } else if (!grabbedPuck && sensors.polygons.inner.reading.pucks > 0 && sensors.polygons.outer.reading.pucks > 0) {
         // Turn to avoid this cluster.
-        enterTurnState(sensors, Math.random() < 0.5 ? -1 : 1);
+        FUNC.enterTurnState(sensors, Math.random() < 0.5 ? -1 : 1);
       } else if (grabbedPuck && sensors.polygons.inner.reading.pucks > 0) {
         robot.actuators.grabber.deactivate();
-        enterTurnState(sensors, Math.random() < 0.5 ? -1 : 1);
+        FUNC.enterTurnState(sensors, Math.random() < 0.5 ? -1 : 1);
       }
-    } else if (state === ROBOT_STATE.TURN) {
-      if (stateTimeOut <= 0) {
-        state = ROBOT_STATE.MOVE_FORWARD;
+    } else if (VAR.state === CONST.ROBOT_STATE.TURN) {
+      if (VAR.stateTimeOut <= 0) {
+        VAR.state = CONST.ROBOT_STATE.MOVE_FORWARD;
       }
     }
 
@@ -64,11 +87,11 @@ export default function controller(robot, params, onLoop) {
     //
     let forwardSpeed = 0;
     let angularSpeed = 0;
-    if (state === ROBOT_STATE.MOVE_FORWARD) {
+    if (VAR.state === CONST.ROBOT_STATE.MOVE_FORWARD) {
       // Go full speed ahead.
-      forwardSpeed = maxForwardSpeed * robot.velocityScale;
-    } else if (state === ROBOT_STATE.TURN) {
-      angularSpeed = turnDir * maxAngularSpeed * robot.velocityScale;
+      forwardSpeed = CONST.maxForwardSpeed * robot.velocityScale;
+    } else if (VAR.state === CONST.ROBOT_STATE.TURN) {
+      angularSpeed = CONST.turnDir * CONST.maxAngularSpeed * robot.velocityScale;
     }
 
     return {
