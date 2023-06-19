@@ -225,7 +225,7 @@ const App = () => {
     <Benchmark simConfig={config} benchSettings={benchSettings} reset={reset} data={benchmarkData}/>
   ) : <></>;
 
-  const controllerCodeEditor = initialized ? (
+  const controllerCodeEditor = initialized && config?.robots?.controllers?.supportsUserDefinedControllers !== false ? (
      <CodeEditor
       deploy={() => reset(config, true, false)}
       sections={[
@@ -243,7 +243,9 @@ const App = () => {
         }
       ]}
      />
-  ) : <></>;
+  ) : (
+    <p>This scene does not support user defined controllers.</p>
+  );
 
   const tabContents = [
     { label: 'Options', content: optionsElem },
