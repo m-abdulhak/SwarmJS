@@ -2,9 +2,9 @@
 /* eslint-disable default-param-last */
 /* eslint-disable no-eval */
 
-export function init(CONST, VAR, FUNC, robot, { theta = 0.1 } = {}) {
+export function init(CONST, VAR, FUNC, robot, params) {
   // PARAMETERS:
-  CONST.theta = theta;
+  CONST.theta = params.theta || 0.1;
   CONST.maxAngularSpeed = 0.1;
   CONST.maxForwardSpeed = 5;
   CONST.minNearbyNeighborsToTriggerWait = 1;
