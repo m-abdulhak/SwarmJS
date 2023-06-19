@@ -8,7 +8,7 @@ import SceneRenderables from '@common/scene/renderables';
 import PuckRenderables from '@common/puck/renderables';
 import LocalRenderables from './robot/renderables';
 
-import controller from './robot/controllers/controller';
+import { init, controller } from './robot/controllers/controller';
 
 import PuckFieldValueTracker from './benchmarking/puckFieldValueTracker';
 
@@ -132,6 +132,7 @@ const simConfig = {
     },
     controllers: {
       velocity: {
+        init,
         controller
       }
     },
