@@ -5,7 +5,7 @@ import { normalizeAnglePlusMinusPi, getAngularDifference } from '@common/utils/g
 const normalizeAnglePlusMinusPiFunc = normalizeAnglePlusMinusPi;
 const getAngularDifferenceFunc = getAngularDifference;
 
-export function init(CONST, VAR, FUNC, robot) {
+export function init(CONST, VAR, FUNC, robot, params) {
   // PARAMETERS:
   CONST.maxAngularSpeed = 0.01;
   CONST.maxForwardSpeed = 0.1;
@@ -145,7 +145,7 @@ export function controller(robot, params, onLoop, onInit) {
     }
   }
 
-  initFunc(CONST, VAR, FUNC, robot);
+  initFunc(CONST, VAR, FUNC, robot, params);
 
   Object.freeze(CONST);
 

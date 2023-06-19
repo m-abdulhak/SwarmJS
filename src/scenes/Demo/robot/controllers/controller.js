@@ -2,7 +2,7 @@
 /* eslint-disable default-param-last */
 /* eslint-disable no-eval */
 
-export function init(CONST, VAR, FUNC, robot) {
+export function init(CONST, VAR, FUNC, robot, params) {
   // PARAMETERS:
   CONST.maxAngularSpeed = 0.1;
   CONST.maxForwardSpeed = 5;
@@ -35,7 +35,7 @@ export function controller(robot, params, onLoop, onInit) {
     }
   }
 
-  initFunc(CONST, VAR, FUNC, robot);
+  initFunc(CONST, VAR, FUNC, robot, params);
 
   Object.freeze(CONST);
 

@@ -2,8 +2,9 @@
 /* eslint-disable default-param-last */
 /* eslint-disable no-eval */
 
-export function init(CONST, VAR, FUNC, robot) {
+export function init(CONST, VAR, FUNC, robot, { theta = 0.1 } = {}) {
   // PARAMETERS:
+  CONST.theta = theta;
   CONST.maxAngularSpeed = 0.1;
   CONST.maxForwardSpeed = 5;
   CONST.minNearbyNeighborsToTriggerWait = 1;
@@ -35,7 +36,7 @@ export function init(CONST, VAR, FUNC, robot) {
   };
 }
 
-export function controller(robot, { theta = 0.1 } = {}, onLoop, onInit) {
+export function controller(robot, params, onLoop, onInit) {
   // Object that contains constants
   const CONST = {};
 
@@ -85,7 +86,7 @@ export function controller(robot, { theta = 0.1 } = {}, onLoop, onInit) {
       } else {
         sensors.potentialWaitTime = Math.ceil(
           (CONST.maxWaitTime * (temperatureScaled - CONST.tempShift) ** 2)
-          / ((temperatureScaled - CONST.tempShift) ** 2 + theta)
+          / ((temperatureScaled - CONST.tempShift) ** 2 + CONST.theta)
         );
       }
     }
