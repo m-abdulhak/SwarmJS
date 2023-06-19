@@ -33,7 +33,7 @@ const usedSensors = {
         },
         {
           name: 'left',
-          centre: { type: 'Polar', name: '0', coords: { distance: 8, angle: (- Math.PI / 4.0) } },
+          centre: { type: 'Polar', name: '0', coords: { distance: 8, angle: (-Math.PI / 4.0) } },
           radius: 3,
           sensedTypes: ['walls']
         },
@@ -42,7 +42,7 @@ const usedSensors = {
           centre: { type: 'Polar', name: '0', coords: { distance: 8, angle: (Math.PI / 4.0) } },
           radius: 3,
           sensedTypes: ['walls']
-        },
+        }
       ]
     }
   },

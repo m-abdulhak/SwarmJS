@@ -10,7 +10,7 @@ import SceneRenderables from '@common/scene/renderables';
 
 import RobotRenderables from './robot/renderables';
 
-import { controller, init } from './robot/controllers/controller';
+import { init, controller } from './robot/controllers/controller';
 import fieldDiffusion from './scene/fieldsDiffusion';
 
 import mapUrl from './map.png';
