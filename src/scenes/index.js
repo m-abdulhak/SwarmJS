@@ -7,11 +7,13 @@ import voronoiSorting from './VoronoiSorting';
 import simpleSorting from './Sorting';
 import demo from './Demo';
 import labyrinth from './Labyrinth';
+import orbitalConstructionBridge from './OrbitalConstructionBridge';
 
 export default {
+  orbitalConstruction,
+  orbitalConstructionBridge,
   labyrinth,
   demo,
-  orbitalConstruction,
   beeClust,
   cluster,
   fieldManipulation,
