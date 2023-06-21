@@ -304,6 +304,10 @@ const App = () => {
       </Box>
   );
 
+  const sceneDescriptionElem = description?.html ? (
+  <div id='scene-description' dangerouslySetInnerHTML={{ __html: description?.html || null }} />
+  ) : <></>;
+
   return loading ? loadingElem : (
     <div style={{ width: '100%' }}>
       {selectElem}
@@ -336,7 +340,7 @@ const App = () => {
             <svg id='simulation-svg' ref={svgRef} width={config.env.width} height={config.env.height}/>
           </div>
         </div>
-        <div id='scene-description' dangerouslySetInnerHTML={{ __html: description.html }} />
+        {sceneDescriptionElem}
       </div>
       {ui}
     </div>

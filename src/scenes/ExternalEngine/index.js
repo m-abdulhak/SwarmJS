@@ -1,5 +1,6 @@
 import {
   CoreSensors,
+  ExtraSensors,
   CorePositionsGenerators,
   CorePerformanceTrakers,
   CoreControllers
@@ -24,20 +25,11 @@ const renderables = [
   { module: 'Robot', elements: RobotRenderables }
 ];
 
-const usedSensors = {
-  ...CoreSensors,
-  walls: {
-    ...CoreSensors.walls,
-    params: {
-      detectionRadius: 10
-    }
-  }
-};
-
 const simConfig = {
   env: {
     width: 600,
     height: 400,
+    renderSkip: 1,
     externalEngine: {
       url: 'ws://localhost:5000',
       updateInterval: 100
@@ -57,7 +49,7 @@ const simConfig = {
         params: { angularVelocityScale: 0.01 }
       }
     },
-    sensors: [...Object.values(usedSensors)],
+    sensors: [...Object.values(CoreSensors), ...Object.values(ExtraSensors)],
     actuators: [],
     // The neighbors sensor doesn't work unless the Voronoi diagram is used.
     useVoronoiDiagram: true,
@@ -125,9 +117,23 @@ const benchmarkConfig = {
   timeStep: 1000
 };
 
+const description = {
+  html: `<p>The 'External Engine' scene demonstrates connecting SwarmJS with an external server for simulation.</p>
+
+  <p>To use it:</p>
+  
+  <p>- Start SwarmJS and select the 'External Engine' scene.</p>
+  <p>- Launch 'src/scenes/ExternalEngine/will-o-wisp server/server.js' using the command: > python server.js.</p>
+  <p>The server is an example implementation of a Python script (tested with Python 3.10.6). It creates a web server
+  and accepts WebSocket connections from SwarmJS. It receives robot goals from SwarmJS, simulates robot movement,
+  and sends updated positions back to SwarmJS. The Python server also logs all received and sent messages to the 
+  console.</p>`
+};
+
 export default {
   title: 'External Engine',
   name: 'ExternalEngine',
   simConfig,
-  benchmarkConfig
+  benchmarkConfig,
+  description
 };

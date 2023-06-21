@@ -93,6 +93,7 @@ def on_goals(data):
     
     # reply with last known robot positions
     emit('robot_positions', robotPositions, broadcast=True)
+    print('Robot positions sent: ', data)
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
