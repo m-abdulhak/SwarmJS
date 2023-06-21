@@ -12,6 +12,8 @@ import RobotRenderables from './robot/renderables';
 
 import { init, controller } from './robot/controllers/controller';
 
+import PercentageCompletionTracker from './benchmarking/percentageCompletionTracker';
+
 const renderables = [
   { module: 'Scene', elements: SceneRenderables },
   { module: 'Puck', elements: PuckRenderables },
@@ -147,8 +149,7 @@ const benchmarkConfig = {
     }
   ],
   trackers: [
-    CorePerformanceTrakers.RobotToGoalDistanceTracker,
-    CorePerformanceTrakers.MinRobotRobotDistanceTracker
+    new PercentageCompletionTracker()
   ],
   maxTimeStep: 20000,
   timeStep: 1000
