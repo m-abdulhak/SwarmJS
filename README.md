@@ -4,6 +4,9 @@ SwarmJS
 
 ![image](https://user-images.githubusercontent.com/5468250/149712476-0fa0c7b0-bf23-409d-9dff-90b92c9cbbb7.png)
 
+## tasks
+- [ ] reimplement orbital construction in python
+- [ ] add RL to it according [paper]()
 ## connection to python
 - you should be installing all the dependencies for python:
 ```

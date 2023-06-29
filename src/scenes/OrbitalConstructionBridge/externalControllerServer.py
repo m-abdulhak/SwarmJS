@@ -38,14 +38,19 @@ def on_ping():
 # Add a websocket route for receiving the desired speed for a single robot.
 @socketio.on('get_robot_speeds')
 def get_robot_speeds(data):
-    print('=================================================')
-    print('get_robot_speeds: ', data)
+    # print('=================================================')
+    # print('get_robot_speeds: ', data)
     
     # Reply 
     speeds = {}
     speeds['forwardSpeed'] = 0
-    speeds['angularSpeed'] = 1
+    speeds['angularSpeed'] = 0
     emit('robot_speeds', speeds, broadcast=True)
+
+@socketio.on('custom_message')
+def get_robot_speeds(data):
+    print('custom_message: ', data , type(data))
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

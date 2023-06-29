@@ -34,7 +34,7 @@ export function init(CONST, VAR, FUNC, robot, params) {
     console.log('>>>>>>>>>>>>>received robot speeds', speeds);
     VAR.receivedSpeeds = speeds;
   });
-}
+} // init()
 
 export function controller(robot, params, onLoop, onInit) {
   // Object that contains constants
@@ -98,6 +98,8 @@ export function controller(robot, params, onLoop, onInit) {
     // We'll make these Boolean since the number shouldn't really change the response.
     const leftRobots = sensors.circles.leftObstacle.reading.robots > 0;
     const leftWalls =  sensors.circles.leftObstacle.reading.walls > 0;
+    VAR.socket.emit('custom_message' , leftWalls);
+
 
     // We want the controller to determine the forward speed and angular speed.
     let forwardSpeed = 0;
