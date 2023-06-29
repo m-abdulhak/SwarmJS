@@ -4,9 +4,15 @@
 
 import Socket from '@common/utils/socket';
 
+/* This part is different from original: sensor retrieveing part*/
 export function init(CONST, VAR, FUNC, robot, params) {
   // PARAMETERS:
-  CONST.SOCKET_URL = 'ws://localhost:5000';
+  // CONST.SOCKET_URL = 'ws://localhost:5000';
+  // CONST.SOCKET_URL = 'http://127.0.0.1:5000'
+  // CONST.SOCKET_URL = 'http://localhost:5000'
+  CONST.SOCKET_URL = 'http://127.0.0.1:5000';
+
+  
   CONST.middleTau = params.tau || 0.6;
   CONST.maxAngularSpeed = 0.015;
   CONST.maxForwardSpeed = 0.2;
@@ -25,7 +31,7 @@ export function init(CONST, VAR, FUNC, robot, params) {
       return acc;
     }, {});
 
-    console.log('received robot speeds', speeds);
+    console.log('>>>>>>>>>>>>>received robot speeds', speeds);
     VAR.receivedSpeeds = speeds;
   });
 }
@@ -60,7 +66,7 @@ export function controller(robot, params, onLoop, onInit) {
       return func;
     }
   }
-
+  /* This part is different from original*/
   return (sensors) => {
 
     var command = {
@@ -107,6 +113,12 @@ export function controller(robot, params, onLoop, onInit) {
 
     command.linearVel = VAR.receivedSpeeds.forwardSpeed * robot.velocityScale * CONST.maxForwardSpeed;
     command.angularVel = VAR.receivedSpeeds.angularSpeed * robot.velocityScale * CONST.maxAngularSpeed;
+
+    /* to slove canvas error */
+    command.linearVel = isNaN(command.linearVel) ? 0 : command.linearVel;
+    command.angularVel = isNaN(command.angularVel) ? 0 : command.angularVel;
+
+    // debugger;
     return command;
   };
 }

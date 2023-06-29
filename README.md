@@ -4,6 +4,16 @@ SwarmJS
 
 ![image](https://user-images.githubusercontent.com/5468250/149712476-0fa0c7b0-bf23-409d-9dff-90b92c9cbbb7.png)
 
+## connection to python
+- you should be installing all the dependencies for python:
+```
+pip install Flask Flask-SocketIO
+pip install simple-websocket
+```
+- run flask by
+```
+flask --app src/scenes/OrbitalConstructionBridge/externalControllerServer.py run
+```
 ## About
 SwarmJS is an interactive 2D swarm robotics simulator built on the [Matter.js](https://github.com/liabru/matter-js) physics engine and uses [D3.js](https://github.com/d3/d3) for rendering and [React](https://github.com/facebook/react) for the UI. A demo is available [here](https://m-abdulhak.github.io/SwarmJS).
 

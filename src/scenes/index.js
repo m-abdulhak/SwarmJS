@@ -9,9 +9,10 @@ import demo from './Demo';
 import labyrinth from './Labyrinth';
 import orbitalConstructionBridge from './OrbitalConstructionBridge';
 
+// changing this will change the order in webpage
 export default {
-  orbitalConstruction,
   orbitalConstructionBridge,
+  orbitalConstruction,
   labyrinth,
   demo,
   beeClust,

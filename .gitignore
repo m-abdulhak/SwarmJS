@@ -6,3 +6,6 @@ python_scripts/__pycache__
 
 # Ignore wierd Mac OS file
 .DS_Store
+
+**/__pycache__/
+**/.*
