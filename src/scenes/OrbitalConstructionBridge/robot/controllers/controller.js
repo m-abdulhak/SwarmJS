@@ -17,8 +17,20 @@ export function init(CONST, VAR, FUNC, robot, params) {
   CONST.maxAngularSpeed = 0.015;
   CONST.maxForwardSpeed = 0.2;
 
+  // We'll define 25% of the robots as innies (pretty arbitrary)
+  CONST.innie = Math.random() < 0.25;
+  CONST.tau = CONST.innie ? CONST.middleTau + 0.05 : CONST.middleTau - 0.05;
+  if (robot) {
+    if (CONST.innie) {
+      robot.color = 'yellow';
+    } else {
+      robot.color = 'cyan';
+    }
+  }
+
+
   VAR.socket = new Socket(CONST.SOCKET_URL);
-  VAR.socket.connect();
+  VAR.socket.connect(CONST);
   VAR.socket.ping();
 
   VAR.receivedSpeeds = {};
@@ -110,8 +122,21 @@ export function controller(robot, params, onLoop, onInit) {
     //
     // CONTROLLER CODE
     //
+    console.log(sensors.fields.readings.heatMap.leftField , sensors.fields.readings.heatMap.frontField , sensors.fields.readings.heatMap.rightField)
+
+    let pythonSensors = {
+      leftField : leftField,
+      centreField : centreField,
+      rightField : rightField,
+      leftPucks : leftPucks,
+      rightPucks : rightPucks,
+      leftRobots : leftRobots,
+      leftWalls : leftWalls
+      }
     let passedData = { data: '???' };
-    VAR.socket.emit('get_robot_speeds', sensors); //! getting commands from python
+    // console.log(sensors.polygons)
+    VAR.socket.emit('get_robot_speeds', pythonSensors); //! getting commands from python
+    // debugger;
 
     // HOW DO WE WAIT FOR A RESPONSE FROM THE SERVER???
 
@@ -122,7 +147,6 @@ export function controller(robot, params, onLoop, onInit) {
     command.linearVel = isNaN(command.linearVel) ? 0 : command.linearVel;
     command.angularVel = isNaN(command.angularVel) ? 0 : command.angularVel;
 
-    // debugger;
     return command;
   };
 }

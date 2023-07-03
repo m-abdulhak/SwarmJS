@@ -17,6 +17,8 @@ app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
 # Set cors_allowed_origins to "*" to allow all origins
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+controller = None
+
 @app.route('/')
 def index():
     return 'Python web server is running and accepting websocket connections.'
@@ -40,8 +42,8 @@ def on_ping():
     emit('pong', broadcast=True)
 
 @socketio.on('init_py_controller')
-def get_robot_speeds(CONST):
-    # debugger()
+def init_py_controller(CONST):
+
     global controller #!TODO can avoid this
     controller = Orbital_Construction(CONST)
     print("initilized robot controller")
@@ -57,10 +59,17 @@ def get_robot_speeds(sensors):
     
     # Reply 
     # debugger()
+    if controller is None:
+        print("controller not initilized")
+        return
+    speed_commands = 0
+
     speed_commands = controller.calculate_speed_command(sensors)
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> sensors:", type(sensors) , sensors)
     speeds = {}
-    speeds['forwardSpeed'] = 1
+    speeds['forwardSpeed'] = controller.CONST.maxForwardSpeed
     speeds['angularSpeed'] = speed_commands
+    print("python ordered speed:" ,speeds)
     emit('robot_speeds', speeds, broadcast=True)
 
 @socketio.on('custom_message')

@@ -1,47 +1,58 @@
-class Dict_2_Obj:
-  def __init__(self, **kwargs):
-    for key, value in kwargs.items():
-        setattr(self, key, value)
+def build_object_from_dict(data):
+    if isinstance(data, dict):
+        obj = type('Object', (), {})()  # Create an empty object
+        for key, value in data.items():
+            setattr(obj, key, build_object_from_dict(value))  # Recursively build nested objects
+        return obj
+    else:
+        return data
 
 class Orbital_Construction:
   def __init__(self,CONST) -> None:
 
-    self.CONST = Dict_2_Obj(**CONST)
+    self.CONST = build_object_from_dict(CONST)
 
-  def calculate_angular_speed(self , sensors):
-
-    if (not sensors.fields.readings.heatMap.leftField) \
-        or (not sensors.fields.readings.heatMap.frontField) \
-        or (not sensors.fields.readings.heatMap.rightField): 
+  def calculate_angular_speed(self , sensors_dict):
+    sensors = build_object_from_dict(sensors_dict)
+    # print(sensors)
+    # print(self.sensors)
+    print("sensors object",sensors)
+    if (not sensors.leftField) \
+        or (not sensors.centreField) \
+        or (not sensors.rightField): 
+      print("0  ")
       return 0
 
-    l = (sensors.fields.readings.heatMap.leftField)[0] / 255
-    c = (sensors.fields.readings.heatMap.frontField)[0] / 255
-    r = (sensors.fields.readings.heatMap.rightField)[0] / 255
+    l = (sensors.leftField) / 255
+    c = (sensors.centreField) / 255
+    r = (sensors.rightField) / 255
 
-    leftPucks = sensors.polygons.left.reading.pucks
-    rightPucks = sensors.polygons.right.reading.pucks
-
-
-    if (sensors.circles.leftObstacle.reading.robots > 0 or sensors.circles.leftObstacle.reading.walls > 0) :
+    if (sensors.leftRobots > 0 or sensors.leftWalls > 0) :
+      print("1")
       return self.CONST.maxAngularSpeed
     
     if (r >= c and c >= l): 
-      if (self.CONST.innie and rightPucks > 0) :
+      if (self.CONST.innie and sensors.rightPucks > 0) :
+        print("2")
         return self.CONST.maxAngularSpeed
-      if (not self.CONST.innie and leftPucks > 0) :
+      if (not self.CONST.innie and sensors.leftPucks > 0) :
+        print("3")
         return -self.CONST.maxAngularSpeed
       
 
       if (c < self.CONST.tau):
-        return 0.3 * self.CONST.maxAngularSpeed;
+        print("4")
+        return 0.3 * self.CONST.maxAngularSpeed
       
-      return -0.3 * self.CONST.maxAngularSpeed;
+      print("5")
+      return -0.3 * self.CONST.maxAngularSpeed
     
     
     if (c >= r and c >= l):
+      print("6")
       return -self.CONST.maxAngularSpeed
 
+    print("7")
     return self.CONST.maxAngularSpeed
 
   def calculate_speed_command(self,sensors):

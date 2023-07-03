@@ -20,12 +20,13 @@ export function init(CONST, VAR, FUNC, robot, params) {
   }
 
   FUNC.getAngularSpeed = (sensors) => {
+    console.log(sensors.fields.readings.heatMap.leftField , sensors.fields.readings.heatMap.frontField , sensors.fields.readings.heatMap.rightField)
     if (!sensors.fields.readings.heatMap.leftField
         || !sensors.fields.readings.heatMap.frontField
         || !sensors.fields.readings.heatMap.rightField) {
       return 0;
     }
-
+    // debugger;
     const l = (sensors.fields.readings.heatMap.leftField)[0] / 255;
     const c = (sensors.fields.readings.heatMap.frontField)[0] / 255;
     const r = (sensors.fields.readings.heatMap.rightField)[0] / 255;
