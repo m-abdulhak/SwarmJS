@@ -23,6 +23,8 @@ export function init(CONST, VAR, FUNC, robot, params) {
 
   VAR.receivedSpeeds = {};
 
+  VAR.socket.emit('init_py_controller', CONST);
+
   // Add callback to store robot speeds received by external engine
   VAR.socket.on('robot_speeds', (data) => {
     const speeds = Object.entries(data).reduce((acc, [k, v]) => {
@@ -98,7 +100,7 @@ export function controller(robot, params, onLoop, onInit) {
     // We'll make these Boolean since the number shouldn't really change the response.
     const leftRobots = sensors.circles.leftObstacle.reading.robots > 0;
     const leftWalls =  sensors.circles.leftObstacle.reading.walls > 0;
-    VAR.socket.emit('custom_message' , leftWalls);
+    // VAR.socket.emit('custom_message' , leftWalls);
 
 
     // We want the controller to determine the forward speed and angular speed.
@@ -109,7 +111,7 @@ export function controller(robot, params, onLoop, onInit) {
     // CONTROLLER CODE
     //
     let passedData = { data: '???' };
-    VAR.socket.emit('get_robot_speeds', passedData);
+    VAR.socket.emit('get_robot_speeds', sensors); //! getting commands from python
 
     // HOW DO WE WAIT FOR A RESPONSE FROM THE SERVER???
 
