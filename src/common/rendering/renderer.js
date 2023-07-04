@@ -116,14 +116,14 @@ export const resetRenderer = () => {
 
 const getCanvasIdForField = (fieldTitle) => `field-${fieldTitle.split(' ').join('-').toLowerCase()}-canvas`;
 
-export const createFieldCanvas = (field, onLoadCallback) => {
+export const createFieldCanvas = (field, onLoadCallback, defaultField) => {
   const canvasElem = document.createElement('canvas');
   canvasElem.id = getCanvasIdForField(field.title);
   canvasElem.style.position = 'absolute';
   canvasElem.style.top = 0;
   canvasElem.style.left = 0;
 
-  if (!field.defaultBackground) {
+  if (!field.defaultBackground && defaultField !== field.title) {
     canvasElem.classList.add('hidden');
   }
 

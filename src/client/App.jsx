@@ -46,10 +46,15 @@ const options = Object.values(exampleConfigs).map((v) => ({
   value: v.name
 }));
 
+const getDefaultField = (fields) => Object.values(fields || {})
+  .find((x) => x.defaultBackground)?.title
+  || Object.values(fields || {})?.[0]?.title;
+
 const App = () => {
   const [loading, setLoading] = useState(true);
   const [selectedScene, setSelectedScene] = useState(getSceneFromUrlQuery(options));
   const [config, setConfig] = useState(exampleConfigs[selectedScene].simConfig);
+  const [selectedBackgroundField, setSelectedBackgroundField] = useState(getDefaultField(config?.env?.fields) ?? null);
   const [benchSettings, setBenchSettings] = useState(exampleConfigs[selectedScene].benchmarkConfig);
   const [description, setDescription] = useState(exampleConfigs[selectedScene].description);
   const [uiEnabled, setUiEnabled] = useState(false);
@@ -61,10 +66,9 @@ const App = () => {
   const svgRef = useRef(null);
   const fieldsElemRef = useRef(null);
 
-  const availableFieldTitles = Object.values(exampleConfigs[selectedScene]?.simConfig?.env?.fields || {})
-    .map((field) => field.title);
-
-  const [selectedBackgroundField, setSelectedBackgroundField] = useState(availableFieldTitles?.[0] ?? null);
+  useEffect(() => {
+    changeBackgroundField(fieldsElemRef.current, selectedBackgroundField);
+  }, [fieldsElemRef.current, selectedBackgroundField]);
 
   // User Defined Robot Velocity Controller
   const [controlerCode, setControlerCode] = useState(
@@ -163,11 +167,11 @@ const App = () => {
           fieldsElemRef?.current?.appendChild(canvasElem);
         };
 
-        createFieldCanvas(field, imageElemOnload);
+        createFieldCanvas(field, imageElemOnload, selectedBackgroundField);
       }
     }
 
-    setSelectedBackgroundField(Object.values(newConfig?.env?.fields || {})?.[0]?.title ?? null);
+    setSelectedBackgroundField(getDefaultField(newConfig?.env?.fields) ?? null);
   };
 
   const onTogglePause = () => {
@@ -320,10 +324,9 @@ const App = () => {
         uiEnabled={uiEnabled}
         changeBackground={(fieldTitle) => {
           setSelectedBackgroundField(fieldTitle);
-          changeBackgroundField(fieldsElemRef.current, fieldTitle);
         }}
         setSelectedBackgroundField={setSelectedBackgroundField}
-        availableFields={availableFieldTitles}
+        availableFields={Object.values(config?.env?.fields || {}).map((field) => field.title)}
         selectedBackgroundField={selectedBackgroundField}
         reset={reset}
         onTogglePause={onTogglePause}
