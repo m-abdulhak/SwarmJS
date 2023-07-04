@@ -119,7 +119,6 @@ const simConfig = {
       },
       travelTime: {
         url: travelTimeUrl,
-        defaultBackground: false,
         title: 'Travel Time'
       }
     }
