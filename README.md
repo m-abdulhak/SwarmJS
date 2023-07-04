@@ -7,6 +7,11 @@ SwarmJS
 ## tasks
 - [ ] reimplement orbital construction in python
 - [ ] add RL to it according [paper]()
+- [ ] how fast of simulation can backend support?
+## notes
+- sensors.fields.readings.heatMap.leftField has same three fields and last one is all 255
+
+
 ## connection to python
 - you should be installing all the dependencies for python:
 ```

@@ -44,8 +44,6 @@ export function init(CONST, VAR, FUNC, robot, params) {
       acc[strKey] = v;
       return acc;
     }, {});
-
-    console.log('>>>>>>>>>>>>>received robot speeds', speeds);
     VAR.receivedSpeeds = speeds;
   });
 } // init()
@@ -119,11 +117,6 @@ export function controller(robot, params, onLoop, onInit) {
     let forwardSpeed = 0;
     let angularSpeed = 0;
 
-    //
-    // CONTROLLER CODE
-    //
-    console.log(sensors.fields.readings.heatMap.leftField , sensors.fields.readings.heatMap.frontField , sensors.fields.readings.heatMap.rightField)
-
     let pythonSensors = {
       leftField : leftField,
       centreField : centreField,
@@ -140,13 +133,15 @@ export function controller(robot, params, onLoop, onInit) {
 
     // HOW DO WE WAIT FOR A RESPONSE FROM THE SERVER???
 
-    command.linearVel = VAR.receivedSpeeds.forwardSpeed * robot.velocityScale * CONST.maxForwardSpeed;
-    command.angularVel = VAR.receivedSpeeds.angularSpeed * robot.velocityScale * CONST.maxAngularSpeed;
+    command.linearVel = VAR.receivedSpeeds.forwardSpeed * robot.velocityScale;
+    command.angularVel = VAR.receivedSpeeds.angularSpeed * robot.velocityScale;
+    // debugger;
 
-    /* to slove canvas error */
+    //! /* to slove canvas error */
     command.linearVel = isNaN(command.linearVel) ? 0 : command.linearVel;
     command.angularVel = isNaN(command.angularVel) ? 0 : command.angularVel;
-
+    console.log(command)
+    console.log(forwardSpeed , robot.velocityScale)
     return command;
   };
 }

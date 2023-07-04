@@ -64,12 +64,14 @@ def get_robot_speeds(sensors):
         return
     speed_commands = 0
 
-    speed_commands = controller.calculate_speed_command(sensors)
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> sensors:", type(sensors) , sensors)
+    angular_speed_commands = controller.calculate_speed_command(sensors)
+    # print(">>>>> sensors:", type(sensors) , sensors , "<<<<")
+    # print("\n -> CONST:", controller.CONST ,"<-/n")
+
     speeds = {}
-    speeds['forwardSpeed'] = controller.CONST.maxForwardSpeed
-    speeds['angularSpeed'] = speed_commands
-    print("python ordered speed:" ,speeds)
+    speeds['forwardSpeed'] = controller.CONST.maxForwardSpeed 
+    speeds['angularSpeed'] = angular_speed_commands
+    # print("python ordered speed:" ,speeds)
     emit('robot_speeds', speeds, broadcast=True)
 
 @socketio.on('custom_message')

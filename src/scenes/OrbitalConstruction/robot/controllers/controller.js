@@ -20,7 +20,6 @@ export function init(CONST, VAR, FUNC, robot, params) {
   }
 
   FUNC.getAngularSpeed = (sensors) => {
-    console.log(sensors.fields.readings.heatMap.leftField , sensors.fields.readings.heatMap.frontField , sensors.fields.readings.heatMap.rightField)
     if (!sensors.fields.readings.heatMap.leftField
         || !sensors.fields.readings.heatMap.frontField
         || !sensors.fields.readings.heatMap.rightField) {
@@ -37,23 +36,35 @@ export function init(CONST, VAR, FUNC, robot, params) {
     // console.log(`leftPucks: ${leftPucks}, rightPucks: ${rightPucks}`);
 
     if (sensors.circles.leftObstacle.reading.robots > 0 || sensors.circles.leftObstacle.reading.walls > 0) {
+      console.log('1')
       return CONST.maxAngularSpeed;
-    }
-    if (r >= c && c >= l) {
+    } 
+    else if (r >= c && c >= l) {
       if (CONST.innie && rightPucks > 0) {
+        console.log('2')
         return CONST.maxAngularSpeed;
       } if (!CONST.innie && leftPucks > 0) {
+        console.log('3')
         return -CONST.maxAngularSpeed;
       }
 
-      if (c < CONST.tau) {
+      else if (c < CONST.tau) {
+        console.log('4')
         return 0.3 * CONST.maxAngularSpeed;
       }
-      return -0.3 * CONST.maxAngularSpeed;
-    } if (c >= r && c >= l) {
+      else{
+        console.log('5')
+        return -0.3 * CONST.maxAngularSpeed;
+      }
+    } 
+    else if (c >= r && c >= l) {
+      console.log('6')
       return -CONST.maxAngularSpeed;
     }
-    return CONST.maxAngularSpeed;
+    else {
+      console.log('7')
+      return CONST.maxAngularSpeed;
+    }
   };
 }
 
@@ -92,10 +103,14 @@ export function controller(robot, params, onLoop, onInit) {
     const forwardSpeed = CONST.maxForwardSpeed;
     const angularSpeed = FUNC.getAngularSpeed(sensors);
 
-    return {
+    let command = {
       linearVel: forwardSpeed * robot.velocityScale,
       angularVel: angularSpeed * robot.velocityScale,
       type: robot.SPEED_TYPES.RELATIVE
     };
+    console.log(command)
+    console.log(forwardSpeed , robot.velocityScale)
+
+    return command
   };
 }
