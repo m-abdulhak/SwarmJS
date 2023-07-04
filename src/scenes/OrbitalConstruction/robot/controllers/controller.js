@@ -11,6 +11,7 @@ export function init(CONST, VAR, FUNC, robot, params) {
   // We'll define 25% of the robots as innies (pretty arbitrary)
   CONST.innie = Math.random() < 0.25;
   CONST.tau = CONST.innie ? CONST.middleTau + 0.05 : CONST.middleTau - 0.05;
+  // debugger;
   if (robot) {
     if (CONST.innie) {
       robot.color = 'yellow';
@@ -108,8 +109,8 @@ export function controller(robot, params, onLoop, onInit) {
       angularVel: angularSpeed * robot.velocityScale,
       type: robot.SPEED_TYPES.RELATIVE
     };
-    console.log(command)
-    console.log(forwardSpeed , robot.velocityScale)
+    // console.log(command)
+    // console.log(forwardSpeed , robot.velocityScale)
 
     return command
   };

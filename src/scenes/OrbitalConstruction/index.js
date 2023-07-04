@@ -120,7 +120,7 @@ const simConfig = {
     }
   },
   robots: {
-    count: 1,
+    count: 2,
     radius: 4,
     params: {
       velocityScale: 15

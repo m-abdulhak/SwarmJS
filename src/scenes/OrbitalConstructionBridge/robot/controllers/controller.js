@@ -44,7 +44,16 @@ export function init(CONST, VAR, FUNC, robot, params) {
       acc[strKey] = v;
       return acc;
     }, {});
-    VAR.receivedSpeeds = speeds;
+
+    if (speeds.id === robot.id ){ //! to make sure we got the right ID. THis problem existed
+      VAR.receivedSpeeds = {
+        forwardSpeed : speeds.forwardSpeed,
+        angularSpeed : speeds.angularSpeed
+      };
+      console.log(speeds.id , robot.id , VAR.receivedSpeeds)
+
+    }
+
   });
 } // init()
 
@@ -118,6 +127,7 @@ export function controller(robot, params, onLoop, onInit) {
     let angularSpeed = 0;
 
     let pythonSensors = {
+      id : robot.id,
       leftField : leftField,
       centreField : centreField,
       rightField : rightField,
@@ -126,22 +136,14 @@ export function controller(robot, params, onLoop, onInit) {
       leftRobots : leftRobots,
       leftWalls : leftWalls
       }
-    let passedData = { data: '???' };
-    // console.log(sensors.polygons)
-    VAR.socket.emit('get_robot_speeds', pythonSensors); //! getting commands from python
-    // debugger;
 
-    // HOW DO WE WAIT FOR A RESPONSE FROM THE SERVER???
-
+    VAR.socket.emit('get_robot_speeds', {pythonSensors , CONST}); //! getting commands from python
     command.linearVel = VAR.receivedSpeeds.forwardSpeed * robot.velocityScale;
     command.angularVel = VAR.receivedSpeeds.angularSpeed * robot.velocityScale;
-    // debugger;
-
     //! /* to slove canvas error */
     command.linearVel = isNaN(command.linearVel) ? 0 : command.linearVel;
     command.angularVel = isNaN(command.angularVel) ? 0 : command.angularVel;
-    console.log(command)
-    console.log(forwardSpeed , robot.velocityScale)
+    // console.log(command)
     return command;
   };
 }

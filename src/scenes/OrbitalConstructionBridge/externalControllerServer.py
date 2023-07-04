@@ -41,43 +41,33 @@ def on_ping():
     print('Ping received')
     emit('pong', broadcast=True)
 
-@socketio.on('init_py_controller')
-def init_py_controller(CONST):
+# @socketio.on('init_py_controller')
+# def init_py_controller(CONST):
 
-    global controller #!TODO can avoid this
-    controller = Orbital_Construction(CONST)
-    print("initilized robot controller")
+#     global controller #!TODO can avoid this
+#     controller = Orbital_Construction(CONST)
+#     print("initilized robot controller")
 
 
 # Add a websocket route for receiving the desired speed for a single robot.
 @socketio.on('get_robot_speeds')
-def get_robot_speeds(sensors):
-    global controller
-
-    # print('=================================================')
-    # print('get_robot_speeds: ', data)
-    
-    # Reply 
-    # debugger()
-    if controller is None:
-        print("controller not initilized")
-        return
-    speed_commands = 0
-
-    angular_speed_commands = controller.calculate_speed_command(sensors)
+def get_robot_speeds(data):
+    # print(data)
+    sensors = data['pythonSensors']
+    CONST = data['CONST']
+    controller = Orbital_Construction()
+    # print("CONST" , CONST)
+    # print("sensors", sensors)
+    angular_speed_commands = controller.calculate_angular_speed(sensors,CONST)
     # print(">>>>> sensors:", type(sensors) , sensors , "<<<<")
     # print("\n -> CONST:", controller.CONST ,"<-/n")
 
     speeds = {}
-    speeds['forwardSpeed'] = controller.CONST.maxForwardSpeed 
+    speeds['id'] = sensors['id']
+    speeds['forwardSpeed'] = CONST['maxForwardSpeed']
     speeds['angularSpeed'] = angular_speed_commands
     # print("python ordered speed:" ,speeds)
     emit('robot_speeds', speeds, broadcast=True)
-
-@socketio.on('custom_message')
-def get_robot_speeds(data):
-    print('custom_message: ', data , type(data))
-
 
 if __name__ == '__main__': #! app never enters here
     socketio.run(app, debug=True)

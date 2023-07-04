@@ -5,11 +5,22 @@ SwarmJS
 ![image](https://user-images.githubusercontent.com/5468250/149712476-0fa0c7b0-bf23-409d-9dff-90b92c9cbbb7.png)
 
 ## tasks
-- [ ] reimplement orbital construction in python
+- [ ] make react to wait for response of backend before moving forward. This will make sure there is no time stamp mismatch.
+- [x] reimplement orbital construction in python
 - [ ] add RL to it according [paper]()
 - [ ] how fast of simulation can backend support?
 ## notes
 - sensors.fields.readings.heatMap.leftField has same three fields and last one is all 255
+- there was a problem with command mismatch among robots. solved it by id handshaking.
+- however the behavior is very great and this might be because of time stamp difference:
+- another possible improvement is creating different instance of controller for each robot and sending commands to seperate instances.
+ However I feel like the bottle neck here is websocket connection traffin and not speed of instances. 
+ One possible solution might be using different websocket connections per each robot.
+- now with normal speed and many robots we get acceptable behavior but increasing simulation time screws the behavior
+- another easy solution might be telling robots to stop whenever a command is not yet recieved from backend. use something like promise or await. 
+This is a bit tricky because we dont know how long an expectation is too long for which time period a command should be executed.
+- ***OBESETVATION*** when simulation is made faster, robots behave dumb. at this point if you pause simulation, you will see still commands coming through, indicating time stamp mismatch.
+- ***OBESETVATION*** when I close console, they behavior becomes also wierd because without console log simulation becomes naturally faster
 
 
 ## connection to python
