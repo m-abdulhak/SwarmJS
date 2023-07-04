@@ -5,6 +5,8 @@ export default function fieldDiffusion(scene) {
     // Apply simple Gaussian-like blur filter with the passed radius to a specified box in the field
     // parameters: (canvasElement, xOfTopLeftBox, yOfTopLeftBox, widthOfBox, heightOfBox, radiusOfBlur)
     // Reference for the blur algorithm availabe at: https://www.npmjs.com/package/stackblur-canvas
-    StackBlur.canvasRGBA(field.canvasElem, 0, 0, field.canvasElem.width, field.canvasElem.height, 15);
+    if (field?.canvasElem?.width && field?.canvasElem?.height) {
+      StackBlur.canvasRGBA(field.canvasElem, 0, 0, field.canvasElem.width, field.canvasElem.height, 15);
+    }
   }
 }
