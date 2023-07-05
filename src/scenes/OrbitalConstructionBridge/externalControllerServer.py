@@ -25,6 +25,8 @@ def index():
 
 @socketio.on('connect')
 def on_connect():
+    global controller
+    controller = Orbital_Construction()
     print('Client connected')
 
 @socketio.on('disconnect')
@@ -46,7 +48,6 @@ def on_ping():
 def get_robot_speeds(data):
     sensors = data['pythonSensors']
     CONST = data['CONST']
-    controller = Orbital_Construction()
     angular_speed_commands = controller.calculate_angular_speed(sensors,CONST)
     angular_speed_and_id = {}
     angular_speed_and_id['id'] = sensors['id']

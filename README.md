@@ -10,6 +10,7 @@ SwarmJS
 - [ ] add RL to it according [paper]()
 - [ ] how fast of simulation can backend support?
 ## notes
+- speed limit is not because of python speed. if python does not do anything, still swarmjs loop speed is three time python speed. Between each socket data recieveing, controller does 2 loop. this is because of websocket speed bottle neck.
 - robot requests should not trigger execution of pythonBridge. They should only access its data
 - sensors.fields.readings.heatMap.leftField has same three fields and last one is all 255
 - there was a problem with command mismatch among robots. solved it by id handshaking.
