@@ -14,6 +14,9 @@ import PuckFieldValueTracker from '../OrbitalConstruction/benchmarking/puckField
 
 import mapUrl from '../OrbitalConstruction/scalar_field.png';
 
+import pyhtonBridger from './scene/pyhtonBridge';
+
+
 // This constant defines the contour line of the scalar field around which the
 // robots will build.
 const tau = 0.6;
@@ -116,10 +119,16 @@ const simConfig = {
         defaultBackground: true,
         title: 'Heat Map'
       }
-    }
+    },
+    effects: [
+      {
+        func: pyhtonBridger,
+        framesBetweenRuns: 2
+      }
+    ]
   },
   robots: {
-    count: 10,
+    count: 1,
     radius: 4,
     params: {
       velocityScale: 15
@@ -189,7 +198,7 @@ const description = {
   html: `<p>The task is planar construction, as in the <a href=./?scene=OrbitalConstruction>the Orbital Construction scene</a> but using an externally defined controller that is connected via a Websocket bridge.  ADD MORE DETAILS</p>.
   `
 };
-
+console.log("index execution xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 export default {
   title: 'Orbital Construction via Websocket Bridge',
   name: 'orbitalConstructionBridge',

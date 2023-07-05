@@ -10,6 +10,7 @@ SwarmJS
 - [ ] add RL to it according [paper]()
 - [ ] how fast of simulation can backend support?
 ## notes
+- robot requests should not trigger execution of pythonBridge. They should only access its data
 - sensors.fields.readings.heatMap.leftField has same three fields and last one is all 255
 - there was a problem with command mismatch among robots. solved it by id handshaking.
 - however the behavior is very great and this might be because of time stamp difference:

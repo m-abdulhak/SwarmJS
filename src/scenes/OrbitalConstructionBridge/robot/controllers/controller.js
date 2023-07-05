@@ -2,7 +2,9 @@
 /* eslint-disable default-param-last */
 /* eslint-disable no-eval */
 
-import Socket from '@common/utils/socket';
+import {fetchAngularCommand} from '../../scene/pyhtonBridge';
+
+// import Socket from '@common/utils/socket';
 
 /* This part is different from original: sensor retrieveing part*/
 export function init(CONST, VAR, FUNC, robot, params) {
@@ -10,7 +12,7 @@ export function init(CONST, VAR, FUNC, robot, params) {
   // CONST.SOCKET_URL = 'ws://localhost:5000';
   // CONST.SOCKET_URL = 'http://127.0.0.1:5000'
   // CONST.SOCKET_URL = 'http://localhost:5000'
-  CONST.SOCKET_URL = 'http://127.0.0.1:5000';
+  // CONST.SOCKET_URL = 'http://127.0.0.1:5000';
 
   
   CONST.middleTau = params.tau || 0.6;
@@ -27,34 +29,6 @@ export function init(CONST, VAR, FUNC, robot, params) {
       robot.color = 'cyan';
     }
   }
-
-
-  VAR.socket = new Socket(CONST.SOCKET_URL);
-  VAR.socket.connect(CONST);
-  VAR.socket.ping();
-
-  VAR.receivedSpeeds = {};
-
-  VAR.socket.emit('init_py_controller', CONST);
-
-  // Add callback to store robot speeds received by external engine
-  VAR.socket.on('robot_speeds', (data) => {
-    const speeds = Object.entries(data).reduce((acc, [k, v]) => {
-      const strKey = `${k}`;
-      acc[strKey] = v;
-      return acc;
-    }, {});
-
-    if (speeds.id === robot.id ){ //! to make sure we got the right ID. THis problem existed
-      VAR.receivedSpeeds = {
-        forwardSpeed : speeds.forwardSpeed,
-        angularSpeed : speeds.angularSpeed
-      };
-      console.log(speeds.id , robot.id , VAR.receivedSpeeds)
-
-    }
-
-  });
 } // init()
 
 export function controller(robot, params, onLoop, onInit) {
@@ -89,61 +63,30 @@ export function controller(robot, params, onLoop, onInit) {
   }
   /* This part is different from original*/
   return (sensors) => {
-
     var command = {
       linearVel: 0,
       angularVel: 0,
       type: robot.SPEED_TYPES.RELATIVE
     };
-
     if (sensors.fields.readings.heatMap.leftField == null) {
       console.log("Sensors not readable yet.");
       return command;
     }
+    let forwardSpeed = CONST.maxForwardSpeed;
+    let angularSpeed = fetchAngularCommand(robot.id);
+    
+    //! trick... if angular speed is 0 means bridge is on hold
+    if (angularSpeed === 0) {
+      forwardSpeed = 0;
+    }
+    
+    command.linearVel = forwardSpeed * robot.velocityScale;
 
-    //
-    // Sensor variables that we might want to pass...
-    //
-
-    //console.log(sensors);
-
-    // Integers in the range 0 - 255:
-    const leftField = (sensors.fields.readings.heatMap.leftField)[0];
-    const centreField = (sensors.fields.readings.heatMap.frontField)[0];
-    const rightField = (sensors.fields.readings.heatMap.rightField)[0];
-
-    // Positive integers (unbounded, but generally small)
-    const leftPucks = sensors.polygons.left.reading.pucks;
-    const rightPucks = sensors.polygons.right.reading.pucks;
-
-    // We'll make these Boolean since the number shouldn't really change the response.
-    const leftRobots = sensors.circles.leftObstacle.reading.robots > 0;
-    const leftWalls =  sensors.circles.leftObstacle.reading.walls > 0;
-    // VAR.socket.emit('custom_message' , leftWalls);
-
-
-    // We want the controller to determine the forward speed and angular speed.
-    let forwardSpeed = 0;
-    let angularSpeed = 0;
-
-    let pythonSensors = {
-      id : robot.id,
-      leftField : leftField,
-      centreField : centreField,
-      rightField : rightField,
-      leftPucks : leftPucks,
-      rightPucks : rightPucks,
-      leftRobots : leftRobots,
-      leftWalls : leftWalls
-      }
-
-    VAR.socket.emit('get_robot_speeds', {pythonSensors , CONST}); //! getting commands from python
-    command.linearVel = VAR.receivedSpeeds.forwardSpeed * robot.velocityScale;
-    command.angularVel = VAR.receivedSpeeds.angularSpeed * robot.velocityScale;
-    //! /* to slove canvas error */
+    command.angularVel = angularSpeed * robot.velocityScale;
+    // //! /* to slove canvas error */
     command.linearVel = isNaN(command.linearVel) ? 0 : command.linearVel;
     command.angularVel = isNaN(command.angularVel) ? 0 : command.angularVel;
-    // console.log(command)
+    console.log(">>>> controller returning command" ,command , "by order", angularSpeed)
     return command;
   };
 }
