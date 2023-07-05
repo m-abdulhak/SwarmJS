@@ -16,15 +16,17 @@ socket.on('robot_speeds', (data) => {
         acc[strKey] = v;
         return acc;
     }, {});
-
-    command[speeds.id] = speeds.angularSpeed
-    receivedFlag[speeds.id] = 1;
-    console.log("VVVVVVVVV recieved command by python bridger", speeds , data,receivedFlag)
+    let speedsList = Object.values(speeds)
+    for(let i=0 ; i< speedsList.length ; i++){
+        command[speedsList[i].id] = speedsList[i].angularSpeed //* double standard
+        receivedFlag[speedsList[i].id] = 1;
+    }
+    console.log("VVVVVVVVV recieved command by python bridger", speedsList , receivedFlag)
 
 });
 
 
-export function fetchAngularCommand(id) {
+export function fetchAngularCommand(id) { //! doesn't execute anything. only has access to memory calculated by python.
     // console.log("fetch request form",id)
     // while(receivedFlag[id] === 0){
     //     console.log("id",id,"waiting")
@@ -44,9 +46,6 @@ export default function pyhtonBridger(scene) {
     // console.log("-----------------------------I AM pyhtonBridge",)
     
     //! duplicate code ----  can do better. also executing at each loop
-    const CONST = {}  
-    CONST.maxAngularSpeed = 0.015;
-    CONST.maxForwardSpeed = 0.2;
 
 
     let allRobotSensors = new Array(scene.robots.length)
@@ -55,8 +54,16 @@ export default function pyhtonBridger(scene) {
 
     
     for(let i = 0; i < allRobotSensors.length ; i++){
+        let CONST = {}  //! if moves out will cause address conflict
+        CONST.maxAngularSpeed = 0.015;
+        CONST.maxForwardSpeed = 0.2;
+    
         CONST.middleTau = scene.robots[i].controllers.velocity.params.tau || 0.6; 
+        
+        
         CONST.innie = scene.robots[i].color === 'yellow'? 1 : 0; //! PROBLEM inconsistent with robots themselves
+        console.log(")))))))))))))))))) robot", i ,"collor" , scene.robots[i].color , scene.robots[i].color === 'yellow' , CONST.innie)
+        // debugger;
         CONST.tau = CONST.innie ? CONST.middleTau + 0.05 : CONST.middleTau - 0.05;
     
         const leftField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.leftField[0];
@@ -84,9 +91,9 @@ export default function pyhtonBridger(scene) {
             leftWalls : leftWalls
             };
 
-        allRobotSensors[i] = pythonSensors
-
-        socket.emit('get_robot_speeds', {pythonSensors , CONST});    
+        allRobotSensors[i] = {pythonSensors , CONST}
     }
+    console.log("will emit",allRobotSensors)
+    socket.emit('get_robot_speeds', allRobotSensors);    
 
 }
