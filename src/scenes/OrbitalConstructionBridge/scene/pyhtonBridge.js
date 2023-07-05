@@ -47,10 +47,6 @@ export default function pyhtonBridger(scene) {
     const CONST = {}  
     CONST.maxAngularSpeed = 0.015;
     CONST.maxForwardSpeed = 0.2;
-    CONST.middleTau = scene.robots[0].controllers.velocity.params.tau || 0.6; //! fixed robot index PROBLEM
-    // We'll define 25% of the robots as innies (pretty arbitrary)
-    CONST.innie = Math.random() < 0.25; //! PROBLEM inconsistent with robots themselves
-    CONST.tau = CONST.innie ? CONST.middleTau + 0.05 : CONST.middleTau - 0.05;
 
 
     let allRobotSensors = new Array(scene.robots.length)
@@ -59,6 +55,10 @@ export default function pyhtonBridger(scene) {
 
     
     for(let i = 0; i < allRobotSensors.length ; i++){
+        CONST.middleTau = scene.robots[i].controllers.velocity.params.tau || 0.6; 
+        CONST.innie = scene.robots[i].color === 'yellow'? 1 : 0; //! PROBLEM inconsistent with robots themselves
+        CONST.tau = CONST.innie ? CONST.middleTau + 0.05 : CONST.middleTau - 0.05;
+    
         const leftField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.leftField[0];
         const centreField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.frontField[0];
         const rightField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.rightField[0];
