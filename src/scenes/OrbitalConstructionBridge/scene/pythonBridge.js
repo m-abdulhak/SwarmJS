@@ -57,7 +57,7 @@ function initilizeRobots(scene) {
     for(let i = 0; i < CONST.length ; i++){
         
         let middleTau_ = scene.robots[i].controllers.velocity.params.tau || 0.6;
-        let innie_ = Math.random() < 0.25;
+        let innie_ = scene.robots[i].color === 'yellow'? 1 : 0;
         let tau_ = innie_ ? middleTau_ + 0.05 : middleTau_ - 0.05;
 
         CONST[i] = {maxAngularSpeed : 0.015,
@@ -66,20 +66,12 @@ function initilizeRobots(scene) {
             innie : innie_,
             tau : tau_,
         }
-        // debugger;
-        if (scene.robots[i]) {
-          if (CONST[i].innie) {
-            scene.robots[i].color = 'yellow';
-          } else {
-            scene.robots[i].color = 'cyan';
-          }
-        }
     }
 }
 
 export default function pythonBridger(scene) {
     initilizeRobots(scene);
-    debugger;
+    // debugger;
     let allRobotSensors = new Array(scene.robots.length)
 
     for(let i = 0; i < allRobotSensors.length ; i++){

@@ -1,8 +1,20 @@
 import {fetchAngularCommand} from '../../scene/pythonBridge';
 
 export function init(CONST, VAR, FUNC, robot, params) {
-  return CONST , robot.controllers.velocity.init ;
+  CONST.middleTau = params.tau || 0.6;
+  CONST.maxAngularSpeed = 0.015;
+  CONST.maxForwardSpeed = 0.2;
 
+  // We'll define 25% of the robots as innies (pretty arbitrary)
+  CONST.innie = Math.random() < 0.25;
+  CONST.tau = CONST.innie ? CONST.middleTau + 0.05 : CONST.middleTau - 0.05;
+  if (robot) {
+    if (CONST.innie) {
+      robot.color = 'yellow';
+    } else {
+      robot.color = 'cyan';
+    }
+  }
 } // init()
 
 export function controller(robot, params, onLoop, onInit) {
