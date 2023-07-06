@@ -138,7 +138,8 @@ const simConfig = {
         init,
         controller,
         params: { tau }
-      }
+      },
+      supportsUserDefinedControllers: false
     },
     sensors: [...Object.values(usedSensors)],
     actuators: [],
@@ -195,11 +196,34 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>The task is planar construction, as in the <a href=./?scene=OrbitalConstruction>the Orbital Construction scene</a> but using an externally defined controller that is connected via a Websocket bridge.  
-  The python code controlling this scene is in <pre>./robot/controllers/orbital_construction.py</pre> and the backend server that handeles websocket connection with swarmJS is <pre>./externalControllerServer.py</pre>.
+  html: `<p>
+  The task is planar construction, as in the
+  <a href="./?scene=OrbitalConstruction">the Orbital Construction scene</a>,
+  but using an externally defined controller that is connected via a Websocket bridge.
+  The python code controlling this scene is in
+  <code>./robot/controllers/orbital_construction.py</code>
+  and the backend server that handles websocket connection with swarmJS is
+  <code>./externalControllerServer.py</code>.
+  </p>
 
-  </p>.
-  `
+  <p>
+    - You should be installing all the dependencies for Python:
+    <br>
+    <code>
+      pip install Flask Flask-SocketIO
+      <br>
+      pip install simple-websocket
+    </code>
+  </p>
+
+  <p>
+    - Run Flask by executing the following command:
+    <br>
+    <code>
+      flask --app src/scenes/OrbitalConstructionBridge/externalControllerServer.py run
+    </code>
+  </p>
+`
 };
 export default {
   title: 'Orbital Construction via Websocket Bridge',

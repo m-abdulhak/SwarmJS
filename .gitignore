@@ -9,3 +9,4 @@ python_scripts/__pycache__
 
 **/__pycache__/
 **/.*
+/src/scenes/OrbitalConstructionBridge/.README.md

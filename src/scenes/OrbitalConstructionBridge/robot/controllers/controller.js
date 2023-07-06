@@ -1,20 +1,5 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable default-param-last */
-/* eslint-disable no-eval */
-
 import {fetchAngularCommand} from '../../scene/pythonBridge';
-
-// import Socket from '@common/utils/socket';
-
-/* This part is different from original: sensor retrieveing part*/
 export function init(CONST, VAR, FUNC, robot, params) {
-  // PARAMETERS:
-  // CONST.SOCKET_URL = 'ws://localhost:5000';
-  // CONST.SOCKET_URL = 'http://127.0.0.1:5000'
-  // CONST.SOCKET_URL = 'http://localhost:5000'
-  // CONST.SOCKET_URL = 'http://127.0.0.1:5000';
-
-  
   CONST.middleTau = params.tau || 0.6;
   CONST.maxAngularSpeed = 0.015;
   CONST.maxForwardSpeed = 0.2;
