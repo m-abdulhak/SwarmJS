@@ -1,15 +1,17 @@
 
 import Socket from '@common/utils/socket';
 
+/* global variables */
 const SOCKET_URL = 'http://127.0.0.1:5000';
 var command = {};
 var receivedFlag = [0];
 var socket = new Socket(SOCKET_URL);
 socket.connect();
 socket.ping();
+var isInitilized = false;
+var CONST = [{}]
 
-
-
+/* socket callback function */
 socket.on('robot_speeds', (data) => {
     const speeds = Object.entries(data).reduce((acc, [k, v]) => {
         const strKey = `${k}`;
@@ -42,30 +44,46 @@ export function fetchAngularCommand(id) { //! doesn't execute anything. only has
     return command[id];
 }
 
-export default function pythonBridger(scene) {
-    // console.log("-----------------------------I AM pyhtonBridge",)
+function initilizeRobots(scene) {
+    if(isInitilized)// robots have been initilized before
+        return; 
     
-    //! duplicate code ----  can do better. also executing at each loop
+    isInitilized = true;
 
-
-    let allRobotSensors = new Array(scene.robots.length)
     command = new Array(scene.robots.length) //! global
     receivedFlag = new Array(scene.robots.length).fill(0) //! global
 
-    
-    for(let i = 0; i < allRobotSensors.length ; i++){
-        let CONST = {}  //! if moves out will cause address conflict
-        CONST.maxAngularSpeed = 0.015;
-        CONST.maxForwardSpeed = 0.2;
-    
-        CONST.middleTau = scene.robots[i].controllers.velocity.params.tau || 0.6; 
+    CONST = new Array(scene.robots.length).fill({});
+    for(let i = 0; i < CONST.length ; i++){
         
-        
-        CONST.innie = scene.robots[i].color === 'yellow'? 1 : 0; //! PROBLEM inconsistent with robots themselves
-        console.log(")))))))))))))))))) robot", i ,"collor" , scene.robots[i].color , scene.robots[i].color === 'yellow' , CONST.innie)
+        let middleTau_ = scene.robots[i].controllers.velocity.params.tau || 0.6;
+        let innie_ = Math.random() < 0.25;
+        let tau_ = innie_ ? middleTau_ + 0.05 : middleTau_ - 0.05;
+
+        CONST[i] = {maxAngularSpeed : 0.015,
+            maxForwardSpeed : 0.2,
+            middleTau : middleTau_,
+            innie : innie_,
+            tau : tau_,
+        }
         // debugger;
-        CONST.tau = CONST.innie ? CONST.middleTau + 0.05 : CONST.middleTau - 0.05;
-    
+        if (scene.robots[i]) {
+          if (CONST[i].innie) {
+            scene.robots[i].color = 'yellow';
+          } else {
+            scene.robots[i].color = 'cyan';
+          }
+        }
+    }
+}
+
+export default function pythonBridger(scene) {
+    initilizeRobots(scene);
+    debugger;
+    let allRobotSensors = new Array(scene.robots.length)
+
+    for(let i = 0; i < allRobotSensors.length ; i++){
+
         const leftField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.leftField[0];
         const centreField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.frontField[0];
         const rightField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.rightField[0];
@@ -77,8 +95,6 @@ export default function pythonBridger(scene) {
         // We'll make these Boolean since the number shouldn't really change the response.
         const leftRobots = scene.robots[i].sensorManager.activeSensors[0].value.leftObstacle.reading.robots > 0;
         const leftWalls =  scene.robots[i].sensorManager.activeSensors[0].value.leftObstacle.reading.walls > 0;
-        // VAR.socket.emit('custom_message' , leftWalls);
-    
     
         let pythonSensors = {
             id : i,
@@ -91,8 +107,10 @@ export default function pythonBridger(scene) {
             leftWalls : leftWalls
             };
 
-        allRobotSensors[i] = {pythonSensors , CONST}
+        let robotCONST = CONST[i]
+        allRobotSensors[i] = {pythonSensors , robotCONST};
     }
+
     console.log("will emit",allRobotSensors)
     socket.emit('get_robot_speeds', allRobotSensors);    
 

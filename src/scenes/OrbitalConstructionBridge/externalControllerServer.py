@@ -50,7 +50,7 @@ def get_robot_speeds(data):
     swarm_speeds = []
     for robot_data in data:
         sensors = robot_data['pythonSensors']
-        CONST = robot_data['CONST']
+        CONST = robot_data['robotCONST']
         angular_speed_commands = controller.calculate_angular_speed(sensors,CONST)
         angular_speed_and_id = {}
         angular_speed_and_id['id'] = sensors['id']
