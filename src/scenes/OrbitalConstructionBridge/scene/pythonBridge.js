@@ -42,7 +42,7 @@ export function fetchAngularCommand(id) { //! doesn't execute anything. only has
     return command[id];
 }
 
-export default function pyhtonBridger(scene) {
+export default function pythonBridger(scene) {
     // console.log("-----------------------------I AM pyhtonBridge",)
     
     //! duplicate code ----  can do better. also executing at each loop

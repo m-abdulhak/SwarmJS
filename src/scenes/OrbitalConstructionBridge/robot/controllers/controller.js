@@ -2,7 +2,7 @@
 /* eslint-disable default-param-last */
 /* eslint-disable no-eval */
 
-import {fetchAngularCommand} from '../../scene/pyhtonBridge';
+import {fetchAngularCommand} from '../../scene/pythonBridge';
 
 // import Socket from '@common/utils/socket';
 

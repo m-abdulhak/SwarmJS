@@ -14,7 +14,7 @@ import PuckFieldValueTracker from '../OrbitalConstruction/benchmarking/puckField
 
 import mapUrl from '../OrbitalConstruction/scalar_field.png';
 
-import pyhtonBridger from './scene/pyhtonBridge';
+import pyhtonBridger from './scene/pythonBridge';
 
 
 // This constant defines the contour line of the scalar field around which the
