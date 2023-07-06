@@ -1,5 +1,5 @@
 #! /bin/bash
 echo "running backend"
-. /home/arash/Workdir/Research/SwarmJS/.swarmjs/bin/activate
-flask --app externalControllerServer.py run
+. ./.swarmjs/bin/activate
+flask --app src/scenes/OrbitalConstructionBridge/externalControllerServer.py run
 
