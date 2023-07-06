@@ -195,10 +195,12 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>The task is planar construction, as in the <a href=./?scene=OrbitalConstruction>the Orbital Construction scene</a> but using an externally defined controller that is connected via a Websocket bridge.  ADD MORE DETAILS</p>.
+  html: `<p>The task is planar construction, as in the <a href=./?scene=OrbitalConstruction>the Orbital Construction scene</a> but using an externally defined controller that is connected via a Websocket bridge.  
+  The python code controlling this scene is in <pre>./robot/controllers/orbital_construction.py</pre> and the backend server that handeles websocket connection with swarmJS is <pre>./externalControllerServer.py</pre>.
+
+  </p>.
   `
 };
-console.log("index execution xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 export default {
   title: 'Orbital Construction via Websocket Bridge',
   name: 'orbitalConstructionBridge',
