@@ -12,9 +12,7 @@ const getPos = () => {
   return positions.pop();
 };
 
-export default function getRandCollFreePosGenerator(
-  numOfPos, radius, envWidth, envHeight, staticObjects
-) {
+export default function getRandCollFreePosGenerator(numOfPos, radius, envWidth, envHeight, staticObjects) {
   const resolution = (radius * 2.1);
   const xCount = envWidth / resolution;
   const yCount = envHeight / resolution;
