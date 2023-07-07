@@ -1,4 +1,4 @@
-import cluster from './Cluster';
+import cluster from './DensityCluster';
 //import ExternalEngine from './ExternalEngine';
 import orbitalConstruction from './OrbitalConstruction';
 import beeClust from './BeeClust';
