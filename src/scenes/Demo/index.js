@@ -157,7 +157,7 @@ const description = {
 
 
 export default {
-  title: 'Demo',
+  title: 'Demo (General)',
   name: 'demo',
   simConfig,
   benchmarkConfig,

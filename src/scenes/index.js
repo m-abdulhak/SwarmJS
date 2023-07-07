@@ -1,6 +1,6 @@
 import cluster from './Cluster';
 import fieldManipulation from './Fields';
-import ExternalEngine from './ExternalEngine';
+//import ExternalEngine from './ExternalEngine';
 import orbitalConstruction from './OrbitalConstruction';
 import beeClust from './BeeClust';
 import voronoiSorting from './VoronoiSorting';
@@ -10,13 +10,13 @@ import labyrinth from './Labyrinth';
 import collisionAvoidance from './CollisionAvoidance';
 
 export default {
-  labyrinth,
-  demo,
-  orbitalConstruction,
   beeClust,
-  cluster,
+  collisionAvoidance,
+  demo,
   fieldManipulation,
+  cluster,
+  labyrinth,
+  orbitalConstruction,
   simpleSorting,
-  voronoiSorting,
-  collisionAvoidance
+  voronoiSorting
 };

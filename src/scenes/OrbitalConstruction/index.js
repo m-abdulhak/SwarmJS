@@ -17,7 +17,7 @@ import mapUrl from './scalar_field.png';
 
 // This constant defines the contour line of the scalar field around which the
 // robots will build.
-const tau = 0.1;
+const tau = 0.6;
 
 const renderables = [
   { module: 'Scene', elements: SceneRenderables },

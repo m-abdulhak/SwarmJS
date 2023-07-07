@@ -29,5 +29,8 @@
     "eslint-plugin-react": "^7.31.10",
     "eslint-plugin-react-hooks": "^4.6.0",
     "file-loader": "^6.2.0"
+  },
+  "dependencies": {
+    "js-graph-algorithms": "^1.0.18"
   }
 }

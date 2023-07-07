@@ -168,7 +168,7 @@ const description = {
 
 
 export default {
-  title: 'Voronoi Sorting',
+  title: 'Sorting (Voronoi)',
   name: 'voronoiSorting',
   simConfig,
   benchmarkConfig,
