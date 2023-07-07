@@ -11,21 +11,6 @@ socket.ping();
 var isInitilized = false;
 var CONST = [{}]
 
-/* socket callback function */
-socket.on('robot_speeds', (data) => {
-    const speeds = Object.entries(data).reduce((acc, [k, v]) => {
-        const strKey = `${k}`;
-        acc[strKey] = v;
-        return acc;
-    }, {});
-    let speedsList = Object.values(speeds)
-    for(let i=0 ; i< speedsList.length ; i++){
-        command[speedsList[i].id] = speedsList[i].angularSpeed //* double standard
-        receivedFlag[speedsList[i].id] = 1;
-    }
-    console.log("VVVVVVVVV recieved command by python bridger", speedsList , receivedFlag)
-
-});
 
 
 export function fetchAngularCommand(id) { //! doesn't execute anything. only has access to memory calculated by python.
@@ -67,6 +52,26 @@ function initilizeRobots(scene) {
             tau : tau_,
         }
     }
+
+    /* socket callback function */
+    socket.on('robot_speeds', (data) => {
+        const speeds = Object.entries(data).reduce((acc, [k, v]) => {
+            const strKey = `${k}`;
+            acc[strKey] = v;
+            return acc;
+        }, {});
+        let speedsList = Object.values(speeds)
+        for(let i=0 ; i< speedsList.length ; i++){
+            command[speedsList[i].id] = speedsList[i].angularSpeed //* double standard
+            receivedFlag[speedsList[i].id] = 1;
+            
+            // scene.robots[speedsList[i].id].externalVelocity= {angularSpeed : speedsList[i].angularSpeed};
+        }
+        console.log("iVVVVVVVVV recieved command by python bridger", speedsList , receivedFlag)
+
+});
+
+
 }
 
 export default function pythonBridger(scene) {
