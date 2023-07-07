@@ -1,5 +1,6 @@
 import {
   CoreSensors,
+  CoreActuators,
   ExtraSensors,
   CorePositionsGenerators,
   CorePerformanceTrakers
@@ -10,8 +11,10 @@ import SceneRenderables from '@common/scene/renderables';
 import RobotRenderables from './robot/renderables';
 
 import { init, controller } from './robot/controllers/controller';
+import fieldEffects from './scene/fieldEffects';
 
-import mapUrl from './map.png';
+import pheromoneUrl from './centre.png';
+import occupancyUrl from './black.png';
 
 // All renderables should be registered in this list and assigned a module property
 // This is necessary to avoid imposing a unique restriction on renderable type in different modules
@@ -37,15 +40,23 @@ const usedSensors = {
       points: [
         {
           type: 'Cartesian',
-          name: 'left',
+          name: 'forward',
           coords: {
-            x: 0,
-            y: 30
+            x: 30,
+            y: 0
           }
         },
         {
           type: 'Polar',
-          name: 'right45',
+          name: 'left',
+          coords: {
+            distance: 30,
+            angle: -Math.PI / 4.0
+          }
+        },
+        {
+          type: 'Polar',
+          name: 'right',
           coords: {
             distance: 30,
             angle: Math.PI / 4.0
@@ -62,15 +73,25 @@ const simConfig = {
     height: 400,
     renderSkip: 1,
     fields: {
-      heatMap: {
-        url: mapUrl,
+      pheromone: {
+        url: pheromoneUrl,
         defaultBackground: true,
-        title: 'Heat Map'
+        title: 'Pheromone'
+      },
+      occupancy: {
+        url: occupancyUrl,
+        title: 'Occupancy'
       }
-    }
+    },
+    effects: [
+      {
+        func: fieldEffects,
+        framesBetweenRuns: 10
+      }
+    ]
   },
   robots: {
-    count: 3,
+    count: 10,
     radius: 15,
     params: {
       velocityScale: 15
@@ -83,7 +104,7 @@ const simConfig = {
       }
     },
     sensors: [...Object.values(usedSensors)],
-    actuators: [],
+    actuators: [CoreActuators.field],
     // The neighbors sensor doesn't work unless the Voronoi diagram is used.
     useVoronoiDiagram: true,
     misc: {
@@ -151,13 +172,15 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>A demo scene.  The index.js file that underlies this scene has more comments than other scenes.  So this scene serves the purpose of demonstration but also as a template for your own scene.</p>
+  html: `<p>A demo scene to illustrate how the robots can perceive and manipulate fields.  These fields could be temperature, pheromone level, or any other such scalar field.</p>
+  
+  <p>The index.js file that underlies this scene has more comments than other scenes.  So this scene could be used as a template for your own custom scene.</p>
   `
 };
 
 
 export default {
-  title: 'Demo',
+  title: 'Fields Demo',
   name: 'demo',
   simConfig,
   benchmarkConfig,

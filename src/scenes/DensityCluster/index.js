@@ -156,14 +156,21 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>An example of self-organized clustering.  Each robot can sense pucks in two sensor regions (inner and outer) and choose to pick-up or deposit pucks depending on whether they are in a low-density or high-density region (i.e. there are few pucks, or many pucks).</p>
+  html: `<p>An example of self-organized clustering based on local object <b>density</b>.  Each robot can sense pucks in two sensor regions (inner and outer) and choose to pick-up or deposit pucks depending on whether they are in a low-density or high-density region (i.e. there are few pucks, or many pucks).</p>
+  
+  <p>Loosely inspired by the following classic paper:</p>
+
+  <p>
+  <a href=https://link.springer.com/chapter/10.1007/978-94-010-0870-9_63 target=_blank>
+  Beckers, Ralph, Owen E. Holland, and Jean-Louis Deneubourg. "Fom local actions to global tasks: Stigmergy and collective robotics." Prerational Intelligence: Adaptive Behavior and Intelligent Systems Without Symbols and Logic, Volume 1, Volume 2 Prerational Intelligence: Interdisciplinary Perspectives on the Behavior of Natural and Artificial Systems, Volume 3 (2000): 1008-1022.
+  </a>
   </p>
   `
 };
 
 export default {
-  title: 'Object Clustering',
-  name: 'cluster',
+  title: 'Cluster (Density)',
+  name: 'densityCluster',
   simConfig,
   benchmarkConfig,
   description

@@ -208,15 +208,12 @@ const sensorsRenderables = [
       shape: 'circle',
       dataPoints: { sceneProp: 'robots' },
       staticAttrs: {
-          r: {
-              prop: 'radius',
-              modifier: (val) => val * 0.4
-          },
+          r: 4,
           id: { prop: 'id' }
       },
       dynamicAttrs: {
           stroke: {
-              prop: 'sensors.fields.readings.heatMap.forward',
+              prop: 'sensors.fields.readings.pheromone.forward',
               modifier: (val) => {
                   if (!val) {
                       return 'black';
@@ -226,7 +223,7 @@ const sensorsRenderables = [
               }
           },
           fill: {
-              prop: 'sensors.fields.readings.heatMap.forward',
+              prop: 'sensors.fields.readings.pheromone.forward',
               modifier: (val) => {
                   if (!val) {
                       return 'black';
@@ -249,18 +246,36 @@ const sensorsRenderables = [
   {
       type: 'Sensor',
       svgClass: '',
-      desc: 'Right45 Field Sensor',
+      desc: 'Left Field Sensor',
       shape: 'circle',
       dataPoints: { sceneProp: 'robots' },
       staticAttrs: {
-          r: 2,
+          r: 4,
           id: { prop: 'id' }
       },
       dynamicAttrs: {
-          stroke: 'none',
-          fill: 'rgb(255, 0, 255, 0.9)',
-          cx: { prop: 'sensors.fields.sensingPoints.right45.x' },
-          cy: { prop: 'sensors.fields.sensingPoints.right45.y' }
+          stroke: {
+              prop: 'sensors.fields.readings.pheromone.left',
+              modifier: (val) => {
+                  if (!val) {
+                      return 'black';
+                  }
+                  const res = `rgb(${255-val[0]}, ${255-val[1]}, ${255-val[2]})`;
+                  return res;
+              }
+          },
+          fill: {
+              prop: 'sensors.fields.readings.pheromone.left',
+              modifier: (val) => {
+                  if (!val) {
+                      return 'black';
+                  }
+                  const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
+                  return res;
+              }
+          },
+          cx: { prop: 'sensors.fields.sensingPoints.left.x' },
+          cy: { prop: 'sensors.fields.sensingPoints.left.y' }
       },
       styles: {
           fill: 'none',
@@ -269,6 +284,75 @@ const sensorsRenderables = [
           'stroke-width': 1,
           'stroke-opacity': 1
       }
+  },
+  {
+      type: 'Sensor',
+      svgClass: '',
+      desc: 'Right Field Sensor',
+      shape: 'circle',
+      dataPoints: { sceneProp: 'robots' },
+      staticAttrs: {
+          r: 4,
+          id: { prop: 'id' }
+      },
+      dynamicAttrs: {
+          stroke: {
+              prop: 'sensors.fields.readings.pheromone.right',
+              modifier: (val) => {
+                  if (!val) {
+                      return 'black';
+                  }
+                  const res = `rgb(${255-val[0]}, ${255-val[1]}, ${255-val[2]})`;
+                  return res;
+              }
+          },
+          fill: {
+              prop: 'sensors.fields.readings.pheromone.right',
+              modifier: (val) => {
+                  if (!val) {
+                      return 'black';
+                  }
+                  const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
+                  return res;
+              }
+          },
+          cx: { prop: 'sensors.fields.sensingPoints.right.x' },
+          cy: { prop: 'sensors.fields.sensingPoints.right.y' }
+      },
+      styles: {
+          fill: 'none',
+          stroke: 'black',
+          'fill-opacity': 0,
+          'stroke-width': 1,
+          'stroke-opacity': 1
+      }
+  },
+  {
+    type: 'Text',
+    svgClass: 'robot-number-text',
+    desc: 'Forward Field Value',
+    shape: 'text',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      text: {
+        prop: 'id'
+      },
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      x: { prop: 'sensors.fields.sensingPoints.forward.x' },
+      y: { prop: 'sensors.fields.sensingPoints.forward.y' },
+      text: {
+        prop: 'sensors.fields.readings.pheromone.forward[0]'
+      }
+    },
+    styles: {
+      'text-anchor': 'middle',
+      'font-size': 15,
+      fill: 'black',
+      stroke: 'grey',
+      'stroke-width': 1
+    }
   },
   {
     type: 'Text',
@@ -286,7 +370,7 @@ const sensorsRenderables = [
       x: { prop: 'sensors.fields.sensingPoints.left.x' },
       y: { prop: 'sensors.fields.sensingPoints.left.y' },
       text: {
-        prop: 'sensors.fields.readings.heatMap.left[0]'
+        prop: 'sensors.fields.readings.pheromone.left[0]'
       }
     },
     styles: {
@@ -310,10 +394,10 @@ const sensorsRenderables = [
       id: { prop: 'id' }
     },
     dynamicAttrs: {
-      x: { prop: 'sensors.fields.sensingPoints.right45.x' },
-      y: { prop: 'sensors.fields.sensingPoints.right45.y' },
+      x: { prop: 'sensors.fields.sensingPoints.right.x' },
+      y: { prop: 'sensors.fields.sensingPoints.right.y' },
       text: {
-        prop: 'sensors.fields.readings.heatMap.right45[0]'
+        prop: 'sensors.fields.readings.pheromone.right[0]'
       }
     },
     styles: {
