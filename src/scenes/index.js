@@ -1,6 +1,5 @@
-import cluster from './Cluster';
-import fieldManipulation from './Fields';
-import ExternalEngine from './ExternalEngine';
+import densityCluster from './DensityCluster';
+import peripheryCluster from './PeripheryCluster';
 import orbitalConstruction from './OrbitalConstruction';
 import beeClust from './BeeClust';
 import voronoiSorting from './VoronoiSorting';
@@ -9,17 +8,20 @@ import demo from './Demo';
 import labyrinth from './Labyrinth';
 import orbitalConstructionBridge from './OrbitalConstructionBridge';
 import collisionAvoidance from './CollisionAvoidance';
+//import ExternalEngine from './ExternalEngine';
 
 // changing this will change the order in webpage
 export default {
-  orbitalConstructionBridge,
-  orbitalConstruction,
-  labyrinth,
-  demo,
   beeClust,
-  cluster,
-  fieldManipulation,
+  densityCluster,
+  peripheryCluster,
+  collisionAvoidance,
+  demo,
+  labyrinth,
+  orbitalConstruction,
   simpleSorting,
   voronoiSorting,
-  collisionAvoidance
+  orbitalConstructionBridge,
+  cluster,
+  fieldManipulation,
 };

@@ -32,5 +32,6 @@
   },
   "dependencies": {
     "socket.io-client": "^4.7.1"
+    "js-graph-algorithms": "^1.0.18"
   }
 }

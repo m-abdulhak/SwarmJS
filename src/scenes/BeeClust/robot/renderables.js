@@ -192,7 +192,7 @@ const sensorsRenderables = [
     },
     dynamicAttrs: {
       stroke: {
-        prop: 'sensors.fields.readings.heatMap.forward',
+        prop: 'sensors.fields.readings.temperature.forward',
         modifier: (val) => {
           if (!val) {
             return 'black';
@@ -202,7 +202,7 @@ const sensorsRenderables = [
         }
       },
       fill: {
-        prop: 'sensors.fields.readings.heatMap.forward',
+        prop: 'sensors.fields.readings.temperature.forward',
         modifier: (val) => {
           if (!val) {
             return 'black';

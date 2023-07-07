@@ -71,9 +71,9 @@ const simConfig = {
     renderSkip: 1,
     background: mapUrl,
     fields: {
-      heatMap: {
+      temperature: {
         url: mapUrl,
-        title: 'Heat Map'
+        title: 'Temperature'
       }
     }
   },
