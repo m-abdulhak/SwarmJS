@@ -85,6 +85,10 @@
     margin-right: 10px;
 }
 
+#scene-selection a {
+    margin-left: 12px;
+}
+
 #quick-actions {
     width: fit-content;
     height: 50px;
@@ -227,6 +231,23 @@
     top: 0;
     left: 0;
     z-index: 1;
+}
+
+.input-stack-horizontal {
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.input-group {
+    display: flex;
+}
+
+.input-group {
+    margin: 10px 10px 10px 0px;
+}
+
+.input-group input {
+    height: 3px;
 }
 
 .hidden {

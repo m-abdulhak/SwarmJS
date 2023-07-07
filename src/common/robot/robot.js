@@ -252,7 +252,7 @@ export default class Robot {
   }
 
   reached(point) {
-    const ret = this.getDistanceTo(point) <= this.radius / 50;
+    const ret = this.getDistanceTo(point) <= this.radius / 5;
     return ret;
   }
 

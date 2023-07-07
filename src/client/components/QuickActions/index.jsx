@@ -121,7 +121,7 @@ const QuickActions = ({
       <FontAwesomeIcon
         icon={faCog}
         className={`quick-actions-icon ${uiEnabled ? 'green-action-btn' : ''}`}
-        title="Toggle UI"
+        title="Toggle Configuration Panels"
         onClick={() => setUiEnabled(!uiEnabled)}
       />
       <FontAwesomeIcon
