@@ -220,7 +220,7 @@ const App = () => {
       <a href={`${window.location.origin}${window.location.pathname}?scene=${selectedScene}`}>
         <FontAwesomeIcon
           icon={faLink}
-          title="Change Background"
+          title="Direct Link to This Scene"
         />
       </a>
     </div>
