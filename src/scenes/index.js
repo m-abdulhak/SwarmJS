@@ -21,7 +21,5 @@ export default {
   orbitalConstruction,
   simpleSorting,
   voronoiSorting,
-  orbitalConstructionBridge,
-  cluster,
-  fieldManipulation,
+  orbitalConstructionBridge
 };
