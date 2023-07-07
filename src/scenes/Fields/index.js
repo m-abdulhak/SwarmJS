@@ -62,7 +62,7 @@ const simConfig = {
     fields: {
       heatMap: {
         url: mapUrl,
-        title: 'Heat Map'
+        title: 'Field 1'
       },
       field2: {
         url: mapUrl2,

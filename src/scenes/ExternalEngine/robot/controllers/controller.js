@@ -21,5 +21,10 @@ export function controller(
   onLoop = null,
   onInit = null
 ) {
-  return CoreControllers.velocity.diffVelocityController(robot, params, onLoop, onInit || init);
+  return CoreControllers.velocity.diffVelocityController(
+    robot,
+    params,
+    () => ({ linearVel: { x: 0, y: 0 }, angularVel: 0 }),
+    onInit || init
+  );
 }

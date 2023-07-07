@@ -15,7 +15,7 @@ class PercentageCompletionTracker extends Tracker {
 
     this.getValue = (scene) => {
 
-      return 0;
+      return 42;
       /*
       const puckDistanceThreshold = 5 * scene.pucks[0].radius;
 
