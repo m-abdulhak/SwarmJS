@@ -46,7 +46,7 @@ def on_ping():
 # Add a websocket route for receiving the desired speed for a single robot.
 @socketio.on('get_robot_speeds')
 def get_robot_speeds(data):
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>data",data)
+    print("recieved",data)
     swarm_speeds = []
     for robot_data in data:
         sensors = robot_data['pythonSensors']
@@ -57,6 +57,7 @@ def get_robot_speeds(data):
         angular_speed_and_id['angularSpeed'] = angular_speed_commands
         swarm_speeds.append(angular_speed_and_id)
     emit('robot_speeds', swarm_speeds, broadcast=True)
+    print("sent",swarm_speeds)
 
 if __name__ == '__main__': #! app never enters here
     socketio.run(app, debug=True)

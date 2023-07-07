@@ -4,30 +4,11 @@ import Socket from '@common/utils/socket';
 /* global variables */
 const SOCKET_URL = 'http://127.0.0.1:5000';
 var command = {};
-var receivedFlag = [0];
 var socket = new Socket(SOCKET_URL);
 socket.connect();
 socket.ping();
 var isInitilized = false;
 var CONST = [{}]
-
-
-
-export function fetchAngularCommand(id) { //! doesn't execute anything. only has access to memory calculated by python.
-    // console.log("fetch request form",id)
-    // while(receivedFlag[id] === 0){
-    //     console.log("id",id,"waiting")
-    // }
-
-    if(receivedFlag[id] === 0){
-        console.log("id",id,"waiting")
-        return 0;
-    }
-
-
-    receivedFlag[id] = 0;
-    return command[id];
-}
 
 function initilizeRobots(scene) {
     if(isInitilized)// robots have been initilized before
@@ -36,7 +17,6 @@ function initilizeRobots(scene) {
     isInitilized = true;
 
     command = new Array(scene.robots.length) //! global
-    receivedFlag = new Array(scene.robots.length).fill(0) //! global
 
     CONST = new Array(scene.robots.length).fill({});
     for(let i = 0; i < CONST.length ; i++){
@@ -53,7 +33,6 @@ function initilizeRobots(scene) {
         }
     }
 
-    /* socket callback function */
     socket.on('robot_speeds', (data) => {
         const speeds = Object.entries(data).reduce((acc, [k, v]) => {
             const strKey = `${k}`;
@@ -62,19 +41,56 @@ function initilizeRobots(scene) {
         }, {});
         let speedsList = Object.values(speeds)
         for(let i=0 ; i< speedsList.length ; i++){
-            command[speedsList[i].id] = speedsList[i].angularSpeed //* double standard
-            receivedFlag[speedsList[i].id] = 1;
-            
-            // scene.robots[speedsList[i].id].externalVelocity= {angularSpeed : speedsList[i].angularSpeed};
+            scene.robots[speedsList[i].id].externalVelocity = {linearVel: CONST[speedsList[i].id].maxForwardSpeed ,
+                    angularVel: speedsList[i].angularSpeed}
         }
-        console.log("iVVVVVVVVV recieved command by python bridger", speedsList , receivedFlag)
+        console.log("iVVVVVVVVV recieved command by python bridger", speedsList)
+        scene.unpause();
+        console.log("---------------------------unpaused")
 
-});
-
-
+    });
 }
 
-export default function pythonBridger(scene) {
+
+// const waitForData = async () => {
+//     return new Promise(resolve => {
+//     socket.on('robot_speeds', (data) => {
+//         const speeds = Object.entries(data).reduce((acc, [k, v]) => {
+//             const strKey = `${k}`;
+//             acc[strKey] = v;
+//             return acc;
+//         }, {});
+//         let speedsList = Object.values(speeds)
+//         for(let i=0 ; i< speedsList.length ; i++){
+//             scene.robots[speedsList[i].id].externalVelocity = {linearVel: CONST[speedsList[i].id].maxForwardSpeed ,
+//                  angularVel: speedsList[i].angularSpeed}
+//         }
+//         console.log("iVVVVVVVVV recieved command by python bridger", speedsList)
+//         debugger;
+//         resolve();
+//     });
+
+//     });
+//   };
+
+
+
+
+// const delay = ms => new Promise(
+//     resolve => setTimeout(resolve, ms)
+//   );
+  
+export default async function pythonBridger(scene) {
+    // debugger;
+    // console.log('efeeeeeeeeeeeeeeeeeect')
+    // scene.robots[0].externalVelocity = 'yay'
+    // console.log(scene.robots[0].color)
+    // scene.robots[0].color = "yellow";
+    // debugger;
+
+    scene.pause();
+    console.log("+++++++++++++++++++++++++++++paused")
+
     initilizeRobots(scene);
     // debugger;
     let allRobotSensors = new Array(scene.robots.length)
@@ -107,12 +123,12 @@ export default function pythonBridger(scene) {
         let robotCONST = CONST[i]
         allRobotSensors[i] = {pythonSensors , robotCONST};
     }
-
+    // debugger;
     console.log("will emit",allRobotSensors)
     socket.emit('get_robot_speeds', allRobotSensors);    
 
-    // while (receivedFlag[0] === 0){
-    //     console.log("pausing")
-    // }
+    // await waitForData();
+    // scene.unpause();
+    // console.log("--------------------unpaused")
 
 }

@@ -1,5 +1,3 @@
-import {fetchAngularCommand} from '../../scene/pythonBridge';
-
 export function init(CONST, VAR, FUNC, robot, params) {
   CONST.middleTau = params.tau || 0.6;
   CONST.maxAngularSpeed = 0.015;
@@ -49,41 +47,25 @@ export function controller(robot, params, onLoop, onInit) {
   }
 
 
-  // return (sensors, actuators) => {
-  //   return {
-  //     linearVel: robot.externalVelocity.forwardSpeed,
-  //     angularVel: robot.externalVelocity.angularSpeed,
-  //     type: robot.SPEED_TYPES.RELATIVE
-  //   };
-  // };
-  
-  /* This part is different from original*/
   return (sensors) => {
     var command = {
       linearVel: 0,
       angularVel: 0,
       type: robot.SPEED_TYPES.RELATIVE
     };
-    if (sensors.fields.readings.heatMap.leftField == null) {
+    if (sensors.fields.readings.heatMap.leftField == null || robot.externalVelocity === undefined) {
       console.log("Sensors not readable yet.");
       return command;
     }
-    let forwardSpeed = CONST.maxForwardSpeed;
-    let angularSpeed = fetchAngularCommand(robot.id);
-    
-    //! trick... if angular speed is 0 means bridge is on hold
-    if (angularSpeed === 0) {
-      forwardSpeed = 0;
-    }
-    
-    command.linearVel = forwardSpeed * robot.velocityScale;
 
-    command.angularVel = angularSpeed * robot.velocityScale;
+    command.linearVel =  robot.externalVelocity.linearVel * robot.velocityScale;
+    command.angularVel =  robot.externalVelocity.angularVel * robot.velocityScale;
+
     // //! /* to slove canvas error */
     command.linearVel = isNaN(command.linearVel) ? 0 : command.linearVel;
     command.angularVel = isNaN(command.angularVel) ? 0 : command.angularVel;
-    console.log(">>>> controller returning command" ,command , "by order", angularSpeed , robot.externalVelocity)
-    // debugger;
+
+    console.log(">>>> controller returning command" ,command , "by order", robot.externalVelocity)
     return command;
   };
 }
