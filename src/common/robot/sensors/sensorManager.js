@@ -59,7 +59,7 @@ const extraSensorDefinitions = [
   FieldSensor,
   PolygonsSensor,
   CirclesSensor
-]
+];
 
 // Sensors are stored in these objects allowing other modules to easily reference them
 // e.g. in config when defining the enabled sensors, or in other sensors to define a dependency
