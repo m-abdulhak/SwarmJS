@@ -20,7 +20,8 @@ function CodeEditorSection({
   setCode,
   defaultCode,
   getDefaultCode,
-  foldAll
+  foldAll,
+  readOnly
 }) {
   const editorRef = useRef(null);
 
@@ -69,6 +70,7 @@ function CodeEditorSection({
           mode='javascript'
           theme='monokai'
           highlightActiveLine={true}
+          readOnly={readOnly || false}
           setOptions={{
             enableBasicAutocompletion: true,
             enableLiveAutocompletion: true,
@@ -88,7 +90,8 @@ CodeEditorSection.propTypes = {
   setCode: PropTypes.func,
   defaultCode: PropTypes.string,
   getDefaultCode: PropTypes.func,
-  foldAll: PropTypes.bool
+  foldAll: PropTypes.bool,
+  readOnly: PropTypes.bool
 };
 
 export default CodeEditorSection;

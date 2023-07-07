@@ -6,6 +6,9 @@ import MenuItem from '@mui/material/MenuItem';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLink } from '@fortawesome/free-solid-svg-icons';
+
 import {
   stopBenchmark,
   isBenchmarking,
@@ -214,6 +217,12 @@ const App = () => {
               </MenuItem>
         ))}
       </Select>
+      <a href={`/?scene=${selectedScene}`}>
+        <FontAwesomeIcon
+          icon={faLink}
+          title="Change Background"
+        />
+      </a>
     </div>
   );
 
@@ -235,12 +244,13 @@ const App = () => {
         tooltTip='Controls robots velocity, only works when supported in robot controller.'
       />
       <CodeEditorSection
-        title='Scene Configuration'
+        title='Scene Configuration (Read Only)'
         code={JSON.stringify(config, null, 2)}
         setCode={() => {
           // TODO: update current configuration
         }}
         foldAll
+        readOnly
       />
       {/* <p> TODO: Change other runtime parameters, simulation configuration, and benchmarking configuration.</p> */}
     </>
@@ -288,7 +298,7 @@ const App = () => {
       label: 'Debug',
       content: (
         <DebugPanel
-          title='Scene State'
+          title='Scene State (Read Only)'
           getSceneState={() => window.scene}
         />
       )
