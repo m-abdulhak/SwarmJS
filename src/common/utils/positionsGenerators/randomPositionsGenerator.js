@@ -1,59 +1,47 @@
 // Module to generate random initial positions for robots and pucks
-// TODO: replace with a js generator
 
 import { getDistance } from '../geometry';
 
-const positions = [];
+export default function getRandCollFreePosGenerator(posNum, radius, envWidth, envHeight, staticObjects = []) {
+  const positionsAndRadii = [];
 
-const getPos = () => {
-  if (positions.length === 0) {
-    throw new Error('No positions available!');
-  }
-  return positions.pop();
-};
+  const generatePos = (r) => {
+    const xCount = envWidth / r;
+    const yCount = envHeight / r;
+    const minX = r * 2;
+    const maxX = envWidth - r * 2;
+    const minY = r * 2;
+    const maxY = envHeight - r * 2;
 
-export default function getRandCollFreePosGenerator(
-  numOfPos, radius, envWidth, envHeight, staticObjects
-) {
-  const resolution = (radius * 2.1);
-  const xCount = envWidth / resolution;
-  const yCount = envHeight / resolution;
-  const positionsCount = parseInt(numOfPos, 10);
-
-  /*
-  if (xCount * yCount < positionsCount * 4) {
-    throw new Error('Invalid inputs, number and size of robots and pucks are too high for this environment size!');
-  }
-  */
-
-  let i = 0;
-  while (positions.length < positionsCount * 3 && i < positionsCount * 100) {
-    const newX = Math.max(
-      radius * 2,
-      Math.min(envWidth - radius * 2, Math.floor(Math.random() * xCount) * resolution)
-    );
-    const newY = Math.max(
-      radius * 2,
-      Math.min(envHeight - radius * 2, Math.floor(Math.random() * yCount) * resolution)
-    );
+    const newX = Math.max(minX, Math.min(maxX, Math.floor(Math.random() * xCount) * r));
+    const newY = Math.max(minY, Math.min(maxY, Math.floor(Math.random() * yCount) * r));
     const newPos = { x: newX, y: newY };
-    const doesNotCollideWithRobots = positions
-      .findIndex((x) => getDistance(x, newPos) < radius * 2.2) === -1;
-    const doesNotCollideWithObstacles = staticObjects
-      .reduce((acc, cur) => !cur.containsPoint(newPos)
-        && cur.getDistanceToBorder(newPos) > radius && acc, true);
 
-    if (doesNotCollideWithRobots && doesNotCollideWithObstacles) {
-      positions.push(newPos);
+    const doesNotCollideWithOtherPositions = positionsAndRadii
+      .findIndex(([p, pr]) => getDistance(p, newPos) < (r + pr) * 1.1) === -1;
+
+    const doesNotCollideWithObstacles = staticObjects.reduce((acc, cur) => !cur.containsPoint(newPos)
+        && cur.getDistanceToBorder(newPos) > r && acc, true);
+
+    if (doesNotCollideWithOtherPositions && doesNotCollideWithObstacles) {
+      return newPos;
     }
-    i += 1;
-  }
 
-  /*
-  if (positions.length < positionsCount * 2) {
-    throw new Error('Invalid inputs, number and size of robots are too high for this environment!');
-  }
-  */
+    return null;
+  };
+
+  const getPos = (r) => {
+    for (let tries = 0; tries < 100000; tries += 1) {
+      const newPos = generatePos(r);
+
+      if (newPos) {
+        positionsAndRadii.push([newPos, r]);
+        return newPos;
+      }
+    }
+
+    throw new Error('No collision-free positions available!');
+  };
 
   return getPos;
 }
