@@ -306,8 +306,8 @@ export default class Scene {
     return d3.range(numOfRobots)
       .map((i) => new Robot(
         i,
-        this.getPos(radius),
-        this.getPos(radius),
+        this.getPos(),
+        this.getPos(),
         controllers,
         sensors,
         actuators,
@@ -329,7 +329,7 @@ export default class Scene {
         ...d3.range(puckGroup.count)
           .map((i) => new Puck(
             i + id,
-            this.getPos(puckGroup.radius),
+            this.getPos(),
             puckGroup.radius,
             puckGroup.goal,
             puckGroup.goalRadius,
