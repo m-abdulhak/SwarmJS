@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 // Module to generate random initial positions for robots and pucks
 
 import { getDistance } from '../geometry';
