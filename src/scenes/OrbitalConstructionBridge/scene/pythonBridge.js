@@ -111,4 +111,8 @@ export default function pythonBridger(scene) {
     console.log("will emit",allRobotSensors)
     socket.emit('get_robot_speeds', allRobotSensors);    
 
+    // while (receivedFlag[0] === 0){
+    //     console.log("pausing")
+    // }
+
 }
