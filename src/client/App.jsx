@@ -217,7 +217,7 @@ const App = () => {
               </MenuItem>
         ))}
       </Select>
-      <a href={`/?scene=${selectedScene}`}>
+      <a href={`${window.location.origin}${window.location.pathname}?scene=${selectedScene}`}>
         <FontAwesomeIcon
           icon={faLink}
           title="Change Background"
