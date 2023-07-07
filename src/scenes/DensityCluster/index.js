@@ -169,8 +169,8 @@ const description = {
 };
 
 export default {
-  title: 'Density Clustering',
-  name: 'cluster',
+  title: 'Cluster (Density)',
+  name: 'densityCluster',
   simConfig,
   benchmarkConfig,
   description
