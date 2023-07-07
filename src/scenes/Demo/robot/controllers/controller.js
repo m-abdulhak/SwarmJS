@@ -5,15 +5,15 @@
 export function init(CONST, VAR, FUNC, robot, params) {
   // PARAMETERS:
   CONST.maxAngularSpeed = 0.1;
-  CONST.maxForwardSpeed = 5;
-  CONST.loopsToKeepSameSpeeds = 1000;
+  CONST.maxForwardSpeed = 2.5;
+  CONST.minPheromoneToFollow = 100;
 
   FUNC.getNewAngularSpeed = () => Math.random() * CONST.maxAngularSpeed * 2 - CONST.maxAngularSpeed;
-  FUNC.getNewForwardSpeed = () => Math.random() * CONST.maxForwardSpeed * 2 - CONST.maxForwardSpeed;
+  FUNC.getNewForwardSpeed = () => Math.random() * CONST.maxForwardSpeed * CONST.maxForwardSpeed;
 
   VAR.angularSpeed = FUNC.getNewAngularSpeed();
   VAR.forwardSpeed = FUNC.getNewForwardSpeed();
-  VAR.loopsSinceLastSpeedChange = 0;
+  VAR.minPheromoneToFollow = 0;
 }
 
 export function controller(robot, params, onLoop, onInit) {
@@ -47,13 +47,29 @@ export function controller(robot, params, onLoop, onInit) {
     }
   }
 
-  return (sensors) => {
-    if (VAR.loopsSinceLastSpeedChange >= CONST.loopsToKeepSameSpeeds) {
+  return (sensors, actuators) => {
+
+    // Manipulate the pheromone field to leave a trail.
+    actuators.field.activate(
+      robot.scene.fields.pheromone,
+      [
+        [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]],
+        [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]],
+        [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
+      ],
+      robot.sensors.position
+    );
+
+    const left = sensors.fields.readings.pheromone.left?.[0] || 0;
+    const right = sensors.fields.readings.pheromone.right?.[0] || 0;
+
+    if (left > CONST.minPheromoneToFollow && left > right) {
+      VAR.angularSpeed = - CONST.maxAngularSpeed;
+    } else if (right > CONST.minPheromoneToFollow) {
+      VAR.angularSpeed = CONST.maxAngularSpeed;
+    } else {
       VAR.angularSpeed = FUNC.getNewAngularSpeed();
       VAR.forwardSpeed = FUNC.getNewForwardSpeed();
-      VAR.loopsSinceLastSpeedChange = 0;
-    } else {
-      VAR.loopsSinceLastSpeedChange += 1;
     }
 
     return {

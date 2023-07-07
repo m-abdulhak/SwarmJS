@@ -1,5 +1,4 @@
 import cluster from './Cluster';
-import fieldManipulation from './Fields';
 //import ExternalEngine from './ExternalEngine';
 import orbitalConstruction from './OrbitalConstruction';
 import beeClust from './BeeClust';
@@ -12,9 +11,8 @@ import collisionAvoidance from './CollisionAvoidance';
 export default {
   beeClust,
   collisionAvoidance,
-  demo,
-  fieldManipulation,
   cluster,
+  demo,
   labyrinth,
   orbitalConstruction,
   simpleSorting,
