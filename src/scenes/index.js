@@ -6,9 +6,11 @@ import voronoiSorting from './VoronoiSorting';
 import simpleSorting from './Sorting';
 import demo from './Demo';
 import labyrinth from './Labyrinth';
+import orbitalConstructionBridge from './OrbitalConstructionBridge';
 import collisionAvoidance from './CollisionAvoidance';
 //import ExternalEngine from './ExternalEngine';
 
+// changing this will change the order in webpage
 export default {
   beeClust,
   densityCluster,
@@ -18,5 +20,8 @@ export default {
   labyrinth,
   orbitalConstruction,
   simpleSorting,
-  voronoiSorting
+  voronoiSorting,
+  orbitalConstructionBridge,
+  cluster,
+  fieldManipulation,
 };
