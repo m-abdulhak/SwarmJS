@@ -1,7 +1,7 @@
 import Tracker from '@common/benchmarking/performanceTrackers/tracker';
 
 // CAN'T GET jsgraphs to work!
-const jsgraphs = require('js-graph-algorithms');
+import jsgraphs from '../Lib/jsgraphs';
 
 class PercentageCompletionTracker extends Tracker {
   constructor() {
