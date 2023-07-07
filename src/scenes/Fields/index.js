@@ -164,7 +164,7 @@ const description = {
 };
 
 export default {
-  title: 'Field Manipulation Demo',
+  title: 'Demo (Fields)',
   name: 'fieldManipulation',
   simConfig,
   benchmarkConfig,

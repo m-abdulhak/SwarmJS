@@ -132,7 +132,7 @@ const description = {
 
 
 export default {
-  title: 'Simple Sorting',
+  title: 'Sorting (Simple)',
   name: 'simpleSorting',
   simConfig,
   benchmarkConfig,
