@@ -1,32 +1,35 @@
 
+/* depending on the value of parameter framesBetweenRuns, this effect function will run afte framesBetweenRuns loop of controller.js. 
+ */
 import Socket from '@common/utils/socket';
 
 /* global variables */
-const SOCKET_URL = 'http://127.0.0.1:5000';
 var command = {};
 var receivedFlag = [0];
-var socket = new Socket(SOCKET_URL);
-socket.connect();
-socket.ping();
 var isInitilized = false;
 var CONST = [{}]
-
+var socket = null
 
 
 export function fetchAngularCommand(id) { //! doesn't execute anything. only has access to memory calculated by python.
     if(receivedFlag[id] === 0){
         console.log("id",id,"waiting")
+        // window.alert("oh")
         return 0;
     }
-
-
     receivedFlag[id] = 0;
     return command[id];
 }
 
 function initilizeRobots(scene) {
     if(isInitilized)// robots have been initilized before
-        return; 
+        return null; 
+
+    const SOCKET_URL = 'http://127.0.0.1:5000';
+    socket = new Socket(SOCKET_URL); //! global
+    socket.connect();
+    socket.ping();
+   
     
     isInitilized = true;
 
@@ -59,23 +62,31 @@ function initilizeRobots(scene) {
         for(let i=0 ; i< speedsList.length ; i++){
             command[speedsList[i].id] = speedsList[i].angularSpeed //* double standard
             receivedFlag[speedsList[i].id] = 1;
-            
-            // scene.robots[speedsList[i].id].externalVelocity= {angularSpeed : speedsList[i].angularSpeed};
         }
-        console.log("iVVVVVVVVV recieved command by python bridger", speedsList , receivedFlag)
+    });
+}
 
-});
-
+function checkSensorAvailbility(fieldSensors){
+    if (!fieldSensors.readings.heatMap.leftField
+        || !fieldSensors.readings.heatMap.frontField
+        || !fieldSensors.readings.heatMap.rightField) {
+        console.log("sensors not readable")
+        return 0;
+    } else{
+        return 1;
+    }
 
 }
 
+
 export default function pythonBridger(scene) {
     initilizeRobots(scene);
-    // debugger;
     let allRobotSensors = new Array(scene.robots.length)
 
     for(let i = 0; i < allRobotSensors.length ; i++){
-
+        if (!checkSensorAvailbility(scene.robots[i].sensorManager.activeSensors[6].value))
+            return ;
+        
         const leftField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.leftField[0];
         const centreField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.frontField[0];
         const rightField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.rightField[0];
@@ -102,12 +113,6 @@ export default function pythonBridger(scene) {
         let robotCONST = CONST[i]
         allRobotSensors[i] = {pythonSensors , robotCONST};
     }
-
     console.log("will emit",allRobotSensors)
     socket.emit('get_robot_speeds', allRobotSensors);    
-
-    // while (receivedFlag[0] === 0){
-    //     console.log("pausing")
-    // }
-
 }
