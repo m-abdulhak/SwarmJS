@@ -8,7 +8,23 @@ var socket = new Socket(SOCKET_URL);
 socket.connect();
 socket.ping();
 var isInitilized = false;
-var CONST = [{}]
+var CONST = [{}];
+var isTransmited = 0;
+console.log('global effect ');
+
+const delay = (ms) => new Promise(
+    resolve => setTimeout(resolve, ms)
+);
+
+async function runDelay() {
+    console.log('Before delay');
+    await delay(5000); // Wait for 2000 milliseconds (2 seconds)
+    console.log('After delay');
+}
+
+runDelay();
+
+console.log('global effect ');
 
 function initilizeRobots(scene) {
     if(isInitilized)// robots have been initilized before
@@ -47,6 +63,7 @@ function initilizeRobots(scene) {
         console.log("iVVVVVVVVV recieved command by python bridger", speedsList)
         scene.unpause();
         console.log("---------------------------unpaused")
+        isTransmited = 0;
 
     });
 }
@@ -76,59 +93,79 @@ function initilizeRobots(scene) {
 
 
 
-// const delay = ms => new Promise(
-//     resolve => setTimeout(resolve, ms)
-//   );
-  
-export default async function pythonBridger(scene) {
+export default function pythonBridger(scene) {
     // debugger;
     // console.log('efeeeeeeeeeeeeeeeeeect')
     // scene.robots[0].externalVelocity = 'yay'
     // console.log(scene.robots[0].color)
     // scene.robots[0].color = "yellow";
     // debugger;
+    console.log("xxxxxxxxxxxxxx")
+    socket.ping();
+    socket.on('pong',()=>{
+        console.log('pongggggggggggg')
 
-    scene.pause();
-    console.log("+++++++++++++++++++++++++++++paused")
+        if(isTransmited)
+            return;
 
-    initilizeRobots(scene);
-    // debugger;
-    let allRobotSensors = new Array(scene.robots.length)
+        scene.pause();
+        console.log("+++++++++++++++++++++++++++++paused")
 
-    for(let i = 0; i < allRobotSensors.length ; i++){
+        initilizeRobots(scene);
+        // debugger;
+        let allRobotSensors = new Array(scene.robots.length)
 
-        const leftField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.leftField[0];
-        const centreField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.frontField[0];
-        const rightField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.rightField[0];
-    
-        // Positive integers (unbounded, but generally small)
-        const leftPucks = scene.robots[i].sensorManager.activeSensors[7].value.left.reading.pucks;
-        const rightPucks = scene.robots[i].sensorManager.activeSensors[7].value.right.reading.pucks;
-    
-        // We'll make these Boolean since the number shouldn't really change the response.
-        const leftRobots = scene.robots[i].sensorManager.activeSensors[0].value.leftObstacle.reading.robots > 0;
-        const leftWalls =  scene.robots[i].sensorManager.activeSensors[0].value.leftObstacle.reading.walls > 0;
-    
-        let pythonSensors = {
-            id : i,
-            leftField : leftField,
-            centreField : centreField,
-            rightField : rightField,
-            leftPucks : leftPucks,
-            rightPucks : rightPucks,
-            leftRobots : leftRobots,
-            leftWalls : leftWalls
-            };
+        for(let i = 0; i < allRobotSensors.length ; i++){
+            // debugger
+            let leftField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.leftField;
+            if (leftField === null)
+                return
+            else if(leftField.length>1)      
+                leftField = leftField[0]
 
-        let robotCONST = CONST[i]
-        allRobotSensors[i] = {pythonSensors , robotCONST};
-    }
-    // debugger;
-    console.log("will emit",allRobotSensors)
-    socket.emit('get_robot_speeds', allRobotSensors);    
+            let centreField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.frontField;
+            if (centreField === null)
+                return
+            else if(centreField.length>1)      
+                centreField = centreField[0]
 
-    // await waitForData();
-    // scene.unpause();
-    // console.log("--------------------unpaused")
+            let rightField = scene.robots[i].sensorManager.activeSensors[6].value.readings.heatMap.rightField;
+            if (rightField === null)
+                return
+            else if(rightField.length>1)      
+                rightField = rightField[0]
+        
+            // Positive integers (unbounded, but generally small)
+            const leftPucks = scene.robots[i].sensorManager.activeSensors[7].value.left.reading.pucks;
+            const rightPucks = scene.robots[i].sensorManager.activeSensors[7].value.right.reading.pucks;
+        
+            // We'll make these Boolean since the number shouldn't really change the response.
+            const leftRobots = scene.robots[i].sensorManager.activeSensors[0].value.leftObstacle.reading.robots > 0;
+            const leftWalls =  scene.robots[i].sensorManager.activeSensors[0].value.leftObstacle.reading.walls > 0;
+        
+            let pythonSensors = {
+                id : i,
+                leftField : leftField,
+                centreField : centreField,
+                rightField : rightField,
+                leftPucks : leftPucks,
+                rightPucks : rightPucks,
+                leftRobots : leftRobots,
+                leftWalls : leftWalls
+                };
+
+            let robotCONST = CONST[i]
+            allRobotSensors[i] = {pythonSensors , robotCONST};
+        }
+        // debugger;
+        console.log("will emit",allRobotSensors)
+        socket.emit('get_robot_speeds', allRobotSensors);    
+        isTransmited = 1;
+        // debugger;
+
+        // await waitForData();
+        // scene.unpause();
+        // console.log("--------------------unpaused")
+    });
 
 }
