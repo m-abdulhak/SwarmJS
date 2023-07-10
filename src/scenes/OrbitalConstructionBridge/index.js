@@ -206,8 +206,9 @@ const description = {
   <code>./externalControllerServer.py</code>.
   </p>
 
+  <h2>How to Run</h2>
   <p>
-    - You should be installing all the dependencies for Python:
+    Install dependencies for Python:
     <br>
     <code>
       pip install Flask Flask-SocketIO
@@ -217,7 +218,7 @@ const description = {
   </p>
 
   <p>
-    - Run Flask by executing the following command:
+    Run Flask by executing the following command:
     <br>
     <code>
       flask --app src/scenes/OrbitalConstructionBridge/externalControllerServer.py run

@@ -13,7 +13,7 @@ import RobotRenderables from './robot/renderables';
 import { init, controller } from './robot/controllers/controller';
 import fieldEffects from './scene/fieldEffects';
 
-import pheromoneUrl from './centre.png';
+import pheromoneUrl from './black.png';
 import occupancyUrl from './black.png';
 
 // All renderables should be registered in this list and assigned a module property
@@ -40,31 +40,42 @@ const usedSensors = {
       points: [
         {
           type: 'Cartesian',
-          name: 'forward',
-          coords: {
-            x: 30,
-            y: 0
-          }
-        },
-        {
-          type: 'Polar',
           name: 'left',
           coords: {
-            distance: 30,
-            angle: -Math.PI / 4.0
+            x: 20,
+            y: 5
           }
         },
         {
-          type: 'Polar',
+          type: 'Cartesian',
           name: 'right',
           coords: {
-            distance: 30,
-            angle: Math.PI / 4.0
+            x: 20,
+            y: -5
           }
         }
       ]
     }
-  }
+  },
+  circles: {
+    ...ExtraSensors.circles,
+    params: {
+      regions: [
+        {
+          name: 'left',
+          centre: { type: 'Polar', name: '0', coords: { distance: 22, angle: (-Math.PI / 4.0) } },
+          radius: 6,
+          sensedTypes: ['robots', 'walls']
+        },
+        {
+          name: 'right',
+          centre: { type: 'Polar', name: '0', coords: { distance: 22, angle: (Math.PI / 4.0) } },
+          radius: 6,
+          sensedTypes: ['robots', 'walls']
+        }
+      ]
+    }
+  },
 };
 
 const simConfig = {
@@ -91,7 +102,7 @@ const simConfig = {
     ]
   },
   robots: {
-    count: 10,
+    count: 7,
     radius: 15,
     params: {
       velocityScale: 15
@@ -163,18 +174,19 @@ const benchmarkConfig = {
       }
     }
   ],
-  trackers: [
-    CorePerformanceTrakers.RobotToGoalDistanceTracker,
-    CorePerformanceTrakers.MinRobotRobotDistanceTracker
-  ],
+  trackers: [],
   maxTimeStep: 20000,
   timeStep: 1000
 };
 
 const description = {
-  html: `<p>A demo scene to illustrate how the robots can perceive and manipulate fields.  These fields could be temperature, pheromone level, or any other such scalar field.</p>
+  html: `<p>A demo scene to illustrate how the robots can perceive and manipulate fields.  These fields could be temperature, pheromone level, or any other such scalar field.  In this case, there is a pheromone field that the robots can sense and manipulate.  There is also an occupancy field which they have no awareness of, which could be used to track where their time is spent.</p>
   
-  <p>The index.js file that underlies this scene has more comments than other scenes.  So this scene could be used as a template for your own custom scene.</p>
+  <p>The controller used is inspired by the <a href=http://meyleankronemann.de/lumibots target=_black>Lumibots project</a>.  In essence, there are two rules: avoid obstacles and turn towards the strongest pheromone.</p>
+  
+  <a href=https://dl.acm.org/doi/abs/10.1145/1858171.1858249 target=_blank>
+  Kronemann, Mey Lean, and Verena V. Hafner. "Lumibots: making emergence graspable in a swarm of robots." Proceedings of the 8th ACM Conference on Designing Interactive Systems. 2010.
+  </a>
   `
 };
 
