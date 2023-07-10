@@ -49,14 +49,6 @@ export function controller(robot, params, onLoop, onInit) {
   }
 
 
-  // return (sensors, actuators) => {
-  //   return {
-  //     linearVel: robot.externalVelocity.forwardSpeed,
-  //     angularVel: robot.externalVelocity.angularSpeed,
-  //     type: robot.SPEED_TYPES.RELATIVE
-  //   };
-  // };
-  
   /* This part is different from original*/
   return (sensors) => {
     var command = {
@@ -83,7 +75,6 @@ export function controller(robot, params, onLoop, onInit) {
     command.linearVel = isNaN(command.linearVel) ? 0 : command.linearVel;
     command.angularVel = isNaN(command.angularVel) ? 0 : command.angularVel;
     console.log(">>>> controller returning command" ,command , "by order", angularSpeed , robot.externalVelocity)
-    // debugger;
     return command;
   };
 }

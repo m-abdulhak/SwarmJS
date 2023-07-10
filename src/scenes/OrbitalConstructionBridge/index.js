@@ -123,7 +123,7 @@ const simConfig = {
     effects: [
       {
         func: pyhtonBridger,
-        framesBetweenRuns: 2
+        framesBetweenRuns: 0
       }
     ]
   },
