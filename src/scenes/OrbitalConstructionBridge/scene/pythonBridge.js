@@ -14,11 +14,6 @@ var CONST = [{}]
 
 
 export function fetchAngularCommand(id) { //! doesn't execute anything. only has access to memory calculated by python.
-    // console.log("fetch request form",id)
-    // while(receivedFlag[id] === 0){
-    //     console.log("id",id,"waiting")
-    // }
-
     if(receivedFlag[id] === 0){
         console.log("id",id,"waiting")
         return 0;
