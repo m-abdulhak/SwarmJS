@@ -13,13 +13,13 @@ import collisionAvoidance from './CollisionAvoidance';
 // changing this will change the order in webpage
 export default {
   beeClust,
+  demo,
   densityCluster,
   peripheryCluster,
   collisionAvoidance,
-  demo,
   labyrinth,
   orbitalConstruction,
+  orbitalConstructionBridge,
   simpleSorting,
-  voronoiSorting,
-  orbitalConstructionBridge
+  voronoiSorting
 };

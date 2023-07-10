@@ -127,7 +127,7 @@ const bodyRenderables = [
             cy: { prop: 'sensors.position.y' }
         },
         styles: {
-            fill: '#FFC53A',
+            fill: 'rgb(255, 127, 255, 0.4)',
             stroke: 'black',
             'stroke-width': 1,
             'stroke-opacity': 1,
@@ -204,53 +204,11 @@ const sensorsRenderables = [
   {
       type: 'Sensor',
       svgClass: '',
-      desc: 'Forward Field Sensor',
-      shape: 'circle',
-      dataPoints: { sceneProp: 'robots' },
-      staticAttrs: {
-          r: 4,
-          id: { prop: 'id' }
-      },
-      dynamicAttrs: {
-          stroke: {
-              prop: 'sensors.fields.readings.pheromone.forward',
-              modifier: (val) => {
-                  if (!val) {
-                      return 'black';
-                  }
-                  const res = `rgb(${255-val[0]}, ${255-val[1]}, ${255-val[2]})`;
-                  return res;
-              }
-          },
-          fill: {
-              prop: 'sensors.fields.readings.pheromone.forward',
-              modifier: (val) => {
-                  if (!val) {
-                      return 'black';
-                  }
-                  const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
-                  return res;
-              }
-          },
-          cx: { prop: 'sensors.fields.sensingPoints.forward.x' },
-          cy: { prop: 'sensors.fields.sensingPoints.forward.y' }
-      },
-      styles: {
-          fill: 'none',
-          stroke: 'black',
-          'fill-opacity': 0,
-          'stroke-width': 1,
-          'stroke-opacity': 1
-      }
-  },
-  {
-      type: 'Sensor',
-      svgClass: '',
       desc: 'Left Field Sensor',
       shape: 'circle',
       dataPoints: { sceneProp: 'robots' },
       staticAttrs: {
-          r: 4,
+          r: 2,
           id: { prop: 'id' }
       },
       dynamicAttrs: {
@@ -292,7 +250,7 @@ const sensorsRenderables = [
       shape: 'circle',
       dataPoints: { sceneProp: 'robots' },
       staticAttrs: {
-          r: 4,
+          r: 2,
           id: { prop: 'id' }
       },
       dynamicAttrs: {
@@ -327,33 +285,7 @@ const sensorsRenderables = [
           'stroke-opacity': 1
       }
   },
-  {
-    type: 'Text',
-    svgClass: 'robot-number-text',
-    desc: 'Forward Field Value',
-    shape: 'text',
-    dataPoints: { sceneProp: 'robots' },
-    staticAttrs: {
-      text: {
-        prop: 'id'
-      },
-      id: { prop: 'id' }
-    },
-    dynamicAttrs: {
-      x: { prop: 'sensors.fields.sensingPoints.forward.x' },
-      y: { prop: 'sensors.fields.sensingPoints.forward.y' },
-      text: {
-        prop: 'sensors.fields.readings.pheromone.forward[0]'
-      }
-    },
-    styles: {
-      'text-anchor': 'middle',
-      'font-size': 15,
-      fill: 'black',
-      stroke: 'grey',
-      'stroke-width': 1
-    }
-  },
+  /*
   {
     type: 'Text',
     svgClass: 'robot-number-text',
@@ -375,7 +307,7 @@ const sensorsRenderables = [
     },
     styles: {
       'text-anchor': 'middle',
-      'font-size': 12,
+      'font-size': 14,
       fill: 'black',
       stroke: 'grey',
       'stroke-width': 1
@@ -402,12 +334,71 @@ const sensorsRenderables = [
     },
     styles: {
       'text-anchor': 'middle',
-      'font-size': 12,
+      'font-size': 14,
       fill: 'black',
       stroke: 'grey',
       'stroke-width': 1
     }
-  }
+  },
+  */
+  {
+    type: 'Sensor',
+    svgClass: '',
+    desc: 'Left Circle Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'sensors.circles.left.radius'
+      },
+      id: { prop: 'id' },
+      stroke: 'black'
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.circles.left.reading',
+        modifier: (val) => ((val.walls > 0|| val.robots > 0) ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
+      },
+      cx: { prop: 'sensors.circles.left.centre.x' },
+      cy: { prop: 'sensors.circles.left.centre.y' }
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'fill-opacity': 0,
+      'stroke-width': 1,
+      'stroke-opacity': 1
+    }
+  },
+  {
+    type: 'Sensor',
+    svgClass: '',
+    desc: 'Right Circle Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'sensors.circles.right.radius'
+      },
+      id: { prop: 'id' },
+      stroke: 'black'
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.circles.right.reading',
+        modifier: (val) => ((val.walls > 0|| val.robots > 0) ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
+      },
+      cx: { prop: 'sensors.circles.right.centre.x' },
+      cy: { prop: 'sensors.circles.right.centre.y' }
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'fill-opacity': 0,
+      'stroke-width': 1,
+      'stroke-opacity': 1
+    }
+  },
 ];
 
 export default [
