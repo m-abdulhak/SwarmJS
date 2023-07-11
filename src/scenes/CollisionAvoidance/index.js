@@ -92,9 +92,9 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>Distributed collision avoidance algorithm based on the concept of Buffered Voronoi Cells (BVC). This novel algorithm predicts and avoids deadlock configurations.</p>
+  html: `<p>Distributed collision avoidance algorithm based on the concept of Buffered Voronoi Cells (BVC). This novel algorithm predicts and avoids deadlock configurations.  In this scene, the robots try to reach the opposite point on the circle from where they started.</p>
 
-  <p>In this experiment, the robots each try to reach the opposite point on the circle from which they begin.</p>
+  <p>This scene allows you to interact with both the robots and their goals.  Each robot has a corresponding goal (small circle) and waypoint (slightly larger circle with a dotted outline).  You can click-and-drag either the robots or their goals.</p> 
 
   <p>
   <a href=https://ieeexplore.ieee.org/document/9636609 target=_blank>
