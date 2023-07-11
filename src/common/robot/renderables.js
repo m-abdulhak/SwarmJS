@@ -369,6 +369,7 @@ const vornoiRenderables = [
   }
 ];
 
+/*
 const sensorsRenderables = [
   {
     type: 'Sensor',
@@ -427,9 +428,10 @@ const sensorsRenderables = [
     }
   }
 ];
+*/
 
 export default [
-  ...sensorsRenderables,
+  //...sensorsRenderables,
   ...bodyRenderables,
   ...waypointRenderables,
   ...goalRenderables,
