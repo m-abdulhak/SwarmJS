@@ -113,6 +113,6 @@ export default function pythonBridger(scene) {
         let robotCONST = CONST[i]
         allRobotSensors[i] = {pythonSensors , robotCONST};
     }
-    console.log("will emit",allRobotSensors)
+    // console.log("will emit",allRobotSensors)
     socket.emit('get_robot_speeds', allRobotSensors);    
 }

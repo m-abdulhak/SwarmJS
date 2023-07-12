@@ -74,7 +74,7 @@ export function controller(robot, params, onLoop, onInit) {
     // //! /* to slove canvas error */
     command.linearVel = isNaN(command.linearVel) ? 0 : command.linearVel;
     command.angularVel = isNaN(command.angularVel) ? 0 : command.angularVel;
-    console.log(">>>> controller returning command" ,command , "by order", angularSpeed , robot.externalVelocity)
+    // console.log(">>>> controller returning command" ,command , "by order", angularSpeed , robot.externalVelocity)
     return command;
   };
 }
