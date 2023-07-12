@@ -6,7 +6,6 @@ import Socket from '@common/utils/socket';
 /* global variables */
 var command = {};
 var receivedFlag = [0];
-var isInitilized = false;
 var CONST = [{}]
 var socket = null
 
@@ -22,17 +21,14 @@ export function fetchAngularCommand(id) { //! doesn't execute anything. only has
 }
 
 function initilizeRobots(scene) {
-    if(isInitilized)// robots have been initilized before
+    if(scene.isInitilized)// robots have been initilized before
         return null; 
-
+    scene.isInitilized = true;
     const SOCKET_URL = 'http://127.0.0.1:5000';
     socket = new Socket(SOCKET_URL); //! global
     socket.connect();
     socket.ping();
    
-    
-    isInitilized = true;
-
     command = new Array(scene.robots.length) //! global
     receivedFlag = new Array(scene.robots.length).fill(0) //! global
 
@@ -80,7 +76,9 @@ function checkSensorAvailbility(fieldSensors){
 
 
 export default function pythonBridger(scene) {
+
     initilizeRobots(scene);
+    
     let allRobotSensors = new Array(scene.robots.length)
 
     for(let i = 0; i < allRobotSensors.length ; i++){
