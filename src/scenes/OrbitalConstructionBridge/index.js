@@ -14,7 +14,7 @@ import PuckFieldValueTracker from '../OrbitalConstruction/benchmarking/puckField
 
 import mapUrl from '../OrbitalConstruction/scalar_field.png';
 
-import pyhtonBridger from './scene/pythonBridge';
+import pythonBridger from './scene/pythonBridge';
 
 
 // This constant defines the contour line of the scalar field around which the
@@ -122,7 +122,7 @@ const simConfig = {
     },
     effects: [
       {
-        func: pyhtonBridger,
+        func: pythonBridger,
         framesBetweenRuns: 0
       }
     ]
