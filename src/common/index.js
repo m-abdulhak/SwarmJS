@@ -115,7 +115,7 @@ export const controllerCodeIsValid = (loopCode, initCode) => {
     return { valid: false, error: 'Could not find test robots.' };
   }
 
-  // TODO: this is dangerous as tested code can curropt robot,
+  // TODO: this is dangerous as tested code can corrupt robot,
   // use a special scene or robot for testing ??
   const res = scene.robots[0].controllerCodeIsValid(loopCode, initCode);
 
@@ -144,5 +144,5 @@ export { CoreSensors } from './robot/sensors/sensorManager';
 export { ExtraSensors } from './robot/sensors/sensorManager';
 export { default as CorePositionsGenerators } from './utils/positionsGenerators';
 export { default as GraphRenderer } from './benchmarking/graphRenderer';
-export { default as CorePerformanceTrakers } from './benchmarking/performanceTrackers';
+export { default as CorePerformanceTrackers } from './benchmarking/performanceTrackers';
 export { default as CoreControllers } from './robot/controllers';

@@ -1,5 +1,6 @@
+/* eslint-disable import/no-cycle */
 import Sensor from '@common/robot/sensors/sensor';
-import { sensorSamplingTypes, CoreSensors as CoreSensors, ExtraSensors as ExtraSensors } from '@common/robot/sensors/sensorManager';
+import { sensorSamplingTypes, CoreSensors, ExtraSensors } from '@common/robot/sensors/sensorManager';
 import { getDistance } from '@common/utils/geometry';
 
 const name = 'pucksNearGrabber';

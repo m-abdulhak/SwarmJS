@@ -1,8 +1,9 @@
 import {
   CoreSensors,
+  CoreActuators,
   ExtraSensors,
   CorePositionsGenerators,
-  CorePerformanceTrakers
+  CorePerformanceTrackers
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -10,8 +11,10 @@ import SceneRenderables from '@common/scene/renderables';
 import RobotRenderables from './robot/renderables';
 
 import { init, controller } from './robot/controllers/controller';
+import fieldEffects from './scene/fieldEffects';
 
-import mapUrl from './map.png';
+import pheromoneUrl from './black.png';
+import occupancyUrl from './black.png';
 
 // All renderables should be registered in this list and assigned a module property
 // This is necessary to avoid imposing a unique restriction on renderable type in different modules
@@ -39,21 +42,40 @@ const usedSensors = {
           type: 'Cartesian',
           name: 'left',
           coords: {
-            x: 0,
-            y: 30
+            x: 20,
+            y: 5
           }
         },
         {
-          type: 'Polar',
-          name: 'right45',
+          type: 'Cartesian',
+          name: 'right',
           coords: {
-            distance: 30,
-            angle: Math.PI / 4.0
+            x: 20,
+            y: -5
           }
         }
       ]
     }
-  }
+  },
+  circles: {
+    ...ExtraSensors.circles,
+    params: {
+      regions: [
+        {
+          name: 'left',
+          centre: { type: 'Polar', name: '0', coords: { distance: 22, angle: (-Math.PI / 4.0) } },
+          radius: 6,
+          sensedTypes: ['robots', 'walls']
+        },
+        {
+          name: 'right',
+          centre: { type: 'Polar', name: '0', coords: { distance: 22, angle: (Math.PI / 4.0) } },
+          radius: 6,
+          sensedTypes: ['robots', 'walls']
+        }
+      ]
+    }
+  },
 };
 
 const simConfig = {
@@ -62,15 +84,25 @@ const simConfig = {
     height: 400,
     renderSkip: 1,
     fields: {
-      heatMap: {
-        url: mapUrl,
+      pheromone: {
+        url: pheromoneUrl,
         defaultBackground: true,
-        title: 'Heat Map'
+        title: 'Pheromone'
+      },
+      occupancy: {
+        url: occupancyUrl,
+        title: 'Occupancy'
       }
-    }
+    },
+    effects: [
+      {
+        func: fieldEffects,
+        framesBetweenRuns: 10
+      }
+    ]
   },
   robots: {
-    count: 3,
+    count: 7,
     radius: 15,
     params: {
       velocityScale: 15
@@ -83,7 +115,7 @@ const simConfig = {
       }
     },
     sensors: [...Object.values(usedSensors)],
-    actuators: [],
+    actuators: [CoreActuators.field],
     // The neighbors sensor doesn't work unless the Voronoi diagram is used.
     useVoronoiDiagram: true,
     misc: {
@@ -142,22 +174,25 @@ const benchmarkConfig = {
       }
     }
   ],
-  trackers: [
-    CorePerformanceTrakers.RobotToGoalDistanceTracker,
-    CorePerformanceTrakers.MinRobotRobotDistanceTracker
-  ],
+  trackers: [],
   maxTimeStep: 20000,
   timeStep: 1000
 };
 
 const description = {
-  html: `<p>A demo scene.  The index.js file that underlies this scene has more comments than other scenes.  So this scene serves the purpose of demonstration but also as a template for your own scene.</p>
+  html: `<p>A demo scene to illustrate how the robots can perceive and manipulate fields.  These fields could be temperature, pheromone level, or any other such scalar field.  In this case, there is a pheromone field that the robots can sense and manipulate.  There is also an occupancy field which they have no awareness of, which could be used to track where their time is spent.</p>
+  
+  <p>The controller used is inspired by the <a href=http://meyleankronemann.de/lumibots target=_black>Lumibots project</a>.  In essence, there are two rules: avoid obstacles and turn towards the strongest pheromone.</p>
+  
+  <a href=https://dl.acm.org/doi/abs/10.1145/1858171.1858249 target=_blank>
+  Kronemann, Mey Lean, and Verena V. Hafner. "Lumibots: making emergence graspable in a swarm of robots." Proceedings of the 8th ACM Conference on Designing Interactive Systems. 2010.
+  </a>
   `
 };
 
 
 export default {
-  title: 'Demo',
+  title: 'Fields Demo',
   name: 'demo',
   simConfig,
   benchmarkConfig,

@@ -1,13 +1,13 @@
 // Define and Export Renderables:
 // ===============================
 // This is where we define renderables in a simple config format
-// We should also import and register the renderables into renderering module (renderer.js)
+// We should also import and register the renderables into rendering module (renderer.js)
 // This maybe more suitable to be in a separate file,
 // but for now I'm keeping each module's renderables in the same file
 // Some of the syntax might not be very clean, such as requiring knowing where stuff are defined
 // and stored within the Scene and defining them with a sceneProp, but I think it's fine for now
 // ===============================
-// type: mandatory, used for grouping renderables into UI buttons to enable/disable rendedering them
+// type: mandatory, used for grouping renderables into UI buttons to enable/disable rendering them
 // svgClass: optional, used to add classes to the svg elements, useful for debugging
 // dataPoints: optional, defines the data points if the renderable is repeated for multiple objects
 //             dataPoints are usually defined as a property of the scene with the 'sceneProp' key
@@ -16,8 +16,8 @@
 // staticAttrs: optional, defines the attributes to be set only once when the element is initialized
 // styles: optional, defines the styling attributes for the element, also only applied once
 // dynamicAttrs: optional, defines the attributes to be set on every simulation update
-// drag: optional, defines the draggable behavious for the element throuhg the following properties:
-//   - prop: the property of the datapoint to be set using the element drag event when dragging
+// drag: optional, defines the draggable behavior for the element through the following properties:
+//   - prop: the property of the data point to be set using the element drag event when dragging
 //   - pause: whether the simulation should be paused when dragging
 //   - onStart / onEnd: define the actions to be performed when dragging starts and ends
 //        - styles: defines the styles to set when dragging starts / ends
@@ -27,12 +27,12 @@
 
 // Any property can be one of the following:
 // - string / number: the value is set directly
-// - prop: the value is parsed as a property of the datapoint
+// - prop: the value is parsed as a property of the data point
 //          a 'modifier' function can be defined to modify the value after it is parsed
 // - sceneProp: the value is parsed as a property of the scene
 //          a 'modifier' function can be defined to modify the value after it is parsed
 // - special: used for special behaviors, such as setting a color according to the color schema
-//            currenly only 'schemaColor' is supported
+//            currently only 'schemaColor' is supported
 
 // Example of rendering a compound body
 // const compoundBodyRenderables = [
@@ -113,163 +113,179 @@
 // ];
 
 const bodyRenderables = [
-    {
-        type: 'Body',
-        svgClass: 'robot-body',
-        dataPoints: { sceneProp: 'robots' },
-        shape: 'circle',
-        staticAttrs: {
-            r: { prop: 'radius' },
-            id: { prop: 'id' }
-        },
-        dynamicAttrs: {
-            cx: { prop: 'sensors.position.x' },
-            cy: { prop: 'sensors.position.y' }
-        },
-        styles: {
-            fill: '#FFC53A',
-            stroke: 'black',
-            'stroke-width': 1,
-            'stroke-opacity': 1,
-            'fill-opacity': 1
-        },
-        drag: {
-            prop: 'position',
-            pause: true,
-            onStart: {
-                styles: {
-                    stroke: 'green'
-                },
-                log: [
-                    { prop: 'sensors' }
-                ]
-            },
-            onEnd: {
-                styles: {
-                    stroke: 'black'
-                }
-            }
-        }
+  {
+    type: 'Body',
+    svgClass: 'robot-body',
+    dataPoints: { sceneProp: 'robots' },
+    shape: 'circle',
+    staticAttrs: {
+      r: { prop: 'radius' },
+      id: { prop: 'id' }
     },
-    {
-        type: 'Body',
-        svgClass: 'robot-orientation',
-        desc: 'Line segments between robots and headings',
-        dataPoints: { sceneProp: 'robots' },
-        shape: 'path',
-        staticAttrs: {
-            id: { prop: 'id' }
-        },
-        dynamicAttrs: {
-            points: [
-                { prop: 'sensors.position' },
-                { prop: 'sensors.heading' }
-            ]
-        },
+    dynamicAttrs: {
+      cx: { prop: 'sensors.position.x' },
+      cy: { prop: 'sensors.position.y' }
+    },
+    styles: {
+      fill: 'rgb(255, 127, 255, 0.4)',
+      stroke: 'black',
+      'stroke-width': 1,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
+    },
+    drag: {
+      prop: 'position',
+      pause: true,
+      onStart: {
         styles: {
-            fill: 'none',
-            stroke: 'black',
-            'stroke-width': 2,
-            'stroke-opacity': 1,
-            'fill-opacity': 1
+          stroke: 'green'
+        },
+        log: [
+          { prop: 'sensors' }
+        ]
+      },
+      onEnd: {
+        styles: {
+          stroke: 'black'
         }
+      }
     }
+  },
+  {
+    type: 'Body',
+    svgClass: 'robot-orientation',
+    desc: 'Line segments between robots and headings',
+    dataPoints: { sceneProp: 'robots' },
+    shape: 'path',
+    staticAttrs: {
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      points: [
+        { prop: 'sensors.position' },
+        { prop: 'sensors.heading' }
+      ]
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'stroke-width': 2,
+      'stroke-opacity': 1,
+      'fill-opacity': 1
+    }
+  }
 ];
 
 const sensorsRenderables = [
   {
-      type: 'Sensor',
-      svgClass: '',
-      desc: 'Left Field Sensor',
-      shape: 'circle',
-      dataPoints: { sceneProp: 'robots' },
-      staticAttrs: {
-          r: 2, 
-          id: { prop: 'id' }
-      },
-      dynamicAttrs: {
-          stroke: 'none',
-          fill: 'rgb(255, 0, 255, 0.9)',
-          cx: { prop: 'sensors.fields.sensingPoints.left.x' },
-          cy: { prop: 'sensors.fields.sensingPoints.left.y' }
-      },
-      styles: {
-          fill: 'none',
-          stroke: 'black',
-          'fill-opacity': 0,
-          'stroke-width': 1,
-          'stroke-opacity': 1
-      }
+    type: 'Sensor',
+    svgClass: '',
+    desc: 'Left Field Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: 2,
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      stroke: 'none',
+      fill: 'rgb(255, 0, 255, 0.9)',
+      cx: { prop: 'sensors.fields.sensingPoints.left.x' },
+      cy: { prop: 'sensors.fields.sensingPoints.left.y' }
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'fill-opacity': 0,
+      'stroke-width': 1,
+      'stroke-opacity': 1
+    }
   },
   {
-      type: 'Sensor',
-      svgClass: '',
-      desc: 'Forward Field Sensor',
-      shape: 'circle',
-      dataPoints: { sceneProp: 'robots' },
-      staticAttrs: {
-          r: {
-              prop: 'radius',
-              modifier: (val) => val * 0.4
-          },
-          id: { prop: 'id' }
+    type: 'Sensor',
+    svgClass: '',
+    desc: 'Left Field Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: 2,
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      stroke: {
+        prop: 'sensors.fields.readings.pheromone.left',
+        modifier: (val) => {
+          if (!val) {
+            return 'black';
+          }
+          const res = `rgb(${255 - val[0]}, ${255 - val[1]}, ${255 - val[2]})`;
+          return res;
+        }
       },
-      dynamicAttrs: {
-          stroke: {
-              prop: 'sensors.fields.readings.heatMap.forward',
-              modifier: (val) => {
-                  if (!val) {
-                      return 'black';
-                  }
-                  const res = `rgb(${255-val[0]}, ${255-val[1]}, ${255-val[2]})`;
-                  return res;
-              }
-          },
-          fill: {
-              prop: 'sensors.fields.readings.heatMap.forward',
-              modifier: (val) => {
-                  if (!val) {
-                      return 'black';
-                  }
-                  const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
-                  return res;
-              }
-          },
-          cx: { prop: 'sensors.fields.sensingPoints.forward.x' },
-          cy: { prop: 'sensors.fields.sensingPoints.forward.y' }
+      fill: {
+        prop: 'sensors.fields.readings.pheromone.left',
+        modifier: (val) => {
+          if (!val) {
+            return 'black';
+          }
+          const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
+          return res;
+        }
       },
-      styles: {
-          fill: 'none',
-          stroke: 'black',
-          'fill-opacity': 0,
-          'stroke-width': 1,
-          'stroke-opacity': 1
-      }
+      cx: { prop: 'sensors.fields.sensingPoints.left.x' },
+      cy: { prop: 'sensors.fields.sensingPoints.left.y' }
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'fill-opacity': 0,
+      'stroke-width': 1,
+      'stroke-opacity': 1
+    }
   },
   {
-      type: 'Sensor',
-      svgClass: '',
-      desc: 'Right45 Field Sensor',
-      shape: 'circle',
-      dataPoints: { sceneProp: 'robots' },
-      staticAttrs: {
-          r: 2,
-          id: { prop: 'id' }
+    type: 'Sensor',
+    svgClass: '',
+    desc: 'Right Field Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: 2,
+      id: { prop: 'id' }
+    },
+    dynamicAttrs: {
+      stroke: {
+        prop: 'sensors.fields.readings.pheromone.right',
+        modifier: (val) => {
+          if (!val) {
+            return 'black';
+          }
+          const res = `rgb(${255 - val[0]}, ${255 - val[1]}, ${255 - val[2]})`;
+          return res;
+        }
       },
-      dynamicAttrs: {
-          stroke: 'none',
-          fill: 'rgb(255, 0, 255, 0.9)',
-          cx: { prop: 'sensors.fields.sensingPoints.right45.x' },
-          cy: { prop: 'sensors.fields.sensingPoints.right45.y' }
+      fill: {
+        prop: 'sensors.fields.readings.pheromone.right',
+        modifier: (val) => {
+          if (!val) {
+            return 'black';
+          }
+          const res = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
+          return res;
+        }
       },
-      styles: {
-          fill: 'none',
-          stroke: 'black',
-          'fill-opacity': 0,
-          'stroke-width': 1,
-          'stroke-opacity': 1
-      }
+      cx: { prop: 'sensors.fields.sensingPoints.right.x' },
+      cy: { prop: 'sensors.fields.sensingPoints.right.y' }
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'fill-opacity': 0,
+      'stroke-width': 1,
+      'stroke-opacity': 1
+    }
   },
+  /*
   {
     type: 'Text',
     svgClass: 'robot-number-text',
@@ -286,12 +302,12 @@ const sensorsRenderables = [
       x: { prop: 'sensors.fields.sensingPoints.left.x' },
       y: { prop: 'sensors.fields.sensingPoints.left.y' },
       text: {
-        prop: 'sensors.fields.readings.heatMap.left[0]'
+        prop: 'sensors.fields.readings.pheromone.left[0]'
       }
     },
     styles: {
       'text-anchor': 'middle',
-      'font-size': 12,
+      'font-size': 14,
       fill: 'black',
       stroke: 'grey',
       'stroke-width': 1
@@ -310,23 +326,82 @@ const sensorsRenderables = [
       id: { prop: 'id' }
     },
     dynamicAttrs: {
-      x: { prop: 'sensors.fields.sensingPoints.right45.x' },
-      y: { prop: 'sensors.fields.sensingPoints.right45.y' },
+      x: { prop: 'sensors.fields.sensingPoints.right.x' },
+      y: { prop: 'sensors.fields.sensingPoints.right.y' },
       text: {
-        prop: 'sensors.fields.readings.heatMap.right45[0]'
+        prop: 'sensors.fields.readings.pheromone.right[0]'
       }
     },
     styles: {
       'text-anchor': 'middle',
-      'font-size': 12,
+      'font-size': 14,
       fill: 'black',
       stroke: 'grey',
       'stroke-width': 1
+    }
+  },
+  */
+  {
+    type: 'Sensor',
+    svgClass: '',
+    desc: 'Left Circle Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'sensors.circles.left.radius'
+      },
+      id: { prop: 'id' },
+      stroke: 'black'
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.circles.left.reading',
+        modifier: (val) => ((val.walls > 0 || val.robots > 0) ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
+      },
+      cx: { prop: 'sensors.circles.left.centre.x' },
+      cy: { prop: 'sensors.circles.left.centre.y' }
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'fill-opacity': 0,
+      'stroke-width': 1,
+      'stroke-opacity': 1
+    }
+  },
+  {
+    type: 'Sensor',
+    svgClass: '',
+    desc: 'Right Circle Sensor',
+    shape: 'circle',
+    dataPoints: { sceneProp: 'robots' },
+    staticAttrs: {
+      r: {
+        prop: 'sensors.circles.right.radius'
+      },
+      id: { prop: 'id' },
+      stroke: 'black'
+    },
+    dynamicAttrs: {
+      fill: {
+        prop: 'sensors.circles.right.reading',
+        modifier: (val) => ((val.walls > 0 || val.robots > 0) ? 'rgba(255,0,0,0.5)' : 'rgba(0,255,0,0.2)')
+      },
+      cx: { prop: 'sensors.circles.right.centre.x' },
+      cy: { prop: 'sensors.circles.right.centre.y' }
+    },
+    styles: {
+      fill: 'none',
+      stroke: 'black',
+      'fill-opacity': 0,
+      'stroke-width': 1,
+      'stroke-opacity': 1
     }
   }
 ];
 
 export default [
-    ...sensorsRenderables,
-    ...bodyRenderables
+  ...sensorsRenderables,
+  ...bodyRenderables
 ];

@@ -181,13 +181,13 @@ export default function goalController(robot, params) {
       x: envOrbitGoal.x - sensors.position.x,
       y: envOrbitGoal.y - sensors.position.y
     };
-    const rotatedEnvOribtGoal = {
+    const rotatedEnvOrbitGoal = {
       x: -1 * vecToEnvOrbitGoal.y,
       y: vecToEnvOrbitGoal.x
     };
     const newGoal = {
-      x: sensors.position.x + rotatedEnvOribtGoal.x,
-      y: sensors.position.y + rotatedEnvOribtGoal.y
+      x: sensors.position.x + rotatedEnvOrbitGoal.x,
+      y: sensors.position.y + rotatedEnvOrbitGoal.y
     };
     return newGoal;
   }

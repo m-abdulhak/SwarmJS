@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 // This sensor uses the voronoi diagram calculated by the scene to determine the cell
 // that the robot is in to avoid recalculating multiple Voronoi diagrams by each robot.
 // If local measurements are needed, such as if sensor errors are simulated in

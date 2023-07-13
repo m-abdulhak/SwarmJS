@@ -70,7 +70,7 @@ export default class Scene {
     this.engine.positionIterations = 10;
     this.engine.velocityIterations = 10;
 
-    // Add Environment Boundries To World
+    // Add Environment Boundaries To World
     this.envBoundaryObjects = getEnvBoundaryObjects(this.width, this.height);
     World.add(this.world, this.envBoundaryObjects);
 

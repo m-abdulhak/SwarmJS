@@ -33,7 +33,7 @@ export function updateFieldAtPoint(canvasContext, position, value) {
 
   if (!Array.isArray(value[0])) {
     if (value.length !== 3 && value.length !== 4) {
-      throw new Error('Invlaid pixel color value received:', value);
+      throw new Error('Invalid pixel color value received:', value);
     }
     // eslint-disable-next-line no-param-reassign
     value = [[value]];
@@ -41,7 +41,7 @@ export function updateFieldAtPoint(canvasContext, position, value) {
 
   const vLen = value.length;
   if (vLen % 2 !== 1 || value.some((row) => row.length !== vLen)) {
-    throw new Error('Invlaid update kernel received:', value);
+    throw new Error('Invalid update kernel received:', value);
   }
 
   const minXIndx = xp - Math.floor(vLen / 2);

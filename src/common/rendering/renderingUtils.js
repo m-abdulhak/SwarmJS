@@ -4,6 +4,7 @@
 import * as d3 from 'd3';
 import { get } from 'lodash';
 
+// eslint-disable-next-line import/no-cycle
 import { renderScene } from './renderer';
 import { xyPoint } from '../utils/geometry';
 
@@ -11,7 +12,7 @@ let pauseStateOnDragStart = null;
 
 export const getUniqueELementType = (module, type) => `${module} ${type}`;
 
-// Unsed for now but useful, so keeping it for now
+// Unused for now but useful, so keeping it
 const removeElements = (svg, selectionQuery) => {
   let selection = svg.selectAll(selectionQuery).node();
   while (selection) {
@@ -24,7 +25,7 @@ const removeElements = (svg, selectionQuery) => {
 // Rendering helpers
 // ----------------- //
 
-// Unsed for now but useful, so keeping it for now
+// Unused for now but useful, so keeping it
 const renderLineSeg = (p1, p2) => `M${p1.x},${p1.y}L${p2.x},${p2.y}`;
 
 const renderPath = (points, closed) => {
@@ -110,7 +111,7 @@ function setAttrs(attrDef, rends, scene) {
   }
 }
 
-function setDragBehaviour(dragDef, rends, scene) {
+function setDragBehavior(dragDef, rends, scene) {
   if (dragDef && typeof dragDef === 'object') {
     rends.call(d3.drag()
       .on('start', (event, d) => {
@@ -120,7 +121,7 @@ function setDragBehaviour(dragDef, rends, scene) {
         }
         if (dragDef?.onStart?.log) {
           const t = dragDef.onStart.log
-            .map((logginProp) => ([logginProp.prop, parseAttr(d, logginProp)]))
+            .map((loggingProp) => ([loggingProp.prop, parseAttr(d, loggingProp)]))
             .reduce((acc, [prop, val]) => ({ ...acc, [prop]: val }), {});
           console.log(`${d.constructor.name}-${d.id}: `, t);
         }
@@ -212,7 +213,7 @@ export function addRenderables(svg, scene, definitions, module) {
     // Add classes to svg elements if defined, useful for debugging
     rends.classed(def.svgClass, true);
 
-    // Add an id to each svg, usefull for color scheme selection
+    // Add an id to each svg, useful for color scheme selection
     if (!def.staticAttrs?.id) {
       rends.attr('id', (d, i) => i);
     }
@@ -220,7 +221,7 @@ export function addRenderables(svg, scene, definitions, module) {
     setAttrs(def.styles, rends, scene);
     setAttrs(def.staticAttrs, rends, scene);
     setDynamicAttrs(def, rends, scene);
-    setDragBehaviour(def.drag, rends, scene);
+    setDragBehavior(def.drag, rends, scene);
 
     return {
       def,

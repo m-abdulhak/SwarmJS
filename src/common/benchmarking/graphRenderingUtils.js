@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-const getLineKey = (alogName, index) => `${alogName}-${index}`;
+const getLineKey = (algoName, index) => `${algoName}-${index}`;
 
 const outsideDomain = (domain, value) => value < domain[0] || value > domain[1];
 
@@ -150,15 +150,15 @@ export const updateSvgGraph = (svgElem, data, aggData, existingSvgLines, { xScal
     return newLinePlots;
   }
 
-  Object.keys(data).forEach((alogName, algoIndx) => {
-    const dataSets = data[alogName];
+  Object.keys(data).forEach((algoName, algoIndx) => {
+    const dataSets = data[algoName];
 
     if (!dataSets || dataSets.length === 0) {
       return;
     }
 
     dataSets.forEach((dataSet, i) => {
-      const lineKey = getLineKey(alogName, i);
+      const lineKey = getLineKey(algoName, i);
       if (existingSvgLines[lineKey]) {
         updatePlot(existingSvgLines[lineKey], xScale, yScale);
       } else {
@@ -167,9 +167,9 @@ export const updateSvgGraph = (svgElem, data, aggData, existingSvgLines, { xScal
       }
     });
 
-    if (aggData[alogName]) {
-      const aggDataSet = aggData[alogName];
-      const lineKey = getLineKey(alogName, 'agg');
+    if (aggData[algoName]) {
+      const aggDataSet = aggData[algoName];
+      const lineKey = getLineKey(algoName, 'agg');
       if (existingSvgLines[lineKey]) {
         updatePlot(existingSvgLines[lineKey], xScale, yScale, aggDataSet);
       } else {

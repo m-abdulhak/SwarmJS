@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable no-console */
 import Sensor from '../sensor';
 import { sensorSamplingTypes, CoreSensors } from '../sensorManager';
@@ -16,7 +17,7 @@ class PolygonsSensor extends Sensor {
 
     this.regions = regions;
 
-    this.sceneDefinedVerticesDefinitions = {}
+    this.sceneDefinedVerticesDefinitions = {};
     for (const region of this.regions) {
       this.sceneDefinedVerticesDefinitions[region.name] = getSceneDefinedPointDefinitions(region.vertices);
     }
@@ -24,36 +25,42 @@ class PolygonsSensor extends Sensor {
 
   sample() {
     for (const region of this.regions) {
-      this.value[region.name] = this.sampleRegion(region)
+      this.value[region.name] = this.sampleRegion(region);
     }
   }
 
   sampleRegion(region) {
-    let sceneDefinedVertexArray = getSceneDefinedPointsAsArray(this.sceneDefinedVerticesDefinitions[region.name], this.robot.sensors);
+    const sceneDefinedVertexArray = getSceneDefinedPointsAsArray(
+      this.sceneDefinedVerticesDefinitions[region.name],
+      this.robot.sensors
+    );
 
     const reading = {};
 
     // Test against walls.
     if (region.sensedTypes.includes('walls')) {
       reading.walls = 0;
-      alert("Error: PolygonsSensor not yet equipped to detect walls")
+      console.alert('Error: PolygonsSensor not yet equipped to detect walls');
     }
 
     // Test against other robots.
     if (region.sensedTypes.includes('robots')) {
       reading.robots = this.scene?.robots?.filter(
-              (robot) => (robot.id != this.robot.id) && circleIntersectsPolygon(robot.body.position, robot.radius, sceneDefinedVertexArray)
+        (robot) => (
+          (robot.id !== this.robot.id)
+          && circleIntersectsPolygon(robot.body.position, robot.radius, sceneDefinedVertexArray)
+        )
       ).length;
     }
 
     // Test against pucks.
     if (region.sensedTypes.includes('pucks')) {
       reading.pucks = this.scene?.pucks?.filter(
-              (puck) => !puck.held && circleIntersectsPolygon(puck.position, puck.radius, sceneDefinedVertexArray)
+        (puck) => !puck.held && circleIntersectsPolygon(puck.position, puck.radius, sceneDefinedVertexArray)
       ).length;
     }
 
-    return { reading: reading, vertices: sceneDefinedVertexArray };
+    return { reading, vertices: sceneDefinedVertexArray };
   }
 }
 

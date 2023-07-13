@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import Offset from 'polygon-offset';
 
 import Sensor from '../sensor';

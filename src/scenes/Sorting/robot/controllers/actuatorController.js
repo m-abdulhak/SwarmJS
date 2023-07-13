@@ -4,15 +4,15 @@ export default function actuatorController(robot, params) {
   return (sensors, actuators, goal, waypoint) => {
     const curGoalArea = sensors.puckGoalAreaSensor;
     const closestPuck = sensors.closestPuckToGrabber;
-    const grappedPuck = actuators.grabber.getState();
+    const grabbedPuck = actuators.grabber.getState();
 
     if (curGoalArea) {
-      if (grappedPuck && curGoalArea === grappedPuck.color) {
+      if (grabbedPuck && curGoalArea === grabbedPuck.color) {
         actuators.grabber.deactivate();
       }
     }
 
-    if (!grappedPuck && closestPuck && curGoalArea !== closestPuck.color) {
+    if (!grabbedPuck && closestPuck && curGoalArea !== closestPuck.color) {
       actuators.grabber.activate();
     }
   };

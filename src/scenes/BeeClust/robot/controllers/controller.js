@@ -71,7 +71,7 @@ export function controller(robot, params, onLoop, onInit) {
     // Putting this in 'sensors' to be visualized in renderables.js.
     sensors.potentialWaitTime = 0;
 
-    const sensorReading = sensors.fields.readings.heatMap.forward;
+    const sensorReading = sensors.fields.readings.temperature.forward;
     if (sensorReading) {
       const temperatureScaled = sensorReading[0] / 256;
 

@@ -1,14 +1,14 @@
 import GrabberActuator from './grabberActuator';
 import FieldActuator from './fieldActuator';
 
-const availableActuatorsDefitions = [
+const availableActuatorsDefinitions = [
   GrabberActuator,
   FieldActuator
 ];
 
 // Actuators are stored in this object allowing other modules to easily reference them
 // e.g. in config when defining the enabled sensors, or in other sensors to define a dependency
-export const AvailableActuators = availableActuatorsDefitions.reduce((acc, actDef) => {
+export const AvailableActuators = availableActuatorsDefinitions.reduce((acc, actDef) => {
   acc[actDef.name] = actDef;
   return acc;
 }, {});
