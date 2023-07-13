@@ -16,6 +16,7 @@
 */
 
 import Sensor from '../sensor';
+// eslint-disable-next-line import/no-cycle
 import { sensorSamplingTypes, CoreSensors } from '../sensorManager';
 
 const name = 'position';

@@ -151,7 +151,7 @@ const benchmarkConfig = {
 const description = {
   html: `<p>An implementation of the BEECLUST algorithm which was originally proposed to model the ability of young bees to congregate at the warmest point in a temperature field.</p>
   
-  <p>The number printed above each robot is the potential waiting time.  This is computed from the scalar field at the robot's current position.  We can think of this as temperature.  When another robot is sensed, the robot will enter a waiting state.  Since the waiting time is higher in high temperature areas, that is where the robots tend to cluster.  As a whole, the swarm <emph>finds</emph> the warmest spot without ever doing any direct temperature comparisons.</p>
+  <p>The number printed above each robot is the potential waiting time.  This is computed from the scalar field at the robot's current position.  We can think of this as temperature.  When another robot is sensed, the robot will enter a waiting state.  Since the waiting time is higher in high temperature areas, that is where the robots tend to cluster.  As a whole, the swarm <em>finds</em> the warmest spot without ever doing any direct temperature comparisons.</p>
 
   <p><a href=https://www.thomasschmickl.eu/complexity/beeclust target=_blank>A nice informal description of the BEECLUST algorithm</a></p>
 

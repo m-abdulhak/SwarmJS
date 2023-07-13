@@ -3,7 +3,7 @@ import {
   CoreSensors,
   ExtraSensors,
   CorePositionsGenerators,
-  CorePerformanceTrakers,
+  CorePerformanceTrackers,
   CoreControllers
 } from '@common';
 
@@ -14,7 +14,7 @@ import PuckRenderables from '@common/puck/renderables';
 import RobotRenderables from './robot/renderables';
 
 import actuatorController from './robot/controllers/actuatorController';
-import goalContoller from './robot/controllers/goalController';
+import goalController from './robot/controllers/goalController';
 
 // All renderables should be registered in this list and assigned a module property
 // This is necessary to avoid imposing a unique restriction on renderable type in different modules
@@ -43,7 +43,7 @@ const simConfig = {
     },
     controllers: {
       actuators: actuatorController,
-      goal: goalContoller,
+      goal: goalController,
       velocity: {
         controller: CoreControllers.velocity.diffVelocityController,
         params: { angularVelocityScale: 0.001 }
@@ -115,9 +115,9 @@ const benchmarkConfig = {
     }
   ],
   trackers: [
-    CorePerformanceTrakers.RobotToGoalDistanceTracker,
-    CorePerformanceTrakers.PucksOutsideGoalTracker,
-    CorePerformanceTrakers.MinRobotRobotDistanceTracker
+    CorePerformanceTrackers.RobotToGoalDistanceTracker,
+    CorePerformanceTrackers.PucksOutsideGoalTracker,
+    CorePerformanceTrackers.MinRobotRobotDistanceTracker
   ],
   maxTimeStep: 20000,
   timeStep: 1000
@@ -129,7 +129,6 @@ const description = {
   <p>This is not a particularly effective algorithm, but rather exists for benchmarking or comparison with other approaches such as <b>Voronoi Sorting</b>.</p>
   `
 };
-
 
 export default {
   title: 'Sorting (Sorting)',

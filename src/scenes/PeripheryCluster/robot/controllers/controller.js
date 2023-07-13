@@ -2,6 +2,7 @@
 /* eslint-disable default-param-last */
 /* eslint-disable no-eval */
 
+// eslint-disable-next-line no-unused-vars
 export function init(CONST, VAR, FUNC, robot, params) {
   // PARAMETERS:
   CONST.maxAngularSpeed = 0.015;

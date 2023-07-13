@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /*  This module is responsible for managing the sensors,
     sensors are imported and stored in this module,
     all sampling is done through this module.

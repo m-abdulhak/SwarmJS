@@ -8,7 +8,7 @@ export default class StaticRectangle {
     this.scene = scene;
     this.world = scene.world;
 
-    // Rectangle Spicific Properties
+    // Rectangle Specific Properties
     this.center = this.def.center;
     this.width = this.def.width;
     this.height = this.def.height;

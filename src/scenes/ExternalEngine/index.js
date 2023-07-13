@@ -2,7 +2,7 @@ import {
   CoreSensors,
   ExtraSensors,
   CorePositionsGenerators,
-  CorePerformanceTrakers,
+  CorePerformanceTrackers,
   CoreControllers
 } from '@common';
 
@@ -110,8 +110,8 @@ const benchmarkConfig = {
     }
   ],
   trackers: [
-    CorePerformanceTrakers.RobotToGoalDistanceTracker,
-    CorePerformanceTrakers.MinRobotRobotDistanceTracker
+    CorePerformanceTrackers.RobotToGoalDistanceTracker,
+    CorePerformanceTrackers.MinRobotRobotDistanceTracker
   ],
   maxTimeStep: 20000,
   timeStep: 1000

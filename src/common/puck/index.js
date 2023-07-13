@@ -24,7 +24,7 @@ export default class Puck {
     this.body.frictionAir = 0.5;
     // this.body.frictionStatic = 0;
     // this.body.restitution = 0;
-    //Body.setDensity(this.body, 0.001);
+    // Body.setDensity(this.body, 0.001);
 
     // this.body.collisionFilter = {
     //    group: 0,

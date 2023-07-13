@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-use-before-define */
 import * as d3 from 'd3';
+// eslint-disable-next-line import/no-cycle
 import { addRenderables, setDynamicAttrs, getUniqueELementType } from './renderingUtils';
 
 let resetOnNextRender = false;

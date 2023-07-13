@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /*
  ************************************************
  *************** Helper Functions ***************
@@ -24,21 +25,21 @@ export function normalizeAnglePlusMinusPi(a) {
 }
 
 export function getAngularDifference(angleA, angleB) {
-    angleA = normalizeAnglePlusMinusPi(angleA);
-    angleB = normalizeAnglePlusMinusPi(angleB);
-    let error = Math.abs(angleA - angleB);
-    if (error > Math.PI) {
-        error -= Math.PI * 2;
-        error = Math.abs(error);
-    }
-    return error;
+  angleA = normalizeAnglePlusMinusPi(angleA);
+  angleB = normalizeAnglePlusMinusPi(angleB);
+  let error = Math.abs(angleA - angleB);
+  if (error > Math.PI) {
+    error -= Math.PI * 2;
+    error = Math.abs(error);
+  }
+  return error;
 }
 
 export function getSmallestSignedAngularDifference(a, b) {
-    /* Return angle between the two given angles with the smallest absolute
+  /* Return angle between the two given angles with the smallest absolute
        value.  Meanwhile, the value returned will have a sign. */
-    // From: https://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
-    return Math.atan2(Math.sin(a-b), Math.cos(a-b))
+  // From: https://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
+  return Math.atan2(Math.sin(a - b), Math.cos(a - b));
 }
 
 /*
@@ -62,7 +63,7 @@ export function angleBetweenThreePointsDeg(A, B, C) {
   return radToDeg(angleRad);
 }
 
-export function getPointFromDistnaceAndAngle(length, angle) {
+export function getPointFromDistanceAndAngle(length, angle) {
   return {
     x: length * Math.cos(angle),
     y: length * Math.sin(angle)
@@ -83,7 +84,7 @@ export function getPolarCoordsFromCartesian(x, y) {
 }
 
 export function getAbsolutePointFromDistanceAndAngle(center, length, angle) {
-  return getAbsolutePointFromRelativePoint(center, getPointFromDistnaceAndAngle(length, angle));
+  return getAbsolutePointFromRelativePoint(center, getPointFromDistanceAndAngle(length, angle));
 }
 
 export function closePolygon(poly) {
@@ -492,7 +493,7 @@ export function getLineEquationParams(p1, p2) {
 
 /**
  * Finds the intersection between a circle's border
- * and the line from the circl'es origin to the otherLineEndPoint.
+ * and the line from the circle's origin to the otherLineEndPoint.
  * @param  {Vector} center            - center of the circle and start of the line
  * @param  {number} radius            - radius of the circle
  * @param  {Vector} otherLineEndPoint - end of the line

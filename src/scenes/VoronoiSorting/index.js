@@ -3,7 +3,7 @@ import {
   CoreSensors,
   ExtraSensors,
   CorePositionsGenerators,
-  CorePerformanceTrakers,
+  CorePerformanceTrackers,
   CoreControllers
 } from '@common';
 
@@ -145,9 +145,9 @@ const benchmarkConfig = {
     }
   ],
   trackers: [
-    CorePerformanceTrakers.RobotToGoalDistanceTracker,
-    CorePerformanceTrakers.PucksOutsideGoalTracker,
-    CorePerformanceTrakers.MinRobotRobotDistanceTracker
+    CorePerformanceTrackers.RobotToGoalDistanceTracker,
+    CorePerformanceTrackers.PucksOutsideGoalTracker,
+    CorePerformanceTrackers.MinRobotRobotDistanceTracker
   ],
   maxTimeStep: 50000,
   timeStep: 1000
@@ -165,7 +165,6 @@ const description = {
   </p>
   `
 };
-
 
 export default {
   title: 'Sorting (Voronoi)',

@@ -70,7 +70,7 @@ const sensorsRenderables = [
     shape: 'polygon',
     dataPoints: { sceneProp: 'robots' },
     staticAttrs: {
-      stroke: 'none',
+      stroke: 'none'
     },
     dynamicAttrs: {
       fill: 'rgb(0, 0, 255, 0.15)',

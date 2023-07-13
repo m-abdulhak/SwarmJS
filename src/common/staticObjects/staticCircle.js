@@ -7,7 +7,7 @@ export default class StaticCircle {
     this.scene = scene;
     this.world = scene.world;
 
-    // Circle Spicific Properties
+    // Circle Specific Properties
     this.center = this.def.center;
     this.radius = this.def.radius;
     this.points = [

@@ -16,7 +16,6 @@ import mapUrl from '../OrbitalConstruction/scalar_field.png';
 
 import pythonBridger from './scene/pythonBridge';
 
-
 // This constant defines the contour line of the scalar field around which the
 // robots will build.
 const tau = 0.6;
@@ -226,6 +225,7 @@ const description = {
   </p>
 `
 };
+
 export default {
   title: 'Orbital Construction via Websocket Bridge',
   name: 'orbitalConstructionBridge',

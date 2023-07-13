@@ -1,5 +1,6 @@
+/* eslint-disable import/no-cycle */
 // This sensor calculates the points on all directions relative to the robot.
-// Usefull for controllers to easily set a heading direction depending on sensor readings.
+// Useful for controllers to easily set a heading direction depending on sensor readings.
 
 import Sensor from '../sensor';
 import { sensorSamplingTypes, CoreSensors } from '../sensorManager';

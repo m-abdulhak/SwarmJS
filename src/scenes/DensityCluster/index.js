@@ -3,7 +3,7 @@ import {
   CoreSensors,
   ExtraSensors,
   CorePositionsGenerators,
-  CorePerformanceTrakers
+  CorePerformanceTrackers
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';

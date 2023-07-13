@@ -2,11 +2,11 @@ import React from 'react';
 import propTypes from 'prop-types';
 import { Box, Grid, Slider, Typography, Tooltip } from '@mui/material';
 
-const TitledSlider = ({ title, value, setValue, tooltTip, minValue, maxValue }) => (
+const TitledSlider = ({ title, value, setValue, toolTip, minValue, maxValue }) => (
   <Box sx={{ width: '100%', height: '75px' }}>
     <Grid container spacing={2} item sm={12} lg={10} xl={8}>
       <Grid item sm={3} md={2}>
-        <Tooltip title={tooltTip}>
+        <Tooltip title={toolTip}>
           <Typography variant="h6">
             {title}
           </Typography>
@@ -32,7 +32,7 @@ TitledSlider.propTypes = {
   minValue: propTypes.number,
   maxValue: propTypes.number,
   setValue: propTypes.func.isRequired,
-  tooltTip: propTypes.string
+  toolTip: propTypes.string
 };
 
 export default TitledSlider;

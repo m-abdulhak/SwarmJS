@@ -1,4 +1,5 @@
-import {fetchAngularCommand} from '../../scene/pythonBridge';
+/* eslint-disable no-param-reassign */
+import { fetchAngularCommand } from '../../scene/pythonBridge';
 
 export function init(CONST, VAR, FUNC, robot, params) {
   CONST.middleTau = params.tau || 0.6;
@@ -29,6 +30,7 @@ export function controller(robot, params, onLoop, onInit) {
 
   let initFunc = () => {};
   if (onInit) {
+    // eslint-disable-next-line no-eval
     const userDefinedInitFunc = eval(onInit);
 
     if (userDefinedInitFunc && typeof userDefinedInitFunc === 'function') {
@@ -41,6 +43,7 @@ export function controller(robot, params, onLoop, onInit) {
   Object.freeze(CONST);
 
   if (onLoop) {
+    // eslint-disable-next-line no-eval
     const func = eval(onLoop);
 
     if (func && typeof func === 'function') {
@@ -48,32 +51,32 @@ export function controller(robot, params, onLoop, onInit) {
     }
   }
 
-
-  /* This part is different from original*/
+  /* This part is different from original */
   return (sensors) => {
-    var command = {
+    const command = {
       linearVel: 0,
       angularVel: 0,
       type: robot.SPEED_TYPES.RELATIVE
     };
     if (sensors.fields.readings.heatMap.leftField == null) {
-      console.log("Sensors not readable yet.");
+      // eslint-disable-next-line no-console
+      console.log('Sensors not readable yet.');
       return command;
     }
     let forwardSpeed = CONST.maxForwardSpeed;
-    let angularSpeed = fetchAngularCommand(robot.id);
-    
+    const angularSpeed = fetchAngularCommand(robot.id);
+
     //! trick... if angular speed is 0 means bridge is on hold
     if (angularSpeed === 0) {
       forwardSpeed = 0;
     }
-    
+
     command.linearVel = forwardSpeed * robot.velocityScale;
 
     command.angularVel = angularSpeed * robot.velocityScale;
-    // //! /* to slove canvas error */
-    command.linearVel = isNaN(command.linearVel) ? 0 : command.linearVel;
-    command.angularVel = isNaN(command.angularVel) ? 0 : command.angularVel;
+    // //! /* to solve canvas error */
+    command.linearVel = Number.isNaN(command.linearVel) ? 0 : command.linearVel;
+    command.angularVel = Number.isNaN(command.angularVel) ? 0 : command.angularVel;
     // console.log(">>>> controller returning command" ,command , "by order", angularSpeed , robot.externalVelocity)
     return command;
   };
