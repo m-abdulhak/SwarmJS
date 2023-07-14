@@ -3,7 +3,7 @@ import Tracker from './tracker';
 class PucksOutsideGoalTracker extends Tracker {
   constructor() {
     super(
-      'pucksOutsidGoal',
+      'pucksOutsideGoal',
       'Number of Pucks Outside Goal Area',
       'average',
       'average',

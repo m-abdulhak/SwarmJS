@@ -16,9 +16,9 @@ export default function goalController(robot, params) {
 
   return (sensors, actuators, oldGoal) => {
     const curGoalArea = sensors.puckGoalAreaSensor;
-    const grappedPuck = actuators.grabber.getState();
+    const grabbedPuck = actuators.grabber.getState();
 
-    if (curGoalArea && grappedPuck && curGoalArea === grappedPuck.color) {
+    if (curGoalArea && grabbedPuck && curGoalArea === grabbedPuck.color) {
       curGoalHoldTime = 0;
       return getGoalFromDir(
         sensors.position,

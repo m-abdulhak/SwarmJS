@@ -17,7 +17,7 @@ const Options = ({
       minValue={1}
       maxValue={100}
       setValue={setRenderSkip}
-      tooltTip='Number of simulation steps to run between frames, speeds up simulation but can cause app lag.'
+      toolTip='Number of simulation steps to run between frames, speeds up simulation but can cause app lag.'
     />
     <RenderingSettings
       renderingElements={renderingElements}

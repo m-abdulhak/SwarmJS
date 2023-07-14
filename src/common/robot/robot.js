@@ -1,4 +1,4 @@
-import { Body, World, Bodies, Composite, Constraint } from 'matter-js';
+import { Body, World, Bodies } from 'matter-js';
 
 import { getDistance } from '../utils/geometry';
 
@@ -53,8 +53,7 @@ export default class Robot {
     envWidth,
     envHeight,
     scene,
-    misc,
-    externalEngine = false
+    misc
   ) {
     // Configs
     this.DeadLockRecovery = {

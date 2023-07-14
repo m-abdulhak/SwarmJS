@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /*  This module is responsible for managing the sensors,
     sensors are imported and stored in this module,
     all sampling is done through this module.
@@ -59,7 +60,7 @@ const extraSensorDefinitions = [
   FieldSensor,
   PolygonsSensor,
   CirclesSensor
-]
+];
 
 // Sensors are stored in these objects allowing other modules to easily reference them
 // e.g. in config when defining the enabled sensors, or in other sensors to define a dependency

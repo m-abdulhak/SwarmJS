@@ -1,6 +1,6 @@
 import Tracker from '@common/benchmarking/performanceTrackers/tracker';
 
-const GOAL = {x: 450, y: 100};
+const GOAL = { x: 450, y: 100 };
 
 class DistanceToGoalTracker extends Tracker {
   constructor() {

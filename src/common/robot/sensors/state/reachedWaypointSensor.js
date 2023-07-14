@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import Sensor from '../sensor';
 import { CoreSensors, sensorSamplingTypes } from '../sensorManager';
 

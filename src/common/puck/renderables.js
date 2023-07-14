@@ -44,7 +44,7 @@ export default [
       pause: true,
       onStart: {
         styles: {
-          stroke: 'lightgray'
+          stroke: 'lightGray'
         },
         log: [
           { prop: 'color' },

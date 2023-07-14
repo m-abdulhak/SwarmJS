@@ -1,5 +1,6 @@
+/* eslint-disable import/no-cycle */
 import Sensor from '@common/robot/sensors/sensor';
-import { sensorSamplingTypes, CoreSensors as CoreSensors } from '@common/robot/sensors/sensorManager';
+import { sensorSamplingTypes, CoreSensors } from '@common/robot/sensors/sensorManager';
 import { getDistance } from '@common/utils/geometry';
 
 import pucksNearGrabberSensor from './pucksNearGrabberSensor';

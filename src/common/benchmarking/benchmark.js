@@ -22,7 +22,7 @@ export const getBenchData = () => {
   return ret;
 };
 
-const resetHistroicalData = () => {
+const resetHistoricalData = () => {
   historicalData = benchSettings.trackers.reduce((acc, tr) => ({
     ...acc,
     [tr.name]: benchSettings.simConfigs
@@ -65,7 +65,7 @@ export const startBench = (origSimConfig, newBenchConfig, resetSimCB) => {
   });
 
   resetSimCallBack = resetSimCB;
-  resetHistroicalData();
+  resetHistoricalData();
   curBenchConfIndx = null;
   startNewExperiment();
 };
@@ -87,14 +87,14 @@ export const updateBench = (scene, time) => {
     const trackerTimeStep = benchData[tracker.name].curTimeStep;
     const valuesWithinCurTimeStep = benchData[tracker.name].curTimeStepValues;
 
-    // The timestep corresponding to the current simulation time
+    // The timeStep corresponding to the current simulation time
     const curTimeStep = Math.floor(time / benchSettings.timeStep);
 
     if (curTimeStep === trackerTimeStep) {
-      // If new time is still within the current timestep, add the value to the temporary data
+      // If new time is still within the current timeStep, add the value to the temporary data
       valuesWithinCurTimeStep.push(tracker.getValue(scene));
     } else {
-      // If the new time is not within the current timestep,
+      // If the new time is not within the current timeStep,
       // aggregate the temporary data and add the resulting value to the currentRun data set
       const newVal = tracker.reduce(valuesWithinCurTimeStep);
       const curRunData = benchData[tracker.name].data;

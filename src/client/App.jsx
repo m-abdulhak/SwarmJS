@@ -74,7 +74,7 @@ const App = () => {
   }, [fieldsElemRef.current, selectedBackgroundField]);
 
   // User Defined Robot Velocity Controller
-  const [controlerCode, setControlerCode] = useState(
+  const [controllerCode, setControllerCode] = useState(
     {
       defaultOnLoopCode: '',
       onLoopCode: null,
@@ -114,16 +114,16 @@ const App = () => {
     const usedConfig = { ...newConfig };
 
     if (!useDefaultController) {
-      if (controlerCode.onLoopCode) {
-        usedConfig.robots.controllers.velocity.onLoop = controlerCode.onLoopCode;
+      if (controllerCode.onLoopCode) {
+        usedConfig.robots.controllers.velocity.onLoop = controllerCode.onLoopCode;
       }
-      if (controlerCode.onInitCode) {
-        usedConfig.robots.controllers.velocity.init = controlerCode.onInitCode;
+      if (controllerCode.onInitCode) {
+        usedConfig.robots.controllers.velocity.init = controllerCode.onInitCode;
       }
     }
 
-    const updateDefaultControlerCode = (init, loop) => setControlerCode(() => {
-      const newControlerCode = {
+    const updateDefaultControllerCode = (init, loop) => setControllerCode(() => {
+      const newControllerCode = {
         defaultOnLoopCode: '',
         onLoopCode: null,
         defaultOnInitCode: '',
@@ -131,15 +131,15 @@ const App = () => {
       };
 
       if (init) {
-        newControlerCode.defaultOnInitCode = init;
+        newControllerCode.defaultOnInitCode = init;
       }
       if (loop) {
-        newControlerCode.defaultOnLoopCode = loop;
+        newControllerCode.defaultOnLoopCode = loop;
       }
-      return newControlerCode;
+      return newControllerCode;
     });
 
-    resetSimulation(usedConfig, onUpdate, updateDefaultControlerCode);
+    resetSimulation(usedConfig, onUpdate, updateDefaultControllerCode);
     onRobotParamsChange({ velocityScale: newConfig?.robots?.params?.velocityScale || 1 });
     onRenderSkipChange(newConfig.env.renderSkip);
     setPaused(false);
@@ -241,7 +241,7 @@ const App = () => {
         title='Velocity'
         value={robotParams.velocityScale}
         setValue={(newV) => onRobotParamsChange({ velocityScale: newV })}
-        tooltTip='Controls robots velocity, only works when supported in robot controller.'
+        toolTip='Controls robots velocity, only works when supported in robot controller.'
       />
       <CodeEditorSection
         title='Scene Configuration (Read Only)'
@@ -262,25 +262,25 @@ const App = () => {
 
   const controllerCodeEditor = initialized && config?.robots?.controllers?.supportsUserDefinedControllers !== false ? (
      <CodeEditor
-      key={controlerCode.defaultOnInitCode}
+      key={controllerCode.defaultOnInitCode}
       deploy={() => reset(config, true, false)}
       sections={[
         {
           title: 'Initialize:',
-          defaultCode: controlerCode.defaultOnInitCode,
-          onCodeValid: (onInitCode) => setControlerCode((old) => ({ ...old, onInitCode })),
+          defaultCode: controllerCode.defaultOnInitCode,
+          onCodeValid: (onInitCode) => setControllerCode((old) => ({ ...old, onInitCode })),
           checkIfCodeIsValid: (init) => controllerCodeIsValid(
-            controlerCode.onLoopCode ?? controlerCode.defaultOnLoopCode,
+            controllerCode.onLoopCode ?? controllerCode.defaultOnLoopCode,
             init
           )
         },
         {
           title: 'Loop:',
-          defaultCode: controlerCode.defaultOnLoopCode,
-          onCodeValid: (onLoopCode) => setControlerCode((old) => ({ ...old, onLoopCode })),
+          defaultCode: controllerCode.defaultOnLoopCode,
+          onCodeValid: (onLoopCode) => setControllerCode((old) => ({ ...old, onLoopCode })),
           checkIfCodeIsValid: (loop) => controllerCodeIsValid(
             loop,
-            controlerCode.onInitCode ?? controlerCode.defaultOnInitCode
+            controllerCode.onInitCode ?? controllerCode.defaultOnInitCode
           )
         }
       ]}

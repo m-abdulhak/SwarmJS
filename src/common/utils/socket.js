@@ -40,12 +40,12 @@ export default class Socket {
     // }, pingIntervalDuration);
   }
 
-  logEvent(eventName, ...parms) {
+  logEvent(eventName, ...params) {
     // TODO: change logging behavior based on the logLevel
     if (this.logLevel > logLevels.none) {
       console.log(`Socket event (${this.url}): ${eventName}`);
-      if (parms.length > 0) {
-        console.log(parms);
+      if (params.length > 0) {
+        console.log(params);
       }
     }
   }

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import Sensor from '../sensor';
 import { sensorSamplingTypes, CoreSensors } from '../sensorManager';
 
@@ -13,7 +14,7 @@ const getNeighbors = (scene, robotId) => {
     }
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(`Error Exracting Neighbors for robot ${robotId}: ${error}`);
+    console.log(`Error Extracting Neighbors for robot ${robotId}: ${error}`);
   }
 
   return neighbors;

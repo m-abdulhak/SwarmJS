@@ -9,7 +9,7 @@ export function getSceneDefinedPointDefinitions(points) {
   return points.reduce((acc, pDef) => {
     if (!pDef.name || !pDef.coords || !pDef.type || (pDef.type !== 'Cartesian' && pDef.type !== 'Polar')) {
       // eslint-disable-next-line no-console
-      console.error('Unrecognized point definitinon:', pDef);
+      console.error('Unrecognized point definition:', pDef);
       return acc;
     }
     if (pDef.type === 'Cartesian') {

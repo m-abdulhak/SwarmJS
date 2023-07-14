@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import Sensor from '../sensor';
 import { sensorSamplingTypes, CoreSensors } from '../sensorManager';
 import { getAbsolutePointFromDistanceAndAngle } from '../../../utils/geometry';

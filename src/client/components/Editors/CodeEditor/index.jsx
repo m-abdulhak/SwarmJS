@@ -124,10 +124,10 @@ function CodeEditor({
     reader.readAsText(file);
   };
 
-  const allCodeIsVlaid = Object.values(codeValidity).reduce((acc, v) => acc && v, true);
+  const allCodeIsValid = Object.values(codeValidity).reduce((acc, v) => acc && v, true);
   const alertElem = (
-    <Alert className="code-editor-alert" severity={ allCodeIsVlaid ? 'success' : 'error'}>
-      { allCodeIsVlaid ? 'Code compiled successfully.' : 'Error compiling code'}
+    <Alert className="code-editor-alert" severity={ allCodeIsValid ? 'success' : 'error'}>
+      { allCodeIsValid ? 'Code compiled successfully.' : 'Error compiling code'}
     </Alert>
   );
 

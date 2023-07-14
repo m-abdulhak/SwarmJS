@@ -1,13 +1,13 @@
 // Define and Export Renderables:
 // ===============================
 // This is where we define renderables in a simple config format
-// We should also import and register the renderables into renderering module (renderer.js)
+// We should also import and register the renderables into rendering module (renderer.js)
 // This maybe more suitable to be in a separate file,
 // but for now I'm keeping each module's renderables in the same file
 // Some of the syntax might not be very clean, such as requiring knowing where stuff are defined
 // and stored within the Scene and defining them with a sceneProp, but I think it's fine for now
 // ===============================
-// type: mandatory, used for grouping renderables into UI buttons to enable/disable rendedering them
+// type: mandatory, used for grouping renderables into UI buttons to enable/disable rendering them
 // svgClass: optional, used to add classes to the svg elements, useful for debugging
 // dataPoints: optional, defines the data points if the renderable is repeated for multiple objects
 //             dataPoints are usually defined as a property of the scene with the 'sceneProp' key
@@ -16,8 +16,8 @@
 // staticAttrs: optional, defines the attributes to be set only once when the element is initialized
 // styles: optional, defines the styling attributes for the element, also only applied once
 // dynamicAttrs: optional, defines the attributes to be set on every simulation update
-// drag: optional, defines the draggable behavious for the element throuhg the following properties:
-//   - prop: the property of the datapoint to be set using the element drag event when dragging
+// drag: optional, defines the draggable behavior for the element through the following properties:
+//   - prop: the property of the data point to be set using the element drag event when dragging
 //   - pause: whether the simulation should be paused when dragging
 //   - onStart / onEnd: define the actions to be performed when dragging starts and ends
 //        - styles: defines the styles to set when dragging starts / ends
@@ -27,12 +27,12 @@
 
 // Any property can be one of the following:
 // - string / number: the value is set directly
-// - prop: the value is parsed as a property of the datapoint
+// - prop: the value is parsed as a property of the data point
 //          a 'modifier' function can be defined to modify the value after it is parsed
 // - sceneProp: the value is parsed as a property of the scene
 //          a 'modifier' function can be defined to modify the value after it is parsed
 // - special: used for special behaviors, such as setting a color according to the color schema
-//            currenly only 'schemaColor' is supported
+//            currently only 'schemaColor' is supported
 
 // Example of rendering a compound body
 // const compoundBodyRenderables = [
@@ -192,7 +192,7 @@ const sensorsRenderables = [
     },
     dynamicAttrs: {
       stroke: {
-        prop: 'sensors.fields.readings.heatMap.forward',
+        prop: 'sensors.fields.readings.temperature.forward',
         modifier: (val) => {
           if (!val) {
             return 'black';
@@ -202,7 +202,7 @@ const sensorsRenderables = [
         }
       },
       fill: {
-        prop: 'sensors.fields.readings.heatMap.forward',
+        prop: 'sensors.fields.readings.temperature.forward',
         modifier: (val) => {
           if (!val) {
             return 'black';
@@ -326,9 +326,7 @@ const sensorsRenderables = [
       y: { prop: 'sensors.directions.right.y' },
       text: {
         prop: 'sensors.potentialWaitTime',
-        modifier: (val) => {
-          return val;
-        }
+        modifier: (val) => val
       }
     },
     styles: {

@@ -68,8 +68,8 @@ export default function bvcWaypointController(robot, params) {
     return deadLockManeuverInProgress || remainingDeadlockManeuvers > 0;
   }
 
-  function getVerteciesOnManeuverDir(cell, linesSegP1, lineSegP2) {
-    const vertecies = [];
+  function getVerticesOnManeuverDir(cell, linesSegP1, lineSegP2) {
+    const vertices = [];
 
     cell.forEach((vertex) => {
       const dir = pointIsOnRightSideOfVector(
@@ -81,18 +81,18 @@ export default function bvcWaypointController(robot, params) {
         lineSegP2.y
       );
       if (dir === maneuverDirection) {
-        vertecies.push(vertex);
+        vertices.push(vertex);
       }
     });
-    return vertecies;
+    return vertices;
   }
 
   // returns temp goal according to advanced deadlock recovery algorithm
   function setWaypointAccToAdvancedDeadlockRec(cell) {
     // Get vertices of cell that lie on the current maneuver direction
-    const vertecies = getVerteciesOnManeuverDir(cell, robot.sensors.position, robot.goal);
+    const vertices = getVerticesOnManeuverDir(cell, robot.sensors.position, robot.goal);
     const outermostPoint = getFurthestVertexFromLineSeg(
-      vertecies,
+      vertices,
       robot.sensors.position,
       robot.goal
     );
