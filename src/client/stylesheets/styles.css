@@ -155,7 +155,7 @@
     padding: 0px;
 }
 
-.code-section-header {
+.input-section-header {
     height: 100%;
     display: flex;
     position: relative;
@@ -167,7 +167,7 @@
     border-radius: 0;
 }
 
-.code-section-header .code-section-header-title {
+.input-section-header .input-section-header-title {
     height: 50px;
     line-height: 50px;
     margin: 0px 10px 0px 10px;
@@ -236,6 +236,19 @@
 .input-stack-horizontal {
     align-items: center;
     flex-wrap: wrap;
+}
+
+.input-stack-vertical {
+    height: 100%;
+    position: relative;
+    background-color: #fff;
+    color: rgba(0, 0, 0, 0.87);
+    border-radius: 4px;
+    box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
+    position: relative;
+    margin: 1px 0px 10px 0px;
+    padding: 10px 10px;
+    border-radius: 0;
 }
 
 .input-group {

@@ -307,4 +307,8 @@ export default class Robot {
 
     return { minDistance: minDist };
   }
+
+  destroy() {
+    World.remove(this.world, this.body);
+  }
 }

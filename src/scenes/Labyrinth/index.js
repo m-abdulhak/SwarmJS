@@ -1,7 +1,8 @@
 import {
   CoreSensors,
   ExtraSensors,
-  CorePositionsGenerators
+  CorePositionsGenerators,
+  defaultDynamicPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -106,6 +107,12 @@ const usedSensors = {
   }
 };
 
+const supportedDynamicProps = [
+  defaultDynamicPropertyDefinitions.robotCount,
+  defaultDynamicPropertyDefinitions.velocityScale,
+  defaultDynamicPropertyDefinitions.pucksCountG1
+];
+
 const simConfig = {
   env: {
     width: 1024,
@@ -168,7 +175,8 @@ const simConfig = {
     }
   ],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
-  renderables
+  renderables,
+  dynamicPropertyDefinitions: supportedDynamicProps
 };
 
 const benchmarkConfig = {
@@ -208,12 +216,18 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>A planar construction algorithm where the robots are constrained to operate within a labyrinth.  The labyrinth encodes the direction in which objects should be pushed so that they are moved around the grey obstacle and join in the formation of the L shape on the left.</p>
+  html: `
+  <p>
+    A planar construction algorithm where the robots are constrained to operate within a labyrinth. 
+    The labyrinth encodes the direction in which objects should be pushed so that they are moved around the grey 
+    obstacle and join in the formation of the L shape on the left.
+  </p>
 
   <p>
-  <a href=https://link.springer.com/article/10.1007/s10015-022-00849-5 target=_blank>
-  Vardy, Andrew. "The swarm within the labyrinth: planar construction by a robot swarm." Artificial Life and Robotics 28, (2023): 117-126.
-  </a>
+    <a href=https://link.springer.com/article/10.1007/s10015-022-00849-5 target=_blank>
+      Vardy, Andrew. "The swarm within the labyrinth: planar construction by a robot swarm." 
+      Artificial Life and Robotics 28, (2023): 117-126.
+    </a>
   </p>
   `
 };

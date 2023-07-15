@@ -7,15 +7,24 @@
     "settings": {
 				"editor.tabSize": 2,
 				"cSpell.words": [
+					"Beckers",
 					"BEECLUST",
 					"camelcase",
 					"Chirality",
 					"Clust",
+					"Deneubourg",
+					"Gauci",
+					"Hafner",
+					"Kronemann",
+					"Lumibots",
 					"Málaga",
 					"monokai",
 					"noconflict",
 					"plusplus",
-					"Schmickl"
+					"Prerational",
+					"Schmickl",
+					"Stigmergy",
+					"Verena"
 				]
     },
 	"launch": {

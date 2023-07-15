@@ -2,9 +2,14 @@
 
 import { getDistance } from '../geometry';
 
-export default function getRandCollFreePosGenerator(posNum, radius, envWidth, envHeight, staticObjects = []) {
-  const positionsAndRadii = [];
-
+export default function getRandCollFreePosGenerator(
+  posNum,
+  radius,
+  envWidth,
+  envHeight,
+  staticObjects = [],
+  getCurPosAndRadii = []
+) {
   const generatePos = (r) => {
     const xCount = envWidth / r;
     const yCount = envHeight / r;
@@ -17,7 +22,7 @@ export default function getRandCollFreePosGenerator(posNum, radius, envWidth, en
     const newY = Math.max(minY, Math.min(maxY, Math.floor(Math.random() * yCount) * r));
     const newPos = { x: newX, y: newY };
 
-    const doesNotCollideWithOtherPositions = positionsAndRadii
+    const doesNotCollideWithOtherPositions = getCurPosAndRadii
       .findIndex(([p, pr]) => getDistance(p, newPos) < (r + pr) * 1.1) === -1;
 
     const doesNotCollideWithObstacles = staticObjects.reduce((acc, cur) => !cur.containsPoint(newPos)
@@ -35,7 +40,6 @@ export default function getRandCollFreePosGenerator(posNum, radius, envWidth, en
       const newPos = generatePos(r);
 
       if (newPos) {
-        positionsAndRadii.push([newPos, r]);
         return newPos;
       }
     }

@@ -85,7 +85,8 @@ export const resetSimulation = (
     config.objects,
     config.algorithm,
     config.positionsGenerator,
-    gMaps
+    gMaps,
+    config.dynamicPropertyDefinitions
   );
 
   // Make scene globally available if running in browser.
@@ -135,7 +136,7 @@ export const isBenchmarking = () => benchmarkingActive();
 
 export const togglePauseSimulation = () => scene.togglePause();
 
-export const setRobotParams = (velocityScale) => scene.setRobotParams({ velocityScale });
+export const setRobotParams = (params) => scene.setRobotParams(params);
 
 export const setSimulationRenderSkip = (rs) => scene.setRenderSkip(rs);
 
@@ -146,3 +147,4 @@ export { default as CorePositionsGenerators } from './utils/positionsGenerators'
 export { default as GraphRenderer } from './benchmarking/graphRenderer';
 export { default as CorePerformanceTrackers } from './benchmarking/performanceTrackers';
 export { default as CoreControllers } from './robot/controllers';
+export { default as defaultDynamicPropertyDefinitions } from './configurationTemplate/dynamicPropertyDefinitions';
