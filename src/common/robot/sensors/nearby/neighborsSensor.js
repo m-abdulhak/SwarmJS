@@ -4,13 +4,17 @@ import { sensorSamplingTypes, CoreSensors } from '../sensorManager';
 
 const name = 'neighbors';
 
-const getNeighbors = (scene, robotId) => {
-  const neighbors = [];
+const getNeighbors = (scene, robotId, robot) => {
+  let neighbors = [];
   try {
     if (scene.voronoi?.delaunay) {
       Array.from(scene.voronoi?.delaunay.neighbors(robotId))
         .filter((x) => x > -1)
         .forEach((i) => neighbors.push(scene.robots[i]));
+    } else {
+      neighbors = scene.robots
+        .filter((r) => r.id === robotId)
+        .filter((r) => robot.getDistanceTo(r.sensors.position) < robot.radius * 10);
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -28,7 +32,7 @@ class NeighborsSensor extends Sensor {
   }
 
   sample() {
-    this.value = getNeighbors(this.scene, this.robot.id);
+    this.value = getNeighbors(this.scene, this.robot.id, this.robot);
   }
 }
 

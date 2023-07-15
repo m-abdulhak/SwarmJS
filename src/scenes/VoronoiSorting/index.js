@@ -4,7 +4,8 @@ import {
   ExtraSensors,
   CorePositionsGenerators,
   CorePerformanceTrackers,
-  CoreControllers
+  CoreControllers,
+  defaultDynamicPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -17,6 +18,13 @@ const renderables = [
   { module: 'Scene', elements: SceneRenderables },
   { module: 'Puck', elements: PuckRenderables },
   { module: 'Robot', elements: RobotRenderables }
+];
+
+const supportedDynamicProps = [
+  defaultDynamicPropertyDefinitions.robotCount,
+  defaultDynamicPropertyDefinitions.velocityScale,
+  defaultDynamicPropertyDefinitions.pucksCountG1,
+  defaultDynamicPropertyDefinitions.pucksCountG2
 ];
 
 const simConfig = {
@@ -111,7 +119,8 @@ const simConfig = {
     }
   ],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
-  renderables
+  renderables,
+  dynamicPropertyDefinitions: supportedDynamicProps
 };
 
 const benchmarkConfig = {
@@ -154,14 +163,27 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>Object sorting using Buffered Voronoi Cells (BVC).  Each robot chooses an intermediate goal location within its BVC.  This avoids the possibility of collision or conflict with other robots.  Their goal is to incremental shift the pucks towards their respective goal locations.</p>
-
-  <p>Rather than pushing pucks directly towards their goals, the robots make use of a goal map for each type of pucks.  A goal map specifies the direction a puck should be pushed in order to reach the goal, accounting for obstacles that might be in the way.</p>
+  html: `
+  <p>
+    Object sorting using Buffered Voronoi Cells (BVC). 
+    Each robot chooses an intermediate goal location within its BVC. 
+    This avoids the possibility of collision or conflict with other robots. 
+    Their goal is to incremental shift the pucks towards their respective goal locations.
+  </p>
 
   <p>
-  <a href=https://link.springer.com/chapter/10.1007/978-3-031-20176-9_27 target=_blank>
-  Abdullhak, Mohammed, and Andrew Vardy. "Distributed Sorting in Complex Environments." Swarm Intelligence: 13th International Conference, ANTS 2022, Málaga, Spain, November 2–4, 2022, Proceedings. Cham: Springer International Publishing, 2022.
-  </a>
+    Rather than pushing pucks directly towards their goals, the robots make use of a goal map for each type of pucks. 
+    A goal map specifies the direction a puck should be pushed in order to reach the goal, 
+    accounting for obstacles that might be in the way.
+  </p>
+
+  <p>
+    <a href=https://link.springer.com/chapter/10.1007/978-3-031-20176-9_27 target=_blank>
+    Abdullhak, Mohammed, and Andrew Vardy. 
+    "Distributed Sorting in Complex Environments." 
+    Swarm Intelligence: 13th International Conference, ANTS 2022, Málaga, Spain, November 2–4, 2022, 
+    Proceedings. Cham: Springer International Publishing, 2022.
+    </a>
   </p>
   `
 };

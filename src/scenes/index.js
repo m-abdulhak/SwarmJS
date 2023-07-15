@@ -4,7 +4,7 @@ import orbitalConstruction from './OrbitalConstruction';
 import beeClust from './BeeClust';
 import voronoiSorting from './VoronoiSorting';
 import simpleSorting from './Sorting';
-import demo from './Demo';
+import fieldsDemo from './FieldsDemo';
 import labyrinth from './Labyrinth';
 import orbitalConstructionBridge from './OrbitalConstructionBridge';
 import collisionAvoidance from './CollisionAvoidance';
@@ -13,7 +13,7 @@ import collisionAvoidance from './CollisionAvoidance';
 // changing this will change the order in webpage
 export default {
   beeClust,
-  demo,
+  fieldsDemo,
   densityCluster,
   peripheryCluster,
   collisionAvoidance,

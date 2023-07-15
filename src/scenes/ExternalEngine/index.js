@@ -3,7 +3,8 @@ import {
   ExtraSensors,
   CorePositionsGenerators,
   CorePerformanceTrackers,
-  CoreControllers
+  CoreControllers,
+  defaultDynamicPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -64,7 +65,8 @@ const simConfig = {
   },
   objects: [],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
-  renderables
+  renderables,
+  dynamicPropertyDefinitions: Object.values(defaultDynamicPropertyDefinitions)
 };
 
 // Define benchmark configurations:

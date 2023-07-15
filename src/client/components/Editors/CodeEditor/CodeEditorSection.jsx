@@ -42,8 +42,8 @@ function CodeEditorSection({
   return (
     <Grid container item xs={12} md={12} lg={12} spacing={1}>
       <Grid item xs={10} md={11} lg={11}>
-        <div className="code-section-header">
-          <Typography variant="subtitle1" gutterBottom className="code-section-header-title">
+        <div className="input-section-header">
+          <Typography variant="subtitle1" gutterBottom className="input-section-header-title">
             {title ?? 'Code Editor'}
           </Typography>
         </div>

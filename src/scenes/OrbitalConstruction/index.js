@@ -1,7 +1,8 @@
 import {
   CoreSensors,
   ExtraSensors,
-  CorePositionsGenerators
+  CorePositionsGenerators,
+  defaultDynamicPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -106,6 +107,12 @@ const usedSensors = {
   }
 };
 
+const supportedDynamicProps = [
+  defaultDynamicPropertyDefinitions.robotCount,
+  defaultDynamicPropertyDefinitions.velocityScale,
+  defaultDynamicPropertyDefinitions.pucksCountG1
+];
+
 const simConfig = {
   env: {
     width: 600,
@@ -153,7 +160,8 @@ const simConfig = {
   },
   objects: [],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
-  renderables
+  renderables,
+  dynamicPropertyDefinitions: supportedDynamicProps
 };
 
 const benchmarkConfig = {
@@ -187,18 +195,35 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>An implementation of the <b>Orbital Construction</b> algorithm which uses a scalar field to guide the construction of an enclosure.</p>
-
-  <p>The scalar field is just a grayscale image.  A parameter <b>tau</b> defines a contour line of the scalar field.  In this case, the contour line is a circle and <b>tau = 0.6</b> defines that circle's radius.</p>
-
-  <p>The <b style="color:cyan;">cyan robots</b> orbit the periphery, always trying to align themselves so that scalar field increases to their right.  They also try to reach the desired circle.  However, if they see a puck in their left sensor area, they will deviate to nudge it inwards.</p>
-
-  <p>The <b style="color:yellow;">yellow robots</b> operate similarly, except they react to pucks in their right sensor area and deviate to nudge them outwards.</p>
+  html: `
+  <p>
+    An implementation of the <b>Orbital Construction</b> 
+    algorithm which uses a scalar field to guide the construction of an enclosure.
+  </p>
 
   <p>
-  <a href=https://ieeexplore.ieee.org/document/8599547 target=_blank>
-  Vardy, Andrew. "Orbital construction: Swarms of simple robots building enclosures." 2018 IEEE 3rd International Workshops on Foundations and Applications of Self* Systems (FAS* W). IEEE, 2018.
-  </a>
+    The scalar field is just a grayscale image. 
+    A parameter <b>tau</b> defines a contour line of the scalar field. 
+    In this case, the contour line is a circle and <b>tau = 0.6</b> defines that circle's radius.
+  </p>
+
+  <p>
+    The <b style="color:cyan;">cyan robots</b> orbit the periphery, 
+    always trying to align themselves so that scalar field increases to their right. 
+    They also try to reach the desired circle. 
+    However, if they see a puck in their left sensor area, they will deviate to nudge it inwards.
+  </p>
+
+  <p>
+    The <b style="color:yellow;">yellow robots</b> operate similarly, 
+    except they react to pucks in their right sensor area and deviate to nudge them outwards.
+  </p>
+
+  <p>
+    <a href=https://ieeexplore.ieee.org/document/8599547 target=_blank>
+      Vardy, Andrew. "Orbital construction: Swarms of simple robots building enclosures."
+      2018 IEEE 3rd International Workshops on Foundations and Applications of Self* Systems (FAS* W). IEEE, 2018.
+    </a>
   </p>
   `
 };

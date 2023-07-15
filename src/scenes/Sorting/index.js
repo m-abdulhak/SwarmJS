@@ -4,7 +4,8 @@ import {
   ExtraSensors,
   CorePositionsGenerators,
   CorePerformanceTrackers,
-  CoreControllers
+  CoreControllers,
+  defaultDynamicPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -27,6 +28,13 @@ const renderables = [
   { module: 'Scene', elements: SceneRenderables },
   { module: 'Puck', elements: PuckRenderables },
   { module: 'Robot', elements: [...CoreRobotRenderables, ...RobotRenderables] }
+];
+
+const supportedDynamicProps = [
+  defaultDynamicPropertyDefinitions.robotCount,
+  defaultDynamicPropertyDefinitions.velocityScale,
+  defaultDynamicPropertyDefinitions.pucksCountG1,
+  defaultDynamicPropertyDefinitions.pucksCountG2
 ];
 
 const simConfig = {
@@ -81,7 +89,8 @@ const simConfig = {
   },
   objects: [],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
-  renderables
+  renderables,
+  dynamicPropertyDefinitions: supportedDynamicProps
 };
 
 const benchmarkConfig = {
@@ -124,9 +133,17 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>Object sorting using a very straightforward strategy.  Move forward, turning only to avoid a wall.  If not carrying a puck and one is encountered, pick it up.  If the robot happens to reach the puck's goal, drop it.</p>
+  html: `
+  <p>
+    Object sorting using a very straightforward strategy. Move forward, turning only to avoid a wall. 
+    If not carrying a puck and one is encountered, pick it up.
+    If the robot happens to reach the puck's goal, drop it.
+  </p>
 
-  <p>This is not a particularly effective algorithm, but rather exists for benchmarking or comparison with other approaches such as <b>Voronoi Sorting</b>.</p>
+  <p>
+    This is not a particularly effective algorithm, but rather exists for benchmarking or 
+    comparison with other approaches such as <b>Voronoi Sorting</b>.
+  </p>
   `
 };
 

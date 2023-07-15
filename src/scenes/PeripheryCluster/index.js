@@ -1,7 +1,8 @@
 import {
   CoreSensors,
   ExtraSensors,
-  CorePositionsGenerators
+  CorePositionsGenerators,
+  defaultDynamicPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -39,6 +40,12 @@ const usedSensors = {
     }
   }
 };
+
+const supportedDynamicProps = [
+  defaultDynamicPropertyDefinitions.robotCount,
+  defaultDynamicPropertyDefinitions.velocityScale,
+  defaultDynamicPropertyDefinitions.pucksCountG1
+];
 
 const simConfig = {
   env: {
@@ -79,7 +86,8 @@ const simConfig = {
   },
   objects: [],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
-  renderables
+  renderables,
+  dynamicPropertyDefinitions: supportedDynamicProps
 };
 
 const benchmarkConfig = {
@@ -115,14 +123,20 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>Self-organized object clustering.  Each robot has a single sensor which can detect pucks.  If a puck lies in the sensor region, the robot veers left.  Otherwise, it veers right.  That's it!</p>
+  html: `
+  <p>
+    Self-organized object clustering.  Each robot has a single sensor which can detect pucks. 
+    If a puck lies in the sensor region, the robot veers left. 
+    Otherwise, it veers right.  That's it!
+  </p>
 
   <p>This controller is inspired by the following paper:</p>
 
   <p>
-  <a href=https://dl.acm.org/doi/10.5555/2615731.2615800 target=_blank>
-  Gauci, Melvin, et al. "Clustering objects with robots that do not compute." Proceedings of the 2014 international conference on Autonomous agents and multi-agent systems. 2014.
-  </a>
+    <a href=https://dl.acm.org/doi/10.5555/2615731.2615800 target=_blank>
+      Gauci, Melvin, et al. "Clustering objects with robots that do not compute." 
+      Proceedings of the 2014 international conference on Autonomous agents and multi-agent systems. 2014.
+    </a>
   </p>
   `
 };
