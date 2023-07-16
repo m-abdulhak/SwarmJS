@@ -18,8 +18,10 @@ const paramParser = (type) => {
 
 function SceneConfigurations({
   sceneConfig,
-  dynamicParams = { velocityScale: 1 },
-  onDynamicPropsChange
+  dynamicParams = {},
+  staticParams = {},
+  onDynamicPropsChange,
+  onStaticPropsChange
 }) {
   const dynamicParamElems = (sceneConfig.dynamicPropertyDefinitions || []).map((def) => {
     // eslint-disable-next-line no-unused-vars
@@ -49,11 +51,32 @@ function SceneConfigurations({
     </TitledInputSection>
   );
 
+  const staticParamElems = (sceneConfig.staticPropertyDefinitions || []).map((def) => (
+    <TitledSlider
+      className="input-section-header"
+      key={`static-prop-${def.name}`}
+      title={def.title}
+      value={staticParams[def.name] ?? 0}
+      min={def.min || 0}
+      max={def.max || 50}
+      step={def.step || 1}
+      setValue={(newV) => onStaticPropsChange({ [def.name]: paramParser(def.type)(newV) })}
+      toolTip={def.desc}
+    />
+  ));
+
+  const staticConfigurationsElem = staticParamElems?.length === 0 ? null : (
+    <TitledInputSection title='Static Configurations (Require Scene Restart)'>
+      {staticParamElems}
+    </TitledInputSection>
+  );
+
   return (
     <>
       {dynamicConfigurationsElem}
+      {staticConfigurationsElem}
       <CodeEditorSection
-        title='Full Scene Configuration (Read Only)'
+        title='Full Scene Configurations (Read Only)'
         code={JSON.stringify(sceneConfig, null, 2)}
         setCode={() => {
           // TODO: update current configuration
@@ -69,7 +92,9 @@ function SceneConfigurations({
 SceneConfigurations.propTypes = {
   sceneConfig: PropTypes.object.isRequired,
   dynamicParams: PropTypes.object.isRequired,
-  onDynamicPropsChange: PropTypes.func.isRequired
+  staticParams: PropTypes.object.isRequired,
+  onDynamicPropsChange: PropTypes.func.isRequired,
+  onStaticPropsChange: PropTypes.func.isRequired
 };
 
 export default memo(SceneConfigurations);

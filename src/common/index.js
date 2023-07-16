@@ -148,3 +148,4 @@ export { default as GraphRenderer } from './benchmarking/graphRenderer';
 export { default as CorePerformanceTrackers } from './benchmarking/performanceTrackers';
 export { default as CoreControllers } from './robot/controllers';
 export { default as defaultDynamicPropertyDefinitions } from './configurationTemplate/dynamicPropertyDefinitions';
+export { default as defaultStaticPropertyDefinitions } from './configurationTemplate/staticPropertyDefinitions';

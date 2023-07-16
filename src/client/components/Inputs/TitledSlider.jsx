@@ -4,7 +4,7 @@ import { Box, Grid, Slider, Typography, Tooltip } from '@mui/material';
 
 const TitledSlider = ({ title, value, setValue, toolTip, min, max, step }) => (
   <Grid container spacing={2} item sm={12} lg={12} xl={12}>
-    <Grid item sm={2} md={2} lg={1}>
+    <Grid item sm={3} md={3} lg={1.5}>
       <Box display="flex" justifyContent="left" alignItems="center">
         <Tooltip title={toolTip}>
           <Typography variant="h7">
@@ -13,7 +13,7 @@ const TitledSlider = ({ title, value, setValue, toolTip, min, max, step }) => (
         </Tooltip>
       </Box>
     </Grid>
-    <Grid item xs sm={10} md={10} lg={11}>
+    <Grid item xs sm={9} md={9} lg={10.5} sx={{ maxWidth: '300px' }}>
       <Slider
         min={min || 0}
         max={max || 50}

@@ -4,7 +4,8 @@ import {
   CorePositionsGenerators,
   CorePerformanceTrackers,
   CoreControllers,
-  defaultDynamicPropertyDefinitions
+  defaultDynamicPropertyDefinitions,
+  defaultStaticPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';

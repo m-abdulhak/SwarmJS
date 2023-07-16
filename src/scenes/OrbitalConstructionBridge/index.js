@@ -1,8 +1,7 @@
 import {
   CoreSensors,
   ExtraSensors,
-  CorePositionsGenerators,
-  defaultDynamicPropertyDefinitions
+  CorePositionsGenerators
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -162,8 +161,7 @@ const simConfig = {
   },
   objects: [],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
-  renderables,
-  dynamicPropertyDefinitions: Object.values(defaultDynamicPropertyDefinitions)
+  renderables
 };
 
 const benchmarkConfig = {

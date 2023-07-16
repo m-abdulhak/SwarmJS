@@ -5,7 +5,8 @@ import {
   CorePositionsGenerators,
   CorePerformanceTrackers,
   CoreControllers,
-  defaultDynamicPropertyDefinitions
+  defaultDynamicPropertyDefinitions,
+  defaultStaticPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -23,8 +24,51 @@ const renderables = [
 const supportedDynamicProps = [
   defaultDynamicPropertyDefinitions.robotCount,
   defaultDynamicPropertyDefinitions.velocityScale,
-  defaultDynamicPropertyDefinitions.pucksCountG1,
-  defaultDynamicPropertyDefinitions.pucksCountG2
+  {
+    ...defaultDynamicPropertyDefinitions.pucksCountG1,
+    max: 50
+  },
+  {
+    ...defaultDynamicPropertyDefinitions.pucksCountG2,
+    max: 50
+  }
+];
+
+const supportedStaticProps = [
+  {
+    ...defaultStaticPropertyDefinitions.robotCount,
+    max: 25
+  },
+  defaultStaticPropertyDefinitions.velocityScale,
+  {
+    ...defaultStaticPropertyDefinitions.robotRadius,
+    min: 4,
+    max: 12
+  },
+  {
+    ...defaultStaticPropertyDefinitions.pucksCountG1,
+    max: 50
+  },
+  {
+    ...defaultStaticPropertyDefinitions.pucksRadiusG1,
+    min: 8,
+    max: 12
+  },
+  defaultStaticPropertyDefinitions.pucksGoalXG1,
+  defaultStaticPropertyDefinitions.pucksGoalYG1,
+  defaultStaticPropertyDefinitions.pucksGoalRadiusG1,
+  {
+    ...defaultStaticPropertyDefinitions.pucksCountG2,
+    max: 50
+  },
+  {
+    ...defaultStaticPropertyDefinitions.pucksRadiusG2,
+    min: 8,
+    max: 12
+  },
+  defaultStaticPropertyDefinitions.pucksGoalXG2,
+  defaultStaticPropertyDefinitions.pucksGoalYG2,
+  defaultStaticPropertyDefinitions.pucksGoalRadiusG2
 ];
 
 const simConfig = {
@@ -120,7 +164,8 @@ const simConfig = {
   ],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
   renderables,
-  dynamicPropertyDefinitions: supportedDynamicProps
+  dynamicPropertyDefinitions: supportedDynamicProps,
+  staticPropertyDefinitions: supportedStaticProps
 };
 
 const benchmarkConfig = {

@@ -2,7 +2,8 @@ import {
   CoreSensors,
   ExtraSensors,
   CorePositionsGenerators,
-  defaultDynamicPropertyDefinitions
+  defaultDynamicPropertyDefinitions,
+  defaultStaticPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -47,6 +48,22 @@ const supportedDynamicProps = [
   defaultDynamicPropertyDefinitions.pucksCountG1
 ];
 
+const supportedStaticProps = [
+  defaultStaticPropertyDefinitions.robotCount,
+  defaultStaticPropertyDefinitions.velocityScale,
+  {
+    ...defaultStaticPropertyDefinitions.robotRadius,
+    min: 4,
+    max: 8
+  },
+  defaultStaticPropertyDefinitions.pucksCountG1,
+  {
+    ...defaultStaticPropertyDefinitions.pucksRadiusG1,
+    min: 8,
+    max: 12
+  }
+];
+
 const simConfig = {
   env: {
     width: 600,
@@ -87,7 +104,8 @@ const simConfig = {
   objects: [],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
   renderables,
-  dynamicPropertyDefinitions: supportedDynamicProps
+  dynamicPropertyDefinitions: supportedDynamicProps,
+  staticPropertyDefinitions: supportedStaticProps
 };
 
 const benchmarkConfig = {

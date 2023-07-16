@@ -5,7 +5,8 @@ import {
   CorePositionsGenerators,
   CorePerformanceTrackers,
   CoreControllers,
-  defaultDynamicPropertyDefinitions
+  defaultDynamicPropertyDefinitions,
+  defaultStaticPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -90,7 +91,8 @@ const simConfig = {
   objects: [],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
   renderables,
-  dynamicPropertyDefinitions: supportedDynamicProps
+  dynamicPropertyDefinitions: supportedDynamicProps,
+  staticPropertyDefinitions: Object.values(defaultStaticPropertyDefinitions)
 };
 
 const benchmarkConfig = {

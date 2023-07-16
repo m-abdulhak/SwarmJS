@@ -5,7 +5,8 @@ import {
   CorePositionsGenerators,
   CorePerformanceTrackers,
   CoreControllers,
-  defaultDynamicPropertyDefinitions
+  defaultDynamicPropertyDefinitions,
+  defaultStaticPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -21,6 +22,19 @@ const renderables = [
 const supportedDynamicProps = [
   defaultDynamicPropertyDefinitions.robotCount,
   defaultDynamicPropertyDefinitions.velocityScale
+];
+
+const supportedStaticProps = [
+  defaultStaticPropertyDefinitions.envWidth,
+  defaultStaticPropertyDefinitions.envHeight,
+  {
+    ...defaultStaticPropertyDefinitions.robotCount,
+    max: 30
+  },
+  {
+    ...defaultStaticPropertyDefinitions.robotRadius,
+    max: 15
+  }
 ];
 
 const simConfig = {
@@ -55,7 +69,8 @@ const simConfig = {
   objects: [],
   positionsGenerator: CorePositionsGenerators.circularPositionsGenerator,
   renderables,
-  dynamicPropertyDefinitions: supportedDynamicProps
+  dynamicPropertyDefinitions: supportedDynamicProps,
+  staticPropertyDefinitions: supportedStaticProps
 };
 
 // TODO: add other waypoint controller to benchmark

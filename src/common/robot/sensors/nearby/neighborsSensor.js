@@ -12,7 +12,7 @@ const getNeighbors = (scene, robotId, robot) => {
         .filter((x) => x > -1)
         .forEach((i) => neighbors.push(scene.robots[i]));
     } else {
-      neighbors = scene.robots
+      neighbors = (scene.robots || [])
         .filter((r) => r.id === robotId)
         .filter((r) => robot.getDistanceTo(r.sensors.position) < robot.radius * 10);
     }
