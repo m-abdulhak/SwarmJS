@@ -3,7 +3,8 @@ import {
   CoreActuators,
   ExtraSensors,
   CorePositionsGenerators,
-  defaultDynamicPropertyDefinitions
+  defaultDynamicPropertyDefinitions,
+  defaultStaticPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -84,6 +85,14 @@ const supportedDynamicProps = [
   defaultDynamicPropertyDefinitions.robotCount
 ];
 
+const supportedStaticProps = [
+  {
+    ...defaultStaticPropertyDefinitions.robotCount,
+    max: 20
+  },
+  defaultStaticPropertyDefinitions.robotRadius
+];
+
 const simConfig = {
   env: {
     width: 600,
@@ -135,7 +144,8 @@ const simConfig = {
   objects: [],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
   renderables,
-  dynamicPropertyDefinitions: supportedDynamicProps
+  dynamicPropertyDefinitions: supportedDynamicProps,
+  staticPropertyDefinitions: supportedStaticProps
 };
 
 // Define benchmark configurations:

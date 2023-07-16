@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
 import { Delaunay } from 'd3-delaunay';
 
+// DO NOT MODIFY, ALL SCENES WILL BE AFFECTED
+// Import in scene configurations, clone, and override with desired values instead
 const dynamicPropertyDefinitions = {
   robotCount: {
     name: 'robotCount',

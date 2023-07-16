@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
+import { get, set, cloneDeep } from 'lodash';
+
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -56,12 +58,14 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [selectedScene, setSelectedScene] = useState(getSceneFromUrlQuery(options));
   const [config, setConfig] = useState(exampleConfigs[selectedScene].simConfig);
+  const [configWithUserOptions, setConfigWithUserOptions] = useState(config);
   const [selectedBackgroundField, setSelectedBackgroundField] = useState(getDefaultField(config?.env?.fields) ?? null);
   const [benchSettings, setBenchSettings] = useState(exampleConfigs[selectedScene].benchmarkConfig);
   const [description, setDescription] = useState(exampleConfigs[selectedScene].description);
   const [uiEnabled, setUiEnabled] = useState(true);
   const [time, setTime] = useState(0);
   const [dynamicParams, setDynamicParams] = useState({});
+  const [staticParams, setStaticParams] = useState({});
   const [renderSkip, setRenderSkip] = useState(1);
   const [paused, setPaused] = useState(false);
   const [benchmarkData, setBenchmarkData] = useState({});
@@ -84,6 +88,8 @@ const App = () => {
 
   const setScene = (newScene) => {
     setSelectedScene(newScene);
+    setDynamicParams({});
+    setStaticParams({});
   };
 
   const onDynamicPropsChange = useCallback((props) => {
@@ -93,6 +99,10 @@ const App = () => {
       resetRenderer();
       return newProps;
     });
+  }, []);
+
+  const onStaticPropsChange = useCallback((props) => {
+    setStaticParams((oldParams) => ({ ...oldParams, ...props }));
   }, []);
 
   const onRenderSkipChange = (newRS) => {
@@ -113,8 +123,14 @@ const App = () => {
       stopBenchmark();
     }
 
-    // TODO: check for userDefined config and merge
-    const usedConfig = { ...newConfig };
+    const usedConfig = cloneDeep(newConfig);
+
+    for (const [key, val] of Object.entries(staticParams)) {
+      const pDef = (usedConfig.staticPropertyDefinitions || []).find((def) => def.name === key);
+      if (val != null && pDef?.path) {
+        set(usedConfig, pDef.path, val);
+      }
+    }
 
     if (!useDefaultController) {
       if (controllerCode.onLoopCode) {
@@ -144,7 +160,7 @@ const App = () => {
 
     resetSimulation(usedConfig, onUpdate, updateDefaultControllerCode);
 
-    const defaultDynamicValues = usedConfig.dynamicPropertyDefinitions.reduce((acc, pDef) => {
+    const defaultDynamicValues = (usedConfig.dynamicPropertyDefinitions || []).reduce((acc, pDef) => {
       let defaultVal = pDef.defaultValue;
 
       if (defaultVal && typeof defaultVal === 'function') {
@@ -157,7 +173,16 @@ const App = () => {
     }, {});
 
     onDynamicPropsChange(defaultDynamicValues);
-    onRenderSkipChange(newConfig.env.renderSkip);
+
+    const defaultStaticValues = (usedConfig.staticPropertyDefinitions || []).reduce((acc, pDef) => {
+      acc[pDef.name] = get(usedConfig, pDef.path) ?? pDef.defaultValue;
+
+      return acc;
+    }, {});
+
+    onStaticPropsChange(defaultStaticValues);
+
+    onRenderSkipChange(usedConfig.env.renderSkip);
     setPaused(false);
     resetRenderer();
 
@@ -166,11 +191,11 @@ const App = () => {
     }
 
     if (
-      newConfig.env.fields
-      && typeof newConfig.env.fields === 'object'
-      && Object.keys(newConfig.env.fields).length > 0
+      usedConfig.env.fields
+      && typeof usedConfig.env.fields === 'object'
+      && Object.keys(usedConfig.env.fields).length > 0
     ) {
-      for (const [fieldKey, field] of Object.entries(newConfig.env.fields)) {
+      for (const [fieldKey, field] of Object.entries(usedConfig.env.fields)) {
         if (!field.url) {
           console.error(`Field ${fieldKey} has no url!`);
           return;
@@ -190,7 +215,8 @@ const App = () => {
       }
     }
 
-    setSelectedBackgroundField(getDefaultField(newConfig?.env?.fields) ?? null);
+    setSelectedBackgroundField(getDefaultField(usedConfig?.env?.fields) ?? null);
+    setConfigWithUserOptions(usedConfig);
   };
 
   const onTogglePause = () => {
@@ -255,6 +281,8 @@ const App = () => {
     sceneConfig={config}
     dynamicParams={dynamicParams}
     onDynamicPropsChange={onDynamicPropsChange}
+    staticParams={staticParams}
+    onStaticPropsChange={onStaticPropsChange}
   />;
 
   const benchElem = initialized ? (
@@ -349,9 +377,15 @@ const App = () => {
       />
       <div id="main-section">
         <div id='env-section'>
-          <div id='env-container' style={{ width: config.env.width, height: config.env.height }}>
+          <div
+            id='env-container'
+            style={{ width: configWithUserOptions.env.width, height: configWithUserOptions.env.height }}
+          >
             <div id='fields-canvas-container' ref={fieldsElemRef}/>
-            <svg id='simulation-svg' ref={svgRef} width={config.env.width} height={config.env.height}/>
+            <svg
+              id='simulation-svg'
+              ref={svgRef} width={configWithUserOptions.env.width} height={configWithUserOptions.env.height}
+            />
           </div>
         </div>
         {sceneDescriptionElem}
