@@ -2,7 +2,7 @@
 SwarmJS: Interactive Swarm Robotics Simulation
 </h1>
 
-![image](https://user-images.githubusercontent.com/5468250/149712476-0fa0c7b0-bf23-409d-9dff-90b92c9cbbb7.png)
+![mainUI](https://github.com/m-abdulhak/SwarmJS/assets/5468250/8df0998f-d18b-43c2-a09a-dec78cdc28b8)
 
 ## About
 SwarmJS is an interactive 2D simulation platform developed to prototype, benchmark, and showcase control algorithms for multi robot systems.
@@ -40,7 +40,7 @@ The simulator should then be available on: http://localhost:8080/
 ## How to Use
 SwarmJS can be used in two ways:
 * Directly from the browser: In this mode, you can change how the robots behave by modifying the controller code directly in the browser (accessible through the 'Controller' tab). This works in scenes that support user-defined controller code, such as the [demo](https://m-abdulhak.github.io/SwarmJS/?scene=demo) scene provided with SwarmJS.
-In this mode, you can only change the controller code for the robots, and other simple configurations available through the UI, such as the rendering options in the 'Options' tab. You can follow [this](***) tutorial to define and run a simple algorithm directly from the browser.
+In this mode, you can only change the controller code for the robots, and other simple configurations available through the UI, such as the rendering options in the 'Options' tab. You can follow [this](./doc/basics-tutorial.md) tutorial to define and run a simple algorithm directly from the browser.
 * Define a new scene: The full power of SwarmJS can be accessed by creating a new scene, which allows changing every detail of the simulation including, but not limited to: environment size, static obstacles, environment background, environment fields, number and size of robots, shape of robots, custom robot controllers, robot sensors (including ones provided by SwarmJS or custom sensors defined in the scene), robot actuators (including ones provided by SwarmJS or custom actuators defined in the scene), puck groups (including number, size, and color of each group), rendering configuration, benchmarking configuration (including different sets of configuration to benchmark, duration of each benchmark run, and the ability to automatically generate benchmarking graph using performance trackers and graph configuration such as time-step). You can follow [this](***) tutorial to create and configure a new scene.
 
 ## Documentation
