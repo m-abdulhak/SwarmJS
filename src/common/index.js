@@ -68,7 +68,7 @@ export const resetSimulation = (
   let defaultOnLoopCode;
   if (velocityController && typeof velocityController === 'function') {
     defaultOnLoopCode = parseFunctionToEditorCode(
-      velocityController(null, null, config?.robots?.controllers?.velocity?.onLoop)
+      velocityController({}, {}, config?.robots?.controllers?.velocity?.onLoop)
     );
   }
 

@@ -1,12 +1,12 @@
 # Basics Tutorial: Writing Controllers In the Browser
 
-In this tutorial, we will apply a simple clustering algorithm to the [empty scene](https://m-abdulhak.github.io/SwarmJS/?scene=empty), and will reach a result similar to the provided [Cluster (Periphery)](https://m-abdulhak.github.io/SwarmJS/?scene=peripheryCluster).
+In this tutorial, we will apply a simple clustering algorithm to the [empty scene](https://m-abdulhak.github.io/SwarmJS/?scene=emptyScene), to create a scene similar to the [Cluster (Periphery)](https://m-abdulhak.github.io/SwarmJS/?scene=peripheryCluster) scene.
 
 You can familiarize yourself with the user interface by reading through the [UI tutorial](./user-interface.md).
 
-Make sure the Configuration Panels are enabled using the &nbsp;<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/5.x/svgs/solid/cog.svg" width="10" height="10">&nbsp; icon in the quick actions bar.
-
 ### Changing Scene Configuration
+
+First, make sure the Configuration Panels are enabled using the &nbsp;<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/5.x/svgs/solid/cog.svg" width="10" height="10">&nbsp; icon in the quick actions bar.
 
 Start by opening the 'Configuration' tab, here we can change dynamic configurations that immediately take effect such as adding robots or pucks while the simulation is running, and we can change static configurations that take effect when the scene is restarted, but offer more options such as changing environment size, robot radius, or puck radius.
 
