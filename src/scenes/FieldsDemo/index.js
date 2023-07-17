@@ -3,7 +3,8 @@ import {
   CoreActuators,
   ExtraSensors,
   CorePositionsGenerators,
-  CorePerformanceTrackers
+  defaultDynamicPropertyDefinitions,
+  defaultStaticPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -13,7 +14,9 @@ import RobotRenderables from './robot/renderables';
 import { init, controller } from './robot/controllers/controller';
 import fieldEffects from './scene/fieldEffects';
 
+// eslint-disable-next-line import/no-duplicates
 import pheromoneUrl from './black.png';
+// eslint-disable-next-line import/no-duplicates
 import occupancyUrl from './black.png';
 
 // All renderables should be registered in this list and assigned a module property
@@ -75,8 +78,20 @@ const usedSensors = {
         }
       ]
     }
-  },
+  }
 };
+
+const supportedDynamicProps = [
+  defaultDynamicPropertyDefinitions.robotCount
+];
+
+const supportedStaticProps = [
+  {
+    ...defaultStaticPropertyDefinitions.robotCount,
+    max: 20
+  },
+  defaultStaticPropertyDefinitions.robotRadius
+];
 
 const simConfig = {
   env: {
@@ -116,8 +131,7 @@ const simConfig = {
     },
     sensors: [...Object.values(usedSensors)],
     actuators: [CoreActuators.field],
-    // The neighbors sensor doesn't work unless the Voronoi diagram is used.
-    useVoronoiDiagram: true,
+    useVoronoiDiagram: false,
     misc: {
       // EXAMPLE: passing misc objects from config to robots (has to be under 'misc' key)
       sceneSpecificMap: 'test'
@@ -129,7 +143,9 @@ const simConfig = {
   },
   objects: [],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
-  renderables
+  renderables,
+  dynamicPropertyDefinitions: supportedDynamicProps,
+  staticPropertyDefinitions: supportedStaticProps
 };
 
 // Define benchmark configurations:
@@ -180,20 +196,31 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>A demo scene to illustrate how the robots can perceive and manipulate fields.  These fields could be temperature, pheromone level, or any other such scalar field.  In this case, there is a pheromone field that the robots can sense and manipulate.  There is also an occupancy field which they have no awareness of, which could be used to track where their time is spent.</p>
+  html: `
+  <p>
+    A demo scene to illustrate how the robots can perceive and manipulate fields.
+    These fields could be temperature, pheromone level, or any other such scalar field.
+    In this case, there is a pheromone field that the robots can sense and manipulate.
+    There is also an occupancy field which they have no awareness of, 
+    which could be used to track where their time is spent.
+  </p>
   
-  <p>The controller used is inspired by the <a href=http://meyleankronemann.de/lumibots target=_black>Lumibots project</a>.  In essence, there are two rules: avoid obstacles and turn towards the strongest pheromone.</p>
+  <p>
+    The controller used is inspired by the 
+    <a href=http://meyleankronemann.de/lumibots target=_black>Lumibots project</a>.
+    In essence, there are two rules: avoid obstacles and turn towards the strongest pheromone.
+  </p>
   
   <a href=https://dl.acm.org/doi/abs/10.1145/1858171.1858249 target=_blank>
-  Kronemann, Mey Lean, and Verena V. Hafner. "Lumibots: making emergence graspable in a swarm of robots." Proceedings of the 8th ACM Conference on Designing Interactive Systems. 2010.
+    Kronemann, Mey Lean, and Verena V. Hafner. "Lumibots: making emergence graspable in a swarm of robots."
+    Proceedings of the 8th ACM Conference on Designing Interactive Systems. 2010.
   </a>
   `
 };
 
-
 export default {
   title: 'Fields Demo',
-  name: 'demo',
+  name: 'fieldsDemo',
   simConfig,
   benchmarkConfig,
   description

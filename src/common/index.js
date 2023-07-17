@@ -54,7 +54,7 @@ export const initializeSimulation = (config, updateCB) => {
 export const resetSimulation = (
   config,
   updateCallback,
-  updateControllerCode
+  updateDefaultControllerCode
 ) => {
   console.log('Resetting Sim With Config: ', config);
   const velocityController = config?.robots?.controllers?.velocity?.controller;
@@ -67,11 +67,13 @@ export const resetSimulation = (
 
   let defaultOnLoopCode;
   if (velocityController && typeof velocityController === 'function') {
-    defaultOnLoopCode = parseFunctionToEditorCode(velocityController());
+    defaultOnLoopCode = parseFunctionToEditorCode(
+      velocityController({}, {}, config?.robots?.controllers?.velocity?.onLoop)
+    );
   }
 
-  if (updateControllerCode && typeof updateControllerCode === 'function') {
-    updateControllerCode(defaultOnInitCode, defaultOnLoopCode);
+  if (updateDefaultControllerCode && typeof updateDefaultControllerCode === 'function') {
+    updateDefaultControllerCode(defaultOnInitCode, defaultOnLoopCode);
   }
 
   // THE CODE BELOW IS ALMOST IDENTICAL TO createSimulation.  YET IF WE INSERT
@@ -85,7 +87,8 @@ export const resetSimulation = (
     config.objects,
     config.algorithm,
     config.positionsGenerator,
-    gMaps
+    gMaps,
+    config.dynamicPropertyDefinitions
   );
 
   // Make scene globally available if running in browser.
@@ -112,7 +115,7 @@ export const resetSimulation = (
 
 export const controllerCodeIsValid = (loopCode, initCode) => {
   if (!scene?.robots?.length) {
-    return { valid: false, error: 'Could not find test robots.' };
+    return { valid: false, error: 'Scene does not have any robots to verify code.' };
   }
 
   // TODO: this is dangerous as tested code can corrupt robot,
@@ -135,7 +138,7 @@ export const isBenchmarking = () => benchmarkingActive();
 
 export const togglePauseSimulation = () => scene.togglePause();
 
-export const setRobotParams = (velocityScale) => scene.setRobotParams({ velocityScale });
+export const setRobotParams = (params) => scene.setRobotParams(params);
 
 export const setSimulationRenderSkip = (rs) => scene.setRenderSkip(rs);
 
@@ -146,3 +149,5 @@ export { default as CorePositionsGenerators } from './utils/positionsGenerators'
 export { default as GraphRenderer } from './benchmarking/graphRenderer';
 export { default as CorePerformanceTrackers } from './benchmarking/performanceTrackers';
 export { default as CoreControllers } from './robot/controllers';
+export { default as defaultDynamicPropertyDefinitions } from './configurationTemplate/dynamicPropertyDefinitions';
+export { default as defaultStaticPropertyDefinitions } from './configurationTemplate/staticPropertyDefinitions';

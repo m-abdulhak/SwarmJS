@@ -1,36 +1,40 @@
-import React from 'react';
+import React, { memo } from 'react';
 import propTypes from 'prop-types';
 
 import TitledSlider from '../Inputs/TitledSlider';
-import RenderingSettings from './RenderingSettings';
+import RenderingElements from './RenderingElements';
+import TitledInputSection from '../Layouts/TitledInputSection';
 
-const Options = ({
+const RenderingOptions = ({
   renderSkip,
   setRenderSkip,
   renderingElements,
   setElementEnabled
 }) => (
   <>
+  <TitledInputSection title='Rendering Options'>
     <TitledSlider
       title='Render Skip'
       value={renderSkip}
-      minValue={1}
-      maxValue={100}
+      min={1}
+      max={100}
+      step={1}
       setValue={setRenderSkip}
       toolTip='Number of simulation steps to run between frames, speeds up simulation but can cause app lag.'
     />
-    <RenderingSettings
+  </TitledInputSection>
+    <RenderingElements
       renderingElements={renderingElements}
       setElementEnabled={setElementEnabled}
     />
   </>
 );
 
-Options.propTypes = {
+RenderingOptions.propTypes = {
   renderSkip: propTypes.number.isRequired,
   setRenderSkip: propTypes.func.isRequired,
   renderingElements: propTypes.array.isRequired,
   setElementEnabled: propTypes.func.isRequired
 };
 
-export default Options;
+export default memo(RenderingOptions);

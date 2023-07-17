@@ -21,9 +21,15 @@ export default class Scene {
     staticObjectsDefinitions,
     algorithm,
     positionsGenerator,
-    gMaps
+    gMaps,
+    dynamicPropertyDefinitions
   ) {
     Window.Scene = this;
+
+    this.envConfig = envConfig;
+    this.robotsConfig = robotsConfig;
+    this.pucksConfigs = pucksConfigs;
+    this.dynamicPropertyDefinitions = dynamicPropertyDefinitions;
 
     if (envConfig?.externalEngine?.url) {
       this.externalEngine = true;
@@ -85,7 +91,8 @@ export default class Scene {
       this.robotRadius,
       this.width,
       this.height,
-      this.staticObjects
+      this.staticObjects,
+      this.getCurPosAndRadii()
     );
 
     // Initialize Robots
@@ -194,11 +201,19 @@ export default class Scene {
       this.paused = false;
     };
 
-    this.setRobotParams = ({ velocityScale }) => {
-      if (!velocityScale || typeof velocityScale !== 'number' || velocityScale <= 0) {
+    this.setRobotParams = (params) => {
+      // console.log('setRobotParams', velocityScale, robotCount);
+      if (!this.dynamicPropertyDefinitions?.length) {
         return;
       }
-      this.robots.forEach((r) => { r.velocityScale = velocityScale; });
+
+      for (const p of Object.keys(params)) {
+        const paramDef = this.dynamicPropertyDefinitions.find((x) => x.name === p);
+
+        if (paramDef && paramDef.changeHandler && typeof paramDef.changeHandler === 'function') {
+          paramDef.changeHandler(params[p], this);
+        }
+      }
     };
 
     this.setRenderSkip = (rs) => {
@@ -214,8 +229,19 @@ export default class Scene {
     this.setRobotParams.bind(this);
     this.setRenderSkip.bind(this);
 
-    this.setRobotParams({ velocityScale: robotsConfig?.params?.velocityScale || 1 });
+    this.setRobotParams({
+      velocityScale: robotsConfig?.params?.velocityScale || 1,
+      robotRadius: robotsConfig.radius
+    });
     this.setRenderSkip(envConfig.renderSkip);
+  }
+
+  getCurPosAndRadii() {
+    return [
+      ...(this.robots || []).map((r) => [r.sensors.position, r.radius]),
+      ...(this.robots || []).map((r) => [r.goal, r.radius]),
+      ...(this.pucks || []).map((p) => [p.position, p.radius])
+    ];
   }
 
   update() {
@@ -301,11 +327,12 @@ export default class Scene {
     actuators,
     envWidth,
     envHeight,
-    misc
+    misc,
+    idRangeStart = 0
   ) {
     return d3.range(numOfRobots)
       .map((i) => new Robot(
-        i,
+        idRangeStart + i,
         this.getPos(radius),
         this.getPos(radius),
         controllers,
@@ -321,14 +348,14 @@ export default class Scene {
   }
 
   initializePucksRange(pucksGroups, envWidth, envHeight, maps) {
-    const pucks = [];
-    let id = 0;
+    const pucks = this.pucks || [];
 
-    pucksGroups.forEach((puckGroup) => {
+    for (const puckGroup of pucksGroups) {
+      const idRangeStart = (pucks || []).length;
       pucks.push(
         ...d3.range(puckGroup.count)
           .map((i) => new Puck(
-            i + id,
+            i + idRangeStart,
             this.getPos(puckGroup.radius),
             puckGroup.radius,
             puckGroup.goal,
@@ -337,13 +364,55 @@ export default class Scene {
             envHeight,
             this,
             puckGroup.color,
-            maps[puckGroup.id]
+            maps[puckGroup.id],
+            puckGroup.id
           ))
       );
-
-      id += puckGroup.count;
-    });
+    }
 
     return pucks;
+  }
+
+  addPucksToGroup(puckGroupId, count) {
+    const groupConfig = this.pucksGroups.find((g) => g.id === puckGroupId);
+
+    if (!groupConfig) {
+      return;
+    }
+
+    const idRangeStart = (this.pucks || []).length;
+
+    this.pucks.push(
+      ...d3.range(count)
+        .map((i) => new Puck(
+          i + idRangeStart,
+          this.getPos(groupConfig.radius),
+          groupConfig.radius,
+          groupConfig.goal,
+          groupConfig.goalRadius,
+          this.envWidth,
+          this.envHeight,
+          this,
+          groupConfig.color,
+          this.maps?.[puckGroupId],
+          puckGroupId
+        ))
+    );
+  }
+
+  removePucksFromGroup(puckGroupId, count) {
+    const indx = [];
+
+    for (let i = 0; i < this.pucks.length; i += 1) {
+      if (this.pucks[i].group === puckGroupId) {
+        indx.push(i);
+      }
+    }
+
+    while (this.pucks.length > 0 && count > 0) {
+      const removedP = this.pucks.splice(indx.pop(), 1)[0];
+      removedP.destroy();
+      count -= 1;
+    }
   }
 }

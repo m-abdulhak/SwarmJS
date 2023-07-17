@@ -4,7 +4,9 @@ import {
   ExtraSensors,
   CorePositionsGenerators,
   CorePerformanceTrackers,
-  CoreControllers
+  CoreControllers,
+  defaultDynamicPropertyDefinitions,
+  defaultStaticPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -15,6 +17,24 @@ const renderables = [
   { module: 'Scene', elements: SceneRenderables },
   { module: 'Puck', elements: PuckRenderables },
   { module: 'Robot', elements: RobotRenderables }
+];
+
+const supportedDynamicProps = [
+  defaultDynamicPropertyDefinitions.robotCount,
+  defaultDynamicPropertyDefinitions.velocityScale
+];
+
+const supportedStaticProps = [
+  defaultStaticPropertyDefinitions.envWidth,
+  defaultStaticPropertyDefinitions.envHeight,
+  {
+    ...defaultStaticPropertyDefinitions.robotCount,
+    max: 30
+  },
+  {
+    ...defaultStaticPropertyDefinitions.robotRadius,
+    max: 15
+  }
 ];
 
 const simConfig = {
@@ -48,7 +68,9 @@ const simConfig = {
   },
   objects: [],
   positionsGenerator: CorePositionsGenerators.circularPositionsGenerator,
-  renderables
+  renderables,
+  dynamicPropertyDefinitions: supportedDynamicProps,
+  staticPropertyDefinitions: supportedStaticProps
 };
 
 // TODO: add other waypoint controller to benchmark
@@ -92,14 +114,25 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>Distributed collision avoidance algorithm based on the concept of Buffered Voronoi Cells (BVC). This novel algorithm predicts and avoids deadlock configurations.  In this scene, the robots try to reach the opposite point on the circle from where they started.</p>
-
-  <p>This scene allows you to interact with both the robots and their goals.  Each robot has a corresponding goal (small circle) and waypoint (slightly larger circle with a dotted outline).  You can click-and-drag either the robots or their goals.</p> 
+  html: `
+  <p>
+    Distributed collision avoidance algorithm based on the concept of Buffered Voronoi Cells (BVC).
+    This novel algorithm predicts and avoids deadlock configurations. 
+    In this scene, the robots try to reach the opposite point on the circle from where they started.
+  </p>
 
   <p>
-  <a href=https://ieeexplore.ieee.org/document/9636609 target=_blank>
-  Abdullhak, Mohammed, and Andrew Vardy. "Deadlock prediction and recovery for distributed collision avoidance with buffered voronoi cells." 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS). IEEE, 2021.
-  </a>
+    This scene allows you to interact with both the robots and their goals.
+    Each robot has a corresponding goal (small circle) and waypoint (slightly larger circle with a dotted outline).
+    You can click-and-drag either the robots or their goals.
+  </p> 
+
+  <p>
+    <a href=https://ieeexplore.ieee.org/document/9636609 target=_blank>
+      Abdullhak, Mohammed, and Andrew Vardy.
+      "Deadlock prediction and recovery for distributed collision avoidance with buffered voronoi cells."
+      2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS). IEEE, 2021.
+    </a>
   </p>
   `
 };

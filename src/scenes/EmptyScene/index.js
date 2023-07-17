@@ -49,6 +49,8 @@ const supportedDynamicProps = [
 ];
 
 const supportedStaticProps = [
+  defaultStaticPropertyDefinitions.envWidth,
+  defaultStaticPropertyDefinitions.envHeight,
   defaultStaticPropertyDefinitions.robotCount,
   defaultStaticPropertyDefinitions.velocityScale,
   {
@@ -56,7 +58,10 @@ const supportedStaticProps = [
     min: 4,
     max: 8
   },
-  defaultStaticPropertyDefinitions.pucksCountG1,
+  {
+    ...defaultStaticPropertyDefinitions.pucksCountG1,
+    min: 1
+  },
   {
     ...defaultStaticPropertyDefinitions.pucksRadiusG1,
     min: 8,
@@ -66,12 +71,12 @@ const supportedStaticProps = [
 
 const simConfig = {
   env: {
-    width: 600,
-    height: 400,
+    width: 300,
+    height: 300,
     renderSkip: 1
   },
   robots: {
-    count: 10,
+    count: 1,
     radius: 4,
     params: {
       velocityScale: 15
@@ -94,7 +99,7 @@ const simConfig = {
     groups: [
       {
         id: 0,
-        count: 100,
+        count: 1,
         radius: 8,
         color: 'red'
       }
@@ -143,25 +148,18 @@ const benchmarkConfig = {
 const description = {
   html: `
   <p>
-    Self-organized object clustering.  Each robot has a single sensor which can detect pucks. 
-    If a puck lies in the sensor region, the robot veers left. 
-    Otherwise, it veers right.  That's it!
+    This is an empty scene that can be used as a starting point for configuring new simulations.
   </p>
-
-  <p>This controller is inspired by the following paper:</p>
-
   <p>
-    <a href=https://dl.acm.org/doi/10.5555/2615731.2615800 target=_blank>
-      Gauci, Melvin, et al. "Clustering objects with robots that do not compute." 
-      Proceedings of the 2014 international conference on Autonomous agents and multi-agent systems. 2014.
-    </a>
+    <a href='https://github.com/m-abdulhak/SwarmJS/blob/main/doc/basics-tutorial.md'>This tutorial</a> has a 
+    step-by-step guide on how to create a new simulation using this scene.
   </p>
   `
 };
 
 export default {
-  title: 'Cluster (Periphery)',
-  name: 'peripheryCluster',
+  title: 'Empty Scene',
+  name: 'emptyScene',
   simConfig,
   benchmarkConfig,
   description
