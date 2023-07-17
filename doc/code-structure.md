@@ -1,5 +1,7 @@
 
 
+# TODO: Add description of scenes structures
+
 ## Main Modules
 - [Index](src/swarmjs-core/index.js): Provides the interface for starting and controlling the simulation, such as `initializeSimulation`, `resetSimulation`, `startBenchmark`, and `stopBenchmark`. It also exposes important objects that are imported and used when defining simulations and benchmarks such as `AvailableActuators`, `AvailableSensors`, `PositionsGenerators`, `PerformanceTrakers`, and `Controllers`.
 - [Scene](src/swarmjs-core/scene.js): Defines the `Scene` class that initializes the simulation world and all other elements in the simulation such as static objects, robots, and pucks. It is also responsible for calculating and storing global maps and Voronoi Diagrams if they are enabled. 

@@ -71,8 +71,8 @@ const supportedStaticProps = [
 
 const simConfig = {
   env: {
-    width: 600,
-    height: 400,
+    width: 300,
+    height: 300,
     renderSkip: 1
   },
   robots: {

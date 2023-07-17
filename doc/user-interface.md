@@ -32,7 +32,10 @@ This section provides more options for configuring the simulation, including the
   - Render Skip: Fine tune the number of simulation steps per rendered frame.
   - Rendering Options: Enables / disables rendering for specific elements in the simulations. These options are auto generated using the 'type' property in the renderable definition. More information about renderable definitions is available in the [rendering reference](./rendering-reference.md).
 
-- Configuration: shows the current scene configuration and allows dynamically changing some simulation parameters such as the robot velocities, when supported by the scene.
+- Configuration: 
+  - Dynamic Configurations: changes configurations that immediately take effect such as adding robots or pucks while the simulation is running
+  - Static Configurations: changes static configurations that take effect when the scene is restarted, but offer more options such as changing environment size, robot radius, or puck radius.
+  - Full Scene Configuration: shows the full scene configurations (read only).
 
 - Benchmark: allows starting and stopping benchmarking the current scene and automatically generates performance graphs according the benchmarking configuration and performance trackers. More information about benchmarking configurations is available in the [Configuration Reference](./configuration-reference.md).
 

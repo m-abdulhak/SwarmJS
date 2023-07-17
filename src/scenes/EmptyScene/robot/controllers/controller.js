@@ -38,7 +38,7 @@ export function controller(robot, params, onLoop, onInit) {
     }
   }
 
-  return (sensors) => {
+  return (sensors, actuators) => {
     return {
       linearVel: 0,
       angularVel: 0,

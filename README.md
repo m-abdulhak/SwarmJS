@@ -47,8 +47,8 @@ In this mode, you can only change the controller code for the robots, and other 
 
 The documentation is divided into several sections:
 * [User Interface](./doc/user-interface.md)
-* [How to Write Controllers In the Browser](./doc/basics-tutorial.md)
-* [How to Define New Scenes](***)
+* [How to Modify Scenes In the Browser](./doc/basics-tutorial.md)
+* [How to Create New Scenes](./doc/advanced-tutorial.md)
 * [Configuration Reference](***)
 * [Rendering Reference](***)
 * [Code Structure and Main Concepts](***)
