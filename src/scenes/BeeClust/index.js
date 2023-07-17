@@ -1,7 +1,9 @@
 import {
   CoreSensors,
   ExtraSensors,
-  CorePositionsGenerators
+  CorePositionsGenerators,
+  defaultDynamicPropertyDefinitions,
+  defaultStaticPropertyDefinitions
 } from '@common';
 
 import SceneRenderables from '@common/scene/renderables';
@@ -64,6 +66,18 @@ const usedSensors = {
   }
 };
 
+const supportedDynamicProps = [
+  defaultDynamicPropertyDefinitions.robotCount
+];
+
+const supportedStaticProps = [
+  defaultStaticPropertyDefinitions.robotCount,
+  {
+    ...defaultStaticPropertyDefinitions.robotRadius,
+    max: 8
+  }
+];
+
 const simConfig = {
   env: {
     width: 600,
@@ -92,8 +106,7 @@ const simConfig = {
     },
     sensors: [...Object.values(usedSensors)],
     actuators: [],
-    // The neighbors sensor doesn't work unless the Voronoi diagram is used.
-    useVoronoiDiagram: true,
+    useVoronoiDiagram: false,
     misc: {
       // EXAMPLE: passing misc objects from config to robots (has to be under 'misc' key)
       sceneSpecificMap: 'test'
@@ -105,7 +118,9 @@ const simConfig = {
   },
   objects: [],
   positionsGenerator: CorePositionsGenerators.randomCollisionFree,
-  renderables
+  renderables,
+  dynamicPropertyDefinitions: supportedDynamicProps,
+  staticPropertyDefinitions: supportedStaticProps
 };
 
 const benchmarkConfig = {
@@ -149,14 +164,31 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>An implementation of the BEECLUST algorithm which was originally proposed to model the ability of young bees to congregate at the warmest point in a temperature field.</p>
+  html: `
+  <p>
+    An implementation of the BEECLUST algorithm which was originally proposed to model the ability of young bees to
+    congregate at the warmest point in a temperature field.
+  </p>
   
-  <p>The number printed above each robot is the potential waiting time.  This is computed from the scalar field at the robot's current position.  We can think of this as temperature.  When another robot is sensed, the robot will enter a waiting state.  Since the waiting time is higher in high temperature areas, that is where the robots tend to cluster.  As a whole, the swarm <em>finds</em> the warmest spot without ever doing any direct temperature comparisons.</p>
+  <p>
+    The number printed above each robot is the potential waiting time.
+    This is computed from the scalar field at the robot's current position.
+    We can think of this as temperature.
+    When another robot is sensed, the robot will enter a waiting state.
+    Since the waiting time is higher in high temperature areas, that is where the robots tend to cluster.
+    As a whole, the swarm <em>finds</em> the warmest spot without ever doing any direct temperature comparisons.
+  </p>
 
-  <p><a href=https://www.thomasschmickl.eu/complexity/beeclust target=_blank>A nice informal description of the BEECLUST algorithm</a></p>
+  <p>
+    <a href=https://www.thomasschmickl.eu/complexity/beeclust target=_blank>
+      A nice informal description of the BEECLUST algorithm
+    </a>
+  </p>
 
   <a href=https://link.springer.com/article/10.1007/s10458-008-9058-5 target=_blank>
-  Schmickl, Thomas, et al. "Get in touch: cooperative decision making based on robot-to-robot collisions." Autonomous Agents and Multi-Agent Systems 18 (2009): 133-155.
+    Schmickl, Thomas, et al.
+    "Get in touch: cooperative decision making based on robot-to-robot collisions."
+    Autonomous Agents and Multi-Agent Systems 18 (2009): 133-155.
   </a>
   `
 };

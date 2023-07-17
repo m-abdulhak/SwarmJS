@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+
+import { get, set, cloneDeep } from 'lodash';
 
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -33,12 +35,11 @@ import {
 
 import QuickActions from './components/QuickActions';
 import TabContainer from './components/Layouts/TabContainer';
-import Options from './components/Options/index';
+import RenderingOptions from './components/Options/RenderingOptions';
 import Benchmark from './components/Benchmark';
 import CodeEditor from './components/Editors/CodeEditor';
 import DebugPanel from './components/Debug';
-import TitledSlider from './components/Inputs/TitledSlider';
-import CodeEditorSection from './components/Editors/CodeEditor/CodeEditorSection';
+import SceneConfigurations from './components/Options/SceneConfigurations';
 
 import exampleConfigs from '../scenes';
 
@@ -57,12 +58,14 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [selectedScene, setSelectedScene] = useState(getSceneFromUrlQuery(options));
   const [config, setConfig] = useState(exampleConfigs[selectedScene].simConfig);
+  const [configWithUserOptions, setConfigWithUserOptions] = useState(config);
   const [selectedBackgroundField, setSelectedBackgroundField] = useState(getDefaultField(config?.env?.fields) ?? null);
   const [benchSettings, setBenchSettings] = useState(exampleConfigs[selectedScene].benchmarkConfig);
   const [description, setDescription] = useState(exampleConfigs[selectedScene].description);
-  const [uiEnabled, setUiEnabled] = useState(false);
+  const [uiEnabled, setUiEnabled] = useState(true);
   const [time, setTime] = useState(0);
-  const [robotParams, setRobotParams] = useState({ velocityScale: 1 });
+  const [dynamicParams, setDynamicParams] = useState({});
+  const [staticParams, setStaticParams] = useState({});
   const [renderSkip, setRenderSkip] = useState(1);
   const [paused, setPaused] = useState(false);
   const [benchmarkData, setBenchmarkData] = useState({});
@@ -85,19 +88,30 @@ const App = () => {
 
   const setScene = (newScene) => {
     setSelectedScene(newScene);
+    setDynamicParams({});
+    setStaticParams({});
   };
 
-  const onRobotParamsChange = ({ velocityScale }) => {
-    const v = parseFloat(velocityScale);
-    setRobotParams((oldParams) => ({ ...oldParams, velocityScale: v }));
-    sceneSetRobotParams(v);
-  };
+  const onDynamicPropsChange = useCallback((props) => {
+    setDynamicParams((oldParams) => {
+      const newProps = { ...oldParams, ...props };
+      sceneSetRobotParams(newProps);
+      resetRenderer();
+      return newProps;
+    });
+  }, []);
 
-  const onRenderSkipChange = (newRS) => {
+  const onStaticPropsChange = useCallback((props) => {
+    setStaticParams((oldParams) => ({ ...oldParams, ...props }));
+  }, []);
+
+  const onRenderSkipChange = useCallback((newRS) => {
     const rs = parseInt(newRS);
     setRenderSkip(rs);
     setSimulationRenderSkip(rs);
-  };
+  }, []);
+
+  const uniqueRenderElems = useMemo(() => uniqueRenderingElements(config.renderables), [config.renderables]);
 
   const onUpdate = (newTime, scene, benchData, renderables) => {
     setTime(newTime);
@@ -106,12 +120,19 @@ const App = () => {
   };
 
   const reset = (newConfig = config, stopBench = false, useDefaultController = true) => {
+    // TODO: setLoading until scene is initialized
     if (stopBench && isBenchmarking()) {
       stopBenchmark();
     }
 
-    // TODO: check for userDefined config and merge
-    const usedConfig = { ...newConfig };
+    const usedConfig = cloneDeep(newConfig);
+
+    for (const [key, val] of Object.entries(staticParams)) {
+      const pDef = (usedConfig.staticPropertyDefinitions || []).find((def) => def.name === key);
+      if (val != null && pDef?.path) {
+        set(usedConfig, pDef.path, val);
+      }
+    }
 
     if (!useDefaultController) {
       if (controllerCode.onLoopCode) {
@@ -140,8 +161,30 @@ const App = () => {
     });
 
     resetSimulation(usedConfig, onUpdate, updateDefaultControllerCode);
-    onRobotParamsChange({ velocityScale: newConfig?.robots?.params?.velocityScale || 1 });
-    onRenderSkipChange(newConfig.env.renderSkip);
+
+    const defaultDynamicValues = (usedConfig.dynamicPropertyDefinitions || []).reduce((acc, pDef) => {
+      let defaultVal = pDef.defaultValue;
+
+      if (defaultVal && typeof defaultVal === 'function') {
+        defaultVal = defaultVal(usedConfig);
+      }
+
+      acc[pDef.name] = defaultVal;
+
+      return acc;
+    }, {});
+
+    onDynamicPropsChange(defaultDynamicValues);
+
+    const defaultStaticValues = (usedConfig.staticPropertyDefinitions || []).reduce((acc, pDef) => {
+      acc[pDef.name] = get(usedConfig, pDef.path) ?? pDef.defaultValue;
+
+      return acc;
+    }, {});
+
+    onStaticPropsChange(defaultStaticValues);
+
+    onRenderSkipChange(usedConfig.env.renderSkip);
     setPaused(false);
     resetRenderer();
 
@@ -150,11 +193,11 @@ const App = () => {
     }
 
     if (
-      newConfig.env.fields
-      && typeof newConfig.env.fields === 'object'
-      && Object.keys(newConfig.env.fields).length > 0
+      usedConfig.env.fields
+      && typeof usedConfig.env.fields === 'object'
+      && Object.keys(usedConfig.env.fields).length > 0
     ) {
-      for (const [fieldKey, field] of Object.entries(newConfig.env.fields)) {
+      for (const [fieldKey, field] of Object.entries(usedConfig.env.fields)) {
         if (!field.url) {
           console.error(`Field ${fieldKey} has no url!`);
           return;
@@ -174,7 +217,8 @@ const App = () => {
       }
     }
 
-    setSelectedBackgroundField(getDefaultField(newConfig?.env?.fields) ?? null);
+    setSelectedBackgroundField(getDefaultField(usedConfig?.env?.fields) ?? null);
+    setConfigWithUserOptions(usedConfig);
   };
 
   const onTogglePause = () => {
@@ -226,40 +270,29 @@ const App = () => {
     </div>
   );
 
-  const optionsElem = initialized ? (
-    <Options
+  const renderingOptionsElem = initialized ? (
+    <RenderingOptions
       renderSkip={renderSkip}
       setRenderSkip={onRenderSkipChange}
-      renderingElements = {uniqueRenderingElements(config.renderables)}
+      renderingElements = {uniqueRenderElems}
       setElementEnabled={setElementEnabled}
     />
   ) : <></>;
 
-  const configurationsElem = (
-    <>
-      <TitledSlider
-        title='Velocity'
-        value={robotParams.velocityScale}
-        setValue={(newV) => onRobotParamsChange({ velocityScale: newV })}
-        toolTip='Controls robots velocity, only works when supported in robot controller.'
-      />
-      <CodeEditorSection
-        title='Scene Configuration (Read Only)'
-        code={JSON.stringify(config, null, 2)}
-        setCode={() => {
-          // TODO: update current configuration
-        }}
-        foldAll
-        readOnly
-      />
-      {/* <p> TODO: Change other runtime parameters, simulation configuration, and benchmarking configuration.</p> */}
-    </>
-  );
+  const configurationsElem = <SceneConfigurations
+    sceneConfig={configWithUserOptions}
+    dynamicParams={dynamicParams}
+    onDynamicPropsChange={onDynamicPropsChange}
+    staticParams={staticParams}
+    onStaticPropsChange={onStaticPropsChange}
+  />;
 
+  // TODO: memoize
   const benchElem = initialized ? (
-    <Benchmark simConfig={config} benchSettings={benchSettings} reset={reset} data={benchmarkData}/>
+    <Benchmark simConfig={configWithUserOptions} benchSettings={benchSettings} reset={reset} data={benchmarkData}/>
   ) : <></>;
 
+  // TODO: memoize
   const controllerCodeEditor = initialized && config?.robots?.controllers?.supportsUserDefinedControllers !== false ? (
      <CodeEditor
       key={controllerCode.defaultOnInitCode}
@@ -290,7 +323,7 @@ const App = () => {
   );
 
   const tabContents = [
-    { label: 'Options', content: optionsElem },
+    { label: 'Rendering', content: renderingOptionsElem },
     { label: 'Configuration', content: configurationsElem },
     { label: 'Benchmark', content: benchElem },
     { label: 'Controller', content: controllerCodeEditor },
@@ -322,10 +355,9 @@ const App = () => {
   <div id='scene-description' dangerouslySetInnerHTML={{ __html: description?.html || null }} />
   ) : <></>;
 
-  return loading ? loadingElem : (
-    <div style={{ width: '100%' }}>
-      {selectElem}
-      <QuickActions
+  // TODO: memoize, possible split time counter into separate component
+  const quickActionsElem = (
+    <QuickActions
         setElementEnabled={setElementEnabled}
         isElementEnabled={isElementEnabled}
         renderSkip={renderSkip}
@@ -343,14 +375,26 @@ const App = () => {
         paused={paused}
         time={time}
         benchmarkData={benchmarkData}
-        simConfig={config}
+        simConfig={configWithUserOptions}
         benchSettings={benchSettings}
       />
+  );
+
+  return loading ? loadingElem : (
+    <div style={{ width: '100%' }}>
+      {selectElem}
+      {quickActionsElem}
       <div id="main-section">
         <div id='env-section'>
-          <div id='env-container' style={{ width: config.env.width, height: config.env.height }}>
+          <div
+            id='env-container'
+            style={{ width: configWithUserOptions.env.width, height: configWithUserOptions.env.height }}
+          >
             <div id='fields-canvas-container' ref={fieldsElemRef}/>
-            <svg id='simulation-svg' ref={svgRef} width={config.env.width} height={config.env.height}/>
+            <svg
+              id='simulation-svg'
+              ref={svgRef} width={configWithUserOptions.env.width} height={configWithUserOptions.env.height}
+            />
           </div>
         </div>
         {sceneDescriptionElem}

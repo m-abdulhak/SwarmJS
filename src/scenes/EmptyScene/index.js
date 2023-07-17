@@ -49,6 +49,8 @@ const supportedDynamicProps = [
 ];
 
 const supportedStaticProps = [
+  defaultStaticPropertyDefinitions.envWidth,
+  defaultStaticPropertyDefinitions.envHeight,
   defaultStaticPropertyDefinitions.robotCount,
   defaultStaticPropertyDefinitions.velocityScale,
   {
@@ -56,7 +58,10 @@ const supportedStaticProps = [
     min: 4,
     max: 8
   },
-  defaultStaticPropertyDefinitions.pucksCountG1,
+  {
+    ...defaultStaticPropertyDefinitions.pucksCountG1,
+    min: 1
+  },
   {
     ...defaultStaticPropertyDefinitions.pucksRadiusG1,
     min: 8,
@@ -71,7 +76,7 @@ const simConfig = {
     renderSkip: 1
   },
   robots: {
-    count: 10,
+    count: 1,
     radius: 4,
     params: {
       velocityScale: 15
@@ -94,7 +99,7 @@ const simConfig = {
     groups: [
       {
         id: 0,
-        count: 100,
+        count: 1,
         radius: 8,
         color: 'red'
       }
@@ -160,8 +165,8 @@ const description = {
 };
 
 export default {
-  title: 'Cluster (Periphery)',
-  name: 'peripheryCluster',
+  title: 'Empty Scene',
+  name: 'emptyScene',
   simConfig,
   benchmarkConfig,
   description

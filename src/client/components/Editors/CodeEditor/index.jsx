@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable no-eval */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import PropTypes from 'prop-types';
 import Alert from '@mui/material/Alert';
 import Accordion from '@mui/material/Accordion';
@@ -227,4 +227,4 @@ CodeEditor.propTypes = {
   })).isRequired
 };
 
-export default CodeEditor;
+export default memo(CodeEditor);

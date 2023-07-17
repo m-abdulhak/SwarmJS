@@ -2,8 +2,9 @@ import { World, Bodies, Body } from 'matter-js';
 import { getDistance } from '../utils/geometry';
 
 export default class Puck {
-  constructor(id, position, radius, goal, goalRadius, envWidth, envHeight, scene, color, map) {
+  constructor(id, position, radius, goal, goalRadius, envWidth, envHeight, scene, color, map, groupId) {
     this.id = id;
+    this.group = groupId;
     this.prevPosition = position;
     this.velocityScale = 1;
     this.groupGoal = { ...goal };
@@ -115,5 +116,9 @@ export default class Puck {
       skipOrbit: true,
       fromPuck: true
     };
+  }
+
+  destroy() {
+    World.remove(this.world, this.body);
   }
 }

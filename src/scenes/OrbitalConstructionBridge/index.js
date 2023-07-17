@@ -195,14 +195,15 @@ const benchmarkConfig = {
 };
 
 const description = {
-  html: `<p>
-  The task is planar construction, as in the
-  <a href="./?scene=OrbitalConstruction">the Orbital Construction scene</a>,
-  but using an externally defined controller that is connected via a Websocket bridge.
-  The python code controlling this scene is in
-  <code>./robot/controllers/orbital_construction.py</code>
-  and the backend server that handles websocket connection with swarmJS is
-  <code>./externalControllerServer.py</code>.
+  html: `
+  <p>
+    The task is planar construction, as in the
+    <a href="./?scene=OrbitalConstruction">the Orbital Construction scene</a>,
+    but using an externally defined controller that is connected via a Websocket bridge.
+    The python code controlling this scene is in
+    <code>./robot/controllers/orbital_construction.py</code>
+    and the backend server that handles websocket connection with swarmJS is
+    <code>./externalControllerServer.py</code>.
   </p>
 
   <h2>How to Run</h2>
