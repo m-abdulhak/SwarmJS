@@ -352,7 +352,6 @@ export default class Scene {
 
     for (const puckGroup of pucksGroups) {
       const idRangeStart = (pucks || []).length;
-      console.log('range start for group', puckGroup, 'is', idRangeStart);
       pucks.push(
         ...d3.range(puckGroup.count)
           .map((i) => new Puck(
@@ -382,8 +381,6 @@ export default class Scene {
     }
 
     const idRangeStart = (this.pucks || []).length;
-
-    console.log('range start for group', groupConfig, 'is', idRangeStart);
 
     this.pucks.push(
       ...d3.range(count)

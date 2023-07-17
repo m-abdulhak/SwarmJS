@@ -54,7 +54,7 @@ export const initializeSimulation = (config, updateCB) => {
 export const resetSimulation = (
   config,
   updateCallback,
-  updateControllerCode
+  updateDefaultControllerCode
 ) => {
   console.log('Resetting Sim With Config: ', config);
   const velocityController = config?.robots?.controllers?.velocity?.controller;
@@ -67,11 +67,13 @@ export const resetSimulation = (
 
   let defaultOnLoopCode;
   if (velocityController && typeof velocityController === 'function') {
-    defaultOnLoopCode = parseFunctionToEditorCode(velocityController());
+    defaultOnLoopCode = parseFunctionToEditorCode(
+      velocityController(null, null, config?.robots?.controllers?.velocity?.onLoop)
+    );
   }
 
-  if (updateControllerCode && typeof updateControllerCode === 'function') {
-    updateControllerCode(defaultOnInitCode, defaultOnLoopCode);
+  if (updateDefaultControllerCode && typeof updateDefaultControllerCode === 'function') {
+    updateDefaultControllerCode(defaultOnInitCode, defaultOnLoopCode);
   }
 
   // THE CODE BELOW IS ALMOST IDENTICAL TO createSimulation.  YET IF WE INSERT
@@ -113,7 +115,7 @@ export const resetSimulation = (
 
 export const controllerCodeIsValid = (loopCode, initCode) => {
   if (!scene?.robots?.length) {
-    return { valid: false, error: 'Could not find test robots.' };
+    return { valid: false, error: 'Scene does not have any robots to verify code.' };
   }
 
   // TODO: this is dangerous as tested code can corrupt robot,

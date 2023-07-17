@@ -8,6 +8,7 @@ import fieldsDemo from './FieldsDemo';
 import labyrinth from './Labyrinth';
 import orbitalConstructionBridge from './OrbitalConstructionBridge';
 import collisionAvoidance from './CollisionAvoidance';
+import emptyScene from './EmptyScene';
 // import ExternalEngine from './ExternalEngine';
 
 // changing this will change the order in webpage
@@ -21,5 +22,6 @@ export default {
   orbitalConstruction,
   orbitalConstructionBridge,
   simpleSorting,
-  voronoiSorting
+  voronoiSorting,
+  emptyScene
 };

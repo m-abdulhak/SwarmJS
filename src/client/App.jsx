@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 
 import { get, set, cloneDeep } from 'lodash';
 
@@ -105,11 +105,13 @@ const App = () => {
     setStaticParams((oldParams) => ({ ...oldParams, ...props }));
   }, []);
 
-  const onRenderSkipChange = (newRS) => {
+  const onRenderSkipChange = useCallback((newRS) => {
     const rs = parseInt(newRS);
     setRenderSkip(rs);
     setSimulationRenderSkip(rs);
-  };
+  }, []);
+
+  const uniqueRenderElems = useMemo(() => uniqueRenderingElements(config.renderables), [config.renderables]);
 
   const onUpdate = (newTime, scene, benchData, renderables) => {
     setTime(newTime);
@@ -272,23 +274,25 @@ const App = () => {
     <RenderingOptions
       renderSkip={renderSkip}
       setRenderSkip={onRenderSkipChange}
-      renderingElements = {uniqueRenderingElements(config.renderables)}
+      renderingElements = {uniqueRenderElems}
       setElementEnabled={setElementEnabled}
     />
   ) : <></>;
 
   const configurationsElem = <SceneConfigurations
-    sceneConfig={config}
+    sceneConfig={configWithUserOptions}
     dynamicParams={dynamicParams}
     onDynamicPropsChange={onDynamicPropsChange}
     staticParams={staticParams}
     onStaticPropsChange={onStaticPropsChange}
   />;
 
+  // TODO: memoize
   const benchElem = initialized ? (
-    <Benchmark simConfig={config} benchSettings={benchSettings} reset={reset} data={benchmarkData}/>
+    <Benchmark simConfig={configWithUserOptions} benchSettings={benchSettings} reset={reset} data={benchmarkData}/>
   ) : <></>;
 
+  // TODO: memoize
   const controllerCodeEditor = initialized && config?.robots?.controllers?.supportsUserDefinedControllers !== false ? (
      <CodeEditor
       key={controllerCode.defaultOnInitCode}
@@ -351,10 +355,9 @@ const App = () => {
   <div id='scene-description' dangerouslySetInnerHTML={{ __html: description?.html || null }} />
   ) : <></>;
 
-  return loading ? loadingElem : (
-    <div style={{ width: '100%' }}>
-      {selectElem}
-      <QuickActions
+  // TODO: memoize, possible split time counter into separate component
+  const quickActionsElem = (
+    <QuickActions
         setElementEnabled={setElementEnabled}
         isElementEnabled={isElementEnabled}
         renderSkip={renderSkip}
@@ -372,9 +375,15 @@ const App = () => {
         paused={paused}
         time={time}
         benchmarkData={benchmarkData}
-        simConfig={config}
+        simConfig={configWithUserOptions}
         benchSettings={benchSettings}
       />
+  );
+
+  return loading ? loadingElem : (
+    <div style={{ width: '100%' }}>
+      {selectElem}
+      {quickActionsElem}
       <div id="main-section">
         <div id='env-section'>
           <div
