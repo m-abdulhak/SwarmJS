@@ -54,8 +54,6 @@ const supportedStaticProps = [
     min: 8,
     max: 12
   },
-  defaultStaticPropertyDefinitions.pucksGoalXG1,
-  defaultStaticPropertyDefinitions.pucksGoalYG1,
   defaultStaticPropertyDefinitions.pucksGoalRadiusG1,
   {
     ...defaultStaticPropertyDefinitions.pucksCountG2,
@@ -66,8 +64,6 @@ const supportedStaticProps = [
     min: 8,
     max: 12
   },
-  defaultStaticPropertyDefinitions.pucksGoalXG2,
-  defaultStaticPropertyDefinitions.pucksGoalYG2,
   defaultStaticPropertyDefinitions.pucksGoalRadiusG2
 ];
 

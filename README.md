@@ -18,9 +18,11 @@ SwarmJS is tailored towards mobile robots operating in the plane and engaged in 
 
 ## Getting Started
 
+You can start by watching the [video introdution](https://www.youtube.com/watch?v=LUtpTkcM_ZI) or trying SwarmJS youself [here](https://m-abdulhak.github.io/SwarmJS).
+
 Simulations in SwarmJS are defined as 'scenes'. A scene defines a set of configurations that describe every detail in the simulation. Multiple scenes are provided in SwarmJS to showcase the various capabilities of the simulator, some of which offer the ability to modify the control algorithm directly from the browser while others only enable modifications by cloning the repository and changing the code. Scenes can be selected and run with the scene selector in the quick actions menu.
 
-The latest version of the simulator is available [here](https://m-abdulhak.github.io/SwarmJS), you can modify, run, and benchmark control algorithms for scenes that support user-defined controllers directly in the browser.
+The latest version of the simulator is available on https://m-abdulhak.github.io/SwarmJS, you can modify, run, and benchmark control algorithms for scenes that support user-defined controllers directly in the browser.
 
 You can also run a local instance with the following steps: 
 
