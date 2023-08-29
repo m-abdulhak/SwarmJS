@@ -1,3 +1,10 @@
+@media (max-width: 768px) {   
+    body {
+        min-width: 800px;
+        display: flex;
+    }
+}
+
 .loading-screen {
     position: absolute;
     left: 0px;
@@ -215,6 +222,7 @@
         max-width: 97%;
     }
 }
+
 #scene-description :first-child {
     margin-top: 0px;
 }
