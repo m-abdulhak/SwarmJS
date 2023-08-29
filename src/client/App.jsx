@@ -338,6 +338,14 @@ const App = () => {
     }
   ];
 
+  const sceneDescriptionElem = description?.html ? (
+    <div dangerouslySetInnerHTML={{ __html: description?.html }} />
+  ) : null;
+
+  if (sceneDescriptionElem) {
+    tabContents.unshift({ label: 'About Scene', content: sceneDescriptionElem });
+  }
+
   const ui = uiEnabled ? (
     <TabContainer tabContents={tabContents} />
   ) : <></>;
@@ -350,10 +358,6 @@ const App = () => {
         </div>
       </Box>
   );
-
-  const sceneDescriptionElem = description?.html ? (
-  <div id='scene-description' dangerouslySetInnerHTML={{ __html: description?.html || null }} />
-  ) : <></>;
 
   // TODO: memoize, possible split time counter into separate component
   const quickActionsElem = (
@@ -397,7 +401,6 @@ const App = () => {
             />
           </div>
         </div>
-        {sceneDescriptionElem}
       </div>
       {ui}
     </div>
