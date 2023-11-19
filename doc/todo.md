@@ -1,13 +1,3 @@
-
-
-************
-
-Simulations in SwarmJS are defined as 'scenes'. A scene is defined by a set of configurations that specify every detail in the simulation starting from basic environment properties such as the environment's width and height, and up to complex the robots' controllers, performance trackers that can be used in benchmarking, and rendering configuration that define which parts of the simulation are rendered and how they are rendered.
-A detailed list of all available configurations is documented [here](***).
-
-**************
-
-
 ## TODO:
 
 UI:

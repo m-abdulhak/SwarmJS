@@ -5,7 +5,7 @@
 
 ## Quick Actions
 
-The quick action section contains the scene selector at the top which shows all available scenes configured in SwarmJS and a direct link &nbsp;<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/link.svg" width="10" height="10">&nbsp; to the current scene.
+The quick action section contains the scene selector at the top which shows all available scenes configured in `SwarmJS` and a direct link &nbsp;<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/link.svg" width="10" height="10">&nbsp; to the current scene.
 
 <p align="center">
   <img src="https://github.com/m-abdulhak/SwarmJS/assets/5468250/1d4f48a1-ba84-45a5-aeb5-2ec40e88e130" height="100">
