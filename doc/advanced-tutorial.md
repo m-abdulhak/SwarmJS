@@ -1,4 +1,4 @@
-# Advanced Tutorial: Creating a New Scene
+# Advanced Tutorial: Creating New Scenes
 
 In this tutorial, we will create a new scene and re-implement the simple clustering algorithm to found in the [Cluster (Periphery)](https://m-abdulhak.github.io/SwarmJS/?scene=peripheryCluster) scene.
 
@@ -8,8 +8,8 @@ This tutorial will only work by cloning the project and running it locally as it
 
 First, create a new folder under the 'src/scenes' folder and name it 'myScene'. Then create a new file under the 'myScene' folder and name it 'index.js'. This file will contain the code for the scene, and will be loaded automatically by the simulator when the scene is selected from the scene selector.
 
-The 'index.js' file should always export a default object containing all the properties and configurations SwarmJS needs to run the scene. The object should have the following shape: 
-```
+The 'index.js' file should always export a default object containing all the properties and configurations `SwarmJS` needs to run the scene. The object should have the following shape: 
+```js
 export default {
   title: 'My Scene',
   name: 'myScene',
@@ -24,7 +24,7 @@ export default {
 The title, name, and description properties are used to display information about the scene in the UI such as the scene selector.
 
 The simConfig and benchmarkConfig properties are used to configure the simulation and benchmarking respectively. We will discuss the simConfig and benchmarkConfig properties in more details in the [Configuration Reference](./configuration-reference.md) section, but let's define simple configurations for now. Add the following variables to the file:
-```
+```js
 import {
   CoreSensors,
   CorePositionsGenerators,
@@ -134,11 +134,11 @@ The robots property defines:
 
 - sensors: 
 
-  an array of sensors to be attached to each robot, commonly used sensors are defined in the '@common' package in SwarmJS under 'CoreSensors'.
+  an array of sensors to be attached to each robot, commonly used sensors are defined in the '@common' package in `SwarmJS` under 'CoreSensors'.
 
 - actuators: 
 
-  an array of actuators to be attached to each robot, commonly used actuators are defined in the '@common' package in SwarmJS under 'CoreActuators'. We will not be using any actuators in this scene.
+  an array of actuators to be attached to each robot, commonly used actuators are defined in the '@common' package in `SwarmJS` under 'CoreActuators'. We will not be using any actuators in this scene.
 
 - useVoronoiDiagram: 
 
@@ -159,19 +159,19 @@ The pucks property defines:
 The objects property defines an array of static objects in the scene, we will not be adding any static obstacles in this scene.
 
 #### positionsGenerator
-The positionsGenerator property defines the function used to generate the initial positions of the robots and pucks. commonly used positions generators are defined in the '@common' package in SwarmJS under 'CorePositionsGenerators'.
+The positionsGenerator property defines the function used to generate the initial positions of the robots and pucks. commonly used positions generators are defined in the '@common' package in `SwarmJS` under 'CorePositionsGenerators'.
 
 #### renderables
 The renderables property is an array that defines all the rendering configuration for the scene, this topic is discussed in more details in the [Rendering Reference](./rendering-reference.md).
 
-All renderables (such as static obstacles, robot body, robot sensors,... ) should be registered in this list and assigned a module property. SwarmJS will generate all the required code to render these properties and will add a UI toggle in the 'Rendering' page that allows properties that share the same tag to be disabled/enabled independently.
+All renderables (such as static obstacles, robot body, robot sensors,... ) should be registered in this list and assigned a module property. `SwarmJS` will generate all the required code to render these properties and will add a UI toggle in the 'Rendering' page that allows properties that share the same tag to be disabled/enabled independently.
 
 For this scene, we will only be using the default renderables defined in each of the three modules: Scene, Puck, and Robot.
 
 ### Registering The New Scene
 
 The final step is to register the new scene in the 'src/scenes/index.js' file, which defines all the scenes that are injected into the simulator. Import the new scene configurations and add the scene to the list of exported scenes as follows:
-```
+```js
 import myScene from './MyScene';
 
 export default {
@@ -191,7 +191,7 @@ As discussed earlier the controller is defined as a higher-order function (a fun
 - Loop: This can be done by modifying the inner function, this function gets executed for each robot at every time step in the simulation. It has access to the robot's sensors and actuators as well as access to all the constants, variables, and functions defined in the initialization step. It can also access the robot using the 'robot' object and the entire scene using the 'robot.scene' object.
 
 First we will use the initialization step to  define two constants for specifying the maximum forward and angular speeds. Modify the code in the 'Initialize' section to be:
-```
+```js
 velocity: {
   controller: (robot) => {
     const maxAngularSpeed = 0.015;
@@ -210,7 +210,7 @@ Then we will do the following steps in the loop function:
 - detect the number of pucks on the left side of the robot using the 'polygons' sensors provided by SwarmJS
 - set the angular speed of the robot to be the 'maxAngularSpeed' to the left (negative) if there are any pucks detected by the sensor on the left side of the robot or to the right (positive) otherwise
 - set the forward speed as the 'maxForwardSpeed' and send the new speeds to the robot as relative speeds by setting the appropriate velocity properties in the return value of the loop function as follows:
-  ```
+  ```js
   velocity: {
     controller: (robot) => {
       const maxAngularSpeed = 0.015;
@@ -230,9 +230,9 @@ Then we will do the following steps in the loop function:
   }
   ```
 
-This controller code uses the 'polygons' sensor, which is not part of the 'CoreSensors' we used in this scene, but is provided by SwarmJS under 'ExtraSensors'. So we should enable it with these steps:
+This controller code uses the 'polygons' sensor, which is not part of the 'CoreSensors' we used in this scene, but is provided by `SwarmJS` under 'ExtraSensors'. So we should enable it with these steps:
 - Add 'ExtraSensors' to the list of imports at the top of the file:
-  ```
+  ```js
   import {
     CoreSensors,
     ExtraSensors,
@@ -242,7 +242,7 @@ This controller code uses the 'polygons' sensor, which is not part of the 'CoreS
   ```
 
 - Add the 'polygons' sensor to the list of sensors attached to the robot as follows:
-  ```
+  ```js
   sensors: [
     ...Object.values(CoreSensors),
     {
@@ -276,12 +276,12 @@ These should be all the changes needed to get the algorithm working, refresh the
 
 ### Adding Dynamic Configurations
 
-This can be done by adding a 'velocity' slider in the Dynamic Configurations panel, the configuration for this slider is available in the '@common' package in SwarmJS under 'defaultDynamicPropertyDefinitions.velocityScale'.
+This can be done by adding a 'velocity' slider in the Dynamic Configurations panel, the configuration for this slider is available in the '@common' package in `SwarmJS` under 'defaultDynamicPropertyDefinitions.velocityScale'.
 
 To enable this slider we need to make two changes:
 
 - Import the 'defaultDynamicPropertyDefinitions.velocityScale' and pass it to the scene under the 'dynamicPropertyDefinitions' property in the scene configuration object:
-  ```
+  ```js
   import {
     CoreSensors,
     ExtraSensors,
@@ -301,7 +301,7 @@ To enable this slider we need to make two changes:
   Tip: You can also add other dynamic properties to the scene by adding them to the 'dynamicPropertyDefinitions' array such as the 'defaultDynamicPropertyDefinitions.robotCount' which allows dynamically changing the number of robots in the scene, or the 'defaultDynamicPropertyDefinitions.pucksCountG1' which allows dynamically changing the number of pucks in the first group, or you can even define your own dynamic properties by following the same structure as the ones defined in the 'defaultDynamicPropertyDefinitions'.
 
 - Update the controller function to use the 'velocityScale' property in the robot as follows:
-  ```
+  ```js
   (sensors, actuators) => {
     const leftPucks = sensors.polygons.left.reading.pucks;
     const angularSpeed = leftPucks > 0 ? -maxAngularSpeed : maxAngularSpeed;
@@ -323,7 +323,7 @@ The benchmarkConfig variable we defined earlier is used to configure the benchma
 
 Each configuration in the 'simConfigs' array defines a set of configurations to benchmark, each configuration has a name and a simConfig property, the name is used to identify the configuration in the benchmarking graph, and the simConfig property is used to define the configuration that will overwrite the default simulation configuration, it can change any of the configurations we discussed earlier, such as the number of robots, number of pucks, controller code, sensor parameters, etc.
 
-The 'trackers' property defines the performance trackers to use, commonly used trackers are defined in the '@common' package in SwarmJS under 'CorePerformanceTrackers', but you can also define your own trackers by following the same structure as the ones defined in the 'CorePerformanceTrackers' module.
+The 'trackers' property defines the performance trackers to use, commonly used trackers are defined in the '@common' package in `SwarmJS` under 'CorePerformanceTrackers', but you can also define your own trackers by following the same structure as the ones defined in the 'CorePerformanceTrackers' module.
 
 The performance trackers are used to track the performance of the algorithm over time, they can be used to track any metric, such as the number of pucks clustered, the number of robots clustered, the number of collisions, the number of times the algorithm failed, etc. The trackers are run at each time step and can access the robot and the scene to get the required information.
 
@@ -340,7 +340,7 @@ Challenge: This tracker does not provide useful information for measuring perfor
 You might notice the the scene is rendering extra elements such as the robot's 'goal' and 'waypoint' that are not part of the scene. These elements are defined in the default renderables we used in the scene, and can be disabled by overriding the 'Robot' renderable.
 
 We can do this be defining a new robot renderables array:
-```
+```js
 const MyRobotRenderables = [
   {
     type: 'Body',
@@ -427,7 +427,7 @@ const MyRobotRenderables = [
 ];
 ```
 Then replace the 'Robot' renderable in the 'renderables' array with the new renderables array:
-```
+```js
 renderables: [
   { module: 'Scene', elements: SceneRenderables },
   { module: 'Puck', elements: PuckRenderables },
@@ -443,7 +443,7 @@ The new renderables array defines three renderables:
   - shape: This property defines the shape of the renderable, it can be 'circle', 'path', or 'polygon', or other.
   - staticAttrs: This property defines the static attributes of the renderable, these attributes are set once when the renderable is created and do not change afterwards.
   - dynamicAttrs: This property defines the dynamic attributes of the renderable, these attributes are updated at each time step.
-  - styles: This property defines the styles of the renderable, these styles are updated at each time step.
+  - styles: This property defines the styles of the renderable, these styles are set once when the renderable is created and do not change afterwards.
   - drag: This property defines the drag behavior of the renderable, it can be used to enable/disable dragging the renderable with the mouse, it can also be used to define styles that are applied when the drag starts and ends, and logs that are written to the developer console (useful for debugging).
 - Orientation: This renderable is used to render the robot orientation, it is defined in the same way as the default robot orientation renderable.
 - Sensor: This renderable is used to render the 'polygons' sensor, it is defined in the same way as the default 'polygons' sensor renderable.
@@ -452,9 +452,9 @@ The new renderables array defines three renderables:
 
 By now the scene you created should be identical to the [Cluster (Periphery)](https://m-abdulhak.github.io/SwarmJS/?scene=peripheryCluster) scene, and you should now have a better understanding of how to create new scenes and how to modify existing scenes.
 
-There are still a lot of features and capabilities in SwarmJS that we did not cover in this tutorial, but you should now have a good understanding of the main concepts and should be able to explore the rest of the scenes on your own.
+There are still a lot of features and capabilities in `SwarmJS` that we did not cover in this tutorial, but you should now have a good understanding of the main concepts and should be able to explore the rest of the scenes on your own.
 
-So make sure to check out the other tutorials and the [Configuration Reference](./configuration-reference.md) and [Rendering Reference](./rendering-reference.md) and to play around with the other scenes to get a better understanding of what SwarmJS can do.
+So make sure to check out the other tutorials and the [Configuration Reference](./configuration-reference.md) and [Rendering Reference](./rendering-reference.md) and to play around with the other scenes to get a better understanding of what `SwarmJS` can do.
 
-Thank you for reading this tutorial, and I hope you enjoy using SwarmJS as much as I enjoyed developing it.
+Thank you for reading this tutorial, and I hope you enjoy using `SwarmJS` as much as I enjoyed developing it.
 
