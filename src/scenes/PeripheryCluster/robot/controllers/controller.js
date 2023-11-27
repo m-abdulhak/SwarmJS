@@ -41,12 +41,14 @@ export function controller(robot, params, onLoop, onInit) {
   }
 
   return (sensors) => {
-    const leftPucks = sensors.polygons.left.reading.pucks;
-    const angularSpeed = leftPucks > 0 ? -CONST.maxAngularSpeed : CONST.maxAngularSpeed;
+    const pucksDetected = sensors.polygons.left.reading.pucks;
+
+    const forwardSpeed = 1;
+    const angularSpeed = pucksDetected > 0 ? -1 : 1;
 
     return {
-      linearVel: CONST.maxForwardSpeed * robot.velocityScale,
-      angularVel: angularSpeed * robot.velocityScale,
+      linearVel: forwardSpeed * CONST.maxForwardSpeed * robot.velocityScale,
+      angularVel: angularSpeed * CONST.maxAngularSpeed * robot.velocityScale,
       type: robot.SPEED_TYPES.RELATIVE
     };
   };

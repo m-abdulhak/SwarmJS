@@ -73,7 +73,10 @@ const sensorsRenderables = [
       stroke: 'none'
     },
     dynamicAttrs: {
-      fill: 'rgb(0, 0, 255, 0.15)',
+      fill: {
+        prop: 'sensors.polygons.left.reading',
+        modifier: (val) => ((val.robots) ? 'rgba(255,255,0,0.5)' : (val.pucks) ? 'rgba(255,0,0,0.5)' : 'rgba(200,200,200,0.5)')
+      },
       points: { prop: 'sensors.polygons.left.vertices' }
     },
     styles: {
