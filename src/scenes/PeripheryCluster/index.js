@@ -35,7 +35,7 @@ const usedSensors = {
                   { type: 'Polar', name: '1', coords: { distance: 100, angle: (0.0 * Math.PI) / 2 } },
                   { type: 'Cartesian', name: 'bottomRight', coords: { x: 0, y: 5 } }
                 ],
-                sensedTypes: ['pucks']
+                sensedTypes: ['pucks', 'robots']
               }
             ]
     }
