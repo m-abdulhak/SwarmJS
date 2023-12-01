@@ -1,4 +1,4 @@
-<h1 align="center" >
+<h1 align="center">
 SwarmJS: Interactive Swarm Robotics Simulation
 </h1>
 
